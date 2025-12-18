@@ -16,8 +16,10 @@
             "mcp__linear__list_projects",
             "mcp__linear__list_issue_labels",
             "mcp__linear__list_users",
+            "mcp__linear__list_issues",
+            "mcp__linear__list_issue_statuses",
             "mcp__linear__create_issue",
-            "mcp__linear__list_issues"
+            "mcp__linear__update_issue"
         ],
         "deny": [
             "Read(.env)",
