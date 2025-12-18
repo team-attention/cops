@@ -1,0 +1,34 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(cat:*)",
+            "Bash(find:*)",
+            "Bash(grep:*)",
+            "Bash(git log:*)",
+            "Bash(tree:*)",
+            "Bash(xargs:*)",
+            "Bash(go build:*)",
+            "mcp__context7__resolve-library-id",
+            "mcp__context7__get-library-docs",
+            "mcp__ide__getDiagnostics",
+            "mcp__linear__get_issue",
+            "mcp__linear__list_teams",
+            "mcp__linear__list_projects",
+            "mcp__linear__list_issue_labels",
+            "mcp__linear__list_users",
+            "mcp__linear__create_issue",
+            "mcp__linear__list_issues"
+        ],
+        "deny": [
+            "Read(.env)",
+            "Read(**/.env)",
+            "Read(**/.env.*)",
+            "Read(**/secret*.{yaml,yml})"
+        ]
+    },
+    "enableAllProjectMcpServers": true,
+    "enabledMcpjsonServers": [
+        "context7",
+        "linear"
+    ]
+}

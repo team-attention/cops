@@ -1,0 +1,26 @@
+{
+    "mcpServers": {
+        "linear": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "mcp-remote",
+                "https://mcp.linear.app/mcp",
+                "--header",
+                "Authorization: Bearer ${LINEAR_API_KEY}"
+            ],
+            "env": {
+                "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+            }
+        },
+        "context7": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ],
+            "env": {}
+        }
+    }
+}
