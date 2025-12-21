@@ -20,7 +20,7 @@ Providers are functions that return values to be injected into the container.
 ```go
 func NewConfig() *Config {
     return &Config{
-        AppName: "code-rules",
+        AppName: "cops",
     }
 }
 ```
