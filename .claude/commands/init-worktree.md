@@ -17,10 +17,13 @@ Create a git worktree for a Linear ticket.
    - Branch: Use the exact `gitBranchName` from Linear ticket
    - Base: `main` branch
 
-4. **Update Linear Ticket**:
+4. **Copy Local Settings**:
+   - If `.claude/settings.local.json` exists, copy it to the new worktree's `.claude/` directory
+
+5. **Update Linear Ticket**:
    - Change status to "In Progress"
 
-5. **Report Result**:
+6. **Report Result**:
    - Ticket ID, title, and URL
    - Worktree path created
    - Branch name
