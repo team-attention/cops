@@ -4,16 +4,25 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/dig"
 
-	setup "github.com/team-attention/code-rules/internal/platform/setup/cobra"
+	setup_cobra "github.com/team-attention/cops/internal/platform/setup/cobra"
+	"github.com/team-attention/cops/internal/platform/setup/config"
+	"github.com/team-attention/cops/internal/platform/setup/logger"
 )
 
-// Run creates the container, registers all providers, and executes the root command
+// Run creates the container, registers all providers, and executes the root command.
 func Run() error {
 	c := dig.New()
 
-	// Register all providers
+	// Register all providers in dependency order.
+	// Note: dig resolves the dependency graph automatically.
 	providers := []interface{}{
-		setup.NewRootCommand,
+		// Platform setup
+		config.LoadConfig,  // *config.Config (root - no dependencies)
+		logger.InitLogger,  // *slog.Logger (depends on *config.Config)
+
+		// Command setup
+		setup_cobra.NewRootCommand, // *cobra.Command (depends on *slog.Logger)
+
 		// Add more providers here as the application grows
 	}
 

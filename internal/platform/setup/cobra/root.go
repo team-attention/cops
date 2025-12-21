@@ -1,15 +1,22 @@
 package cobra
 
 import (
+	"log/slog"
+
 	"github.com/spf13/cobra"
 )
 
-// NewRootCommand creates the root cobra command
-func NewRootCommand() *cobra.Command {
+// NewRootCommand creates the root cobra command with logger injection.
+func NewRootCommand(l *slog.Logger) *cobra.Command {
+	logger := l.With(slog.String("name", "root.command"))
+
 	cmd := &cobra.Command{
-		Use:   "code-rules",
+		Use:   "cops",
 		Short: "A CLI tool for managing code rules",
-		Long:  "code-rules is a CLI tool that helps manage and enforce coding rules across your projects.",
+		Long:  "cops is a CLI tool that helps manage and enforce coding rules across your projects.",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			logger.Debug("executing command", slog.String("command", cmd.Name()))
+		},
 	}
 
 	return cmd
