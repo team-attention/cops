@@ -12,6 +12,7 @@
             "mcp__context7__get-library-docs",
             "mcp__ide__getDiagnostics",
             "mcp__linear__get_issue",
+            "mcp__linear__get_project",
             "mcp__linear__list_teams",
             "mcp__linear__list_projects",
             "mcp__linear__list_issue_labels",
