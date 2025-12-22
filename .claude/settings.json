@@ -8,6 +8,7 @@
             "Bash(tree:*)",
             "Bash(xargs:*)",
             "Bash(go build:*)",
+            "Bash(git worktree list:*)",
             "mcp__context7__resolve-library-id",
             "mcp__context7__get-library-docs",
             "mcp__ide__getDiagnostics",
