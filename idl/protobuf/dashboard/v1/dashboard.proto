@@ -1,0 +1,266 @@
+syntax = "proto3";
+
+package dashboard.v1;
+
+import "google/protobuf/timestamp.proto";
+import "collector/v1/collector.proto";
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1;dashboardv1";
+
+// TokenUsageSummary aggregates token usage statistics.
+message TokenUsageSummary {
+  // Total input tokens consumed
+  int64 total_input_tokens = 1;
+
+  // Total output tokens generated
+  int64 total_output_tokens = 2;
+
+  // Total cache creation tokens
+  int64 total_cache_creation_tokens = 3;
+
+  // Total cache read tokens
+  int64 total_cache_read_tokens = 4;
+}
+
+// PaginationRequest contains pagination parameters.
+message PaginationRequest {
+  // Page number (1-based)
+  int32 page = 1;
+
+  // Number of items per page
+  int32 page_size = 2;
+}
+
+// PaginationResponse contains pagination metadata.
+message PaginationResponse {
+  // Current page number
+  int32 current_page = 1;
+
+  // Items per page
+  int32 page_size = 2;
+
+  // Total number of pages
+  int32 total_pages = 3;
+
+  // Total number of items
+  int64 total_count = 4;
+}
+
+// ProjectSummary contains basic project information for list views.
+message ProjectSummary {
+  // Project unique identifier
+  string id = 1;
+
+  // Project display name
+  string name = 2;
+
+  // Project path
+  string path = 3;
+
+  // Current git branch
+  string git_branch = 4;
+
+  // Number of sessions in this project
+  int32 session_count = 5;
+
+  // Aggregated token usage
+  TokenUsageSummary usage = 6;
+
+  // Last activity timestamp
+  google.protobuf.Timestamp last_activity = 7;
+}
+
+// ProjectDetail contains full project information.
+message ProjectDetail {
+  // Project unique identifier
+  string id = 1;
+
+  // Project display name
+  string name = 2;
+
+  // Project path
+  string path = 3;
+
+  // Current git branch
+  string git_branch = 4;
+
+  // List of git worktrees
+  repeated string worktrees = 5;
+
+  // Number of sessions in this project
+  int32 session_count = 6;
+
+  // Aggregated token usage
+  TokenUsageSummary usage = 7;
+
+  // Project creation timestamp
+  google.protobuf.Timestamp created_at = 8;
+
+  // Last activity timestamp
+  google.protobuf.Timestamp last_activity = 9;
+}
+
+// SessionSummary contains basic session information for list views.
+message SessionSummary {
+  // Session unique identifier
+  string id = 1;
+
+  // Parent project identifier
+  string project_id = 2;
+
+  // Git branch during session
+  string git_branch = 3;
+
+  // Number of messages in session
+  int32 message_count = 4;
+
+  // Session token usage
+  TokenUsageSummary usage = 5;
+
+  // Session start timestamp
+  google.protobuf.Timestamp started_at = 6;
+
+  // Session end timestamp
+  google.protobuf.Timestamp ended_at = 7;
+}
+
+// SessionDetail contains full session information with records.
+message SessionDetail {
+  // Session unique identifier
+  string id = 1;
+
+  // Parent project identifier
+  string project_id = 2;
+
+  // Git branch during session
+  string git_branch = 3;
+
+  // Working directory
+  string cwd = 4;
+
+  // Claude Code version
+  string version = 5;
+
+  // Session token usage
+  TokenUsageSummary usage = 6;
+
+  // Session start timestamp
+  google.protobuf.Timestamp started_at = 7;
+
+  // Session end timestamp
+  google.protobuf.Timestamp ended_at = 8;
+
+  // All session records
+  repeated collector.v1.SessionRecord records = 9;
+}
+
+// GetOverviewRequest is the request for GetOverview RPC.
+message GetOverviewRequest {}
+
+// GetOverviewResponse is the response for GetOverview RPC.
+message GetOverviewResponse {
+  // Total token usage across all projects
+  TokenUsageSummary total_usage = 1;
+
+  // Total number of projects
+  int32 project_count = 2;
+
+  // Total number of sessions
+  int32 session_count = 3;
+
+  // Recent projects (limited to 5)
+  repeated ProjectSummary recent_projects = 4;
+
+  // Recent sessions (limited to 5)
+  repeated SessionSummary recent_sessions = 5;
+}
+
+// ListProjectsRequest is the request for ListProjects RPC.
+message ListProjectsRequest {
+  // Pagination parameters
+  PaginationRequest pagination = 1;
+
+  // Search query for project name
+  string search = 2;
+
+  // Sort field: "name", "last_activity", "session_count"
+  string sort_by = 3;
+
+  // Sort in descending order
+  bool sort_desc = 4;
+}
+
+// ListProjectsResponse is the response for ListProjects RPC.
+message ListProjectsResponse {
+  // List of projects
+  repeated ProjectSummary projects = 1;
+
+  // Pagination metadata
+  PaginationResponse pagination = 2;
+}
+
+// GetProjectRequest is the request for GetProject RPC.
+message GetProjectRequest {
+  // Project identifier
+  string project_id = 1;
+}
+
+// GetProjectResponse is the response for GetProject RPC.
+message GetProjectResponse {
+  // Project details
+  ProjectDetail project = 1;
+}
+
+// ListSessionsRequest is the request for ListSessions RPC.
+message ListSessionsRequest {
+  // Project identifier
+  string project_id = 1;
+
+  // Pagination parameters
+  PaginationRequest pagination = 2;
+
+  // Sort field: "started_at", "message_count", "usage"
+  string sort_by = 3;
+
+  // Sort in descending order
+  bool sort_desc = 4;
+}
+
+// ListSessionsResponse is the response for ListSessions RPC.
+message ListSessionsResponse {
+  // List of sessions
+  repeated SessionSummary sessions = 1;
+
+  // Pagination metadata
+  PaginationResponse pagination = 2;
+}
+
+// GetSessionRequest is the request for GetSession RPC.
+message GetSessionRequest {
+  // Session identifier
+  string session_id = 1;
+}
+
+// GetSessionResponse is the response for GetSession RPC.
+message GetSessionResponse {
+  // Session details with records
+  SessionDetail session = 1;
+}
+
+// DashboardService provides dashboard data access.
+service DashboardService {
+  // GetOverview returns dashboard summary statistics.
+  rpc GetOverview(GetOverviewRequest) returns (GetOverviewResponse);
+
+  // ListProjects returns a paginated list of projects.
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+
+  // GetProject returns detailed project information.
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse);
+
+  // ListSessions returns sessions for a project.
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+
+  // GetSession returns detailed session information with records.
+  rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
+}

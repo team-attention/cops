@@ -14,7 +14,7 @@ settings.local.json
 *.dll
 *.so
 *.dylib
-cops
+tmp
 
 # Test binary, built with `go test -c`
 *.test
@@ -26,7 +26,7 @@ cops
 # vendor/
 
 # Go workspace file
-go.work
+# go.work
 
 ### macOS ###
 # General

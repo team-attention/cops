@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: api/.meta/Dockerfile
+      target: development
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../..:/app
+      - go-mod-cache:/go/pkg/mod
+    working_dir: /app/api
+    command: ["air", "-c", ".meta/.air.toml"]
+
+volumes:
+  go-mod-cache:
