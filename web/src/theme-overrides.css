@@ -1,0 +1,21 @@
+/*
+ * Theme Overrides for C-Ops
+ *
+ * This file customizes shadcn CSS variables without modifying the auto-generated styles.css
+ * Import this AFTER styles.css to override default values.
+ */
+
+/* Light theme - sidebar slightly darker than background */
+:root {
+  --sidebar: oklch(0.97 0.001 286);           /* Slightly darker than white */
+  --sidebar-accent: oklch(0.94 0.001 286);    /* Hover state */
+}
+
+/* Dark theme - sidebar darker than main content for Terminal-Noir aesthetic */
+.dark {
+  --sidebar: oklch(0.12 0.005 286);           /* Darker than zinc-950 */
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.18 0.005 286);    /* Hover state */
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.22 0.006 286);    /* Subtle border */
+}

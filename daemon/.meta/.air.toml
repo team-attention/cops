@@ -1,0 +1,38 @@
+root = ".."
+tmp_dir = "tmp"
+
+[build]
+  # Build command
+  cmd = "go build -o ./tmp/api ./cmd/api"
+  # Binary to run
+  bin = "./tmp/api"
+  # Watch these extensions
+  include_ext = ["go", "toml", "yaml"]
+  # Exclude directories
+  exclude_dir = ["tmp", "vendor", ".git", ".meta"]
+  # Include directories to watch (relative to root)
+  include_dir = ["cmd", "internal", "../shared"]
+  # Delay before rebuild (milliseconds)
+  delay = 1000
+  # Stop old binary before building new one
+  stop_on_error = true
+  # Send interrupt signal before killing process
+  send_interrupt = true
+  # Delay after interrupt before killing (milliseconds)
+  kill_delay = 500
+
+[log]
+  # Show build time
+  time = true
+  # Main log only
+  main_only = false
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
+
+[misc]
+  # Delete tmp directory on exit
+  clean_on_exit = true

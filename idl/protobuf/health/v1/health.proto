@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package health.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/health/v1;healthv1";
+
+// ServingStatus represents the health status of a service.
+enum ServingStatus {
+  SERVING_STATUS_UNSPECIFIED = 0;
+  SERVING_STATUS_SERVING = 1;
+  SERVING_STATUS_NOT_SERVING = 2;
+  SERVING_STATUS_SERVICE_UNKNOWN = 3;
+}
+
+// CheckReq is the request message for Check RPC.
+message CheckReq {
+  // Service name to check (empty for overall health)
+  string service = 1;
+}
+
+// CheckRes is the response message for Check RPC.
+message CheckRes {
+  // Current serving status
+  ServingStatus status = 1;
+}
+
+// WatchReq is the request message for Watch RPC.
+message WatchReq {
+  // Service name to watch (empty for overall health)
+  string service = 1;
+}
+
+// WatchRes is the response message for Watch RPC.
+message WatchRes {
+  // Current serving status
+  ServingStatus status = 1;
+}
+
+// HealthService provides health check operations.
+service HealthService {
+  // Check returns the serving status of the service.
+  rpc Check(CheckReq) returns (CheckRes);
+
+  // Watch streams the serving status changes.
+  rpc Watch(WatchReq) returns (stream WatchRes);
+}

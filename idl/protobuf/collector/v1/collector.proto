@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package collector.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/collector/v1;collectorv1";
+
+// SessionRecord represents a single Claude Code session entry.
+message SessionRecord {
+  // Unique identifier for this record
+  string uuid = 1;
+
+  // Parent record UUID (for message threading)
+  string parent_uuid = 2;
+
+  // Session identifier
+  string session_id = 3;
+
+  // Message type: user, assistant, system, summary, file-history-snapshot, queue-operation
+  string type = 4;
+
+  // Message role
+  string role = 5;
+
+  // Message content (may be JSON for complex content)
+  string content = 6;
+
+  // Record timestamp
+  google.protobuf.Timestamp timestamp = 7;
+
+  // Current working directory when message was created
+  string cwd = 8;
+
+  // Git branch name
+  string git_branch = 9;
+
+  // Claude Code version
+  string version = 10;
+
+  // Usage metadata (for assistant messages)
+  UsageMetadata usage = 11;
+
+  // User type (e.g., "external")
+  string user_type = 12;
+
+  // Whether this entry is part of a sidechain
+  bool is_sidechain = 13;
+
+  // True for meta messages (e.g., system reminders)
+  bool is_meta = 14;
+
+  // Human-readable name (present in tool_result and assistant entries)
+  string slug = 15;
+
+  // API Request ID (for assistant entries)
+  string request_id = 16;
+}
+
+// UsageMetadata contains token usage information from Claude API.
+message UsageMetadata {
+  // Number of input tokens
+  int32 input_tokens = 1;
+
+  // Number of output tokens
+  int32 output_tokens = 2;
+
+  // Number of cache creation input tokens
+  int32 cache_creation_input_tokens = 3;
+
+  // Number of cache read input tokens
+  int32 cache_read_input_tokens = 4;
+
+  // Ephemeral cache token counts
+  CacheCreation cache_creation = 5;
+
+  // Service tier (e.g., "standard")
+  string service_tier = 6;
+}
+
+// CacheCreation contains ephemeral cache token counts.
+message CacheCreation {
+  // Ephemeral 5-minute input tokens
+  int32 ephemeral_5m_input_tokens = 1;
+
+  // Ephemeral 1-hour input tokens
+  int32 ephemeral_1h_input_tokens = 2;
+}
+
+// SendRecordsReq is the request message for SendRecords RPC.
+message SendRecordsReq {
+  // Project identifier (UUID)
+  string project_id = 1;
+
+  // Session records to send
+  repeated SessionRecord records = 2;
+}
+
+// SendRecordsRes is the response message for SendRecords RPC.
+message SendRecordsRes {
+  // Number of records received
+  int32 records_received = 1;
+
+  // Whether the operation was successful
+  bool success = 2;
+}
+
+// CollectorService handles session record collection.
+service CollectorService {
+  // SendRecords sends session records to the collector.
+  rpc SendRecords(SendRecordsReq) returns (SendRecordsRes);
+}
