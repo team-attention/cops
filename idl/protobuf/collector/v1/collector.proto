@@ -87,10 +87,25 @@ message CacheCreation {
   int32 ephemeral_1h_input_tokens = 2;
 }
 
+// ProjectMetadata contains project information.
+message ProjectMetadata {
+  // Project identifier (MongoDB ObjectID, if exists)
+  string id = 1;
+
+  // Project display name
+  string name = 2;
+
+  // Project path (absolute path)
+  string path = 3;
+
+  // Whether this is a Git repository
+  bool git_project = 4;
+}
+
 // SendRecordsReq is the request message for SendRecords RPC.
 message SendRecordsReq {
-  // Project identifier (UUID)
-  string project_id = 1;
+  // Project metadata
+  ProjectMetadata project = 1;
 
   // Session records to send
   repeated SessionRecord records = 2;

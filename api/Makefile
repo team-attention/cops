@@ -16,7 +16,7 @@ export
 ## dev: Start API server with Docker Compose
 .PHONY: dev
 dev:
-	$(COMPOSE_CMD) $(ENV_FILES) up --build
+	$(COMPOSE_CMD) $(ENV_FILES) up --no-attach mongodb
 
 ## dev-down: Stop and remove all Docker Compose resources
 .PHONY: dev-down

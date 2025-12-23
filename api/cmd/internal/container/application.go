@@ -13,6 +13,7 @@ func Run() {
 		newPlatformModule(),
 		newHealthModule(),
 		newLogModule(),
+		newDashboardModule(),
 
 		// Registrations (invoked for side effects)
 		fx.Invoke(registerFiberServer),

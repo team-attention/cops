@@ -38,8 +38,8 @@ type LoggingConfig struct {
 
 // MongoDBConfig holds MongoDB connection settings.
 type MongoDBConfig struct {
-	URI      string `env:"MONGODB_URI" envDefault:"mongodb://localhost:27017"`
-	Database string `env:"MONGODB_DATABASE" envDefault:"cops"`
+	URI      string `env:"MONGODB_URI,required"`
+	Database string `env:"MONGODB_DATABASE,required"`
 }
 
 // LoadConfig loads configuration from environment variables.

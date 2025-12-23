@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file collector/v1/collector.proto.
  */
 export const file_collector_v1_collector: GenFile = /*@__PURE__*/
-  fileDesc("Chxjb2xsZWN0b3IvdjEvY29sbGVjdG9yLnByb3RvEgxjb2xsZWN0b3IudjEi3AIKDVNlc3Npb25SZWNvcmQSDAoEdXVpZBgBIAEoCRITCgtwYXJlbnRfdXVpZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEgwKBHR5cGUYBCABKAkSDAoEcm9sZRgFIAEoCRIPCgdjb250ZW50GAYgASgJEi0KCXRpbWVzdGFtcBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASCwoDY3dkGAggASgJEhIKCmdpdF9icmFuY2gYCSABKAkSDwoHdmVyc2lvbhgKIAEoCRIqCgV1c2FnZRgLIAEoCzIbLmNvbGxlY3Rvci52MS5Vc2FnZU1ldGFkYXRhEhEKCXVzZXJfdHlwZRgMIAEoCRIUCgxpc19zaWRlY2hhaW4YDSABKAgSDwoHaXNfbWV0YRgOIAEoCBIMCgRzbHVnGA8gASgJEhIKCnJlcXVlc3RfaWQYECABKAkizQEKDVVzYWdlTWV0YWRhdGESFAoMaW5wdXRfdG9rZW5zGAEgASgFEhUKDW91dHB1dF90b2tlbnMYAiABKAUSIwobY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zGAMgASgFEh8KF2NhY2hlX3JlYWRfaW5wdXRfdG9rZW5zGAQgASgFEjMKDmNhY2hlX2NyZWF0aW9uGAUgASgLMhsuY29sbGVjdG9yLnYxLkNhY2hlQ3JlYXRpb24SFAoMc2VydmljZV90aWVyGAYgASgJIlUKDUNhY2hlQ3JlYXRpb24SIQoZZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucxgBIAEoBRIhChllcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zGAIgASgFIlIKDlNlbmRSZWNvcmRzUmVxEhIKCnByb2plY3RfaWQYASABKAkSLAoHcmVjb3JkcxgCIAMoCzIbLmNvbGxlY3Rvci52MS5TZXNzaW9uUmVjb3JkIjsKDlNlbmRSZWNvcmRzUmVzEhgKEHJlY29yZHNfcmVjZWl2ZWQYASABKAUSDwoHc3VjY2VzcxgCIAEoCDJdChBDb2xsZWN0b3JTZXJ2aWNlEkkKC1NlbmRSZWNvcmRzEhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVxGhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVzQsABChBjb20uY29sbGVjdG9yLnYxQg5Db2xsZWN0b3JQcm90b1ABWktnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9jb2xsZWN0b3IvdjE7Y29sbGVjdG9ydjGiAgNDWFiqAgxDb2xsZWN0b3IuVjHKAgxDb2xsZWN0b3JcVjHiAhhDb2xsZWN0b3JcVjFcR1BCTWV0YWRhdGHqAg1Db2xsZWN0b3I6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+  fileDesc("Chxjb2xsZWN0b3IvdjEvY29sbGVjdG9yLnByb3RvEgxjb2xsZWN0b3IudjEi3AIKDVNlc3Npb25SZWNvcmQSDAoEdXVpZBgBIAEoCRITCgtwYXJlbnRfdXVpZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEgwKBHR5cGUYBCABKAkSDAoEcm9sZRgFIAEoCRIPCgdjb250ZW50GAYgASgJEi0KCXRpbWVzdGFtcBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASCwoDY3dkGAggASgJEhIKCmdpdF9icmFuY2gYCSABKAkSDwoHdmVyc2lvbhgKIAEoCRIqCgV1c2FnZRgLIAEoCzIbLmNvbGxlY3Rvci52MS5Vc2FnZU1ldGFkYXRhEhEKCXVzZXJfdHlwZRgMIAEoCRIUCgxpc19zaWRlY2hhaW4YDSABKAgSDwoHaXNfbWV0YRgOIAEoCBIMCgRzbHVnGA8gASgJEhIKCnJlcXVlc3RfaWQYECABKAkizQEKDVVzYWdlTWV0YWRhdGESFAoMaW5wdXRfdG9rZW5zGAEgASgFEhUKDW91dHB1dF90b2tlbnMYAiABKAUSIwobY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zGAMgASgFEh8KF2NhY2hlX3JlYWRfaW5wdXRfdG9rZW5zGAQgASgFEjMKDmNhY2hlX2NyZWF0aW9uGAUgASgLMhsuY29sbGVjdG9yLnYxLkNhY2hlQ3JlYXRpb24SFAoMc2VydmljZV90aWVyGAYgASgJIlUKDUNhY2hlQ3JlYXRpb24SIQoZZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucxgBIAEoBRIhChllcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zGAIgASgFIk4KD1Byb2plY3RNZXRhZGF0YRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEgwKBHBhdGgYAyABKAkSEwoLZ2l0X3Byb2plY3QYBCABKAgibgoOU2VuZFJlY29yZHNSZXESLgoHcHJvamVjdBgBIAEoCzIdLmNvbGxlY3Rvci52MS5Qcm9qZWN0TWV0YWRhdGESLAoHcmVjb3JkcxgCIAMoCzIbLmNvbGxlY3Rvci52MS5TZXNzaW9uUmVjb3JkIjsKDlNlbmRSZWNvcmRzUmVzEhgKEHJlY29yZHNfcmVjZWl2ZWQYASABKAUSDwoHc3VjY2VzcxgCIAEoCDJdChBDb2xsZWN0b3JTZXJ2aWNlEkkKC1NlbmRSZWNvcmRzEhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVxGhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVzQsABChBjb20uY29sbGVjdG9yLnYxQg5Db2xsZWN0b3JQcm90b1ABWktnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9jb2xsZWN0b3IvdjE7Y29sbGVjdG9ydjGiAgNDWFiqAgxDb2xsZWN0b3IuVjHKAgxDb2xsZWN0b3JcVjHiAhhDb2xsZWN0b3JcVjFcR1BCTWV0YWRhdGHqAg1Db2xsZWN0b3I6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * SessionRecord represents a single Claude Code session entry.
@@ -225,17 +225,59 @@ export const CacheCreationSchema: GenMessage<CacheCreation> = /*@__PURE__*/
   messageDesc(file_collector_v1_collector, 2);
 
 /**
+ * ProjectMetadata contains project information.
+ *
+ * @generated from message collector.v1.ProjectMetadata
+ */
+export type ProjectMetadata = Message<"collector.v1.ProjectMetadata"> & {
+  /**
+   * Project identifier (MongoDB ObjectID, if exists)
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * Project display name
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * Project path (absolute path)
+   *
+   * @generated from field: string path = 3;
+   */
+  path: string;
+
+  /**
+   * Whether this is a Git repository
+   *
+   * @generated from field: bool git_project = 4;
+   */
+  gitProject: boolean;
+};
+
+/**
+ * Describes the message collector.v1.ProjectMetadata.
+ * Use `create(ProjectMetadataSchema)` to create a new message.
+ */
+export const ProjectMetadataSchema: GenMessage<ProjectMetadata> = /*@__PURE__*/
+  messageDesc(file_collector_v1_collector, 3);
+
+/**
  * SendRecordsReq is the request message for SendRecords RPC.
  *
  * @generated from message collector.v1.SendRecordsReq
  */
 export type SendRecordsReq = Message<"collector.v1.SendRecordsReq"> & {
   /**
-   * Project identifier (UUID)
+   * Project metadata
    *
-   * @generated from field: string project_id = 1;
+   * @generated from field: collector.v1.ProjectMetadata project = 1;
    */
-  projectId: string;
+  project?: ProjectMetadata;
 
   /**
    * Session records to send
@@ -250,7 +292,7 @@ export type SendRecordsReq = Message<"collector.v1.SendRecordsReq"> & {
  * Use `create(SendRecordsReqSchema)` to create a new message.
  */
 export const SendRecordsReqSchema: GenMessage<SendRecordsReq> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 3);
+  messageDesc(file_collector_v1_collector, 4);
 
 /**
  * SendRecordsRes is the response message for SendRecords RPC.
@@ -278,7 +320,7 @@ export type SendRecordsRes = Message<"collector.v1.SendRecordsRes"> & {
  * Use `create(SendRecordsResSchema)` to create a new message.
  */
 export const SendRecordsResSchema: GenMessage<SendRecordsRes> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 4);
+  messageDesc(file_collector_v1_collector, 5);
 
 /**
  * CollectorService handles session record collection.
