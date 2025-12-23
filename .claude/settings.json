@@ -36,14 +36,8 @@
     "enabledMcpjsonServers": [
         "context7",
         "linear"
-    ]
-  },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "context7",
-    "linear"
-  ],
-  "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true
-  }
+    ],
+    "enabledPlugins": {
+        "frontend-design@claude-plugins-official": true
+    }
 }
