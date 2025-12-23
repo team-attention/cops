@@ -13,6 +13,17 @@
                 "LINEAR_API_KEY": "${LINEAR_API_KEY}"
             }
         },
+        "tavily": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "mcp-remote",
+                "https://mcp.tavily.com/mcp/?${TAVILY_API_KEY}"
+            ],
+            "env": {
+                "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+            }
+        },
         "context7": {
             "type": "stdio",
             "command": "npx",

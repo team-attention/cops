@@ -22,8 +22,10 @@ Create a git worktree for a Linear ticket.
    - Branch: Use the exact `gitBranchName` from Linear ticket
    - Base: `main` branch
 
-5. **Copy Local Settings**:
+5. **Copy Local Settings and Environment Files**:
    - If `.claude/settings.local.json` exists, copy it to the new worktree's `.claude/` directory
+   - Find all `.env` and `.env*` files in the current repository (excluding `.env.example` files)
+   - Copy each found environment file to the same relative path in the new worktree, preserving directory structure
 
 6. **Update Linear Ticket**:
    - Change status to "In Progress"
