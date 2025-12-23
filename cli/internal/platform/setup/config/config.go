@@ -14,6 +14,7 @@ type Config struct {
 	Logging   LoggingConfig
 	Collector CollectorConfig
 	API       APIConfig
+	Daemon    DaemonConfig
 }
 
 // AppConfig holds application-level settings.
@@ -40,6 +41,11 @@ type APIConfig struct {
 	Timeout time.Duration
 }
 
+// DaemonConfig holds daemon settings.
+type DaemonConfig struct {
+	BinaryPath string
+}
+
 // LoadConfig loads configuration from environment variables using Viper.
 // Environment variables are prefixed with COPS_ (e.g., COPS_LOG_LEVEL).
 func LoadConfig() (*Config, error) {
@@ -59,6 +65,7 @@ func LoadConfig() (*Config, error) {
 	v.SetDefault("collector.timeout", "30s")
 	v.SetDefault("api.url", "http://localhost:8081")
 	v.SetDefault("api.timeout", "30s")
+	v.SetDefault("daemon.binarypath", "~/.cops/bin/cops-daemon")
 
 	cfg := &Config{
 		App: AppConfig{
@@ -76,6 +83,9 @@ func LoadConfig() (*Config, error) {
 		API: APIConfig{
 			URL:     v.GetString("api.url"),
 			Timeout: v.GetDuration("api.timeout"),
+		},
+		Daemon: DaemonConfig{
+			BinaryPath: v.GetString("daemon.binarypath"),
 		},
 	}
 
