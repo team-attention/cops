@@ -12,18 +12,23 @@ Create a git worktree for a Linear ticket.
    - If `$ARGUMENTS` is provided: Search for ticket by ID or title
    - If `$ARGUMENTS` is empty: Find the highest priority ticket (Urgent > High > Medium > Low) that is in "Backlog" or "Todo" status
 
-3. **Create Git Worktree**:
-   - Directory: `.worktree/{gitBranchName}` (preserving `/` as nested directories)
+3. **Choose Worktree Path**:
+   - Default path: `../worktree/{gitBranchName}` (outside current repo to avoid Claude Code loading parent rules)
+   - Ask user to confirm or provide custom path using AskUserQuestion
+   - Preserve `/` in branch name as nested directories
+
+4. **Create Git Worktree**:
+   - Directory: User-chosen path
    - Branch: Use the exact `gitBranchName` from Linear ticket
    - Base: `main` branch
 
-4. **Copy Local Settings**:
+5. **Copy Local Settings**:
    - If `.claude/settings.local.json` exists, copy it to the new worktree's `.claude/` directory
 
-5. **Update Linear Ticket**:
+6. **Update Linear Ticket**:
    - Change status to "In Progress"
 
-6. **Report Result**:
+7. **Report Result**:
    - Ticket ID, title, and URL
    - Worktree path created
    - Branch name
