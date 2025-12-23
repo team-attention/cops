@@ -10,6 +10,7 @@
             "Bash(tree:*)",
             "Bash(xargs:*)",
             "Bash(go build:*)",
+            "Bash(gh pr view:*)",
             "Bash(git worktree list:*)",
             "Bash(buf generate:*)",
             "mcp__context7__resolve-library-id",

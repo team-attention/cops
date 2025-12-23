@@ -2,7 +2,6 @@ package daemon
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 
@@ -56,7 +55,7 @@ func (s *Service) Install(ctx context.Context) error {
 		s.logger.Info("daemon service is already installed",
 			slog.String("status", status.String()))
 		// TODO: Ask user for reinstall confirmation
-		return fmt.Errorf("service is already installed (status: %s)", status)
+		return errutil.BadRequestf("service is already installed (status: %s)", status)
 	}
 
 	// Install the service

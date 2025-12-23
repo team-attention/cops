@@ -2,12 +2,14 @@ package kardianos
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/kardianos/service"
 
 	"github.com/team-attention/cops/cli/internal/platform/setup/config"
+	"github.com/team-attention/cops/cli/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/cli/internal/service/daemon/outbound/installer"
 )
 
@@ -66,8 +68,10 @@ func (i *KardianosInstaller) Status() (installer.ServiceStatus, error) {
 
 	status, err := svc.Status()
 	if err != nil {
-		// If the service is not installed, kardianos returns an error
-		return installer.StatusNotInstalled, nil
+		if errors.Is(err, service.ErrNotInstalled) {
+			return installer.StatusNotInstalled, nil
+		}
+		return installer.StatusUnknown, fmt.Errorf("failed to get service status: %w", err)
 	}
 
 	switch status {
@@ -82,11 +86,16 @@ func (i *KardianosInstaller) Status() (installer.ServiceStatus, error) {
 
 // createService creates a kardianos service instance with the appropriate configuration.
 func (i *KardianosInstaller) createService() (service.Service, error) {
+	binaryPath, err := pathutil.ExpandPath(i.cfg.Daemon.BinaryPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to expand binary path: %w", err)
+	}
+
 	svcConfig := &service.Config{
 		Name:        "com.cops.daemon",
 		DisplayName: "C-Ops Daemon",
 		Description: "C-Ops background service for Claude Code session tracking",
-		Executable:  i.cfg.Daemon.BinaryPath,
+		Executable:  binaryPath,
 		Arguments:   []string{"start"},
 		Option: service.KeyValue{
 			"KeepAlive": true,
