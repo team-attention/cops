@@ -26,25 +26,7 @@ to the API server. It can run as a foreground process or as a launchd service.`,
 		},
 	}
 
-	installCmd := &cobra.Command{
-		Use:   "install",
-		Short: "Install as launchd service",
-		Long:  "Generate and install a launchd plist to run the daemon as a background service.",
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("launchd installation not yet implemented")
-		},
-	}
-
-	uninstallCmd := &cobra.Command{
-		Use:   "uninstall",
-		Short: "Uninstall launchd service",
-		Long:  "Remove the launchd plist and stop the daemon service.",
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("launchd uninstallation not yet implemented")
-		},
-	}
-
-	rootCmd.AddCommand(startCmd, installCmd, uninstallCmd)
+	rootCmd.AddCommand(startCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
