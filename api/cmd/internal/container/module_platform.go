@@ -12,7 +12,7 @@ import (
 func newPlatformModule() fx.Option {
 	return fx.Module("platform",
 		// Configuration (root - no dependencies)
-		fx.Provide(config.LoadConfig),
+		fx.Provide(config.InitConfig),
 
 		// Logger (depends on config)
 		fx.Provide(logger.InitLogger),
@@ -21,6 +21,6 @@ func newPlatformModule() fx.Option {
 		fx.Provide(mongodb.InitMongoDB),
 
 		// Fiber app (depends on config, logger)
-		fx.Provide(server.NewFiberApp),
+		fx.Provide(server.InitFiber),
 	)
 }

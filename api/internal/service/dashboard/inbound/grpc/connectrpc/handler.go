@@ -77,9 +77,7 @@ func (h *DashboardGRPCHandler) ListProjects(
 	params := repository.ListProjectsParams{
 		Page:     msg.GetPagination().GetPage(),
 		PageSize: msg.GetPagination().GetPageSize(),
-		Search:   msg.GetSearch(),
-		SortBy:   msg.GetSortBy(),
-		SortDesc: msg.GetSortDesc(),
+		Query:    repository.ListProjectsQuery{},
 	}
 
 	// Call service
@@ -89,8 +87,8 @@ func (h *DashboardGRPCHandler) ListProjects(
 	}
 
 	// Convert projects
-	projects := make([]*dashboardv1.ProjectSummary, len(result.Projects))
-	for i, p := range result.Projects {
+	projects := make([]*dashboardv1.ProjectSummary, len(result.Items))
+	for i, p := range result.Items {
 		projects[i] = toProtoProjectSummary(p)
 	}
 
@@ -133,11 +131,13 @@ func (h *DashboardGRPCHandler) ListSessions(
 	// Parse request
 	msg := req.Msg
 	params := repository.ListSessionsParams{
-		ProjectID: msg.GetProjectId(),
-		Page:      msg.GetPagination().GetPage(),
-		PageSize:  msg.GetPagination().GetPageSize(),
-		SortBy:    msg.GetSortBy(),
-		SortDesc:  msg.GetSortDesc(),
+		Page:     msg.GetPagination().GetPage(),
+		PageSize: msg.GetPagination().GetPageSize(),
+		Query: repository.ListSessionsQuery{
+			ProjectID: msg.GetProjectId(),
+			SortBy:    msg.GetSortBy(),
+			SortDesc:  msg.GetSortDesc(),
+		},
 	}
 
 	// Call service
@@ -147,8 +147,8 @@ func (h *DashboardGRPCHandler) ListSessions(
 	}
 
 	// Convert sessions
-	sessions := make([]*dashboardv1.SessionSummary, len(result.Sessions))
-	for i, s := range result.Sessions {
+	sessions := make([]*dashboardv1.SessionSummary, len(result.Items))
+	for i, s := range result.Items {
 		sessions[i] = toProtoSessionSummary(s)
 	}
 

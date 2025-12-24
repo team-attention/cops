@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package log.v1;
+package aggregation.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/log/v1;logv1";
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1;aggregationv1";
 
 // SessionType represents the type of session message.
 enum SessionType {
@@ -75,8 +75,8 @@ message SendLogsRes {
   int32 processed_count = 3;
 }
 
-// LogService handles log collection from daemons.
-service LogService {
+// AggregationService handles log aggregation from daemons.
+service AggregationService {
   // SendLogs sends a batch of session records to the API server.
   rpc SendLogs(SendLogsReq) returns (SendLogsRes);
 }

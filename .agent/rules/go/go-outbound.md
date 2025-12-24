@@ -1,7 +1,7 @@
 ---
 trigger: always_on
-globs: **/internal/**/outbound/**/*
-paths: **/internal/**/outbound/**/*
+globs: **/internal/**/outbound/**/*.go
+paths: **/internal/**/outbound/**/*.go
 ---
 
 # Outbound Adapters

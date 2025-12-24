@@ -783,13 +783,7 @@ func (x *GetOverviewResponse) GetRecentSessions() []*SessionSummary {
 type ListProjectsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Pagination parameters
-	Pagination *PaginationRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	// Search query for project name
-	Search string `protobuf:"bytes,2,opt,name=search,proto3" json:"search,omitempty"`
-	// Sort field: "name", "last_activity", "session_count"
-	SortBy string `protobuf:"bytes,3,opt,name=sort_by,json=sortBy,proto3" json:"sort_by,omitempty"`
-	// Sort in descending order
-	SortDesc      bool `protobuf:"varint,4,opt,name=sort_desc,json=sortDesc,proto3" json:"sort_desc,omitempty"`
+	Pagination    *PaginationRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -829,27 +823,6 @@ func (x *ListProjectsRequest) GetPagination() *PaginationRequest {
 		return x.Pagination
 	}
 	return nil
-}
-
-func (x *ListProjectsRequest) GetSearch() string {
-	if x != nil {
-		return x.Search
-	}
-	return ""
-}
-
-func (x *ListProjectsRequest) GetSortBy() string {
-	if x != nil {
-		return x.SortBy
-	}
-	return ""
-}
-
-func (x *ListProjectsRequest) GetSortDesc() bool {
-	if x != nil {
-		return x.SortDesc
-	}
-	return false
 }
 
 // ListProjectsResponse is the response for ListProjects RPC.
@@ -1291,14 +1264,11 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\rproject_count\x18\x02 \x01(\x05R\fprojectCount\x12#\n" +
 	"\rsession_count\x18\x03 \x01(\x05R\fsessionCount\x12E\n" +
 	"\x0frecent_projects\x18\x04 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\x0erecentProjects\x12E\n" +
-	"\x0frecent_sessions\x18\x05 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\x0erecentSessions\"\xa4\x01\n" +
+	"\x0frecent_sessions\x18\x05 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\x0erecentSessions\"V\n" +
 	"\x13ListProjectsRequest\x12?\n" +
 	"\n" +
 	"pagination\x18\x01 \x01(\v2\x1f.dashboard.v1.PaginationRequestR\n" +
-	"pagination\x12\x16\n" +
-	"\x06search\x18\x02 \x01(\tR\x06search\x12\x17\n" +
-	"\asort_by\x18\x03 \x01(\tR\x06sortBy\x12\x1b\n" +
-	"\tsort_desc\x18\x04 \x01(\bR\bsortDesc\"\x92\x01\n" +
+	"pagination\"\x92\x01\n" +
 	"\x14ListProjectsResponse\x128\n" +
 	"\bprojects\x18\x01 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\bprojects\x12@\n" +
 	"\n" +

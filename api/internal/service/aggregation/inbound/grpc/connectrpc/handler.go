@@ -7,40 +7,40 @@ import (
 
 	"connectrpc.com/connect"
 
-	logservice "github.com/team-attention/cops/api/internal/service/log"
-	"github.com/team-attention/cops/api/internal/service/log/outbound/repository"
+	aggregationservice "github.com/team-attention/cops/api/internal/service/aggregation"
+	"github.com/team-attention/cops/api/internal/service/aggregation/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
-	logv1 "github.com/team-attention/cops/shared/gen/grpcstub/log/v1"
-	"github.com/team-attention/cops/shared/gen/grpcstub/log/v1/logv1connect"
+	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
+	"github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1/aggregationv1connect"
 )
 
-// LogGRPCHandler handles log service gRPC endpoints.
-type LogGRPCHandler struct {
-	svc    *logservice.Service
+// AggregationGRPCHandler handles aggregation service gRPC endpoints.
+type AggregationGRPCHandler struct {
+	svc    *aggregationservice.Service
 	logger *slog.Logger
 }
 
-// NewLogGRPCHandler creates a new log gRPC handler.
-func NewLogGRPCHandler(l *slog.Logger, svc *logservice.Service) *LogGRPCHandler {
-	return &LogGRPCHandler{
+// NewAggregationGRPCHandler creates a new aggregation gRPC handler.
+func NewAggregationGRPCHandler(l *slog.Logger, svc *aggregationservice.Service) *AggregationGRPCHandler {
+	return &AggregationGRPCHandler{
 		svc:    svc,
-		logger: l.With(slog.String("name", "log.grpc.connectrpc")),
+		logger: l.With(slog.String("name", "aggregation.grpc.connectrpc")),
 	}
 }
 
 // GetHandler implements ConnectHandler interface.
-func (h *LogGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string, http.Handler) {
-	return logv1connect.NewLogServiceHandler(h, opts...)
+func (h *AggregationGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string, http.Handler) {
+	return aggregationv1connect.NewAggregationServiceHandler(h, opts...)
 }
 
-// SendLogs implements logv1connect.LogServiceHandler.
-func (h *LogGRPCHandler) SendLogs(
+// SendLogs implements aggregationv1connect.AggregationServiceHandler.
+func (h *AggregationGRPCHandler) SendLogs(
 	ctx context.Context,
-	req *connect.Request[logv1.SendLogsReq],
-) (*connect.Response[logv1.SendLogsRes], error) {
+	req *connect.Request[aggregationv1.SendLogsReq],
+) (*connect.Response[aggregationv1.SendLogsRes], error) {
 	pbBatch := req.Msg.GetBatch()
 	if pbBatch == nil {
-		return connect.NewResponse(&logv1.SendLogsRes{
+		return connect.NewResponse(&aggregationv1.SendLogsRes{
 			Success:      false,
 			ErrorMessage: "batch is required",
 		}), nil
@@ -49,7 +49,7 @@ func (h *LogGRPCHandler) SendLogs(
 	batch := convertToDomain(pbBatch)
 	result := h.svc.CollectLogs(ctx, batch)
 
-	res := &logv1.SendLogsRes{
+	res := &aggregationv1.SendLogsRes{
 		Success:        result.Success,
 		ErrorMessage:   result.ErrorMessage,
 		ProcessedCount: result.ProcessedCount,
@@ -58,7 +58,7 @@ func (h *LogGRPCHandler) SendLogs(
 	return connect.NewResponse(res), nil
 }
 
-func convertToDomain(pb *logv1.LogBatch) *repository.LogBatch {
+func convertToDomain(pb *aggregationv1.LogBatch) *repository.LogBatch {
 	records := make([]shareddomain.SessionRecord, len(pb.GetRecords()))
 	for i, r := range pb.GetRecords() {
 		records[i] = shareddomain.SessionRecord{
@@ -86,26 +86,26 @@ func convertToDomain(pb *logv1.LogBatch) *repository.LogBatch {
 	}
 }
 
-func convertSessionType(t logv1.SessionType) shareddomain.SessionType {
+func convertSessionType(t aggregationv1.SessionType) shareddomain.SessionType {
 	switch t {
-	case logv1.SessionType_SESSION_TYPE_USER:
+	case aggregationv1.SessionType_SESSION_TYPE_USER:
 		return shareddomain.SessionTypeUser
-	case logv1.SessionType_SESSION_TYPE_ASSISTANT:
+	case aggregationv1.SessionType_SESSION_TYPE_ASSISTANT:
 		return shareddomain.SessionTypeAssistant
-	case logv1.SessionType_SESSION_TYPE_SYSTEM:
+	case aggregationv1.SessionType_SESSION_TYPE_SYSTEM:
 		return shareddomain.SessionTypeSystem
-	case logv1.SessionType_SESSION_TYPE_SUMMARY:
+	case aggregationv1.SessionType_SESSION_TYPE_SUMMARY:
 		return shareddomain.SessionTypeSummary
-	case logv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT:
+	case aggregationv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT:
 		return shareddomain.SessionTypeFileHistorySnapshot
-	case logv1.SessionType_SESSION_TYPE_QUEUE_OPERATION:
+	case aggregationv1.SessionType_SESSION_TYPE_QUEUE_OPERATION:
 		return shareddomain.SessionTypeQueueOperation
 	default:
 		return shareddomain.SessionTypeUser
 	}
 }
 
-func convertMessage(m *logv1.Message) *shareddomain.Message {
+func convertMessage(m *aggregationv1.Message) *shareddomain.Message {
 	if m == nil {
 		return nil
 	}
@@ -137,4 +137,4 @@ func convertMessage(m *logv1.Message) *shareddomain.Message {
 }
 
 // Compile-time interface verification.
-var _ logv1connect.LogServiceHandler = (*LogGRPCHandler)(nil)
+var _ aggregationv1connect.AggregationServiceHandler = (*AggregationGRPCHandler)(nil)

@@ -14,34 +14,23 @@ import (
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
 )
 
-// HTTPRouter interface for HTTP handlers.
-type HTTPRouter interface {
-	Register(app *fiber.App)
-}
-
 // ConnectHandler interface for ConnectRPC handlers.
 type ConnectHandler interface {
 	GetHandler(opts ...connect.HandlerOption) (string, http.Handler)
 }
 
-type fiberServerParams struct {
+type connectRPCServerParams struct {
 	fx.In
 
 	Lifecycle       fx.Lifecycle
 	Logger          *slog.Logger
 	Config          *config.Config
 	App             *fiber.App
-	HTTPRouters     []HTTPRouter     `group:"http_routers"`
 	ConnectHandlers []ConnectHandler `group:"connect_handlers"`
 }
 
-func registerFiberServer(params fiberServerParams) {
-	logger := params.Logger.With(slog.String("name", "server.fiber"))
-
-	// Register HTTP routers
-	for _, router := range params.HTTPRouters {
-		router.Register(params.App)
-	}
+func registerConnectRPCServer(params connectRPCServerParams) {
+	logger := params.Logger.With(slog.String("name", "server.connectrpc"))
 
 	// Register ConnectRPC handlers
 	for _, handler := range params.ConnectHandlers {

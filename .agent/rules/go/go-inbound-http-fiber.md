@@ -1,7 +1,7 @@
 ---
 trigger: glob
-globs: **/internal/service/*/inbound/http/fiber/*
-paths: **/internal/service/*/inbound/http/fiber/*
+globs: **/internal/service/*/inbound/http/fiber/*.go
+paths: **/internal/service/*/inbound/http/fiber/*.go
 ---
 
 # Fiber HTTP Inbound Handler Guidelines
@@ -101,10 +101,10 @@ func (h *{Domain}HTTPHandler) create{Domain}(ctx *fiber.Ctx) error {
 
 ## Response Rules
 
-| Scenario | Response |
-|----------|----------|
-| Success with data | `ctx.Status(fiber.StatusOK).JSON(result)` |
-| Success no content | `ctx.Status(fiber.StatusOK).Send(nil)` |
+| Scenario           | Response                                  |
+| ------------------ | ----------------------------------------- |
+| Success with data  | `ctx.Status(fiber.StatusOK).JSON(result)` |
+| Success no content | `ctx.Status(fiber.StatusOK).Send(nil)`    |
 
 **Never use**: `{"message": "ok"}` style responses
 

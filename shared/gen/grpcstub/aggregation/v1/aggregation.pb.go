@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        (unknown)
-// source: log/v1/log.proto
+// source: aggregation/v1/aggregation.proto
 
-package logv1
+package aggregationv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -68,11 +68,11 @@ func (x SessionType) String() string {
 }
 
 func (SessionType) Descriptor() protoreflect.EnumDescriptor {
-	return file_log_v1_log_proto_enumTypes[0].Descriptor()
+	return file_aggregation_v1_aggregation_proto_enumTypes[0].Descriptor()
 }
 
 func (SessionType) Type() protoreflect.EnumType {
-	return &file_log_v1_log_proto_enumTypes[0]
+	return &file_aggregation_v1_aggregation_proto_enumTypes[0]
 }
 
 func (x SessionType) Number() protoreflect.EnumNumber {
@@ -81,7 +81,7 @@ func (x SessionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SessionType.Descriptor instead.
 func (SessionType) EnumDescriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{0}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{0}
 }
 
 // Usage contains token usage information.
@@ -98,7 +98,7 @@ type Usage struct {
 
 func (x *Usage) Reset() {
 	*x = Usage{}
-	mi := &file_log_v1_log_proto_msgTypes[0]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -110,7 +110,7 @@ func (x *Usage) String() string {
 func (*Usage) ProtoMessage() {}
 
 func (x *Usage) ProtoReflect() protoreflect.Message {
-	mi := &file_log_v1_log_proto_msgTypes[0]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,7 +123,7 @@ func (x *Usage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Usage.ProtoReflect.Descriptor instead.
 func (*Usage) Descriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{0}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Usage) GetInputTokens() int32 {
@@ -178,7 +178,7 @@ type Message struct {
 
 func (x *Message) Reset() {
 	*x = Message{}
-	mi := &file_log_v1_log_proto_msgTypes[1]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -190,7 +190,7 @@ func (x *Message) String() string {
 func (*Message) ProtoMessage() {}
 
 func (x *Message) ProtoReflect() protoreflect.Message {
-	mi := &file_log_v1_log_proto_msgTypes[1]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -203,7 +203,7 @@ func (x *Message) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Message.ProtoReflect.Descriptor instead.
 func (*Message) Descriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{1}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Message) GetId() string {
@@ -268,7 +268,7 @@ type SessionRecord struct {
 	Uuid          string                 `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
 	ParentUuid    string                 `protobuf:"bytes,2,opt,name=parent_uuid,json=parentUuid,proto3" json:"parent_uuid,omitempty"`
 	SessionId     string                 `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	Type          SessionType            `protobuf:"varint,4,opt,name=type,proto3,enum=log.v1.SessionType" json:"type,omitempty"`
+	Type          SessionType            `protobuf:"varint,4,opt,name=type,proto3,enum=aggregation.v1.SessionType" json:"type,omitempty"`
 	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Cwd           string                 `protobuf:"bytes,6,opt,name=cwd,proto3" json:"cwd,omitempty"`
 	GitBranch     string                 `protobuf:"bytes,7,opt,name=git_branch,json=gitBranch,proto3" json:"git_branch,omitempty"`
@@ -285,7 +285,7 @@ type SessionRecord struct {
 
 func (x *SessionRecord) Reset() {
 	*x = SessionRecord{}
-	mi := &file_log_v1_log_proto_msgTypes[2]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -297,7 +297,7 @@ func (x *SessionRecord) String() string {
 func (*SessionRecord) ProtoMessage() {}
 
 func (x *SessionRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_log_v1_log_proto_msgTypes[2]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +310,7 @@ func (x *SessionRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionRecord.ProtoReflect.Descriptor instead.
 func (*SessionRecord) Descriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{2}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SessionRecord) GetUuid() string {
@@ -423,7 +423,7 @@ type LogBatch struct {
 
 func (x *LogBatch) Reset() {
 	*x = LogBatch{}
-	mi := &file_log_v1_log_proto_msgTypes[3]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -435,7 +435,7 @@ func (x *LogBatch) String() string {
 func (*LogBatch) ProtoMessage() {}
 
 func (x *LogBatch) ProtoReflect() protoreflect.Message {
-	mi := &file_log_v1_log_proto_msgTypes[3]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -448,7 +448,7 @@ func (x *LogBatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogBatch.ProtoReflect.Descriptor instead.
 func (*LogBatch) Descriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{3}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LogBatch) GetRecords() []*SessionRecord {
@@ -482,7 +482,7 @@ type SendLogsReq struct {
 
 func (x *SendLogsReq) Reset() {
 	*x = SendLogsReq{}
-	mi := &file_log_v1_log_proto_msgTypes[4]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -494,7 +494,7 @@ func (x *SendLogsReq) String() string {
 func (*SendLogsReq) ProtoMessage() {}
 
 func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
-	mi := &file_log_v1_log_proto_msgTypes[4]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -507,7 +507,7 @@ func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendLogsReq.ProtoReflect.Descriptor instead.
 func (*SendLogsReq) Descriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{4}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SendLogsReq) GetBatch() *LogBatch {
@@ -529,7 +529,7 @@ type SendLogsRes struct {
 
 func (x *SendLogsRes) Reset() {
 	*x = SendLogsRes{}
-	mi := &file_log_v1_log_proto_msgTypes[5]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -541,7 +541,7 @@ func (x *SendLogsRes) String() string {
 func (*SendLogsRes) ProtoMessage() {}
 
 func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
-	mi := &file_log_v1_log_proto_msgTypes[5]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,7 +554,7 @@ func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendLogsRes.ProtoReflect.Descriptor instead.
 func (*SendLogsRes) Descriptor() ([]byte, []int) {
-	return file_log_v1_log_proto_rawDescGZIP(), []int{5}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SendLogsRes) GetSuccess() bool {
@@ -578,17 +578,17 @@ func (x *SendLogsRes) GetProcessedCount() int32 {
 	return 0
 }
 
-var File_log_v1_log_proto protoreflect.FileDescriptor
+var File_aggregation_v1_aggregation_proto protoreflect.FileDescriptor
 
-const file_log_v1_log_proto_rawDesc = "" +
+const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\n" +
-	"\x10log/v1/log.proto\x12\x06log.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe8\x01\n" +
+	" aggregation/v1/aggregation.proto\x12\x0eaggregation.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe8\x01\n" +
 	"\x05Usage\x12!\n" +
 	"\finput_tokens\x18\x01 \x01(\x05R\vinputTokens\x12#\n" +
 	"\routput_tokens\x18\x02 \x01(\x05R\foutputTokens\x12=\n" +
 	"\x1bcache_creation_input_tokens\x18\x03 \x01(\x05R\x18cacheCreationInputTokens\x125\n" +
 	"\x17cache_read_input_tokens\x18\x04 \x01(\x05R\x14cacheReadInputTokens\x12!\n" +
-	"\fservice_tier\x18\x05 \x01(\tR\vserviceTier\"\xdc\x01\n" +
+	"\fservice_tier\x18\x05 \x01(\tR\vserviceTier\"\xe4\x01\n" +
 	"\aMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x12\n" +
@@ -597,15 +597,15 @@ const file_log_v1_log_proto_rawDesc = "" +
 	"\acontent\x18\x05 \x01(\tR\acontent\x12\x1f\n" +
 	"\vstop_reason\x18\x06 \x01(\tR\n" +
 	"stopReason\x12#\n" +
-	"\rstop_sequence\x18\a \x01(\tR\fstopSequence\x12#\n" +
-	"\x05usage\x18\b \x01(\v2\r.log.v1.UsageR\x05usage\"\xc8\x03\n" +
+	"\rstop_sequence\x18\a \x01(\tR\fstopSequence\x12+\n" +
+	"\x05usage\x18\b \x01(\v2\x15.aggregation.v1.UsageR\x05usage\"\xd8\x03\n" +
 	"\rSessionRecord\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x1f\n" +
 	"\vparent_uuid\x18\x02 \x01(\tR\n" +
 	"parentUuid\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x03 \x01(\tR\tsessionId\x12'\n" +
-	"\x04type\x18\x04 \x01(\x0e2\x13.log.v1.SessionTypeR\x04type\x128\n" +
+	"session_id\x18\x03 \x01(\tR\tsessionId\x12/\n" +
+	"\x04type\x18\x04 \x01(\x0e2\x1b.aggregation.v1.SessionTypeR\x04type\x128\n" +
 	"\ttimestamp\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x10\n" +
 	"\x03cwd\x18\x06 \x01(\tR\x03cwd\x12\x1d\n" +
 	"\n" +
@@ -617,15 +617,15 @@ const file_log_v1_log_proto_rawDesc = "" +
 	"\ais_meta\x18\v \x01(\bR\x06isMeta\x12\x12\n" +
 	"\x04slug\x18\f \x01(\tR\x04slug\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\r \x01(\tR\trequestId\x12)\n" +
-	"\amessage\x18\x0e \x01(\v2\x0f.log.v1.MessageR\amessage\"\x93\x01\n" +
-	"\bLogBatch\x12/\n" +
-	"\arecords\x18\x01 \x03(\v2\x15.log.v1.SessionRecordR\arecords\x12\x1b\n" +
+	"request_id\x18\r \x01(\tR\trequestId\x121\n" +
+	"\amessage\x18\x0e \x01(\v2\x17.aggregation.v1.MessageR\amessage\"\x9b\x01\n" +
+	"\bLogBatch\x127\n" +
+	"\arecords\x18\x01 \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\x12\x1b\n" +
 	"\tdaemon_id\x18\x02 \x01(\tR\bdaemonId\x129\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"5\n" +
-	"\vSendLogsReq\x12&\n" +
-	"\x05batch\x18\x01 \x01(\v2\x10.log.v1.LogBatchR\x05batch\"u\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"=\n" +
+	"\vSendLogsReq\x12.\n" +
+	"\x05batch\x18\x01 \x01(\v2\x18.aggregation.v1.LogBatchR\x05batch\"u\n" +
 	"\vSendLogsRes\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12#\n" +
 	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\x12'\n" +
@@ -637,47 +637,45 @@ const file_log_v1_log_proto_rawDesc = "" +
 	"\x13SESSION_TYPE_SYSTEM\x10\x03\x12\x18\n" +
 	"\x14SESSION_TYPE_SUMMARY\x10\x04\x12&\n" +
 	"\"SESSION_TYPE_FILE_HISTORY_SNAPSHOT\x10\x05\x12 \n" +
-	"\x1cSESSION_TYPE_QUEUE_OPERATION\x10\x062B\n" +
-	"\n" +
-	"LogService\x124\n" +
-	"\bSendLogs\x12\x13.log.v1.SendLogsReq\x1a\x13.log.v1.SendLogsResB\x90\x01\n" +
-	"\n" +
-	"com.log.v1B\bLogProtoP\x01Z?github.com/team-attention/cops/shared/gen/grpcstub/log/v1;logv1\xa2\x02\x03LXX\xaa\x02\x06Log.V1\xca\x02\x06Log\\V1\xe2\x02\x12Log\\V1\\GPBMetadata\xea\x02\aLog::V1b\x06proto3"
+	"\x1cSESSION_TYPE_QUEUE_OPERATION\x10\x062Z\n" +
+	"\x12AggregationService\x12D\n" +
+	"\bSendLogs\x12\x1b.aggregation.v1.SendLogsReq\x1a\x1b.aggregation.v1.SendLogsResB\xd0\x01\n" +
+	"\x12com.aggregation.v1B\x10AggregationProtoP\x01ZOgithub.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1;aggregationv1\xa2\x02\x03AXX\xaa\x02\x0eAggregation.V1\xca\x02\x0eAggregation\\V1\xe2\x02\x1aAggregation\\V1\\GPBMetadata\xea\x02\x0fAggregation::V1b\x06proto3"
 
 var (
-	file_log_v1_log_proto_rawDescOnce sync.Once
-	file_log_v1_log_proto_rawDescData []byte
+	file_aggregation_v1_aggregation_proto_rawDescOnce sync.Once
+	file_aggregation_v1_aggregation_proto_rawDescData []byte
 )
 
-func file_log_v1_log_proto_rawDescGZIP() []byte {
-	file_log_v1_log_proto_rawDescOnce.Do(func() {
-		file_log_v1_log_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_log_v1_log_proto_rawDesc), len(file_log_v1_log_proto_rawDesc)))
+func file_aggregation_v1_aggregation_proto_rawDescGZIP() []byte {
+	file_aggregation_v1_aggregation_proto_rawDescOnce.Do(func() {
+		file_aggregation_v1_aggregation_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_aggregation_v1_aggregation_proto_rawDesc), len(file_aggregation_v1_aggregation_proto_rawDesc)))
 	})
-	return file_log_v1_log_proto_rawDescData
+	return file_aggregation_v1_aggregation_proto_rawDescData
 }
 
-var file_log_v1_log_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_log_v1_log_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_log_v1_log_proto_goTypes = []any{
-	(SessionType)(0),              // 0: log.v1.SessionType
-	(*Usage)(nil),                 // 1: log.v1.Usage
-	(*Message)(nil),               // 2: log.v1.Message
-	(*SessionRecord)(nil),         // 3: log.v1.SessionRecord
-	(*LogBatch)(nil),              // 4: log.v1.LogBatch
-	(*SendLogsReq)(nil),           // 5: log.v1.SendLogsReq
-	(*SendLogsRes)(nil),           // 6: log.v1.SendLogsRes
+var file_aggregation_v1_aggregation_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_aggregation_v1_aggregation_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_aggregation_v1_aggregation_proto_goTypes = []any{
+	(SessionType)(0),              // 0: aggregation.v1.SessionType
+	(*Usage)(nil),                 // 1: aggregation.v1.Usage
+	(*Message)(nil),               // 2: aggregation.v1.Message
+	(*SessionRecord)(nil),         // 3: aggregation.v1.SessionRecord
+	(*LogBatch)(nil),              // 4: aggregation.v1.LogBatch
+	(*SendLogsReq)(nil),           // 5: aggregation.v1.SendLogsReq
+	(*SendLogsRes)(nil),           // 6: aggregation.v1.SendLogsRes
 	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
 }
-var file_log_v1_log_proto_depIdxs = []int32{
-	1, // 0: log.v1.Message.usage:type_name -> log.v1.Usage
-	0, // 1: log.v1.SessionRecord.type:type_name -> log.v1.SessionType
-	7, // 2: log.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
-	2, // 3: log.v1.SessionRecord.message:type_name -> log.v1.Message
-	3, // 4: log.v1.LogBatch.records:type_name -> log.v1.SessionRecord
-	7, // 5: log.v1.LogBatch.created_at:type_name -> google.protobuf.Timestamp
-	4, // 6: log.v1.SendLogsReq.batch:type_name -> log.v1.LogBatch
-	5, // 7: log.v1.LogService.SendLogs:input_type -> log.v1.SendLogsReq
-	6, // 8: log.v1.LogService.SendLogs:output_type -> log.v1.SendLogsRes
+var file_aggregation_v1_aggregation_proto_depIdxs = []int32{
+	1, // 0: aggregation.v1.Message.usage:type_name -> aggregation.v1.Usage
+	0, // 1: aggregation.v1.SessionRecord.type:type_name -> aggregation.v1.SessionType
+	7, // 2: aggregation.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
+	2, // 3: aggregation.v1.SessionRecord.message:type_name -> aggregation.v1.Message
+	3, // 4: aggregation.v1.LogBatch.records:type_name -> aggregation.v1.SessionRecord
+	7, // 5: aggregation.v1.LogBatch.created_at:type_name -> google.protobuf.Timestamp
+	4, // 6: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
+	5, // 7: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
+	6, // 8: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
 	8, // [8:9] is the sub-list for method output_type
 	7, // [7:8] is the sub-list for method input_type
 	7, // [7:7] is the sub-list for extension type_name
@@ -685,27 +683,27 @@ var file_log_v1_log_proto_depIdxs = []int32{
 	0, // [0:7] is the sub-list for field type_name
 }
 
-func init() { file_log_v1_log_proto_init() }
-func file_log_v1_log_proto_init() {
-	if File_log_v1_log_proto != nil {
+func init() { file_aggregation_v1_aggregation_proto_init() }
+func file_aggregation_v1_aggregation_proto_init() {
+	if File_aggregation_v1_aggregation_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_log_v1_log_proto_rawDesc), len(file_log_v1_log_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_aggregation_v1_aggregation_proto_rawDesc), len(file_aggregation_v1_aggregation_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_log_v1_log_proto_goTypes,
-		DependencyIndexes: file_log_v1_log_proto_depIdxs,
-		EnumInfos:         file_log_v1_log_proto_enumTypes,
-		MessageInfos:      file_log_v1_log_proto_msgTypes,
+		GoTypes:           file_aggregation_v1_aggregation_proto_goTypes,
+		DependencyIndexes: file_aggregation_v1_aggregation_proto_depIdxs,
+		EnumInfos:         file_aggregation_v1_aggregation_proto_enumTypes,
+		MessageInfos:      file_aggregation_v1_aggregation_proto_msgTypes,
 	}.Build()
-	File_log_v1_log_proto = out.File
-	file_log_v1_log_proto_goTypes = nil
-	file_log_v1_log_proto_depIdxs = nil
+	File_aggregation_v1_aggregation_proto = out.File
+	file_aggregation_v1_aggregation_proto_goTypes = nil
+	file_aggregation_v1_aggregation_proto_depIdxs = nil
 }

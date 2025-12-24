@@ -42,8 +42,8 @@ type MongoDBConfig struct {
 	Database string `env:"MONGODB_DATABASE,required"`
 }
 
-// LoadConfig loads configuration from environment variables.
-func LoadConfig() (*Config, error) {
+// InitConfig loads configuration from environment variables.
+func InitConfig() (*Config, error) {
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse config: %w", err)

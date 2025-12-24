@@ -34,12 +34,7 @@ func (s *Service) GetOverview(ctx context.Context) (*repository.OverviewStats, e
 // ListProjects retrieves a paginated list of projects.
 func (s *Service) ListProjects(ctx context.Context, params repository.ListProjectsParams) (*repository.PaginatedProjects, error) {
 	// Apply defaults
-	if params.PageSize <= 0 {
-		params.PageSize = 20
-	}
-	if params.Page <= 0 {
-		params.Page = 1
-	}
+	params.SetDefaults()
 
 	projects, err := s.repo.ListProjects(ctx, params)
 	if err != nil {
@@ -71,17 +66,12 @@ func (s *Service) GetProject(ctx context.Context, projectID string) (*repository
 // ListSessions retrieves paginated sessions for a project.
 func (s *Service) ListSessions(ctx context.Context, params repository.ListSessionsParams) (*repository.PaginatedSessions, error) {
 	// Apply defaults
-	if params.PageSize <= 0 {
-		params.PageSize = 20
-	}
-	if params.Page <= 0 {
-		params.Page = 1
-	}
+	params.SetDefaults()
 
 	sessions, err := s.repo.ListSessions(ctx, params)
 	if err != nil {
 		s.logger.Error("failed to list sessions",
-			slog.String("projectID", params.ProjectID),
+			slog.String("projectID", params.Query.ProjectID),
 			slog.Int("page", int(params.Page)),
 			slog.Int("pageSize", int(params.PageSize)),
 			slog.Any("error", err),

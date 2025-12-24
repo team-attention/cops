@@ -12,11 +12,11 @@ func Run() {
 		// Modules
 		newPlatformModule(),
 		newHealthModule(),
-		newLogModule(),
+		newAggregationModule(),
 		newDashboardModule(),
 
 		// Registrations (invoked for side effects)
-		fx.Invoke(registerFiberServer),
+		fx.Invoke(registerConnectRPCServer),
 
 		// Lifecycle timeouts
 		fx.StartTimeout(30*time.Second),

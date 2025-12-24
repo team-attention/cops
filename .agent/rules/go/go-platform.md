@@ -1,7 +1,7 @@
 ---
 trigger: always_on
-globs: **/internal/platform/**/*
-paths: **/internal/platform/**/*
+globs: **/internal/platform/**/*.go
+paths: **/internal/platform/**/*.go
 ---
 
 # Platform Package Guidelines

@@ -42,8 +42,8 @@ const (
 )
 
 const (
-    AddressFieldID         = "_id"
-    AddressFieldProjectID  = "projectId"
+    AddressIDField         = "_id"
+    AddressProjectIDField  = "projectId"
     // ... more fields
 )
 
@@ -81,12 +81,12 @@ const (
 ### Pattern
 ```go
 const (
-    {Entity}Field{FieldName} = "{bsonName}"
+    {Entity}{FieldName}Field = "{bsonName}"
 )
 ```
 
 ### Rules
-- **Naming**: `{Entity}Field{FieldName}` (e.g., `AddressFieldID`, `AddressFieldProjectID`)
+- **Naming**: `{Entity}{FieldName}Field` (e.g., `AddressIDField`, `AddressProjectIDField`)
 - **Placement**: Second const block in the file
 - **All fields**: Include constants for ALL fields in the struct (both ID and domain fields)
 - **Ordering**: ID fields first, then domain fields
@@ -208,16 +208,16 @@ const (
 )
 
 const (
-    AddressFieldID         = "_id"
-    AddressFieldProjectID  = "projectId"
-    AddressFieldSourceID   = "sourceId"
-    AddressFieldParentIDs  = "parents"
-    AddressFieldStep       = "step"
-    AddressFieldOptOut     = "optOut"
-    AddressFieldStatus     = "status"
-    AddressFieldUniqueID   = "uniqueId"
-    AddressFieldOriginal   = "original"
-    AddressFieldNormalized = "normalized"
+    AddressIDField         = "_id"
+    AddressProjectIDField  = "projectId"
+    AddressSourceIDField   = "sourceId"
+    AddressParentIDsField  = "parents"
+    AddressStepField       = "step"
+    AddressOptOutField     = "optOut"
+    AddressStatusField     = "status"
+    AddressUniqueIDField   = "uniqueId"
+    AddressOriginalField   = "original"
+    AddressNormalizedField = "normalized"
 )
 
 type Address struct {
@@ -280,7 +280,7 @@ func (s *Address) ToDomain() *domain.Address {
 When creating a MongoSchema file:
 - [ ] Follow mandatory file structure order (imports → collection const → field consts → struct → FromDomain → ToDomain)
 - [ ] Use `{Entity}CollectionName` naming for collection constant
-- [ ] Define field constants for ALL fields using `{Entity}Field{FieldName}` pattern
+- [ ] Define field constants for ALL fields using `{Entity}{FieldName}Field` pattern
 - [ ] Embed domain model with `bson:",inline"`
 - [ ] Override all ID fields as `bson.ObjectID`
 - [ ] FromDomain: Copy embedded struct, then convert IDs with implicit error ignore (`_`)

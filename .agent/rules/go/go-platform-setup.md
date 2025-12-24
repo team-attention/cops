@@ -1,7 +1,7 @@
 ---
 trigger: glob
-globs: **/internal/platform/setup/**/*
-paths: **/internal/platform/setup/**/*
+globs: **/internal/platform/setup/**/*.go
+paths: **/internal/platform/setup/**/*.go
 ---
 
 # Platform Setup Guidelines

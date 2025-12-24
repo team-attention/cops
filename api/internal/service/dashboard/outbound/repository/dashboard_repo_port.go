@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/team-attention/cops/api/internal/platform/structure"
 	shareddomain "github.com/team-attention/cops/shared/domain"
 )
 
@@ -15,52 +16,55 @@ type TokenUsageSummary struct {
 	TotalCacheReadTokens     int64
 }
 
-// ProjectSummary contains project overview data.
+// ProjectAggregation contains computed/aggregated fields for a project.
+// These are derived from session records, not stored with the project itself.
+type ProjectAggregation struct {
+	SessionCount int32
+	Usage        TokenUsageSummary
+	LastActivity time.Time
+}
+
+// ProjectSummary embeds ProjectAbstract with aggregation data.
+// Used for list views and overview displays.
 type ProjectSummary struct {
-	ID           string
-	Name         string
-	Path         string
-	GitBranch    string
-	SessionCount int32
-	Usage        TokenUsageSummary
-	LastActivity time.Time
+	shareddomain.ProjectAbstract
+	GitBranch string
+	ProjectAggregation
 }
 
-// ProjectDetail contains full project information.
+// ProjectDetail embeds full Project with aggregation data.
+// Used for detailed project views.
 type ProjectDetail struct {
-	ID           string
-	Name         string
-	Path         string
-	GitBranch    string
-	Worktrees    []string
-	SessionCount int32
-	Usage        TokenUsageSummary
-	CreatedAt    time.Time
-	LastActivity time.Time
+	shareddomain.Project
+	ProjectAggregation
 }
 
-// SessionSummary contains session overview data.
-type SessionSummary struct {
-	ID           string
-	ProjectID    string
-	GitBranch    string
-	MessageCount int32
-	Usage        TokenUsageSummary
-	StartedAt    time.Time
-	EndedAt      time.Time
-}
-
-// SessionDetail contains full session information with records.
-type SessionDetail struct {
+// SessionBase contains common identification fields for a session.
+// Used for embedding into SessionSummary and SessionDetail.
+type SessionBase struct {
 	ID        string
 	ProjectID string
 	GitBranch string
-	CWD       string
-	Version   string
-	Usage     TokenUsageSummary
 	StartedAt time.Time
 	EndedAt   time.Time
-	Records   []shareddomain.SessionRecord
+}
+
+// SessionSummary contains session overview data.
+// Embeds SessionBase for common identification.
+type SessionSummary struct {
+	SessionBase
+	MessageCount int32
+	Usage        TokenUsageSummary
+}
+
+// SessionDetail contains full session information with records.
+// Embeds SessionBase for common identification.
+type SessionDetail struct {
+	SessionBase
+	CWD     string
+	Version string
+	Usage   TokenUsageSummary
+	Records []shareddomain.SessionRecord
 }
 
 // OverviewStats contains dashboard overview statistics.
@@ -72,41 +76,27 @@ type OverviewStats struct {
 	RecentSessions []SessionSummary
 }
 
-// ListProjectsParams contains parameters for listing projects.
-type ListProjectsParams struct {
-	Page     int32
-	PageSize int32
-	Search   string
-	SortBy   string
-	SortDesc bool
-}
+// ListProjectsQuery contains filter conditions for listing projects.
+type ListProjectsQuery struct{}
 
-// ListSessionsParams contains parameters for listing sessions.
-type ListSessionsParams struct {
+// ListSessionsQuery contains filter conditions for listing sessions.
+type ListSessionsQuery struct {
 	ProjectID string
-	Page      int32
-	PageSize  int32
 	SortBy    string
 	SortDesc  bool
 }
 
-// PaginatedProjects contains paginated project results.
-type PaginatedProjects struct {
-	Projects    []ProjectSummary
-	CurrentPage int32
-	PageSize    int32
-	TotalPages  int32
-	TotalCount  int64
-}
+// ListProjectsParams is a type alias for paginated project queries.
+type ListProjectsParams = structure.PaginationParams[ListProjectsQuery]
 
-// PaginatedSessions contains paginated session results.
-type PaginatedSessions struct {
-	Sessions    []SessionSummary
-	CurrentPage int32
-	PageSize    int32
-	TotalPages  int32
-	TotalCount  int64
-}
+// ListSessionsParams is a type alias for paginated session queries.
+type ListSessionsParams = structure.PaginationParams[ListSessionsQuery]
+
+// PaginatedProjects is a type alias for paginated project results.
+type PaginatedProjects = structure.PaginatedResult[ProjectSummary]
+
+// PaginatedSessions is a type alias for paginated session results.
+type PaginatedSessions = structure.PaginatedResult[SessionSummary]
 
 // DashboardRepositoryPort defines the interface for dashboard data access.
 type DashboardRepositoryPort interface {

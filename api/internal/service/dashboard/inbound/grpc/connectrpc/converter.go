@@ -21,41 +21,41 @@ func toProtoTokenUsageSummary(usage repository.TokenUsageSummary) *dashboardv1.T
 // toProtoProjectSummary converts repository project summary to protobuf.
 func toProtoProjectSummary(p repository.ProjectSummary) *dashboardv1.ProjectSummary {
 	return &dashboardv1.ProjectSummary{
-		Id:           p.ID,
-		Name:         p.Name,
-		Path:         p.Path,
+		Id:           string(p.ProjectAbstract.ID),
+		Name:         p.ProjectAbstract.Name,
+		Path:         p.ProjectAbstract.Path,
 		GitBranch:    p.GitBranch,
-		SessionCount: p.SessionCount,
-		Usage:        toProtoTokenUsageSummary(p.Usage),
-		LastActivity: timestamppb.New(p.LastActivity),
+		SessionCount: p.ProjectAggregation.SessionCount,
+		Usage:        toProtoTokenUsageSummary(p.ProjectAggregation.Usage),
+		LastActivity: timestamppb.New(p.ProjectAggregation.LastActivity),
 	}
 }
 
 // toProtoProjectDetail converts repository project detail to protobuf.
 func toProtoProjectDetail(p *repository.ProjectDetail) *dashboardv1.ProjectDetail {
 	return &dashboardv1.ProjectDetail{
-		Id:           p.ID,
-		Name:         p.Name,
-		Path:         p.Path,
-		GitBranch:    p.GitBranch,
-		Worktrees:    p.Worktrees,
-		SessionCount: p.SessionCount,
-		Usage:        toProtoTokenUsageSummary(p.Usage),
-		CreatedAt:    timestamppb.New(p.CreatedAt),
-		LastActivity: timestamppb.New(p.LastActivity),
+		Id:           string(p.Project.ID),
+		Name:         p.Project.Name,
+		Path:         p.Project.Path,
+		GitBranch:    p.Project.GitBranch,
+		Worktrees:    p.Project.Worktrees,
+		SessionCount: p.ProjectAggregation.SessionCount,
+		Usage:        toProtoTokenUsageSummary(p.ProjectAggregation.Usage),
+		CreatedAt:    timestamppb.New(p.Project.RegisteredAt),
+		LastActivity: timestamppb.New(p.ProjectAggregation.LastActivity),
 	}
 }
 
 // toProtoSessionSummary converts repository session summary to protobuf.
 func toProtoSessionSummary(s repository.SessionSummary) *dashboardv1.SessionSummary {
 	return &dashboardv1.SessionSummary{
-		Id:           s.ID,
-		ProjectId:    s.ProjectID,
-		GitBranch:    s.GitBranch,
+		Id:           s.SessionBase.ID,
+		ProjectId:    s.SessionBase.ProjectID,
+		GitBranch:    s.SessionBase.GitBranch,
 		MessageCount: s.MessageCount,
 		Usage:        toProtoTokenUsageSummary(s.Usage),
-		StartedAt:    timestamppb.New(s.StartedAt),
-		EndedAt:      timestamppb.New(s.EndedAt),
+		StartedAt:    timestamppb.New(s.SessionBase.StartedAt),
+		EndedAt:      timestamppb.New(s.SessionBase.EndedAt),
 	}
 }
 
@@ -67,14 +67,14 @@ func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetai
 	}
 
 	return &dashboardv1.SessionDetail{
-		Id:        s.ID,
-		ProjectId: s.ProjectID,
-		GitBranch: s.GitBranch,
+		Id:        s.SessionBase.ID,
+		ProjectId: s.SessionBase.ProjectID,
+		GitBranch: s.SessionBase.GitBranch,
 		Cwd:       s.CWD,
 		Version:   s.Version,
 		Usage:     toProtoTokenUsageSummary(s.Usage),
-		StartedAt: timestamppb.New(s.StartedAt),
-		EndedAt:   timestamppb.New(s.EndedAt),
+		StartedAt: timestamppb.New(s.SessionBase.StartedAt),
+		EndedAt:   timestamppb.New(s.SessionBase.EndedAt),
 		Records:   records,
 	}
 }

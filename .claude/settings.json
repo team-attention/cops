@@ -9,9 +9,13 @@
             "Bash(git log:*)",
             "Bash(tree:*)",
             "Bash(xargs:*)",
-            "Bash(go build:*)",
             "Bash(git worktree list:*)",
+            "Bash(gh pr list:*)",
+            "Bash(gh pr view:*)",
+            "Bash(gh api:*)",
             "Bash(buf generate:*)",
+            "Bash(go build:*)",
+            "Bash(go test:*)",
             "mcp__context7__resolve-library-id",
             "mcp__context7__get-library-docs",
             "mcp__ide__getDiagnostics",
@@ -36,6 +40,7 @@
     "enableAllProjectMcpServers": true,
     "enabledMcpjsonServers": [
         "context7",
+        "tavily",
         "linear"
     ],
     "enabledPlugins": {

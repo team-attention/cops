@@ -1,7 +1,7 @@
 ---
 trigger: glob
-globs: **/internal/service/*/inbound/**/*
-paths: **/internal/service/*/inbound/**/*
+globs: **/internal/service/*/inbound/**/*.go
+paths: **/internal/service/*/inbound/**/*.go
 ---
 
 # Inbound Adapter Guidelines

@@ -179,15 +179,6 @@ message GetOverviewResponse {
 message ListProjectsRequest {
   // Pagination parameters
   PaginationRequest pagination = 1;
-
-  // Search query for project name
-  string search = 2;
-
-  // Sort field: "name", "last_activity", "session_count"
-  string sort_by = 3;
-
-  // Sort in descending order
-  bool sort_desc = 4;
 }
 
 // ListProjectsResponse is the response for ListProjects RPC.

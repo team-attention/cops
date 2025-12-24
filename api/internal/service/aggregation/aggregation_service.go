@@ -1,18 +1,11 @@
-package log
+package aggregation
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/team-attention/cops/api/internal/service/log/outbound/repository"
+	"github.com/team-attention/cops/api/internal/service/aggregation/outbound/repository"
 )
-
-// CollectLogsResult contains the result of log collection.
-type CollectLogsResult struct {
-	Success        bool
-	ProcessedCount int32
-	ErrorMessage   string
-}
 
 // Service handles log collection operations.
 type Service struct {
@@ -20,12 +13,19 @@ type Service struct {
 	repo   repository.SessionRecordRepositoryPort
 }
 
-// NewService creates a new log service.
+// NewService creates a new aggregation service.
 func NewService(l *slog.Logger, repo repository.SessionRecordRepositoryPort) *Service {
 	return &Service{
-		logger: l.With(slog.String("name", "log.service")),
+		logger: l.With(slog.String("name", "aggregation.service")),
 		repo:   repo,
 	}
+}
+
+// CollectLogsResult contains the result of log collection.
+type CollectLogsResult struct {
+	Success        bool
+	ProcessedCount int32
+	ErrorMessage   string
 }
 
 // CollectLogs processes a batch of session records and saves them to storage.
