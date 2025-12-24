@@ -58,7 +58,17 @@ graph TD
 
 ## 🚀 시작하기
 
-### 필수 조건
+### 설치
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/team-attention/cops/main/script/install.sh | bash
+```
+
+### 지원 플랫폼
+- macOS (Intel & Apple Silicon)
+- Linux (x86_64 & ARM64)
+
+### 필수 조건 (개발용)
 - Go 1.25+
 - Node.js 20+
 - Docker (MongoDB용)

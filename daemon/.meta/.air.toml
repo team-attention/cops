@@ -3,9 +3,9 @@ tmp_dir = "tmp"
 
 [build]
   # Build command
-  cmd = "go build -o ./tmp/api ./cmd/api"
+  cmd = "go build -o ./tmp/copsd ./cmd/daemon"
   # Binary to run
-  bin = "./tmp/api"
+  bin = "./tmp/copsd start"
   # Watch these extensions
   include_ext = ["go", "toml", "yaml"]
   # Exclude directories

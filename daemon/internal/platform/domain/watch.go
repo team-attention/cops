@@ -34,7 +34,11 @@ type FilePosition struct {
 
 // LogBatch contains multiple session records for API transmission.
 type LogBatch struct {
-	Records   []shareddomain.SessionRecord // Session records from shared domain
-	DaemonID  string                       // Daemon instance ID
-	CreatedAt time.Time                    // Batch creation time
+	Records      []shareddomain.SessionRecord // Session records from shared domain
+	DaemonID     string                       // Daemon instance ID
+	CreatedAt    time.Time                    // Batch creation time
+	ProjectID    string                       // Project ID (for collector API)
+	ProjectName  string                       // Project name (for collector API)
+	ProjectPath  string                       // Project path (for collector API)
+	IsGitProject bool                         // Whether project is git repo
 }

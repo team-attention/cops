@@ -9,6 +9,9 @@ import (
 	"github.com/team-attention/cops/daemon/cmd/internal/container"
 )
 
+// version is set via ldflags during build
+var version = "dev"
+
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "cops-daemon",
@@ -26,7 +29,16 @@ to the API server. It can run as a foreground process or as a launchd service.`,
 		},
 	}
 
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print version",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(version)
+		},
+	}
+
 	rootCmd.AddCommand(startCmd)
+	rootCmd.AddCommand(versionCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

@@ -9,5 +9,5 @@ import (
 // CollectorPort defines the interface for sending records to the collector.
 type CollectorPort interface {
 	// SendRecords sends session records to the collector server.
-	SendRecords(ctx context.Context, projectID domain.ID, records []*domain.SessionRecord) error
+	SendRecords(ctx context.Context, project *domain.Project, records []*domain.SessionRecord) error
 }

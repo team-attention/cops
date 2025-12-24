@@ -3,28 +3,28 @@ package connectrpc
 import (
 	"context"
 	"log/slog"
-	"net/http"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup/config"
+	"github.com/team-attention/cops/daemon/internal/platform/setup/copsapi"
 	shareddomain "github.com/team-attention/cops/shared/domain"
-	logv1 "github.com/team-attention/cops/shared/gen/grpcstub/log/v1"
-	"github.com/team-attention/cops/shared/gen/grpcstub/log/v1/logv1connect"
+	collectorv1 "github.com/team-attention/cops/shared/gen/grpcstub/collector/v1"
+	"github.com/team-attention/cops/shared/gen/grpcstub/collector/v1/collectorv1connect"
 )
 
 // Adapter implements APIClientPort using ConnectRPC.
 type Adapter struct {
 	logger *slog.Logger
-	client logv1connect.LogServiceClient
+	client collectorv1connect.CollectorServiceClient
 }
 
 // NewAdapter creates a new ConnectRPC API client adapter.
-func NewAdapter(l *slog.Logger, cfg *config.Config) *Adapter {
-	client := logv1connect.NewLogServiceClient(
-		&http.Client{Timeout: cfg.API.Timeout},
+func NewAdapter(l *slog.Logger, apiClient *copsapi.APIClient, cfg *config.Config) *Adapter {
+	client := collectorv1connect.NewCollectorServiceClient(
+		apiClient.StandardHTTPClient(),
 		cfg.API.URL,
 	)
 
@@ -36,47 +36,47 @@ func NewAdapter(l *slog.Logger, cfg *config.Config) *Adapter {
 
 // SendLogs sends a batch of logs to the API server.
 func (a *Adapter) SendLogs(ctx context.Context, batch domain.LogBatch) error {
-	req := &logv1.SendLogsReq{
-		Batch: convertBatch(batch),
+	// Note: Collector API uses SendRecords, adapt batch to match
+	req := &collectorv1.SendRecordsReq{
+		Project: &collectorv1.ProjectMetadata{
+			Id:         batch.ProjectID,
+			Name:       batch.ProjectName,
+			Path:       batch.ProjectPath,
+			GitProject: batch.IsGitProject,
+		},
+		Records: convertRecords(batch.Records),
 	}
 
-	resp, err := a.client.SendLogs(ctx, connect.NewRequest(req))
+	resp, err := a.client.SendRecords(ctx, connect.NewRequest(req))
 	if err != nil {
 		return err
 	}
 
 	if !resp.Msg.Success {
-		a.logger.Warn("API returned failure",
-			slog.String("error", resp.Msg.ErrorMessage),
-		)
+		a.logger.Warn("API returned failure")
 	}
 
 	a.logger.Debug("logs sent",
-		slog.Int("processed", int(resp.Msg.ProcessedCount)),
+		slog.Int("processed", int(resp.Msg.RecordsReceived)),
 	)
 
 	return nil
 }
 
-func convertBatch(batch domain.LogBatch) *logv1.LogBatch {
-	records := make([]*logv1.SessionRecord, len(batch.Records))
-	for i, r := range batch.Records {
-		records[i] = convertSessionRecord(r)
+func convertRecords(records []shareddomain.SessionRecord) []*collectorv1.SessionRecord {
+	result := make([]*collectorv1.SessionRecord, len(records))
+	for i, r := range records {
+		result[i] = convertSessionRecord(r)
 	}
-
-	return &logv1.LogBatch{
-		Records:   records,
-		DaemonId:  batch.DaemonID,
-		CreatedAt: timestamppb.New(batch.CreatedAt),
-	}
+	return result
 }
 
-func convertSessionRecord(r shareddomain.SessionRecord) *logv1.SessionRecord {
-	record := &logv1.SessionRecord{
+func convertSessionRecord(r shareddomain.SessionRecord) *collectorv1.SessionRecord {
+	record := &collectorv1.SessionRecord{
 		Uuid:        r.UUID,
 		ParentUuid:  r.ParentUUID,
 		SessionId:   r.SessionID,
-		Type:        convertSessionType(r.Type),
+		Type:        string(r.Type),
 		Timestamp:   timestamppb.New(r.Timestamp),
 		Cwd:         r.CWD,
 		GitBranch:   r.GitBranch,
@@ -89,53 +89,28 @@ func convertSessionRecord(r shareddomain.SessionRecord) *logv1.SessionRecord {
 	}
 
 	if r.Message != nil {
-		record.Message = convertMessage(r.Message)
-	}
+		record.Role = r.Message.Role
+		if r.Message.Content != nil && !r.Message.Content.IsBlocks && r.Message.Content.Text != nil {
+			record.Content = *r.Message.Content.Text
+		}
 
-	return record
-}
+		if r.Message.Usage != nil {
+			record.Usage = &collectorv1.UsageMetadata{
+				InputTokens:              int32(r.Message.Usage.InputTokens),
+				OutputTokens:             int32(r.Message.Usage.OutputTokens),
+				CacheCreationInputTokens: int32(r.Message.Usage.CacheCreationInputTokens),
+				CacheReadInputTokens:     int32(r.Message.Usage.CacheReadInputTokens),
+				ServiceTier:              r.Message.Usage.ServiceTier,
+			}
 
-func convertSessionType(t shareddomain.SessionType) logv1.SessionType {
-	switch t {
-	case shareddomain.SessionTypeUser:
-		return logv1.SessionType_SESSION_TYPE_USER
-	case shareddomain.SessionTypeAssistant:
-		return logv1.SessionType_SESSION_TYPE_ASSISTANT
-	case shareddomain.SessionTypeSystem:
-		return logv1.SessionType_SESSION_TYPE_SYSTEM
-	case shareddomain.SessionTypeSummary:
-		return logv1.SessionType_SESSION_TYPE_SUMMARY
-	case shareddomain.SessionTypeFileHistorySnapshot:
-		return logv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT
-	case shareddomain.SessionTypeQueueOperation:
-		return logv1.SessionType_SESSION_TYPE_QUEUE_OPERATION
-	default:
-		return logv1.SessionType_SESSION_TYPE_UNSPECIFIED
-	}
-}
-
-func convertMessage(m *shareddomain.Message) *logv1.Message {
-	msg := &logv1.Message{
-		Id:         m.ID,
-		Type:       m.Type,
-		Role:       m.Role,
-		Model:      m.Model,
-		StopReason: m.StopReason,
-	}
-
-	if m.Content != nil && !m.Content.IsBlocks && m.Content.Text != nil {
-		msg.Content = *m.Content.Text
-	}
-
-	if m.Usage != nil {
-		msg.Usage = &logv1.Usage{
-			InputTokens:              int32(m.Usage.InputTokens),
-			OutputTokens:             int32(m.Usage.OutputTokens),
-			CacheCreationInputTokens: int32(m.Usage.CacheCreationInputTokens),
-			CacheReadInputTokens:     int32(m.Usage.CacheReadInputTokens),
-			ServiceTier:              m.Usage.ServiceTier,
+			if r.Message.Usage.CacheCreation != nil {
+				record.Usage.CacheCreation = &collectorv1.CacheCreation{
+					Ephemeral_5MInputTokens: int32(r.Message.Usage.CacheCreation.Ephemeral5mInputTokens),
+					Ephemeral_1HInputTokens: int32(r.Message.Usage.CacheCreation.Ephemeral1hInputTokens),
+				}
+			}
 		}
 	}
 
-	return msg
+	return record
 }

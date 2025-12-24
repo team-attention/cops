@@ -5,21 +5,48 @@ C-Ops는 당신의 AI 코딩 파트너 Claude Code의 활동을 시각화하고 
 
 ## 1. 설치 (Installation)
 
-macOS 사용자는 Homebrew를 통해 CLI와 데몬 서비스를 한 번에 설치할 수 있습니다.
+### 자동 설치 (권장)
+
+다음 명령어로 CLI와 데몬 서비스를 한 번에 설치할 수 있습니다:
 
 ```bash
-brew tap team-attention/cops
-brew install cops
+curl -fsSL https://raw.githubusercontent.com/team-attention/cops/main/script/install.sh | bash
 ```
 
-설치가 완료되면, C-Ops 데몬 서비스가 백그라운드에서 자동으로 시작됩니다.
+설치 스크립트는 다음 작업을 자동으로 수행합니다:
+- 현재 플랫폼(OS/아키텍처) 감지
+- 최신 바이너리 다운로드 및 설치 (`~/.cops/bin/`)
+- PATH 환경변수 설정
+- 데몬 서비스 자동 등록 및 시작
 
-> **수동 설치**:
-> Go가 설치된 환경이라면 다음 명령어로 설치할 수 있습니다:
-> ```bash
-> go install github.com/team-attention/cops/cmd/cops@latest
-> ```
-> *참고: 수동 설치 시 데몬(`copsd`)을 별도로 실행해야 합니다.*
+### 지원 플랫폼
+- macOS (Intel & Apple Silicon)
+- Linux (x86_64 & ARM64)
+
+### 특정 버전 설치
+
+특정 버전을 설치하려면 `COPS_VERSION` 환경변수를 사용하세요:
+
+```bash
+COPS_VERSION=v1.0.0 curl -fsSL https://raw.githubusercontent.com/team-attention/cops/main/script/install.sh | bash
+```
+
+### 설치 후 확인
+
+설치가 완료되면 터미널을 재시작하거나 다음 명령어를 실행하세요:
+
+```bash
+source ~/.zprofile  # zsh 사용자
+# 또는
+source ~/.bash_profile  # bash 사용자
+```
+
+버전 확인:
+
+```bash
+cops version
+cops-daemon version
+```
 
 ## 2. 서버 연결 (Setup)
 

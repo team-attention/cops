@@ -1,6 +1,11 @@
 settings.local.json
 .worktree
 
+# Project binaries
+/cops
+/cops-*
+/daemon
+
 # Created by https://www.toptal.com/developers/gitignore/api/macos,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,go
 

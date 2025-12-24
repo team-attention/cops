@@ -113,9 +113,11 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 
 	// Create project
 	project := &domain.Project{
-		ID:           projectID,
-		Name:         name,
-		Path:         projectPath,
+		ProjectAbstract: domain.ProjectAbstract{
+			ID:   projectID,
+			Name: name,
+			Path: projectPath,
+		},
 		GitProject:   isGitProject,
 		ClaudeDir:    claudeProjectDir,
 		RegisteredAt: time.Now(),
@@ -256,7 +258,7 @@ func (s *Service) SyncProject(ctx context.Context, projectID domain.ID) error {
 	}
 
 	// Send to collector
-	if err := s.collector.SendRecords(ctx, projectID, records); err != nil {
+	if err := s.collector.SendRecords(ctx, project, records); err != nil {
 		return errutil.Internalf("Collector server must be running for sync: %v", err)
 	}
 

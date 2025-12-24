@@ -37,7 +37,7 @@ func NewCollectorClient(l *slog.Logger, cfg *config.Config, httpClient *httpclie
 }
 
 // SendRecords sends session records to the collector server.
-func (c *CollectorClient) SendRecords(ctx context.Context, projectID domain.ID, records []*domain.SessionRecord) error {
+func (c *CollectorClient) SendRecords(ctx context.Context, project *domain.Project, records []*domain.SessionRecord) error {
 	protoRecords := make([]*collectorv1.SessionRecord, 0, len(records))
 
 	for _, r := range records {
@@ -87,8 +87,13 @@ func (c *CollectorClient) SendRecords(ctx context.Context, projectID domain.ID, 
 	}
 
 	req := connect.NewRequest(&collectorv1.SendRecordsReq{
-		ProjectId: projectID.String(),
-		Records:   protoRecords,
+		Project: &collectorv1.ProjectMetadata{
+			Id:         project.ID.String(),
+			Name:       project.Name,
+			Path:       project.Path,
+			GitProject: project.GitProject,
+		},
+		Records: protoRecords,
 	})
 
 	resp, err := c.client.SendRecords(ctx, req)

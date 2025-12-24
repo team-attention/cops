@@ -20,3 +20,10 @@ type Project struct {
 	Worktrees    []string  `json:"worktrees,omitempty"`    // Worktree paths for git projects
 	RegisteredAt time.Time `json:"registeredAt"`           // When the project was registered
 }
+
+// ProjectWithWorktrees represents a project with dynamically discovered worktrees.
+// Used for listing projects with their git worktree information.
+type ProjectWithWorktrees struct {
+	Project
+	Worktrees []string `json:"worktrees,omitempty"` // Dynamically discovered worktree paths
+}

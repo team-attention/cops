@@ -48,6 +48,7 @@ type DaemonConfig struct {
 
 // LoadConfig loads configuration from environment variables using Viper.
 // Environment variables are prefixed with COPS_ (e.g., COPS_LOG_LEVEL).
+// Version is read from COPS_APP_VERSION environment variable.
 func LoadConfig() (*Config, error) {
 	v := viper.New()
 
@@ -58,7 +59,7 @@ func LoadConfig() (*Config, error) {
 
 	// Set defaults
 	v.SetDefault("app.name", "cops")
-	v.SetDefault("app.version", "0.0.1")
+	v.SetDefault("app.version", "dev")
 	v.SetDefault("logging.level", "info")
 	v.SetDefault("logging.format", "text")
 	v.SetDefault("collector.url", "http://localhost:8080")
