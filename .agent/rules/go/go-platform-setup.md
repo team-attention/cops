@@ -1,12 +1,27 @@
 ---
 trigger: glob
-globs: **/internal/platform/setup/**/*.go
-paths: **/internal/platform/setup/**/*.go
+globs: **/internal/platform/setup/*.go
+paths: **/internal/platform/setup/*.go
 ---
 
 # Platform Setup Guidelines
 
 The setup package contains initialization functions for platform-level dependencies (databases, external clients, logging, etc.).
+
+## Package Structure
+
+All setup files are placed directly in the `setup` package (not in subdirectories):
+
+```
+platform/setup/
+├── config.go      # Configuration loading
+├── logger.go      # Logger initialization
+├── sqlite.go      # SQLite database initialization
+├── mongodb.go     # MongoDB database initialization (example)
+└── copsapi.go     # API client initialization
+```
+
+**Pattern**: `setup/{resource}.go` - All in one package (`package setup`)
 
 ## Function Pattern
 
@@ -15,7 +30,7 @@ Setup functions follow these patterns:
 ### Root Setup (no dependencies)
 
 ```go
-func Init{Service}(cfg *config.Config) *{ReturnType} {
+func Init{Service}(cfg *Config) *{ReturnType} {
     // Extract config, initialize, return
 }
 ```
@@ -23,7 +38,7 @@ func Init{Service}(cfg *config.Config) *{ReturnType} {
 ### Dependent Setup (requires other services)
 
 ```go
-func Init{Service}(cfg *config.Config, logger *slog.Logger, ...) (*{ReturnType}, error) {
+func Init{Service}(cfg *Config, logger *slog.Logger, ...) (*{ReturnType}, error) {
     // Use injected dependencies
     // Extract config, initialize, return
 }
@@ -32,7 +47,7 @@ func Init{Service}(cfg *config.Config, logger *slog.Logger, ...) (*{ReturnType},
 ### Rules
 
 1. **Function naming**: Always use `Init{Service}` pattern
-2. **First parameter**: Always `cfg *config.Config` (full Config object)
+2. **First parameter**: Always `cfg *Config` (full Config object, same package)
 3. **Additional parameters**: Accept required dependencies (logger, other services)
 4. **Return type**: Return the initialized client/service instance
 5. **Error handling**: Return error if initialization can fail
@@ -43,7 +58,9 @@ func Init{Service}(cfg *config.Config, logger *slog.Logger, ...) (*{ReturnType},
 
 ```go
 // internal/platform/setup/logger.go
-func InitLogger(cfg *config.Config) *slog.Logger {
+package setup
+
+func InitLogger(cfg *Config) *slog.Logger {
     var handler slog.Handler
 
     if cfg.Logging.DevMode {
@@ -64,7 +81,9 @@ func InitLogger(cfg *config.Config) *slog.Logger {
 
 ```go
 // internal/platform/setup/mongodb.go
-func InitMongoDB(cfg *config.Config, logger *slog.Logger) (*mongo.Database, error) {
+package setup
+
+func InitMongoDB(cfg *Config, logger *slog.Logger) (*mongo.Database, error) {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
@@ -88,7 +107,9 @@ func InitMongoDB(cfg *config.Config, logger *slog.Logger) (*mongo.Database, erro
 Configuration uses struct-based approach with environment variable binding:
 
 ```go
-// internal/platform/setup/config/config.go
+// internal/platform/setup/config.go
+package setup
+
 type Config struct {
     HTTP     HTTPConfig
     MongoDB  MongoDBConfig
@@ -131,29 +152,71 @@ func LoadConfig() (*Config, error) {
 
 ```go
 // cmd/internal/container/module_platform.go
+import "github.com/team-attention/cops/daemon/internal/platform/setup"
+
 func newPlatformModule() fx.Option {
     return fx.Module("platform",
-        // Config
-        fx.Provide(config.LoadConfig),
+        // Configuration (root - no dependencies)
+        fx.Provide(setup.LoadConfig),
 
-        // Root setup - only takes config
+        // Logger (depends on config)
         fx.Provide(setup.InitLogger),
 
-        // Dependent setup - takes config + logger
-        fx.Provide(setup.InitMongoDB),
+        // SQLite DB (depends on config and logger)
+        fx.Provide(setup.InitSQLite),
 
-        // More setups...
-        fx.Provide(setup.InitValidator),
+        // API Client (depends on config)
+        fx.Provide(setup.InitAPIClient),
     )
 }
 ```
 
+## Table Creation Pattern
+
+Database setup functions should handle table/schema creation:
+
+```go
+func InitSQLite(cfg *Config, logger *slog.Logger) (*sql.DB, error) {
+    // ... connection setup ...
+
+    // Create tables as part of initialization
+    if err := createTables(db); err != nil {
+        db.Close()
+        return nil, fmt.Errorf("failed to create tables: %w", err)
+    }
+
+    return db, nil
+}
+
+// Helper function for table creation
+func createTables(db *sql.DB) error {
+    queries := []string{
+        `CREATE TABLE IF NOT EXISTS table_name (...)`,
+        // Add more tables as needed
+    }
+
+    for _, query := range queries {
+        if _, err := db.Exec(query); err != nil {
+            return err
+        }
+    }
+    return nil
+}
+```
+
+**Why here and not in adapters?**
+- Infrastructure setup is platform concern
+- Shared across all adapters using the DB
+- Centralized schema management
+
 ## Best Practices
 
-1. **Always pass full Config**: Functions receive the complete `*config.Config` object
-2. **Extract what you need**: Inside the function, extract only the relevant configuration
-3. **Inject dependencies**: Accept dependencies (logger, other services) as function parameters
-4. **Log initialization**: Always log when a service is initialized
-5. **Handle errors**: Return errors if initialization can fail
-6. **Test connections**: For external services, verify the connection before returning
-7. **Context with timeout**: Use context with timeout for network operations
+1. **Single package**: All setup files in `platform/setup/` package (no subdirectories)
+2. **Always pass full Config**: Functions receive the complete `*Config` object
+3. **Extract what you need**: Inside the function, extract only the relevant configuration
+4. **Inject dependencies**: Accept dependencies (logger, other services) as function parameters
+5. **Log initialization**: Always log when a service is initialized
+6. **Handle errors**: Return errors if initialization can fail
+7. **Test connections**: For external services, verify the connection before returning
+8. **Context with timeout**: Use context with timeout for network operations
+9. **Create tables/schemas**: Database setup functions should handle table creation

@@ -1,0 +1,65 @@
+package container
+
+import (
+	"go.uber.org/fx"
+
+	"github.com/team-attention/cops/daemon/internal/platform/domain"
+	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub"
+	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub/inmemory"
+	"github.com/team-attention/cops/daemon/internal/service/log"
+	fsnotifyhandler "github.com/team-attention/cops/daemon/internal/service/log/inbound/worker/fsnotify"
+	pubsubhandler "github.com/team-attention/cops/daemon/internal/service/log/inbound/worker/pubsub"
+	"github.com/team-attention/cops/daemon/internal/service/log/outbound/api"
+	connectrpc "github.com/team-attention/cops/daemon/internal/service/log/outbound/api/connectrpc"
+	"github.com/team-attention/cops/daemon/internal/service/log/outbound/filesystem"
+	fsnotifyadapter "github.com/team-attention/cops/daemon/internal/service/log/outbound/filesystem/fsnotify"
+	"github.com/team-attention/cops/daemon/internal/service/log/outbound/repository"
+	sqlite "github.com/team-attention/cops/daemon/internal/service/log/outbound/repository/sqlite"
+)
+
+func newLogModule() fx.Option {
+	return fx.Module("log",
+		// Outbound: FileWatchPort (wraps shared watcher from platform)
+		fx.Provide(fx.Annotate(
+			fsnotifyadapter.NewFileWatchAdapter,
+			fx.As(new(filesystem.FileWatchPort)),
+		)),
+
+		// Outbound: PubSub ReaderPort
+		fx.Provide(fx.Annotate(
+			func(ps *inmemory.PubSub[[]domain.WatchTarget]) pubsub.ReaderPort[[]domain.WatchTarget] {
+				return ps
+			},
+			fx.As(new(pubsub.ReaderPort[[]domain.WatchTarget])),
+		)),
+
+		// Outbound: StateRepositoryPort
+		fx.Provide(fx.Annotate(
+			sqlite.NewSQLiteStateRepository,
+			fx.As(new(repository.StateRepositoryPort)),
+		)),
+
+		// Outbound: APIClientPort
+		fx.Provide(fx.Annotate(
+			connectrpc.NewAPIClient,
+			fx.As(new(api.APIClientPort)),
+		)),
+
+		// Service
+		fx.Provide(log.NewService),
+
+		// Inbound 1: Fsnotify Handler (reads watcher.Events)
+		fx.Provide(fx.Annotate(
+			fsnotifyhandler.NewLogFsnotifyHandler,
+			fx.As(new(FsnotifyHandler)),
+			fx.ResultTags(`group:"fsnotify_handlers"`),
+		)),
+
+		// Inbound 2: PubSub Handler (target changes → Service.UpdateTargets)
+		fx.Provide(fx.Annotate(
+			pubsubhandler.NewLogPubsubHandler,
+			fx.As(new(FsnotifyHandler)),
+			fx.ResultTags(`group:"fsnotify_handlers"`),
+		)),
+	)
+}

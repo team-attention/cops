@@ -46,6 +46,45 @@ outbound/                   # External dependencies
 ### Constructor Names
 - `New{StructName}(...) {Category Interface} { ... }` (ex. `func NewMongoAgentRepository(...) repository.OrganizationRepositoryPort { ... }`, `func NewK8SSecretResource(...) resource.SecretResourcePort { ... }`)
 
+## Constructor Dependency Injection
+
+### Outbound adapters should depend on platform-initialized infrastructure
+
+When an adapter requires external resources (database, HTTP client, etc.):
+- **DO**: Accept pre-initialized infrastructure from `platform/setup` (e.g., `*sql.DB`, `*mongo.Database`)
+- **DON'T**: Initialize infrastructure directly in the adapter
+- **DON'T**: Accept configuration and initialize infrastructure yourself
+
+Example:
+```go
+// CORRECT: Accept pre-initialized DB from platform/setup
+func NewSQLiteStateRepository(l *slog.Logger, db *sql.DB) (repository.StateRepositoryPort, error) {
+    // Create table if not exists
+    if err := createTable(db); err != nil {
+        return nil, err
+    }
+    // ...
+}
+
+// WRONG: Don't initialize infrastructure in adapter
+func NewSQLiteStateRepository(l *slog.Logger, cfg *config.Config) (repository.StateRepositoryPort, error) {
+    db, err := sql.Open("sqlite3", cfg.DaemonDataDir+"/state.db")
+    // ...
+}
+
+// WRONG: Don't inject individual primitive values
+func NewSQLiteStateRepository(l *slog.Logger, dataDir string) (repository.StateRepositoryPort, error) {
+    db, err := sql.Open("sqlite3", dataDir+"/state.db")
+    // ...
+}
+```
+
+This ensures:
+1. Infrastructure initialization is centralized in `platform/setup`
+2. Adapters focus on business logic, not infrastructure setup
+3. Database connections are shared and managed via DI container lifecycle
+4. Consistent pattern across all outbound adapters
+
 # Common Patterns
 
 ## List Operations

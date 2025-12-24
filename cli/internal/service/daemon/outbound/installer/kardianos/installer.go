@@ -96,7 +96,6 @@ func (i *KardianosInstaller) createService() (service.Service, error) {
 		DisplayName: "C-Ops Daemon",
 		Description: "C-Ops background service for Claude Code session tracking",
 		Executable:  binaryPath,
-		Arguments:   []string{"start"},
 		Option: service.KeyValue{
 			"KeepAlive": true,
 			"RunAtLoad": true,

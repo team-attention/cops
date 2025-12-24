@@ -1,0 +1,154 @@
+package fsnotify
+
+import (
+	"context"
+	"log/slog"
+	"strings"
+	"time"
+
+	"github.com/fsnotify/fsnotify"
+
+	"github.com/team-attention/cops/daemon/internal/platform/domain"
+	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/service/logwatcher"
+	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/repository"
+)
+
+// LogFsnotifyHandler owns the fsnotify event loop for log file watching.
+type LogFsnotifyHandler struct {
+	logger        *slog.Logger
+	svc           *logwatcher.Service
+	stateRepo     repository.StateRepositoryPort
+	watcher       *fsnotify.Watcher // shared with Outbound FileWatchPort
+	filePositions map[string]int64
+	flushTicker   *time.Ticker
+	ctx           context.Context
+	cancel        context.CancelFunc
+}
+
+// NewLogFsnotifyHandler creates a new fsnotify handler for log watching.
+func NewLogFsnotifyHandler(
+	l *slog.Logger,
+	svc *logwatcher.Service,
+	stateRepo repository.StateRepositoryPort,
+	watcher *fsnotify.Watcher,
+	cfg *setup.Config,
+) *LogFsnotifyHandler {
+	return &LogFsnotifyHandler{
+		logger:        l.With(slog.String("name", "log.worker.fsnotify")),
+		svc:           svc,
+		stateRepo:     stateRepo,
+		watcher:       watcher,
+		filePositions: make(map[string]int64),
+	}
+}
+
+// Name implements FsnotifyHandler interface.
+func (h *LogFsnotifyHandler) Name() string {
+	return "log-fsnotify"
+}
+
+// Start implements FsnotifyHandler interface.
+func (h *LogFsnotifyHandler) Start(ctx context.Context) error {
+	h.ctx, h.cancel = context.WithCancel(ctx)
+
+	// Load saved file positions from SQLite
+	positions, err := h.stateRepo.LoadFilePositions(ctx)
+	if err != nil {
+		h.logger.Warn("failed to load file positions",
+			slog.Any("error", err),
+		)
+	} else {
+		for path, pos := range positions {
+			h.filePositions[path] = pos.Offset
+		}
+		h.logger.Info("loaded file positions",
+			slog.Int("count", len(positions)),
+		)
+	}
+
+	h.flushTicker = time.NewTicker(5 * time.Second)
+
+	h.logger.Info("log fsnotify handler started")
+	go h.loop()
+	return nil
+}
+
+// Stop implements FsnotifyHandler interface.
+func (h *LogFsnotifyHandler) Stop(ctx context.Context) error {
+	if h.cancel != nil {
+		h.cancel()
+	}
+	if h.flushTicker != nil {
+		h.flushTicker.Stop()
+	}
+
+	// Final flush
+	if err := h.svc.Flush(ctx); err != nil {
+		h.logger.Error("failed to flush on stop", slog.Any("error", err))
+	}
+
+	if err := h.stateRepo.Close(); err != nil {
+		h.logger.Warn("failed to close state repository",
+			slog.Any("error", err),
+		)
+	}
+
+	h.logger.Info("log fsnotify handler stopped")
+	return nil
+}
+
+func (h *LogFsnotifyHandler) loop() {
+	for {
+		select {
+		case <-h.ctx.Done():
+			return
+		case event := <-h.watcher.Events:
+			h.handleFileEvent(event)
+		case <-h.flushTicker.C:
+			if err := h.svc.Flush(h.ctx); err != nil {
+				h.logger.Error("failed to flush", slog.Any("error", err))
+			}
+		case err := <-h.watcher.Errors:
+			h.logger.Error("watcher error", slog.Any("error", err))
+		}
+	}
+}
+
+func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
+	// Only process JSONL files
+	if !strings.HasSuffix(event.Name, ".jsonl") {
+		return
+	}
+
+	// Only process write and create events
+	if event.Op&fsnotify.Write == 0 && event.Op&fsnotify.Create == 0 {
+		return
+	}
+
+	offset := h.filePositions[event.Name]
+	records, newOffset, err := h.svc.HandleFileChange(event.Name, offset)
+	if err != nil {
+		h.logger.Debug("failed to handle file change",
+			slog.String("path", event.Name),
+			slog.Any("error", err),
+		)
+		return
+	}
+
+	if len(records) > 0 {
+		h.svc.AddRecords(records)
+		h.filePositions[event.Name] = newOffset
+
+		// Save position to SQLite
+		if err := h.stateRepo.SaveFilePosition(h.ctx, &domain.FilePosition{
+			Path:   event.Name,
+			Offset: newOffset,
+		}); err != nil {
+			h.logger.Warn("failed to save file position",
+				slog.String("path", event.Name),
+				slog.Any("error", err),
+			)
+		}
+	}
+}

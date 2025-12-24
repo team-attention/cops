@@ -1,47 +1,56 @@
 package configwatcher
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
-	"sync"
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
-	"github.com/team-attention/cops/daemon/internal/platform/setup/config"
+	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub"
+	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/gitutil"
+	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 )
 
-// Service watches the global config file for changes.
+// Service contains pure business logic for config watching.
+// No goroutines, no event loops - just business logic.
 type Service struct {
-	logger   *slog.Logger
-	port     FileWatchPort
-	path     string
-	onChange func(domain.GlobalConfig)
-	mu       sync.RWMutex
-	ctx      context.Context
-	cancel   context.CancelFunc
+	logger     *slog.Logger
+	pubsub     pubsub.WriterPort[[]domain.WatchTarget]
+	configPath string
 }
 
 // NewService creates a new ConfigWatcher service.
-func NewService(l *slog.Logger, port FileWatchPort, cfg *config.Config) *Service {
+func NewService(l *slog.Logger, ps pubsub.WriterPort[[]domain.WatchTarget], cfg *setup.Config) *Service {
 	return &Service{
-		logger: l.With(slog.String("name", "configwatcher.service")),
-		port:   port,
-		path:   cfg.Cops.GlobalConfigPath,
+		logger:     l.With(slog.String("name", "configwatcher.service")),
+		pubsub:     ps,
+		configPath: cfg.Cops.GlobalConfigPath,
 	}
 }
 
-// OnConfigChange registers a callback for config changes.
-func (s *Service) OnConfigChange(fn func(domain.GlobalConfig)) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.onChange = fn
+// HandleConfigChange handles a config file change event.
+// This is called by the Inbound handler when the file changes.
+func (s *Service) HandleConfigChange(path string) error {
+	cfg, err := s.loadConfig(path)
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	targets := s.buildWatchTargets(cfg)
+
+	s.logger.Info("config loaded and targets built",
+		slog.Int("projects", len(cfg.Projects)),
+		slog.Int("targets", len(targets)),
+	)
+
+	return s.pubsub.Publish(targets)
 }
 
-// LoadConfig loads and parses the global config file.
-func (s *Service) LoadConfig() (*domain.GlobalConfig, error) {
-	data, err := os.ReadFile(s.path)
+// loadConfig loads and parses the global config file.
+func (s *Service) loadConfig(path string) (*domain.GlobalConfig, error) {
+	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			// Return empty config if file doesn't exist
@@ -58,66 +67,44 @@ func (s *Service) LoadConfig() (*domain.GlobalConfig, error) {
 	return &cfg, nil
 }
 
-// Start begins watching the config file.
-func (s *Service) Start(ctx context.Context) error {
-	s.ctx, s.cancel = context.WithCancel(ctx)
+// buildWatchTargets builds watch targets from global config.
+// This includes main project directories and git worktrees.
+func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarget {
+	var targets []domain.WatchTarget
 
-	if err := s.port.Watch(s.path); err != nil {
-		s.logger.Warn("failed to watch config file, will retry on next change",
-			slog.String("path", s.path),
-			slog.Any("error", err),
-		)
-	}
+	for _, project := range cfg.Projects {
+		if !project.Active {
+			continue
+		}
 
-	go s.loop()
-	s.logger.Info("config watcher started", slog.String("path", s.path))
-	return nil
-}
+		// Add main project directory
+		targets = append(targets, domain.WatchTarget{
+			ProjectPath: project.Path,
+			ClaudeDir:   pathutil.GetClaudeProjectDir(project.Path),
+			Type:        domain.WatchTargetRoot,
+		})
 
-// Stop stops watching the config file.
-func (s *Service) Stop() error {
-	if s.cancel != nil {
-		s.cancel()
-	}
-	return s.port.Close()
-}
-
-func (s *Service) loop() {
-	for {
-		select {
-		case <-s.ctx.Done():
-			return
-		case event, ok := <-s.port.Events():
-			if !ok {
-				return
+		// Add worktrees if git project
+		if project.IsGitProject {
+			worktrees, err := gitutil.GetWorktrees(project.Path)
+			if err != nil {
+				s.logger.Warn("failed to get worktrees",
+					slog.String("path", project.Path),
+					slog.Any("error", err),
+				)
+				continue
 			}
-			if event.Has(OpWrite) || event.Has(OpCreate) {
-				s.handleConfigChange()
+
+			// Skip first element (main repo) as it's already added
+			for _, wt := range worktrees[1:] {
+				targets = append(targets, domain.WatchTarget{
+					ProjectPath: wt,
+					ClaudeDir:   pathutil.GetClaudeProjectDir(wt),
+					Type:        domain.WatchTargetWorktree,
+				})
 			}
-		case err, ok := <-s.port.Errors():
-			if !ok {
-				return
-			}
-			s.logger.Error("config watcher error", slog.Any("error", err))
 		}
 	}
-}
 
-func (s *Service) handleConfigChange() {
-	cfg, err := s.LoadConfig()
-	if err != nil {
-		s.logger.Error("failed to load config after change", slog.Any("error", err))
-		return
-	}
-
-	s.mu.RLock()
-	onChange := s.onChange
-	s.mu.RUnlock()
-
-	if onChange != nil {
-		s.logger.Info("config changed, notifying listeners",
-			slog.Int("projects", len(cfg.Projects)),
-		)
-		onChange(*cfg)
-	}
+	return targets
 }

@@ -11,11 +11,11 @@ func Run() {
 	fx.New(
 		// Modules
 		newPlatformModule(),
-		newWatcherModule(),
-		newProcessorModule(),
+		newConfigModule(),
+		newLogModule(),
 
-		// Orchestrator registration
-		fx.Invoke(registerWatcher),
+		// Handler registration
+		fx.Invoke(registerFsnotify),
 
 		// Lifecycle timeouts
 		fx.StartTimeout(30*time.Second),
