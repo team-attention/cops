@@ -1,0 +1,4 @@
+- [ ] API 서버에 HealthCheck Handler가 Fiber에 붙어있음. gRPC (ConnectRPC)만 사용해야함.
+- [ ] CLI의 기본 설명이 Deprecated된 설명임
+- [ ] Planning할 때 기본적인 해당 디렉토리의 규칙이 잘 안들어감.
+  - [ ] ex. inbound/** 아래에 무슨 파일을 만들어야겠다고 할 때 Planning에는 잘못된 방식으로 들어감. 아마 Planning때 모든 규칙이 Load되지는 않기 때문인 것 같음.

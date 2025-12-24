@@ -1,7 +1,7 @@
 ---
 trigger: glob
-globs: **/internal/service/*/inbound/worker/queue/*
-paths: **/internal/service/*/inbound/worker/queue/*
+globs: **/internal/service/*/inbound/worker/queue/*.go
+paths: **/internal/service/*/inbound/worker/queue/*.go
 ---
 
 # Queue Worker Inbound Handler Guidelines

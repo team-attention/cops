@@ -1,7 +1,7 @@
 ---
 trigger: glob
-globs: **/internal/service/*/inbound/grpc/connectrpc/*
-paths: **/internal/service/*/inbound/grpc/connectrpc/*
+globs: **/internal/service/*/inbound/grpc/connectrpc/*.go
+paths: **/internal/service/*/inbound/grpc/connectrpc/*.go
 ---
 
 # ConnectRPC Inbound Handler Guidelines

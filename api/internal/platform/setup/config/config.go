@@ -38,12 +38,12 @@ type LoggingConfig struct {
 
 // MongoDBConfig holds MongoDB connection settings.
 type MongoDBConfig struct {
-	URI      string `env:"MONGODB_URI" envDefault:"mongodb://localhost:27017"`
-	Database string `env:"MONGODB_DATABASE" envDefault:"cops"`
+	URI      string `env:"MONGODB_URI,required"`
+	Database string `env:"MONGODB_DATABASE,required"`
 }
 
-// LoadConfig loads configuration from environment variables.
-func LoadConfig() (*Config, error) {
+// InitConfig loads configuration from environment variables.
+func InitConfig() (*Config, error) {
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse config: %w", err)

@@ -10,8 +10,8 @@ import (
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
 )
 
-// NewFiberApp creates a configured Fiber application.
-func NewFiberApp(cfg *config.Config, logger *slog.Logger) *fiber.App {
+// InitFiber creates a configured Fiber application.
+func InitFiber(cfg *config.Config, logger *slog.Logger) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:               cfg.App.Name,
 		ReadTimeout:           cfg.Server.ReadTimeout,

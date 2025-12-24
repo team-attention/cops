@@ -1,7 +1,7 @@
 ---
 trigger: glob
-globs: **/internal/service/**/inbound/**/*, **/internal/service/**/outbound/**/*, **/internal/platform/outbound/**/*
-paths: **/internal/service/**/inbound/**/*, **/internal/service/**/outbound/**/*, **/internal/platform/outbound/**/*
+globs: **/internal/service/**/inbound/**/*.go, **/internal/service/**/outbound/**/*.go, **/internal/platform/outbound/**/*.go
+paths: **/internal/service/**/inbound/**/*.go, **/internal/service/**/outbound/**/*.go, **/internal/platform/outbound/**/*.go
 ---
 
 # Port/Adapter Pattern (Hexagonal Architecture)
