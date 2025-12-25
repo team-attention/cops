@@ -4,16 +4,6 @@ description: |
   Implementation specialist that executes any plan format.
   Handles both initial implementation and revisions.
   Reusable across all workflow types.
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - LSP
-  - mcp__context7__resolve-library-id
-  - mcp__context7__get-library-docs
 model: sonnet
 ---
 

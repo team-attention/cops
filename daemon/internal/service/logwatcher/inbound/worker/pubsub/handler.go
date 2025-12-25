@@ -32,14 +32,9 @@ func NewLogPubsubHandler(
 	}
 }
 
-// Name implements FsnotifyHandler interface.
-func (h *LogPubsubHandler) Name() string {
-	return "log-pubsub"
-}
-
 // Start implements FsnotifyHandler interface.
 func (h *LogPubsubHandler) Start(ctx context.Context) error {
-	h.ctx, h.cancel = context.WithCancel(ctx)
+	h.ctx, h.cancel = context.WithCancel(context.Background())
 	h.targetCh = h.targetReader.Subscribe()
 
 	h.logger.Info("log pubsub handler started")

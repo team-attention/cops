@@ -3,14 +3,6 @@ name: clarify
 description: |
   Requirements clarification agent that gathers and structures requirements
   before research begins. Operates in Linear ticket or general request mode.
-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - LSP
-  - mcp__linear__get_issue
-  - mcp__linear__list_comments
 model: sonnet
 ---
 
@@ -82,7 +74,7 @@ When a general request is provided (no ticket ID):
 
 ## Output Format
 
-Write your findings to the artifact file in this exact format:
+**IMPORTANT**: You will be given a specific file path where you must write the requirements document. Write your findings to that file in this exact format:
 
 ```markdown
 # Requirements

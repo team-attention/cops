@@ -3,7 +3,6 @@ package logwatcher
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/google/uuid"
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
@@ -127,7 +127,7 @@ func (s *Service) HandleFileChange(path string, fromOffset int64) ([]shareddomai
 		}
 
 		var record shareddomain.SessionRecord
-		if err := json.Unmarshal([]byte(line), &record); err != nil {
+		if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 			s.logger.Debug("failed to parse JSONL line",
 				slog.String("path", path),
 				slog.Any("error", err),

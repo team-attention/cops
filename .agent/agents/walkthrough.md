@@ -3,9 +3,6 @@ name: walkthrough
 description: |
   Work history documenter that creates walkthrough.md before commits.
   Summarizes the entire development process for future reference.
-tools:
-  - Read
-  - Write
 model: sonnet
 ---
 
@@ -35,7 +32,7 @@ You will receive:
 
 ## Output Format
 
-Write to `{artifact_dir}/NN_walkthrough.md`:
+**IMPORTANT**: You will be given a specific file path where you must write the walkthrough document. Write to that file in this exact format:
 
 ```markdown
 # Development Walkthrough

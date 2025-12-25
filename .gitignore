@@ -4,6 +4,7 @@ settings.local.json
 # Project binaries
 /cops
 /cops-*
+cli/cops
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,go

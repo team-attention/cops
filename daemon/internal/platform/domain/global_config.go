@@ -7,8 +7,7 @@ type GlobalConfig struct {
 
 // ProjectConfig represents a project entry in GlobalConfig.
 type ProjectConfig struct {
-	Path         string `json:"path"`                   // Project root directory
-	Name         string `json:"name,omitempty"`         // Display name (optional)
-	IsGitProject bool   `json:"isGitProject"`           // CLI determines this when adding
-	Active       bool   `json:"active"`                 // Whether to watch this project
+	Path         string `json:"path"`           // Project root directory
+	Name         string `json:"name,omitempty"` // Display name (optional)
+	IsGitProject bool   `json:"isGitProject"`   // CLI determines this when adding
 }

@@ -39,14 +39,9 @@ func NewConfigWatcherFsnotifyHandler(
 	}, nil
 }
 
-// Name implements FsnotifyHandler interface.
-func (h *ConfigWatcherFsnotifyHandler) Name() string {
-	return "configwatcher"
-}
-
 // Start implements FsnotifyHandler interface.
 func (h *ConfigWatcherFsnotifyHandler) Start(ctx context.Context) error {
-	h.ctx, h.cancel = context.WithCancel(ctx)
+	h.ctx, h.cancel = context.WithCancel(context.Background())
 
 	// Initial config load
 	if err := h.svc.HandleConfigChange(h.configPath); err != nil {
@@ -79,7 +74,7 @@ func (h *ConfigWatcherFsnotifyHandler) loop() {
 			h.logger.Info("config watcher stopping")
 			return
 		case event := <-h.watcher.Events:
-			if event.Op&fsnotify.Write != 0 || event.Op&fsnotify.Create != 0 {
+			if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
 				if err := h.svc.HandleConfigChange(h.configPath); err != nil {
 					h.logger.Error("config change handling failed", slog.Any("error", err))
 				}

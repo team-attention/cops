@@ -54,14 +54,17 @@ echo "Starting Full-Cycle workflow with Artifact ID: $ARTIFACT_ID"
 2. Invoke Clarify Agent:
    ```
    Use Task tool:
-   - Prompt: "Clarify requirements for the following request and write to $REQUIREMENTS_FILE:
+   - Prompt: "Clarify requirements for the following request.
 
      Request: [user request or ticket ID from $ARGUMENTS]
 
      If this is a Linear ticket ID, fetch the ticket details and organize the information.
      If this is a general request, ask structured questions to gather complete requirements.
 
-     Follow the Clarify Agent protocol."
+     **IMPORTANT**: You MUST write the final requirements document to this file:
+     $REQUIREMENTS_FILE
+
+     Follow the Clarify Agent protocol and output format."
    ```
 
 3. After completion, show user the requirements summary:
@@ -87,9 +90,12 @@ echo "Starting Full-Cycle workflow with Artifact ID: $ARTIFACT_ID"
 2. Invoke Research Agent:
    ```
    Use Task tool:
-   - Prompt: "Analyze the requirements at $REQUIREMENTS_FILE and write research report to $RESEARCH_FILE:
+   - Prompt: "Analyze the requirements at $REQUIREMENTS_FILE and conduct research.
 
-     Follow the Research Agent protocol."
+     **IMPORTANT**: You MUST write the research report to this file:
+     $RESEARCH_FILE
+
+     Follow the Research Agent protocol and output format."
    ```
 
 3. After completion, show user the research summary:
@@ -116,8 +122,12 @@ echo "Starting Full-Cycle workflow with Artifact ID: $ARTIFACT_ID"
    ```
    Use Task tool:
    - Prompt: "Read research report at $RESEARCH_FILE and create implementation plan.
-     Write plan to $PLAN_FILE.
-     If you need clarification on any decisions, ask me before writing the plan."
+     If you need clarification on any decisions, ask me before writing the plan.
+
+     **IMPORTANT**: You MUST write the implementation plan to this file:
+     $PLAN_FILE
+
+     Follow the Planning Agent protocol and output format."
    ```
 
 3. If Planning Agent asks questions, relay to user and get answers
@@ -163,8 +173,12 @@ Loop:
    Use Task tool:
    - Prompt: "Perform Pre-PR code review.
      Check git diff against plan at $PLAN_FILE.
-     Write review to $REVIEW_FILE.
-     Mode: Pre-PR Review"
+     Mode: Pre-PR Review
+
+     **IMPORTANT**: You MUST write the review report to this file:
+     $REVIEW_FILE
+
+     Follow the Review Agent protocol and output format."
    ```
 
 3. Check review status:
@@ -190,7 +204,11 @@ Loop:
    Use Task tool:
    - Prompt: "Create walkthrough document for artifact $ARTIFACT_ID.
      Read all artifacts in .agent/artifacts/$ARTIFACT_ID/
-     Write walkthrough to $WALKTHROUGH_FILE"
+
+     **IMPORTANT**: You MUST write the walkthrough document to this file:
+     $WALKTHROUGH_FILE
+
+     Follow the Walkthrough Agent protocol and output format."
    ```
 
 3. Show user the walkthrough summary:

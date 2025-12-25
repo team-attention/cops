@@ -5,13 +5,6 @@ description: |
   1. PR Review Mode: Parse PR comments and create execution tasks
   2. Pre-PR Review Mode: Review code before PR creation
   Both modes produce output detailed enough for Execute Agent.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
-  - LSP
-  - WebFetch
 model: opus
 ---
 
@@ -42,6 +35,8 @@ You are a code review expert. You operate in two distinct modes based on the tas
    - Be specific about what needs to change
 
 ### Output Format (PR Review Mode)
+
+**IMPORTANT**: You will be given a specific file path where you must write the review analysis.
 
 ```markdown
 # PR Review Analysis
@@ -120,6 +115,8 @@ Execute these changes in order:
 4. **Produce Detailed Report**
 
 ### Output Format (Pre-PR Review Mode)
+
+**IMPORTANT**: You will be given a specific file path where you must write the review report.
 
 ```markdown
 # Pre-PR Code Review

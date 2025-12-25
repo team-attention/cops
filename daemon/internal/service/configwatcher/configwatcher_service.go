@@ -1,11 +1,11 @@
 package configwatcher
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
@@ -53,18 +53,32 @@ func (s *Service) loadConfig(path string) (*domain.GlobalConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// Return empty config if file doesn't exist
-			return &domain.GlobalConfig{Projects: []domain.ProjectConfig{}}, nil
+			// Create empty config file if it doesn't exist
+			emptyConfig := &domain.GlobalConfig{Projects: []domain.ProjectConfig{}}
+			if err := s.saveConfig(path, emptyConfig); err != nil {
+				return nil, fmt.Errorf("failed to create config file: %w", err)
+			}
+			s.logger.Info("created empty config file", slog.String("path", path))
+			return emptyConfig, nil
 		}
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
 	var cfg domain.GlobalConfig
-	if err := json.Unmarshal(data, &cfg); err != nil {
+	if err := sonic.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
 	return &cfg, nil
+}
+
+// saveConfig saves the global config to file.
+func (s *Service) saveConfig(path string, cfg *domain.GlobalConfig) error {
+	data, err := sonic.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0644)
 }
 
 // buildWatchTargets builds watch targets from global config.
@@ -73,10 +87,6 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 	var targets []domain.WatchTarget
 
 	for _, project := range cfg.Projects {
-		if !project.Active {
-			continue
-		}
-
 		// Add main project directory
 		targets = append(targets, domain.WatchTarget{
 			ProjectPath: project.Path,

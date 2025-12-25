@@ -43,14 +43,9 @@ func NewLogFsnotifyHandler(
 	}
 }
 
-// Name implements FsnotifyHandler interface.
-func (h *LogFsnotifyHandler) Name() string {
-	return "log-fsnotify"
-}
-
 // Start implements FsnotifyHandler interface.
 func (h *LogFsnotifyHandler) Start(ctx context.Context) error {
-	h.ctx, h.cancel = context.WithCancel(ctx)
+	h.ctx, h.cancel = context.WithCancel(context.Background())
 
 	// Load saved file positions from SQLite
 	positions, err := h.stateRepo.LoadFilePositions(ctx)
@@ -122,7 +117,7 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 	}
 
 	// Only process write and create events
-	if event.Op&fsnotify.Write == 0 && event.Op&fsnotify.Create == 0 {
+	if !event.Has(fsnotify.Write) && !event.Has(fsnotify.Create) {
 		return
 	}
 

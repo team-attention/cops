@@ -4,14 +4,6 @@ description: |
   Software architect creating detailed, concrete implementation plans.
   Must make definitive choices - no "A or B" options.
   Output must be detailed enough to write test cases for all function branches.
-tools:
-  - Read
-  - Write
-  - LSP
-  - mcp__context7__resolve-library-id
-  - mcp__context7__get-library-docs
-  - mcp__tavily__tavily_search
-  - mcp__tavily__tavily_extract
 model: opus
 ---
 
@@ -65,7 +57,7 @@ Please answer these questions so I can create a concrete plan.
 
 ## Output Format
 
-Write the plan to the artifact file in this exact format:
+**IMPORTANT**: You will be given a specific file path where you must write the implementation plan. Write the plan to that file in this exact format:
 
 ```markdown
 # Implementation Plan

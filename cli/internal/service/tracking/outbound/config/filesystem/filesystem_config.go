@@ -1,12 +1,12 @@
 package filesystem
 
 import (
-	"encoding/json"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
 
+	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/cli/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/config"
 	"github.com/team-attention/cops/shared/domain"
@@ -52,14 +52,22 @@ func (a *FilesystemConfigAdapter) LoadGlobalConfig() (*config.GlobalConfig, erro
 
 	data, err := os.ReadFile(a.globalConfigPath)
 	if os.IsNotExist(err) {
-		return &config.GlobalConfig{Projects: []*domain.Project{}}, nil
+		// Create empty config file if it doesn't exist
+		emptyConfig := &config.GlobalConfig{Projects: []*domain.Project{}}
+		a.mu.RUnlock()
+		if err := a.SaveGlobalConfig(emptyConfig); err != nil {
+			a.mu.RLock()
+			return nil, err
+		}
+		a.mu.RLock()
+		return emptyConfig, nil
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	var cfg config.GlobalConfig
-	if err := json.Unmarshal(data, &cfg); err != nil {
+	if err := sonic.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
 
@@ -75,7 +83,7 @@ func (a *FilesystemConfigAdapter) SaveGlobalConfig(cfg *config.GlobalConfig) err
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	data, err := json.MarshalIndent(cfg, "", "  ")
+	data, err := sonic.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -93,7 +101,7 @@ func (a *FilesystemConfigAdapter) LoadLocalConfig(projectPath string) (*config.L
 	}
 
 	var cfg config.LocalConfig
-	if err := json.Unmarshal(data, &cfg); err != nil {
+	if err := sonic.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
 
@@ -109,7 +117,7 @@ func (a *FilesystemConfigAdapter) SaveLocalConfig(projectPath string, cfg *confi
 
 	configPath := filepath.Join(configDir, localConfigFileName)
 
-	data, err := json.MarshalIndent(cfg, "", "  ")
+	data, err := sonic.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return err
 	}

@@ -6,15 +6,15 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub"
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub/inmemory"
-	"github.com/team-attention/cops/daemon/internal/service/log"
-	fsnotifyhandler "github.com/team-attention/cops/daemon/internal/service/log/inbound/worker/fsnotify"
-	pubsubhandler "github.com/team-attention/cops/daemon/internal/service/log/inbound/worker/pubsub"
-	"github.com/team-attention/cops/daemon/internal/service/log/outbound/api"
-	connectrpc "github.com/team-attention/cops/daemon/internal/service/log/outbound/api/connectrpc"
-	"github.com/team-attention/cops/daemon/internal/service/log/outbound/filesystem"
-	fsnotifyadapter "github.com/team-attention/cops/daemon/internal/service/log/outbound/filesystem/fsnotify"
-	"github.com/team-attention/cops/daemon/internal/service/log/outbound/repository"
-	sqlite "github.com/team-attention/cops/daemon/internal/service/log/outbound/repository/sqlite"
+	"github.com/team-attention/cops/daemon/internal/service/logwatcher"
+	fsnotifyhandler "github.com/team-attention/cops/daemon/internal/service/logwatcher/inbound/worker/fsnotify"
+	pubsubhandler "github.com/team-attention/cops/daemon/internal/service/logwatcher/inbound/worker/pubsub"
+	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api"
+	connectrpc "github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api/connectrpc"
+	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/filesystem"
+	fsnotifyadapter "github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/filesystem/fsnotify"
+	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/repository"
+	sqlite "github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/repository/sqlite"
 )
 
 func newLogModule() fx.Option {
@@ -46,7 +46,7 @@ func newLogModule() fx.Option {
 		)),
 
 		// Service
-		fx.Provide(log.NewService),
+		fx.Provide(logwatcher.NewService),
 
 		// Inbound 1: Fsnotify Handler (reads watcher.Events)
 		fx.Provide(fx.Annotate(

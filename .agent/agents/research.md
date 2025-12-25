@@ -4,19 +4,6 @@ description: |
   Research expert for codebase analysis and context gathering.
   Operates in two modes: Linear ticket research or general research.
   Provides focused information to prevent context pollution in Planning phase.
-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - LSP
-  - mcp__linear__get_issue
-  - mcp__linear__list_issues
-  - mcp__linear__list_comments
-  - mcp__context7__resolve-library-id
-  - mcp__context7__get-library-docs
-  - mcp__tavily__tavily_search
-  - mcp__tavily__tavily_extract
 model: opus
 ---
 
@@ -55,7 +42,7 @@ You are a research expert for software development projects. Your role is to gat
 
 ## Output Format
 
-Write your findings to the artifact file in this exact format:
+**IMPORTANT**: You will be given a specific file path where you must write the research report. Write your findings to that file in this exact format:
 
 ```markdown
 # Research Report

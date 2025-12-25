@@ -2,12 +2,12 @@ package jsonl
 
 import (
 	"bufio"
-	"encoding/json"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/parser"
 	"github.com/team-attention/cops/shared/domain"
 )
@@ -79,7 +79,7 @@ func (p *JSONLParser) parseFile(filePath string) ([]*domain.SessionRecord, error
 		}
 
 		var record domain.SessionRecord
-		if err := json.Unmarshal([]byte(line), &record); err != nil {
+		if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 			p.logger.Debug("skipping malformed line",
 				slog.String("file", filePath),
 				slog.Int("line", lineNum),
