@@ -14,422 +14,142 @@ This skill orchestrates the complete development cycle from requirements clarifi
 ## Workflow Overview
 
 ```
-Clarify (Sonnet)
-    ↓ [AskUserQuestion: Proceed to Research?]
-Research (Opus)
-    ↓ [AskUserQuestion: Proceed to Planning?]
-Planning (Opus)
-    ↓ [AskUserQuestion: Proceed to Execute?]
-Execute (Sonnet)
-    ↓ [No user confirmation - automatic]
-Review Loop (Opus, Pre-PR mode) ← iteration = 1
-    ↓
-    ├─ If PASS → Break loop
-    │
-    └─ If FAIL (iteration < 3)
-           ↓
-       Display issues
-           ↓ [Automatic - no user confirmation]
-       Execute (fix issues)
-           ↓
-       iteration++
-           ↓
-       Review again (same loop)
-           ↓
-       If FAIL (iteration >= 3)
-           ↓ [AskUserQuestion: Continue anyway/Manual fix/Stop?]
-           └─ Based on user choice
-
-    ↓ [Only if PASS or user chose "Continue anyway"]
-Walkthrough (Sonnet)
-    ↓ [AskUserQuestion: Ready to commit and PR?]
-Commit & PR
+Clarify → Research → Planning → Execute → Review (auto-loop) → Walkthrough → Commit & PR
+   ↓         ↓          ↓                        ↓                  ↓             ↓
+ [User]    [User]    [User]                   [User]             [User]      [Skill]
 ```
 
-**Key Changes from Previous Version**:
-1. **AskUserQuestion tool used at each approval point** (not just text prompt)
-2. **Review Loop is automatic** - Execute runs automatically on FAIL without user confirmation
-3. **Iteration tracking** - Each review iteration creates a new artifact file
-4. **User only asked after 3 failed iterations** - Not after each iteration
-
-## Step-by-Step Process
-
-### Step 0: Initialize
-
-```bash
-# Generate artifact ID
-ARTIFACT_ID=$(.agent/scripts/artifact-id.sh)
-echo "Starting Full-Cycle workflow with Artifact ID: $ARTIFACT_ID"
-```
-
-### Step 1: Clarify
-
-**Agent**: Clarify (Sonnet)
-**Input**: User request or Linear ticket ID from $ARGUMENTS
-
-1. Generate artifact file path:
-   ```bash
-   REQUIREMENTS_FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID requirements)
-   ```
-
-2. Invoke Clarify Agent:
-   ```
-   Use Task tool:
-   - Prompt: "Clarify requirements for the following request.
-
-     Request: [user request or ticket ID from $ARGUMENTS]
-
-     If this is a Linear ticket ID, fetch the ticket details and organize the information.
-     If this is a general request, ask structured questions to gather complete requirements.
-
-     **IMPORTANT**: You MUST write the final requirements document to this file:
-     $REQUIREMENTS_FILE
-
-     Follow the Clarify Agent protocol and output format."
-   ```
-
-3. After completion, show user the requirements summary and ask for confirmation:
-   ```
-   Requirements clarified. Summary:
-   [Show request summary, acceptance criteria, scope]
-   ```
-
-4. **IMPORTANT**: Use AskUserQuestion tool to get user approval:
-   ```
-   Use AskUserQuestion tool:
-   - Question: "Proceed to Research phase?"
-   - Header: "Next Step"
-   - Options:
-     - label: "Yes, proceed", description: "Continue to Research phase"
-     - label: "No, stop here", description: "Stop the workflow"
-     - label: "Modify requirements", description: "Make changes to requirements first"
-   - multiSelect: false
-   ```
-
-5. Handle user response:
-   - "Yes, proceed" → Continue to Step 2
-   - "No, stop here" → Exit workflow
-   - "Modify requirements" or "Other" → Ask user for changes, update requirements, re-ask
-
-### Step 2: Research
-
-**Agent**: Research (Opus)
-**Input**: Requirements from Step 1
-
-1. Generate artifact file path:
-   ```bash
-   RESEARCH_FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID research)
-   ```
-
-2. Invoke Research Agent:
-   ```
-   Use Task tool:
-   - Prompt: "Analyze the requirements at $REQUIREMENTS_FILE and conduct research.
-
-     **IMPORTANT**: You MUST write the research report to this file:
-     $RESEARCH_FILE
-
-     Follow the Research Agent protocol and output format."
-   ```
-
-3. After completion, show user the research summary:
-   ```
-   Research complete. Summary:
-   [Show key findings from research report]
-   ```
-
-4. **IMPORTANT**: Use AskUserQuestion tool to get user approval:
-   ```
-   Use AskUserQuestion tool:
-   - Question: "Proceed to Planning phase?"
-   - Header: "Next Step"
-   - Options:
-     - label: "Yes, proceed", description: "Continue to Planning phase"
-     - label: "No, stop here", description: "Stop the workflow"
-     - label: "Modify research", description: "Need to re-research some areas"
-   - multiSelect: false
-   ```
-
-5. Handle user response:
-   - "Yes, proceed" → Continue to Step 3
-   - "No, stop here" → Exit workflow
-   - "Modify research" or "Other" → Ask user for changes, update research, re-ask
-
-### Step 3: Planning
-
-**Agent**: Planning (Opus)
-**Input**: Research report path
-
-1. Generate artifact file path:
-   ```bash
-   PLAN_FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID plan)
-   ```
-
-2. Invoke Planning Agent:
-   ```
-   Use Task tool:
-   - Prompt: "Read research report at $RESEARCH_FILE and create implementation plan.
-     If you need clarification on any decisions, ask me before writing the plan.
-
-     **IMPORTANT**: You MUST write the implementation plan to this file:
-     $PLAN_FILE
-
-     Follow the Planning Agent protocol and output format."
-   ```
-
-3. If Planning Agent asks questions, relay to user and get answers
-
-4. After completion, show user the plan summary:
-   ```
-   Plan complete. Overview:
-   [Show architecture decisions and step count]
-   ```
-
-5. **IMPORTANT**: Use AskUserQuestion tool to get user approval:
-   ```
-   Use AskUserQuestion tool:
-   - Question: "Proceed to Execute phase?"
-   - Header: "Next Step"
-   - Options:
-     - label: "Yes, proceed", description: "Continue to Execute phase"
-     - label: "No, stop here", description: "Stop the workflow"
-     - label: "Modify plan", description: "Need to adjust the implementation plan"
-   - multiSelect: false
-   ```
-
-6. Handle user response:
-   - "Yes, proceed" → Continue to Step 4
-   - "No, stop here" → Exit workflow
-   - "Modify plan" or "Other" → Ask user for changes, update plan, re-ask
-
-### Step 4: Execute
-
-**Agent**: Execute (Sonnet)
-**Input**: Plan file path
-
-1. Invoke Execute Agent:
-   ```
-   Use Task tool:
-   - Prompt: "Execute the implementation plan at $PLAN_FILE.
-     Follow each step in order.
-     Run verification commands when complete."
-   ```
-
-2. No user confirmation needed - proceed directly to Review
-
-### Step 5: Review Loop (with automatic iteration)
-
-**Agent**: Review (Opus, Pre-PR mode)
-**Max Iterations**: 3
-**Important**: This step loops automatically until PASS or max iterations reached
-
-**Loop Structure**:
-```
-iteration = 1
-while iteration <= 3:
-  1. Run Review Agent
-  2. Read review status from artifact
-  3. If PASS: break loop → proceed to Walkthrough
-  4. If FAIL:
-     - Show issues to user
-     - Automatically invoke Execute Agent to fix issues
-     - iteration++
-     - Continue loop
-  5. If iteration > 3 and still FAIL:
-     - Ask user how to proceed
-```
-
-**Detailed Steps**:
-
-1. **Generate review file path** (with iteration number):
-   ```bash
-   if [ $iteration -eq 1 ]; then
-     REVIEW_FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID review)
-   else
-     REVIEW_FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID "review_iteration${iteration}")
-   fi
-   ```
-   - First review: `04_review.md`
-   - Second review: `05_review_iteration2.md`
-   - Third review: `06_review_iteration3.md`
-
-2. **Invoke Review Agent**:
-   ```
-   Use Task tool:
-   - Prompt: "Perform Pre-PR code review (Iteration ${iteration}/3).
-     Check git diff against plan at $PLAN_FILE.
-     Mode: Pre-PR Review
-
-     **IMPORTANT**: You MUST write the review report to this file:
-     $REVIEW_FILE
-
-     The review MUST include a clear status: PASS or FAIL.
-     If FAIL, list all issues that need to be fixed.
-
-     Follow the Review Agent protocol and output format."
-   ```
-
-3. **Read and parse review status**:
-   - Read the review artifact file
-   - Look for "Status: PASS" or "Status: FAIL" in the document
-   - Extract list of issues if FAIL
-
-4. **Handle review result**:
-
-   **Case A: PASS**
-   ```
-   - Display: "✓ Review PASS - All checks passed"
-   - Break loop
-   - Proceed to Step 6 (Walkthrough)
-   ```
-
-   **Case B: FAIL and iteration < 3**
-   ```
-   - Display issues found:
-     "✗ Review FAIL (Iteration ${iteration}/3)
-      Issues found:
-      [List all issues from review]
-
-      Automatically invoking Execute Agent to fix these issues..."
-
-   - Invoke Execute Agent:
-     Use Task tool:
-     - Prompt: "Fix all issues identified in the review at $REVIEW_FILE.
-
-       This is iteration ${iteration} of the review-fix cycle.
-       Focus on addressing each issue listed in the review document.
-
-       After fixes, run verification commands to ensure everything builds."
-
-   - increment iteration
-   - Continue loop (go back to step 1)
-   ```
-
-   **Case C: FAIL and iteration >= 3**
-   ```
-   - Display:
-     "✗ Review still FAIL after 3 iterations
-
-      Issues remaining:
-      [List all issues from review]"
-
-   - Use AskUserQuestion tool:
-     - Question: "Review failed after 3 iterations. How should we proceed?"
-     - Header: "Review Failed"
-     - Options:
-       - label: "Continue anyway", description: "Proceed to Walkthrough despite issues (Recommended)"
-       - label: "Manual fix", description: "I'll fix the issues manually, then re-run review"
-       - label: "Stop workflow", description: "Stop and investigate"
-     - multiSelect: false
-
-   - Handle response:
-     - "Continue anyway" → Proceed to Step 6 (Walkthrough)
-     - "Manual fix" → Wait for user to fix, then re-run Review Agent
-     - "Stop workflow" → Exit
-   ```
-
-**Important Notes**:
-- **DO NOT proceed to Walkthrough until Review PASS** (unless user chooses "Continue anyway")
-- Each iteration creates a new review artifact file for debugging
-- Execute Agent runs automatically on FAIL (no user confirmation needed)
-- User is only asked when max iterations exhausted
-
-### Step 6: Walkthrough
-
-**Agent**: Walkthrough (Sonnet)
-**Input**: All artifacts in artifacts directory
-
-1. Generate walkthrough file path:
-   ```bash
-   WALKTHROUGH_FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID walkthrough)
-   ```
-
-2. Invoke Walkthrough Agent:
-   ```
-   Use Task tool:
-   - Prompt: "Create walkthrough document for artifact $ARTIFACT_ID.
-     Read all artifacts in .agent/artifacts/$ARTIFACT_ID/
-
-     **IMPORTANT**: You MUST write the walkthrough document to this file:
-     $WALKTHROUGH_FILE
-
-     Follow the Walkthrough Agent protocol and output format."
-   ```
-
-3. Show user the walkthrough summary:
-   ```
-   Walkthrough complete.
-   [Brief summary of changes from walkthrough]
-   ```
-
-4. **IMPORTANT**: Use AskUserQuestion tool to get user approval:
-   ```
-   Use AskUserQuestion tool:
-   - Question: "Ready to commit and create PR?"
-   - Header: "Final Step"
-   - Options:
-     - label: "Yes, create commit and PR", description: "Commit changes and create pull request"
-     - label: "No, stop here", description: "Stop before committing"
-     - label: "Modify walkthrough", description: "Update walkthrough documentation first"
-   - multiSelect: false
-   ```
-
-5. Handle user response:
-   - "Yes, create commit and PR" → Continue to Step 7
-   - "No, stop here" → Exit workflow
-   - "Modify walkthrough" or "Other" → Ask user for changes, update walkthrough, re-ask
-
-### Step 7: Commit & PR
-
-1. Extract information from artifacts:
-   ```bash
-   # Get ticket ID if available (from research artifact)
-   # Get summary from walkthrough artifact
-   ```
-
-2. Create commit:
-   ```bash
-   git add .
-
-   # Generate commit message from walkthrough
-   git commit -m "$(cat <<'EOF'
-   [type]: [summary from walkthrough] ([TICKET-ID if available])
-
-   [Key changes from walkthrough]
-
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-   Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
-   EOF
-   )"
-   ```
-
-3. Push and create PR:
-   ```bash
-   # Push branch
-   git push -u origin HEAD
-
-   # Create PR with walkthrough content
-   gh pr create \
-     --title "[TICKET-ID] [Title from ticket/request]" \
-     --body "$(cat $WALKTHROUGH_FILE)"
-   ```
-
-4. Update Linear ticket (if applicable):
-   ```bash
-   # Add PR URL as link to Linear ticket
-   # Optionally update status to "In Review"
-   ```
+**User Approval Points**: After Clarify, Research, Planning, Review (PASS), Walkthrough
+**Automatic Steps**: Execute, Review (FAIL → re-execute, max 3 times)
 
 ## Arguments
 
 - `$ARGUMENTS`: User request or Linear ticket ID (e.g., "implement user auth" or "TA-123")
 
+## General Step Pattern
+
+Most steps follow this pattern:
+
+1. **Generate artifact path**:
+   ```bash
+   FILE=$(.agent/scripts/next-artifact-file.sh $ARTIFACT_ID {artifact-name})
+   ```
+
+2. **Invoke agent** using Task tool:
+   ```
+   Use Task tool:
+   - subagent_type: {agent-type}
+   - model: {model}
+   - prompt: "...
+
+     **IMPORTANT**: You MUST write the {output} to this file: $FILE
+
+     Follow the {Agent} Agent protocol and output format."
+   ```
+
+3. **Show summary** to user from artifact
+
+4. **Ask for approval** (if required):
+   ```
+   Use AskUserQuestion tool:
+   - Question: "Proceed to {NextStep}?"
+   - Header: "Next Step"
+   - Options:
+     - label: "Yes, proceed", description: "Continue to {NextStep}"
+     - label: "No, stop here", description: "Stop the workflow"
+     - label: "Modify {current}", description: "Make changes first"
+   - multiSelect: false
+   ```
+
+5. **Handle response**: Yes → next step, No → exit, Modify → wait & re-ask
+
+## Steps Configuration
+
+| # | Step | Agent | Model | Artifact | Approval | Notes |
+|---|------|-------|-------|----------|----------|-------|
+| 0 | Initialize | - | - | `$ARTIFACT_ID` | No | Generate artifact ID |
+| 1 | Clarify | clarify | sonnet | requirements | Yes | Gather requirements |
+| 2 | Research | research | opus | research | Yes | Analyze codebase |
+| 3 | Planning | planning | opus | plan | Yes | Design implementation |
+| 4 | Execute | execute | sonnet | (uses plan) | No | Implement code |
+| 5 | Review Loop | review | opus | review / review_iteration{N} | Conditional* | Check quality |
+| 6 | Walkthrough | walkthrough | sonnet | walkthrough | Yes | Document changes |
+| 7 | Commit & PR | - | - | - | No** | Use commit-pr skill |
+
+*Step 5 approval:
+- **PASS**: Ask user (yes/manual fix/stop)
+- **FAIL (iteration < 3)**: Automatic re-execute
+- **FAIL (iteration >= 3)**: Ask user (continue/manual fix/stop)
+
+**Step 7: Automatically runs after Walkthrough approval
+
+## Special Step Details
+
+### Step 0: Initialize
+
+```bash
+ARTIFACT_ID=$(.agent/scripts/artifact-id.sh)
+echo "Starting Full-Cycle workflow with Artifact ID: $ARTIFACT_ID"
+```
+
+### Step 5: Review Loop
+
+**Special logic** - loops until PASS or 3 failures:
+
+```
+iteration = 1
+while iteration <= 3:
+  1. Generate review artifact:
+     - First: `.agent/artifacts/$ARTIFACT_ID/review.md`
+     - Later: `.agent/artifacts/$ARTIFACT_ID/review_iteration{N}.md`
+
+  2. Invoke Review Agent (Opus, Pre-PR mode)
+     - Prompt: "Check git diff against plan at $PLAN_FILE"
+     - Must include clear status: PASS or FAIL
+
+  3. Read review status
+
+  4. Handle result:
+     a. PASS:
+        - Show review summary
+        - Ask user: "Proceed to Walkthrough?" (yes/manual fix/stop)
+        - If yes → break loop
+        - If manual fix → wait for user, then re-run review
+        - If stop → exit workflow
+
+     b. FAIL and iteration < 3:
+        - Display issues
+        - Automatically invoke Execute Agent to fix issues
+        - iteration++
+        - Continue loop
+
+     c. FAIL and iteration >= 3:
+        - Display remaining issues
+        - Ask user: "Continue anyway/Manual fix/Stop?"
+        - Handle based on choice
+```
+
+### Step 7: Commit & PR
+
+Use the `commit-pr` skill:
+
+```
+Use Skill tool:
+- skill: commit-pr
+- args: $ARTIFACT_ID  # Pass artifact ID for walkthrough mode
+```
+
+The commit-pr skill will:
+1. Read walkthrough artifact
+2. Generate commit message
+3. Create commit and push
+4. Create PR with walkthrough as body
+
 ## Example Usage
 
 ```bash
 # With user request
-/full-cycle "implement HTTP client for external API"
+/full-cycle "fix CLI to API connection issue"
 
 # With Linear ticket
 /full-cycle TA-123
@@ -437,23 +157,6 @@ while iteration <= 3:
 # With specific focus
 /full-cycle "TA-123 - focus on error handling"
 ```
-
-## User Approval Points
-
-The workflow uses **AskUserQuestion tool** at these approval points:
-
-1. **After Clarify**: Proceed to Research? (yes/no/modify)
-2. **After Research**: Proceed to Planning? (yes/no/modify)
-3. **After Planning**: Proceed to Execute? (yes/no/modify)
-4. **After Review (3 failures)**: Continue anyway/Manual fix/Stop?
-5. **After Walkthrough**: Ready to commit and PR? (yes/no/modify)
-
-**User can always select "Other" to provide custom input** at any approval point.
-
-**Automatic Steps (No User Approval)**:
-- Execute → Review (always proceeds)
-- Review FAIL → Execute (auto-fixes, max 3 iterations)
-- Review iteration loop (automatic until PASS or 3 failures)
 
 ## Error Handling
 

@@ -125,28 +125,20 @@ echo "Starting PR-Review cycle with Artifact ID: $ARTIFACT_ID"
 
 ### Step 5: Commit & Push
 
-1. Show summary:
-   ```
-   All PR comments addressed.
+Use the `commit-pr` skill with `--push-only` flag (PR already exists):
 
-   Ready to commit and push? (yes/no)
-   ```
+```
+Use Skill tool:
+- skill: commit-pr
+- args: "$ARTIFACT_ID --push-only"
+```
 
-2. If yes:
-   ```bash
-   git add .
-   git commit -m "Address PR review feedback
+The commit-pr skill will:
+1. Read walkthrough artifact
+2. Generate commit message ("Address PR review feedback" + summary)
+3. Create commit and push (no PR creation since it's an update)
 
-   - [Summary of changes]
-
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-   Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
-
-   git push
-   ```
-
-3. Optionally respond to invalid comments on PR
+Optionally respond to invalid comments on PR if requested by user.
 
 ## Arguments
 
