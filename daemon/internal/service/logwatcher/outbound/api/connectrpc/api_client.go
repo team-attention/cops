@@ -38,7 +38,7 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 	req := &aggregationv1.SendLogsReq{
 		Batch: &aggregationv1.LogBatch{
 			Records:   convertRecords(batch.Records),
-			ProjectId: batch.ProjectID,
+			ProjectId: batch.ProjectID.String(),
 		},
 	}
 

@@ -6,9 +6,9 @@ replace github.com/team-attention/cops/shared => ../shared
 
 require (
 	connectrpc.com/connect v1.19.1
+	github.com/bytedance/sonic v1.14.2
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/google/uuid v1.6.0
 	github.com/imroc/req/v3 v3.57.0
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/team-attention/cops/shared v0.0.0-00010101000000-000000000000
@@ -19,7 +19,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
-	github.com/bytedance/sonic v1.14.2 // indirect
 	github.com/bytedance/sonic/loader v0.4.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect

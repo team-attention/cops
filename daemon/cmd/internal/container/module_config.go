@@ -8,6 +8,8 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub/inmemory"
 	"github.com/team-attention/cops/daemon/internal/service/configwatcher"
 	fsnotifyhandler "github.com/team-attention/cops/daemon/internal/service/configwatcher/inbound/worker/fsnotify"
+	"github.com/team-attention/cops/daemon/internal/service/configwatcher/outbound/localconfig"
+	"github.com/team-attention/cops/daemon/internal/service/configwatcher/outbound/localconfig/filesystem"
 )
 
 func newConfigModule() fx.Option {
@@ -18,6 +20,12 @@ func newConfigModule() fx.Option {
 				return ps
 			},
 			fx.As(new(pubsub.WriterPort[[]domain.WatchTarget])),
+		)),
+
+		// Outbound: LocalConfigPort
+		fx.Provide(fx.Annotate(
+			filesystem.NewFilesystemLocalConfigAdapter,
+			fx.As(new(localconfig.LocalConfigPort)),
 		)),
 
 		// Service (pure business logic)

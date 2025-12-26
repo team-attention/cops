@@ -3,6 +3,7 @@ package fsnotify
 import (
 	"context"
 	"log/slog"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -132,7 +133,9 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 	}
 
 	if len(records) > 0 {
-		h.svc.AddRecords(records)
+		// Extract ClaudeDir from file path (parent directory)
+		claudeDir := filepath.Dir(event.Name)
+		h.svc.AddRecordsForClaudeDir(claudeDir, records)
 		h.filePositions[event.Name] = newOffset
 
 		// Save position to SQLite

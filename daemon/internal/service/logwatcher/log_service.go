@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/bytedance/sonic"
-	"github.com/google/uuid"
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
@@ -22,13 +21,13 @@ import (
 // Service contains pure business logic for log file watching and processing.
 // No goroutines, no event loops - just business logic.
 type Service struct {
-	logger      *slog.Logger
-	fileWatcher filesystem.FileWatchPort // Outbound: fsnotify Add/Remove
-	apiClient   api.APIClientPort        // Outbound: API transmission
-	watchedDirs map[string]bool
-	buffer      []shareddomain.SessionRecord
-	daemonID    string
-	mu          sync.Mutex
+	logger             *slog.Logger
+	fileWatcher        filesystem.FileWatchPort // Outbound: fsnotify Add/Remove
+	apiClient          api.APIClientPort        // Outbound: API transmission
+	watchedDirs        map[string]bool
+	claudeDirToProject map[string]shareddomain.ID
+	bufferByProject    map[shareddomain.ID][]shareddomain.SessionRecord
+	mu                 sync.Mutex
 }
 
 // NewService creates a new Log service.
@@ -39,12 +38,12 @@ func NewService(
 	cfg *setup.Config,
 ) *Service {
 	return &Service{
-		logger:      l.With(slog.String("name", "log.service")),
-		fileWatcher: fileWatcher,
-		apiClient:   apiClient,
-		watchedDirs: make(map[string]bool),
-		buffer:      []shareddomain.SessionRecord{},
-		daemonID:    uuid.New().String(),
+		logger:             l.With(slog.String("name", "log.service")),
+		fileWatcher:        fileWatcher,
+		apiClient:          apiClient,
+		watchedDirs:        make(map[string]bool),
+		claudeDirToProject: make(map[string]shareddomain.ID),
+		bufferByProject:    make(map[shareddomain.ID][]shareddomain.SessionRecord),
 	}
 }
 
@@ -54,10 +53,12 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Build set of new directories
+	// Build set of new directories and ProjectID mapping
 	newDirs := make(map[string]bool)
+	newMapping := make(map[string]shareddomain.ID)
 	for _, t := range targets {
 		newDirs[t.ClaudeDir] = true
+		newMapping[t.ClaudeDir] = t.ProjectID
 	}
 
 	// Remove watches for directories no longer in targets
@@ -88,8 +89,12 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 		}
 	}
 
+	// Update ClaudeDir to ProjectID mapping
+	s.claudeDirToProject = newMapping
+
 	s.logger.Info("updated watch targets",
 		slog.Int("watching", len(s.watchedDirs)),
+		slog.Int("mappings", len(s.claudeDirToProject)),
 	)
 
 	return nil
@@ -144,43 +149,75 @@ func (s *Service) HandleFileChange(path string, fromOffset int64) ([]shareddomai
 	return records, newOffset, nil
 }
 
-// AddRecords adds records to the buffer.
-func (s *Service) AddRecords(records []shareddomain.SessionRecord) {
+// AddRecordsForClaudeDir adds records to the buffer, associating them with the given ClaudeDir.
+func (s *Service) AddRecordsForClaudeDir(claudeDir string, records []shareddomain.SessionRecord) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.buffer = append(s.buffer, records...)
+
+	projectID := s.claudeDirToProject[claudeDir]
+	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], records...)
 }
 
 // Flush sends buffered records to the API server.
+// Sends separate batches for each project.
 func (s *Service) Flush(ctx context.Context) error {
 	s.mu.Lock()
-	if len(s.buffer) == 0 {
+	if len(s.bufferByProject) == 0 {
 		s.mu.Unlock()
 		return nil
 	}
 
 	// Take ownership of buffer
-	records := s.buffer
-	s.buffer = []shareddomain.SessionRecord{}
+	bufferedRecords := s.bufferByProject
+	s.bufferByProject = make(map[shareddomain.ID][]shareddomain.SessionRecord)
 	s.mu.Unlock()
 
-	batch := domain.LogBatch{
-		Records:   records,
-		ProjectID: "", // TODO: Implement project ID tracking from config
+	var totalCount int
+	var lastErr error
+
+	for projectID, records := range bufferedRecords {
+		if len(records) == 0 {
+			continue
+		}
+
+		batch := domain.LogBatch{
+			Records:   records,
+			ProjectID: projectID,
+		}
+
+		s.logger.Info("flushing log batch",
+			slog.Int("count", len(records)),
+			slog.String("projectID", projectID.String()),
+		)
+
+		if err := s.apiClient.SendLogs(ctx, batch); err != nil {
+			// Put records back in buffer on failure
+			s.mu.Lock()
+			s.bufferByProject[projectID] = append(records, s.bufferByProject[projectID]...)
+			s.mu.Unlock()
+
+			lastErr = fmt.Errorf("failed to send logs for project %s: %w", projectID.String(), err)
+			s.logger.Error("failed to send logs",
+				slog.String("projectID", projectID.String()),
+				slog.Any("error", err),
+			)
+			continue
+		}
+
+		totalCount += len(records)
 	}
 
-	s.logger.Info("flushing log batch",
-		slog.Int("count", len(records)),
-	)
-
-	if err := s.apiClient.SendLogs(ctx, batch); err != nil {
-		// Put records back in buffer on failure
-		s.mu.Lock()
-		s.buffer = append(records, s.buffer...)
-		s.mu.Unlock()
-
-		return fmt.Errorf("failed to send logs: %w", err)
+	if lastErr != nil {
+		return lastErr
 	}
 
 	return nil
+}
+
+// GetProjectIDForClaudeDir returns the ProjectID for a given ClaudeDir.
+// Returns empty ID if not found.
+func (s *Service) GetProjectIDForClaudeDir(claudeDir string) shareddomain.ID {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.claudeDirToProject[claudeDir]
 }
