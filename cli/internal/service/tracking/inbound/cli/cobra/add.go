@@ -49,7 +49,7 @@ Examples:
 			fmt.Println("Project added successfully!")
 			fmt.Printf("  ID:   %s\n", project.ID)
 			fmt.Printf("  Path: %s\n", project.Path)
-			fmt.Printf("  Git:  %t\n", project.GitProject)
+			fmt.Printf("  Git:  %t\n", project.IsGitProject)
 
 			if sync {
 				fmt.Println("  Sync: completed")

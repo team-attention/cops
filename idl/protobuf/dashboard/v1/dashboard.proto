@@ -57,17 +57,14 @@ message ProjectSummary {
   // Project path
   string path = 3;
 
-  // Current git branch
-  string git_branch = 4;
-
   // Number of sessions in this project
-  int32 session_count = 5;
+  int32 session_count = 4;
 
   // Aggregated token usage
-  TokenUsageSummary usage = 6;
+  TokenUsageSummary usage = 5;
 
   // Last activity timestamp
-  google.protobuf.Timestamp last_activity = 7;
+  google.protobuf.Timestamp last_activity = 6;
 }
 
 // ProjectDetail contains full project information.
@@ -81,23 +78,20 @@ message ProjectDetail {
   // Project path
   string path = 3;
 
-  // Current git branch
-  string git_branch = 4;
-
   // List of git worktrees
-  repeated string worktrees = 5;
+  repeated string worktrees = 4;
 
   // Number of sessions in this project
-  int32 session_count = 6;
+  int32 session_count = 5;
 
   // Aggregated token usage
-  TokenUsageSummary usage = 7;
+  TokenUsageSummary usage = 6;
 
   // Project creation timestamp
-  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp created_at = 7;
 
   // Last activity timestamp
-  google.protobuf.Timestamp last_activity = 9;
+  google.protobuf.Timestamp last_activity = 8;
 }
 
 // SessionSummary contains basic session information for list views.

@@ -5,6 +5,7 @@ description: |
   Handles both initial implementation and revisions.
   Reusable across all workflow types.
 model: sonnet
+permissionMode: acceptEdits
 ---
 
 # Execute Agent

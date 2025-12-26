@@ -14,7 +14,7 @@ func newDashboardModule() fx.Option {
 		// MongoDB Repository Adapter
 		fx.Provide(
 			fx.Annotate(
-				mongodb.NewAdapter,
+				mongodb.NewMongoDashboardRepository,
 				fx.As(new(repository.DashboardRepositoryPort)),
 			),
 		),

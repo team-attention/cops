@@ -6,9 +6,11 @@ replace github.com/team-attention/cops/shared => ../shared
 
 require (
 	connectrpc.com/connect v1.19.1
-	github.com/google/uuid v1.6.0
+	github.com/bytedance/sonic v1.14.2
 	github.com/imroc/req/v3 v3.57.0
+	github.com/kardianos/service v1.2.4
 	github.com/olekukonko/tablewriter v1.1.2
+	github.com/samber/lo v1.52.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/team-attention/cops/shared v0.0.0
@@ -19,7 +21,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
-	github.com/bytedance/sonic v1.14.2 // indirect
 	github.com/bytedance/sonic/loader v0.4.0 // indirect
 	github.com/clipperhouse/displaywidth v0.6.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
@@ -31,7 +32,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/icholy/digest v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/kardianos/service v1.2.4 // indirect
 	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

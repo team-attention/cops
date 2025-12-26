@@ -4,6 +4,7 @@ description: |
   Requirements clarification agent that gathers and structures requirements
   before research begins. Operates in Linear ticket or general request mode.
 model: sonnet
+permissionMode: acceptEdits
 ---
 
 # Clarify Agent

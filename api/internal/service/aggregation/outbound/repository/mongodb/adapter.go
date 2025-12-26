@@ -14,22 +14,22 @@ import (
 	"github.com/team-attention/cops/shared/domain/mongoschema"
 )
 
-// Adapter implements SessionRecordRepositoryPort using MongoDB.
-type Adapter struct {
+// MongoSessionRecordRepository implements SessionRecordRepositoryPort using MongoDB.
+type MongoSessionRecordRepository struct {
 	logger     *slog.Logger
 	collection *mongo.Collection
 }
 
-// NewAdapter creates a new MongoDB session record repository adapter.
-func NewAdapter(l *slog.Logger, db *mongo.Database) *Adapter {
-	return &Adapter{
+// NewMongoSessionRecordRepository creates a new MongoDB session record repository adapter.
+func NewMongoSessionRecordRepository(l *slog.Logger, db *mongo.Database) *MongoSessionRecordRepository {
+	return &MongoSessionRecordRepository{
 		logger:     l.With(slog.String("name", "aggregation.repository.mongodb")),
 		collection: db.Collection(mongoschema.SessionRecordCollectionName),
 	}
 }
 
 // SaveBatch saves a batch of session records to MongoDB.
-func (a *Adapter) SaveBatch(ctx context.Context, batch *repository.LogBatch) error {
+func (r *MongoSessionRecordRepository) SaveBatch(ctx context.Context, batch *repository.LogBatch) error {
 	if len(batch.Records) == 0 {
 		return nil
 	}
@@ -39,9 +39,9 @@ func (a *Adapter) SaveBatch(ctx context.Context, batch *repository.LogBatch) err
 		docs[i] = toDocument(record, batch.DaemonID)
 	}
 
-	result, err := a.collection.InsertMany(ctx, docs)
+	result, err := r.collection.InsertMany(ctx, docs)
 	if err != nil {
-		a.logger.Error("failed to insert session records",
+		r.logger.Error("failed to insert session records",
 			slog.String("daemonId", batch.DaemonID),
 			slog.Int("count", len(batch.Records)),
 			slog.Any("error", err),
@@ -49,7 +49,7 @@ func (a *Adapter) SaveBatch(ctx context.Context, batch *repository.LogBatch) err
 		return fmt.Errorf("failed to insert session records: %w", err)
 	}
 
-	a.logger.Debug("inserted session records",
+	r.logger.Debug("inserted session records",
 		slog.String("daemonId", batch.DaemonID),
 		slog.Int("count", len(result.InsertedIDs)),
 	)
@@ -112,4 +112,4 @@ func toDocument(record shareddomain.SessionRecord, daemonID string) bson.M {
 }
 
 // Compile-time interface verification.
-var _ repository.SessionRecordRepositoryPort = (*Adapter)(nil)
+var _ repository.SessionRecordRepositoryPort = (*MongoSessionRecordRepository)(nil)

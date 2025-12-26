@@ -5,6 +5,7 @@ description: |
   Operates in two modes: Linear ticket research or general research.
   Provides focused information to prevent context pollution in Planning phase.
 model: opus
+permissionMode: acceptEdits
 ---
 
 # Research Agent

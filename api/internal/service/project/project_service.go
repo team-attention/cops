@@ -1,0 +1,44 @@
+package project
+
+import (
+	"context"
+	"log/slog"
+
+	"github.com/team-attention/cops/api/internal/service/project/outbound/repository"
+)
+
+// RegisterProjectParams contains parameters for registering a project.
+type RegisterProjectParams struct {
+	ConfiguredRemoteURL string
+	ActualRemoteURL     string
+	ExistingProjectID   string
+}
+
+// Service implements project business logic.
+type Service struct {
+	logger *slog.Logger
+	repo   repository.ProjectRepositoryPort
+}
+
+// NewService creates a new project service.
+func NewService(l *slog.Logger, repo repository.ProjectRepositoryPort) *Service {
+	return &Service{
+		logger: l.With(slog.String("name", "project.service")),
+		repo:   repo,
+	}
+}
+
+// RegisterProject registers a project or returns existing project ID if already registered.
+func (s *Service) RegisterProject(ctx context.Context, params RegisterProjectParams) (*repository.FindOrCreateResult, error) {
+	result, err := s.repo.FindOrCreate(ctx, params.ConfiguredRemoteURL, params.ActualRemoteURL, params.ExistingProjectID)
+	if err != nil {
+		s.logger.Error("failed to register project", slog.Any("error", err))
+		return nil, err
+	}
+
+	s.logger.Info("project registered",
+		slog.String("projectID", result.ProjectID),
+		slog.Bool("isNew", result.IsNew))
+
+	return result, nil
+}

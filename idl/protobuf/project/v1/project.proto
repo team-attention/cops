@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package project.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/project/v1;projectv1";
+
+// RegisterProjectReq contains parameters for registering a project with the API server.
+// The server performs duplicate detection using remote URLs and existing project ID.
+message RegisterProjectReq {
+  // configured_remote_url is from git config (git config --get remote.origin.url)
+  string configured_remote_url = 1;
+
+  // actual_remote_url is from git ls-remote (git ls-remote --get-url origin)
+  // This may differ from configured URL if the GitHub repo was renamed
+  string actual_remote_url = 2;
+
+  // existing_project_id is optional - from local config if available
+  // Used as fallback for finding existing projects
+  string existing_project_id = 3;
+}
+
+// RegisterProjectRes contains the result of project registration.
+message RegisterProjectRes {
+  // project_id is the MongoDB ObjectID hex representation
+  string project_id = 1;
+
+  // is_new indicates whether a new project was created (true) or existing found (false)
+  bool is_new = 2;
+}
+
+// ProjectService handles project registration and management.
+service ProjectService {
+  // RegisterProject registers a project or returns existing project ID if already registered.
+  // Performs duplicate detection using remote URLs and optional existing project ID.
+  rpc RegisterProject(RegisterProjectReq) returns (RegisterProjectRes);
+}

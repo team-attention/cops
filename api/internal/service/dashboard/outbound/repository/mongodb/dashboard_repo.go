@@ -17,16 +17,16 @@ import (
 	"github.com/team-attention/cops/shared/domain/mongoschema"
 )
 
-// Adapter implements DashboardRepositoryPort using MongoDB.
-type Adapter struct {
+// MongoDashboardRepository implements DashboardRepositoryPort using MongoDB.
+type MongoDashboardRepository struct {
 	logger             *slog.Logger
 	projectsColl       *mongo.Collection
 	sessionRecordsColl *mongo.Collection
 }
 
-// NewAdapter creates a new MongoDB dashboard repository adapter.
-func NewAdapter(l *slog.Logger, db *mongo.Database) *Adapter {
-	return &Adapter{
+// NewMongoDashboardRepository creates a new MongoDB dashboard repository adapter.
+func NewMongoDashboardRepository(l *slog.Logger, db *mongo.Database) *MongoDashboardRepository {
+	return &MongoDashboardRepository{
 		logger:             l.With(slog.String("name", "dashboard.repository.mongodb")),
 		projectsColl:       db.Collection(mongoschema.ProjectCollectionName),
 		sessionRecordsColl: db.Collection(mongoschema.SessionRecordCollectionName),
@@ -34,7 +34,7 @@ func NewAdapter(l *slog.Logger, db *mongo.Database) *Adapter {
 }
 
 // GetOverviewStats retrieves dashboard overview statistics.
-func (a *Adapter) GetOverviewStats(ctx context.Context) (*repository.OverviewStats, error) {
+func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context) (*repository.OverviewStats, error) {
 	stats := &repository.OverviewStats{}
 
 	// Get total usage from session records
@@ -47,9 +47,9 @@ func (a *Adapter) GetOverviewStats(ctx context.Context) (*repository.OverviewSta
 		}},
 	}
 
-	usageCursor, err := a.sessionRecordsColl.Aggregate(ctx, usagePipeline)
+	usageCursor, err := r.sessionRecordsColl.Aggregate(ctx, usagePipeline)
 	if err != nil {
-		a.logger.Error("failed to aggregate total usage", slog.Any("error", err))
+		r.logger.Error("failed to aggregate total usage", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to aggregate total usage: %w", err)
 	}
 	defer usageCursor.Close(ctx)
@@ -70,9 +70,9 @@ func (a *Adapter) GetOverviewStats(ctx context.Context) (*repository.OverviewSta
 	}
 
 	// Get project count
-	projectCount, err := a.projectsColl.CountDocuments(ctx, bson.M{})
+	projectCount, err := r.projectsColl.CountDocuments(ctx, bson.M{})
 	if err != nil {
-		a.logger.Error("failed to count projects", slog.Any("error", err))
+		r.logger.Error("failed to count projects", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count projects: %w", err)
 	}
 	stats.ProjectCount = int32(projectCount)
@@ -83,9 +83,9 @@ func (a *Adapter) GetOverviewStats(ctx context.Context) (*repository.OverviewSta
 		bson.M{"$count": "count"},
 	}
 
-	sessionCursor, err := a.sessionRecordsColl.Aggregate(ctx, sessionPipeline)
+	sessionCursor, err := r.sessionRecordsColl.Aggregate(ctx, sessionPipeline)
 	if err != nil {
-		a.logger.Error("failed to count sessions", slog.Any("error", err))
+		r.logger.Error("failed to count sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count sessions: %w", err)
 	}
 	defer sessionCursor.Close(ctx)
@@ -100,17 +100,17 @@ func (a *Adapter) GetOverviewStats(ctx context.Context) (*repository.OverviewSta
 	}
 
 	// Get recent projects (top 5 by last activity)
-	recentProjects, err := a.getRecentProjects(ctx, 5)
+	recentProjects, err := r.getRecentProjects(ctx, 5)
 	if err != nil {
-		a.logger.Error("failed to get recent projects", slog.Any("error", err))
+		r.logger.Error("failed to get recent projects", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to get recent projects: %w", err)
 	}
 	stats.RecentProjects = recentProjects
 
 	// Get recent sessions (top 5 by started_at)
-	recentSessions, err := a.getRecentSessions(ctx, 5)
+	recentSessions, err := r.getRecentSessions(ctx, 5)
 	if err != nil {
-		a.logger.Error("failed to get recent sessions", slog.Any("error", err))
+		r.logger.Error("failed to get recent sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to get recent sessions: %w", err)
 	}
 	stats.RecentSessions = recentSessions
@@ -119,7 +119,7 @@ func (a *Adapter) GetOverviewStats(ctx context.Context) (*repository.OverviewSta
 }
 
 // ListProjects retrieves a paginated list of projects.
-func (a *Adapter) ListProjects(ctx context.Context, params repository.ListProjectsParams) (*repository.PaginatedProjects, error) {
+func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repository.ListProjectsParams) (*repository.PaginatedProjects, error) {
 	// Single aggregation pipeline with $facet for count and data
 	pipeline := bson.A{
 		// Stage 1: Lookup session records with sub-pipeline for aggregation
@@ -158,15 +158,15 @@ func (a *Adapter) ListProjects(ctx context.Context, params repository.ListProjec
 
 		// Stage 4: Project final fields with defaults
 		bson.M{"$project": bson.M{
-			mongoschema.ProjectIDField:        1,
-			mongoschema.ProjectNameField:      1,
-			mongoschema.ProjectPathField:      1,
-			mongoschema.ProjectGitBranchField: 1,
-			"sessionCount":                                     bson.M{"$ifNull": bson.A{"$stats.sessionCount", 0}},
-			"lastActivity":                                     bson.M{"$ifNull": bson.A{"$stats.lastActivity", nil}},
-			mongoschema.SessionRecordInputTokensField:          bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordInputTokensField, 0}},
-			mongoschema.SessionRecordOutputTokensField:         bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordOutputTokensField, 0}},
-			mongoschema.SessionRecordCacheReadTokensField:      bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordCacheReadTokensField, 0}},
+			mongoschema.ProjectIDField:                    1,
+			mongoschema.ProjectNameField:                  1,
+			mongoschema.ProjectPathField:                  1,
+			mongoschema.ProjectGitBranchField:             1,
+			"sessionCount":                                bson.M{"$ifNull": bson.A{"$stats.sessionCount", 0}},
+			"lastActivity":                                bson.M{"$ifNull": bson.A{"$stats.lastActivity", nil}},
+			mongoschema.SessionRecordInputTokensField:     bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordInputTokensField, 0}},
+			mongoschema.SessionRecordOutputTokensField:    bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordOutputTokensField, 0}},
+			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordCacheReadTokensField, 0}},
 		}},
 
 		// Stage 5: Facet for count and paginated data
@@ -182,9 +182,9 @@ func (a *Adapter) ListProjects(ctx context.Context, params repository.ListProjec
 		}},
 	}
 
-	cursor, err := a.projectsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.projectsColl.Aggregate(ctx, pipeline)
 	if err != nil {
-		a.logger.Error("failed to aggregate projects", slog.Any("error", err))
+		r.logger.Error("failed to aggregate projects", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to aggregate projects: %w", err)
 	}
 	defer cursor.Close(ctx)
@@ -199,7 +199,7 @@ func (a *Adapter) ListProjects(ctx context.Context, params repository.ListProjec
 
 	if cursor.Next(ctx) {
 		if err := cursor.Decode(&facetResult); err != nil {
-			a.logger.Error("failed to decode facet result", slog.Any("error", err))
+			r.logger.Error("failed to decode facet result", slog.Any("error", err))
 			return nil, fmt.Errorf("failed to decode facet result: %w", err)
 		}
 	}
@@ -237,19 +237,19 @@ func (a *Adapter) ListProjects(ctx context.Context, params repository.ListProjec
 }
 
 // GetProject retrieves detailed project information.
-func (a *Adapter) GetProject(ctx context.Context, projectID string) (*repository.ProjectDetail, error) {
+func (r *MongoDashboardRepository) GetProject(ctx context.Context, projectID string) (*repository.ProjectDetail, error) {
 	objectID, err := bson.ObjectIDFromHex(projectID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid project ID: %w", err)
 	}
 
 	var doc bson.M
-	err = a.projectsColl.FindOne(ctx, bson.M{"_id": objectID}).Decode(&doc)
+	err = r.projectsColl.FindOne(ctx, bson.M{"_id": objectID}).Decode(&doc)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("project not found")
 		}
-		a.logger.Error("failed to find project", slog.String("projectID", projectID), slog.Any("error", err))
+		r.logger.Error("failed to find project", slog.String("projectID", projectID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to find project: %w", err)
 	}
 
@@ -260,16 +260,15 @@ func (a *Adapter) GetProject(ctx context.Context, projectID string) (*repository
 				Name: mongoutil.Get[string](doc, mongoschema.ProjectNameField),
 				Path: mongoutil.Get[string](doc, mongoschema.ProjectPathField),
 			},
-			GitProject:   mongoutil.Get[bool](doc, mongoschema.ProjectGitProjectField),
+			IsGitProject: mongoutil.Get[bool](doc, mongoschema.ProjectIsGitProjectField),
 			ClaudeDir:    mongoutil.Get[string](doc, mongoschema.ProjectClaudeDirField),
-			GitBranch:    mongoutil.Get[string](doc, mongoschema.ProjectGitBranchField),
 			Worktrees:    mongoutil.GetSlice[string](doc, mongoschema.ProjectWorktreesField),
 			RegisteredAt: mongoutil.Get[time.Time](doc, mongoschema.ProjectRegisteredAtField),
 		},
 	}
 
 	// Get session stats
-	stats, err := a.getProjectStats(ctx, projectID)
+	stats, err := r.getProjectStats(ctx, projectID)
 	if err == nil {
 		detail.ProjectAggregation = repository.ProjectAggregation{
 			SessionCount: stats.SessionCount,
@@ -282,7 +281,7 @@ func (a *Adapter) GetProject(ctx context.Context, projectID string) (*repository
 }
 
 // ListSessions retrieves paginated sessions for a project.
-func (a *Adapter) ListSessions(ctx context.Context, params repository.ListSessionsParams) (*repository.PaginatedSessions, error) {
+func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repository.ListSessionsParams) (*repository.PaginatedSessions, error) {
 	projectOID, err := bson.ObjectIDFromHex(params.Query.ProjectID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid project ID: %w", err)
@@ -292,12 +291,12 @@ func (a *Adapter) ListSessions(ctx context.Context, params repository.ListSessio
 	pipeline := bson.A{
 		bson.M{"$match": bson.M{mongoschema.SessionRecordProjectIDField: projectOID}},
 		bson.M{"$group": bson.M{
-			"_id":          "$" + mongoschema.SessionRecordSessionIDField,
-			"messageCount": bson.M{"$sum": 1},
-			"startedAt":    bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
-			"endedAt":      bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-			mongoschema.SessionRecordProjectIDField:       bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
-			mongoschema.SessionRecordGitBranchField:       bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
+			"_id":                                   "$" + mongoschema.SessionRecordSessionIDField,
+			"messageCount":                          bson.M{"$sum": 1},
+			"startedAt":                             bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
+			"endedAt":                               bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
+			mongoschema.SessionRecordProjectIDField: bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
+			mongoschema.SessionRecordGitBranchField: bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
 			mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
 			mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
 			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
@@ -317,9 +316,9 @@ func (a *Adapter) ListSessions(ctx context.Context, params repository.ListSessio
 
 	// Get total count first
 	countPipeline := append(pipeline, bson.M{"$count": "count"})
-	countCursor, err := a.sessionRecordsColl.Aggregate(ctx, countPipeline)
+	countCursor, err := r.sessionRecordsColl.Aggregate(ctx, countPipeline)
 	if err != nil {
-		a.logger.Error("failed to count sessions", slog.Any("error", err))
+		r.logger.Error("failed to count sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count sessions: %w", err)
 	}
 	defer countCursor.Close(ctx)
@@ -340,9 +339,9 @@ func (a *Adapter) ListSessions(ctx context.Context, params repository.ListSessio
 		bson.M{"$limit": int64(params.PageSize)},
 	)
 
-	cursor, err := a.sessionRecordsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.sessionRecordsColl.Aggregate(ctx, pipeline)
 	if err != nil {
-		a.logger.Error("failed to aggregate sessions", slog.Any("error", err))
+		r.logger.Error("failed to aggregate sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to aggregate sessions: %w", err)
 	}
 	defer cursor.Close(ctx)
@@ -377,11 +376,11 @@ func (a *Adapter) ListSessions(ctx context.Context, params repository.ListSessio
 }
 
 // GetSession retrieves detailed session information with all records.
-func (a *Adapter) GetSession(ctx context.Context, sessionID string) (*repository.SessionDetail, error) {
+func (r *MongoDashboardRepository) GetSession(ctx context.Context, sessionID string) (*repository.SessionDetail, error) {
 	// Find all records for this session
-	cursor, err := a.sessionRecordsColl.Find(ctx, bson.M{mongoschema.SessionRecordSessionIDField: sessionID}, options.Find().SetSort(bson.M{mongoschema.SessionRecordTimestampField: 1}))
+	cursor, err := r.sessionRecordsColl.Find(ctx, bson.M{mongoschema.SessionRecordSessionIDField: sessionID}, options.Find().SetSort(bson.M{mongoschema.SessionRecordTimestampField: 1}))
 	if err != nil {
-		a.logger.Error("failed to find session records", slog.String("sessionID", sessionID), slog.Any("error", err))
+		r.logger.Error("failed to find session records", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to find session records: %w", err)
 	}
 	defer cursor.Close(ctx)
@@ -503,7 +502,7 @@ func (a *Adapter) GetSession(ctx context.Context, sessionID string) (*repository
 
 // Helper methods
 
-func (a *Adapter) getRecentProjects(ctx context.Context, limit int) ([]repository.ProjectSummary, error) {
+func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, limit int) ([]repository.ProjectSummary, error) {
 	// Get projects sorted by last activity with all stats calculated in-pipeline
 	pipeline := bson.A{
 		// Stage 1: Lookup session records
@@ -537,7 +536,7 @@ func (a *Adapter) getRecentProjects(ctx context.Context, limit int) ([]repositor
 		}},
 	}
 
-	cursor, err := a.projectsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.projectsColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -574,15 +573,15 @@ func (a *Adapter) getRecentProjects(ctx context.Context, limit int) ([]repositor
 	return projects, nil
 }
 
-func (a *Adapter) getRecentSessions(ctx context.Context, limit int) ([]repository.SessionSummary, error) {
+func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, limit int) ([]repository.SessionSummary, error) {
 	pipeline := bson.A{
 		bson.M{"$group": bson.M{
-			"_id":          "$" + mongoschema.SessionRecordSessionIDField,
-			"messageCount": bson.M{"$sum": 1},
-			"startedAt":    bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
-			"endedAt":      bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-			mongoschema.SessionRecordProjectIDField:       bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
-			mongoschema.SessionRecordGitBranchField:       bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
+			"_id":                                   "$" + mongoschema.SessionRecordSessionIDField,
+			"messageCount":                          bson.M{"$sum": 1},
+			"startedAt":                             bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
+			"endedAt":                               bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
+			mongoschema.SessionRecordProjectIDField: bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
+			mongoschema.SessionRecordGitBranchField: bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
 			mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
 			mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
 			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
@@ -591,7 +590,7 @@ func (a *Adapter) getRecentSessions(ctx context.Context, limit int) ([]repositor
 		bson.M{"$limit": limit},
 	}
 
-	cursor, err := a.sessionRecordsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.sessionRecordsColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -631,7 +630,7 @@ func (a *Adapter) getRecentSessions(ctx context.Context, limit int) ([]repositor
 	return sessions, nil
 }
 
-func (a *Adapter) getProjectStats(ctx context.Context, projectID string) (*repository.ProjectSummary, error) {
+func (r *MongoDashboardRepository) getProjectStats(ctx context.Context, projectID string) (*repository.ProjectSummary, error) {
 	projectOID, err := bson.ObjectIDFromHex(projectID)
 	if err != nil {
 		return nil, err
@@ -656,7 +655,7 @@ func (a *Adapter) getProjectStats(ctx context.Context, projectID string) (*repos
 		}},
 	}
 
-	cursor, err := a.sessionRecordsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.sessionRecordsColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -685,4 +684,4 @@ func (a *Adapter) getProjectStats(ctx context.Context, projectID string) (*repos
 }
 
 // Compile-time interface verification.
-var _ repository.DashboardRepositoryPort = (*Adapter)(nil)
+var _ repository.DashboardRepositoryPort = (*MongoDashboardRepository)(nil)

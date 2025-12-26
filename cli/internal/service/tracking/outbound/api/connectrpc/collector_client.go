@@ -91,7 +91,7 @@ func (c *CollectorClient) SendRecords(ctx context.Context, project *domain.Proje
 			Id:         project.ID.String(),
 			Name:       project.Name,
 			Path:       project.Path,
-			GitProject: project.GitProject,
+			GitProject: project.IsGitProject,
 		},
 		Records: protoRecords,
 	})

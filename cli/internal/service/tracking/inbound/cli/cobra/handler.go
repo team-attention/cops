@@ -27,5 +27,6 @@ func (h *TrackingCLIHandler) Commands() []*cobra.Command {
 	return []*cobra.Command{
 		h.NewAddCommand(),
 		h.NewListCommand(),
+		h.NewRemoveCommand(),
 	}
 }

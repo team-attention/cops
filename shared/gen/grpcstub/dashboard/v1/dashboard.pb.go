@@ -233,14 +233,12 @@ type ProjectSummary struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Project path
 	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	// Current git branch
-	GitBranch string `protobuf:"bytes,4,opt,name=git_branch,json=gitBranch,proto3" json:"git_branch,omitempty"`
 	// Number of sessions in this project
-	SessionCount int32 `protobuf:"varint,5,opt,name=session_count,json=sessionCount,proto3" json:"session_count,omitempty"`
+	SessionCount int32 `protobuf:"varint,4,opt,name=session_count,json=sessionCount,proto3" json:"session_count,omitempty"`
 	// Aggregated token usage
-	Usage *TokenUsageSummary `protobuf:"bytes,6,opt,name=usage,proto3" json:"usage,omitempty"`
+	Usage *TokenUsageSummary `protobuf:"bytes,5,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Last activity timestamp
-	LastActivity  *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=last_activity,json=lastActivity,proto3" json:"last_activity,omitempty"`
+	LastActivity  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=last_activity,json=lastActivity,proto3" json:"last_activity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -296,13 +294,6 @@ func (x *ProjectSummary) GetPath() string {
 	return ""
 }
 
-func (x *ProjectSummary) GetGitBranch() string {
-	if x != nil {
-		return x.GitBranch
-	}
-	return ""
-}
-
 func (x *ProjectSummary) GetSessionCount() int32 {
 	if x != nil {
 		return x.SessionCount
@@ -333,18 +324,16 @@ type ProjectDetail struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Project path
 	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	// Current git branch
-	GitBranch string `protobuf:"bytes,4,opt,name=git_branch,json=gitBranch,proto3" json:"git_branch,omitempty"`
 	// List of git worktrees
-	Worktrees []string `protobuf:"bytes,5,rep,name=worktrees,proto3" json:"worktrees,omitempty"`
+	Worktrees []string `protobuf:"bytes,4,rep,name=worktrees,proto3" json:"worktrees,omitempty"`
 	// Number of sessions in this project
-	SessionCount int32 `protobuf:"varint,6,opt,name=session_count,json=sessionCount,proto3" json:"session_count,omitempty"`
+	SessionCount int32 `protobuf:"varint,5,opt,name=session_count,json=sessionCount,proto3" json:"session_count,omitempty"`
 	// Aggregated token usage
-	Usage *TokenUsageSummary `protobuf:"bytes,7,opt,name=usage,proto3" json:"usage,omitempty"`
+	Usage *TokenUsageSummary `protobuf:"bytes,6,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Project creation timestamp
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	// Last activity timestamp
-	LastActivity  *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=last_activity,json=lastActivity,proto3" json:"last_activity,omitempty"`
+	LastActivity  *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=last_activity,json=lastActivity,proto3" json:"last_activity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -396,13 +385,6 @@ func (x *ProjectDetail) GetName() string {
 func (x *ProjectDetail) GetPath() string {
 	if x != nil {
 		return x.Path
-	}
-	return ""
-}
-
-func (x *ProjectDetail) GetGitBranch() string {
-	if x != nil {
-		return x.GitBranch
 	}
 	return ""
 }
@@ -1211,28 +1193,24 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\vtotal_pages\x18\x03 \x01(\x05R\n" +
 	"totalPages\x12\x1f\n" +
 	"\vtotal_count\x18\x04 \x01(\x03R\n" +
-	"totalCount\"\x84\x02\n" +
+	"totalCount\"\xe5\x01\n" +
 	"\x0eProjectSummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
-	"\x04path\x18\x03 \x01(\tR\x04path\x12\x1d\n" +
-	"\n" +
-	"git_branch\x18\x04 \x01(\tR\tgitBranch\x12#\n" +
-	"\rsession_count\x18\x05 \x01(\x05R\fsessionCount\x125\n" +
-	"\x05usage\x18\x06 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x12?\n" +
-	"\rlast_activity\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\"\xdc\x02\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\x12#\n" +
+	"\rsession_count\x18\x04 \x01(\x05R\fsessionCount\x125\n" +
+	"\x05usage\x18\x05 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x12?\n" +
+	"\rlast_activity\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\"\xbd\x02\n" +
 	"\rProjectDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
-	"\x04path\x18\x03 \x01(\tR\x04path\x12\x1d\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\x12\x1c\n" +
+	"\tworktrees\x18\x04 \x03(\tR\tworktrees\x12#\n" +
+	"\rsession_count\x18\x05 \x01(\x05R\fsessionCount\x125\n" +
+	"\x05usage\x18\x06 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
-	"git_branch\x18\x04 \x01(\tR\tgitBranch\x12\x1c\n" +
-	"\tworktrees\x18\x05 \x03(\tR\tworktrees\x12#\n" +
-	"\rsession_count\x18\x06 \x01(\x05R\fsessionCount\x125\n" +
-	"\x05usage\x18\a \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
-	"\n" +
-	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12?\n" +
-	"\rlast_activity\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\"\xac\x02\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12?\n" +
+	"\rlast_activity\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\"\xac\x02\n" +
 	"\x0eSessionSummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +

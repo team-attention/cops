@@ -132,5 +132,30 @@ func (a *FilesystemConfigAdapter) LocalConfigExists(projectPath string) bool {
 	return err == nil
 }
 
+// DeleteLocalConfig deletes the local configuration directory (.cops/) at the given path.
+// Returns nil if the directory does not exist (graceful handling).
+func (a *FilesystemConfigAdapter) DeleteLocalConfig(projectPath string) error {
+	configDir := filepath.Join(projectPath, localConfigDirName)
+
+	// Check if directory exists
+	if _, err := os.Stat(configDir); os.IsNotExist(err) {
+		a.logger.Debug("local config directory does not exist, nothing to delete",
+			slog.String("path", configDir),
+		)
+		return nil
+	}
+
+	// Remove entire .cops directory
+	if err := os.RemoveAll(configDir); err != nil {
+		return err
+	}
+
+	a.logger.Info("deleted local config directory",
+		slog.String("path", configDir),
+	)
+
+	return nil
+}
+
 // Compile-time interface verification
 var _ config.ConfigPort = (*FilesystemConfigAdapter)(nil)

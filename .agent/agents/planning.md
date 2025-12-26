@@ -5,6 +5,7 @@ description: |
   Must make definitive choices - no "A or B" options.
   Output must be detailed enough to write test cases for all function branches.
 model: opus
+permissionMode: acceptEdits
 ---
 
 # Planning Agent

@@ -37,7 +37,7 @@ Examples:
 
 			for _, p := range projects {
 				gitStatus := "No"
-				if p.GitProject {
+				if p.IsGitProject {
 					gitStatus = "Yes"
 				}
 

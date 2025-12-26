@@ -13,11 +13,12 @@ const (
 	ProjectIDField           = "_id"
 	ProjectNameField         = "name"
 	ProjectPathField         = "path"
-	ProjectGitProjectField   = "gitProject"
+	ProjectIsGitProjectField = "isGitProject"
 	ProjectClaudeDirField    = "claudeDir"
 	ProjectRegisteredAtField = "registeredAt"
 	ProjectGitBranchField    = "git_branch"
 	ProjectWorktreesField    = "worktrees"
+	ProjectRemoteURLField    = "remoteUrl"
 )
 
 type Project struct {

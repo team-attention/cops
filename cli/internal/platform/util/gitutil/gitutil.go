@@ -114,7 +114,8 @@ func GetCurrentBranch(repoPath string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GetRemoteURL returns the remote URL for a git repository.
+// GetRemoteURL returns the configured remote URL for a git repository.
+// Uses: git remote get-url origin
 func GetRemoteURL(repoPath string) (string, error) {
 	cmd := exec.Command("git", "-C", repoPath, "remote", "get-url", "origin")
 	output, err := cmd.Output()
@@ -122,5 +123,18 @@ func GetRemoteURL(repoPath string) (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+// GetActualRemoteURL returns the actual remote URL (what GitHub points to).
+// Uses: git ls-remote --get-url origin
+// This can differ from configured URL if the repo was renamed on GitHub.
+// Returns empty string on error (graceful handling).
+func GetActualRemoteURL(repoPath string) string {
+	cmd := exec.Command("git", "-C", repoPath, "ls-remote", "--get-url", "origin")
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(output))
 }
 

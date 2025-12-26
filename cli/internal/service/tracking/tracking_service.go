@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/team-attention/cops/cli/internal/platform/util/errutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
@@ -31,6 +31,7 @@ type Service struct {
 	configRepo config.ConfigPort
 	parser     parser.ParserPort
 	collector  api.CollectorPort
+	project    api.ProjectPort
 }
 
 // NewService creates a new tracking service.
@@ -39,12 +40,14 @@ func NewService(
 	configRepo config.ConfigPort,
 	parser parser.ParserPort,
 	collector api.CollectorPort,
+	project api.ProjectPort,
 ) *Service {
 	return &Service{
 		logger:     l.With(slog.String("name", "tracking.service")),
 		configRepo: configRepo,
 		parser:     parser,
 		collector:  collector,
+		project:    project,
 	}
 }
 
@@ -80,28 +83,55 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 	// Use directory name as project name
 	name := filepath.Base(projectPath)
 
-	// Check if local config exists
+	// Determine project ID
 	var projectID domain.ID
+	var existingProjectID string
+
+	// Check if local config exists
 	if s.configRepo.LocalConfigExists(projectPath) {
-		// Load existing project ID
 		localConfig, err := s.configRepo.LoadLocalConfig(projectPath)
 		if err != nil {
 			return nil, errutil.Internalf("failed to load local config: %v", err)
 		}
-		projectID = localConfig.ID
-		s.logger.Debug("using existing project ID",
-			slog.String("id", projectID.String()))
-	} else {
-		// Generate new UUID
-		projectID = domain.NewID(uuid.New().String())
-		s.logger.Debug("generated new project ID",
-			slog.String("id", projectID.String()))
+		existingProjectID = localConfig.ID.String()
+	}
 
-		// Save local config
-		localConfig := &config.LocalConfig{ID: projectID}
-		if err := s.configRepo.SaveLocalConfig(projectPath, localConfig); err != nil {
-			return nil, errutil.Internalf("failed to save local config: %v", err)
+	// Get URLs (empty strings if not available)
+	configuredURL := ""
+	actualURL := ""
+	if isGitProject {
+		configuredURL, _ = gitutil.GetRemoteURL(projectPath)
+		actualURL = gitutil.GetActualRemoteURL(projectPath)
+	}
+
+	// Always call API to register project
+	result, err := s.project.RegisterProject(ctx, api.RegisterProjectParams{
+		ConfiguredRemoteURL: configuredURL,
+		ActualRemoteURL:     actualURL,
+		ExistingProjectID:   existingProjectID,
+	})
+	if err != nil {
+		// If we have an existing local ID, use it
+		if existingProjectID != "" {
+			projectID = domain.ID(existingProjectID)
+			s.logger.Warn("failed to register with API, using existing local ID",
+				slog.Any("error", err),
+				slog.String("id", projectID.String()))
+		} else {
+			// No existing ID and API unreachable - FAIL
+			return nil, errutil.Internalf("cannot register project: API unreachable and no existing local ID: %v", err)
 		}
+	} else {
+		projectID = result.ProjectID
+		s.logger.Debug("registered project with API",
+			slog.String("id", projectID.String()),
+			slog.Bool("isNew", result.IsNew))
+	}
+
+	// Save local config with projectID
+	localConfig := &config.LocalConfig{ID: projectID}
+	if err := s.configRepo.SaveLocalConfig(projectPath, localConfig); err != nil {
+		return nil, errutil.Internalf("failed to save local config: %v", err)
 	}
 
 	// Get Claude directory for this project
@@ -118,7 +148,7 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 			Name: name,
 			Path: projectPath,
 		},
-		GitProject:   isGitProject,
+		IsGitProject: isGitProject,
 		ClaudeDir:    claudeProjectDir,
 		RegisteredAt: time.Now(),
 	}
@@ -149,7 +179,7 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		slog.String("id", project.ID.String()),
 		slog.String("name", project.Name),
 		slog.String("path", project.Path),
-		slog.Bool("gitProject", project.GitProject))
+		slog.Bool("gitProject", project.IsGitProject))
 
 	// Sync if requested
 	if params.Sync {
@@ -177,7 +207,7 @@ func (s *Service) ListProjects(ctx context.Context) ([]*domain.ProjectWithWorktr
 		}
 
 		// Discover worktrees for git projects
-		if project.GitProject {
+		if project.IsGitProject {
 			worktrees, err := gitutil.ListWorktrees(project.Path)
 			if err != nil {
 				s.logger.Warn("failed to list worktrees",
@@ -222,6 +252,58 @@ func (s *Service) RemoveProject(ctx context.Context, projectID domain.ID) error 
 	}
 
 	s.logger.Info("project removed", slog.String("id", projectID.String()))
+	return nil
+}
+
+// RemoveProjectByPathParams contains parameters for RemoveProjectByPath.
+type RemoveProjectByPathParams struct {
+	Path string
+}
+
+// RemoveProjectByPath removes a project from tracking by its path.
+// This only removes from local configs (global config + local .cops/ directory).
+// Does NOT delete Claude Code session logs.
+// Does NOT communicate with API server.
+func (s *Service) RemoveProjectByPath(ctx context.Context, params RemoveProjectByPathParams) error {
+	// Expand and validate path
+	absPath, err := pathutil.ExpandPath(params.Path)
+	if err != nil {
+		return errutil.BadRequestf("invalid path: %v", err)
+	}
+
+	// Delete local config first (graceful if not exists)
+	if err := s.configRepo.DeleteLocalConfig(absPath); err != nil {
+		s.logger.Warn("failed to delete local config, continuing with global config removal",
+			slog.String("path", absPath),
+			slog.Any("error", err))
+		// Continue with global config update
+	}
+
+	// Load global config
+	globalConfig, err := s.configRepo.LoadGlobalConfig()
+	if err != nil {
+		return errutil.Internalf("failed to load global config: %v", err)
+	}
+
+	// Filter out project with matching path
+	filtered := lo.Filter(globalConfig.Projects, func(p *domain.Project, _ int) bool {
+		return p.Path != absPath
+	})
+	found := len(filtered) < len(globalConfig.Projects)
+
+	// Save global config if project was found
+	if found {
+		globalConfig.Projects = filtered
+		if err := s.configRepo.SaveGlobalConfig(globalConfig); err != nil {
+			return errutil.Internalf("failed to save global config: %v", err)
+		}
+		s.logger.Info("project removed from tracking",
+			slog.String("path", absPath))
+	} else {
+		s.logger.Info("project not in global config, local config deleted if existed",
+			slog.String("path", absPath))
+	}
+
 	return nil
 }
 

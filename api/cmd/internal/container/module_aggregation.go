@@ -14,7 +14,7 @@ func newAggregationModule() fx.Option {
 		// Repository
 		fx.Provide(
 			fx.Annotate(
-				mongodb.NewAdapter,
+				mongodb.NewMongoSessionRecordRepository,
 				fx.As(new(repository.SessionRecordRepositoryPort)),
 			),
 		),

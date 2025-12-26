@@ -28,4 +28,8 @@ type ConfigPort interface {
 
 	// LocalConfigExists checks if a local config exists at the given path.
 	LocalConfigExists(projectPath string) bool
+
+	// DeleteLocalConfig deletes the local configuration directory (.cops/) at the given path.
+	// Returns nil if the directory does not exist (graceful handling).
+	DeleteLocalConfig(projectPath string) error
 }

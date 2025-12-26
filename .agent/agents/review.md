@@ -6,6 +6,7 @@ description: |
   2. Pre-PR Review Mode: Review code before PR creation
   Both modes produce output detailed enough for Execute Agent.
 model: opus
+permissionMode: acceptEdits
 ---
 
 # Review Agent

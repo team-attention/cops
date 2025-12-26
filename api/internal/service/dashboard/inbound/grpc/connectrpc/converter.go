@@ -2,9 +2,9 @@ package connectrpc
 
 import (
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
+	shareddomain "github.com/team-attention/cops/shared/domain"
 	collectorv1 "github.com/team-attention/cops/shared/gen/grpcstub/collector/v1"
 	dashboardv1 "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1"
-	shareddomain "github.com/team-attention/cops/shared/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -24,7 +24,6 @@ func toProtoProjectSummary(p repository.ProjectSummary) *dashboardv1.ProjectSumm
 		Id:           string(p.ProjectAbstract.ID),
 		Name:         p.ProjectAbstract.Name,
 		Path:         p.ProjectAbstract.Path,
-		GitBranch:    p.GitBranch,
 		SessionCount: p.ProjectAggregation.SessionCount,
 		Usage:        toProtoTokenUsageSummary(p.ProjectAggregation.Usage),
 		LastActivity: timestamppb.New(p.ProjectAggregation.LastActivity),
@@ -37,7 +36,6 @@ func toProtoProjectDetail(p *repository.ProjectDetail) *dashboardv1.ProjectDetai
 		Id:           string(p.Project.ID),
 		Name:         p.Project.Name,
 		Path:         p.Project.Path,
-		GitBranch:    p.Project.GitBranch,
 		Worktrees:    p.Project.Worktrees,
 		SessionCount: p.ProjectAggregation.SessionCount,
 		Usage:        toProtoTokenUsageSummary(p.ProjectAggregation.Usage),

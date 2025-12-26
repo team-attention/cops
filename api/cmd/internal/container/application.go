@@ -14,6 +14,7 @@ func Run() {
 		newHealthModule(),
 		newAggregationModule(),
 		newDashboardModule(),
+		newProjectModule(),
 
 		// Registrations (invoked for side effects)
 		fx.Invoke(registerConnectRPCServer),

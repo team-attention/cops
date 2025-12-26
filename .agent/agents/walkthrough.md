@@ -4,6 +4,7 @@ description: |
   Work history documenter that creates walkthrough.md before commits.
   Summarizes the entire development process for future reference.
 model: sonnet
+permissionMode: acceptEdits
 ---
 
 # Walkthrough Agent
