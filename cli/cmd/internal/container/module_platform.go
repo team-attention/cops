@@ -19,7 +19,6 @@ func newPlatformModule(c *dig.Container) error {
 		logger.InitLogger,
 
 		// HTTP clients (depends on config)
-		httpclient.InitCollectorHTTPClient,
 		httpclient.InitAPIHTTPClient,
 
 		// Cobra root command (depends on logger)

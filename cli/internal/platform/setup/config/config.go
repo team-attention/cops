@@ -10,11 +10,10 @@ import (
 
 // Config holds all application configuration.
 type Config struct {
-	App       AppConfig
-	Logging   LoggingConfig
-	Collector CollectorConfig
-	API       APIConfig
-	Daemon    DaemonConfig
+	App     AppConfig
+	Logging LoggingConfig
+	API     APIConfig
+	Daemon  DaemonConfig
 }
 
 // AppConfig holds application-level settings.
@@ -27,12 +26,6 @@ type AppConfig struct {
 type LoggingConfig struct {
 	Level  string
 	Format string
-}
-
-// CollectorConfig holds collector server settings.
-type CollectorConfig struct {
-	URL     string
-	Timeout time.Duration
 }
 
 // APIConfig holds API server settings.
@@ -62,9 +55,7 @@ func LoadConfig() (*Config, error) {
 	v.SetDefault("app.version", "dev")
 	v.SetDefault("logging.level", "info")
 	v.SetDefault("logging.format", "text")
-	v.SetDefault("collector.url", "http://localhost:8080")
-	v.SetDefault("collector.timeout", "30s")
-	v.SetDefault("api.url", "http://localhost:8081")
+	v.SetDefault("api.url", "http://localhost:8080")
 	v.SetDefault("api.timeout", "30s")
 	v.SetDefault("daemon.binarypath", "~/.cops/bin/cops-daemon")
 
@@ -76,10 +67,6 @@ func LoadConfig() (*Config, error) {
 		Logging: LoggingConfig{
 			Level:  v.GetString("logging.level"),
 			Format: v.GetString("logging.format"),
-		},
-		Collector: CollectorConfig{
-			URL:     v.GetString("collector.url"),
-			Timeout: v.GetDuration("collector.timeout"),
 		},
 		API: APIConfig{
 			URL:     v.GetString("api.url"),

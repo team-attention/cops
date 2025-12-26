@@ -30,7 +30,6 @@ type Service struct {
 
 	configRepo config.ConfigPort
 	parser     parser.ParserPort
-	collector  api.CollectorPort
 	project    api.ProjectPort
 }
 
@@ -39,14 +38,12 @@ func NewService(
 	l *slog.Logger,
 	configRepo config.ConfigPort,
 	parser parser.ParserPort,
-	collector api.CollectorPort,
 	project api.ProjectPort,
 ) *Service {
 	return &Service{
 		logger:     l.With(slog.String("name", "tracking.service")),
 		configRepo: configRepo,
 		parser:     parser,
-		collector:  collector,
 		project:    project,
 	}
 }
@@ -308,45 +305,7 @@ func (s *Service) RemoveProjectByPath(ctx context.Context, params RemoveProjectB
 }
 
 // SyncProject syncs session records for a project to the collector.
+// This feature is not yet implemented.
 func (s *Service) SyncProject(ctx context.Context, projectID domain.ID) error {
-	// Find project
-	globalConfig, err := s.configRepo.LoadGlobalConfig()
-	if err != nil {
-		return errutil.Internalf("failed to load global config: %v", err)
-	}
-
-	var project *domain.Project
-	for _, p := range globalConfig.Projects {
-		if p.ID == projectID {
-			project = p
-			break
-		}
-	}
-
-	if project == nil {
-		return errutil.NotFoundf("project not found: %s", projectID)
-	}
-
-	// Parse session files
-	records, err := s.parser.ParseSessionFiles(project.ClaudeDir)
-	if err != nil {
-		return errutil.Internalf("failed to parse sessions: %v", err)
-	}
-
-	if len(records) == 0 {
-		s.logger.Info("no records to sync",
-			slog.String("projectId", projectID.String()))
-		return nil
-	}
-
-	// Send to collector
-	if err := s.collector.SendRecords(ctx, project, records); err != nil {
-		return errutil.Internalf("Collector server must be running for sync: %v", err)
-	}
-
-	s.logger.Info("project synced",
-		slog.String("projectId", projectID.String()),
-		slog.Int("records", len(records)))
-
-	return nil
+	return errutil.Internalf("sync is not yet implemented")
 }

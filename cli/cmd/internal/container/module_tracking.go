@@ -29,12 +29,6 @@ func newTrackingModule(c *dig.Container) error {
 		return err
 	}
 	if err := c.Provide(
-		connectrpc.NewCollectorClient,
-		dig.As(new(api.CollectorPort)),
-	); err != nil {
-		return err
-	}
-	if err := c.Provide(
 		connectrpc.NewProjectClient,
 		dig.As(new(api.ProjectPort)),
 	); err != nil {

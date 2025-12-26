@@ -14,9 +14,7 @@ C-Ops는 환경 변수를 지원하는 Viper를 사용하여 설정을 관리합
 | `COPS_APP_VERSION` | `0.0.1` | 애플리케이션 버전 |
 | `COPS_LOGGING_LEVEL` | `info` | 로그 레벨 (debug, info, warn, error) |
 | `COPS_LOGGING_FORMAT` | `text` | 로그 포맷 (text, json) |
-| `COPS_COLLECTOR_URL` | `http://localhost:8080` | Collector 서버 URL |
-| `COPS_COLLECTOR_TIMEOUT` | `30s` | Collector 서버 타임아웃 |
-| `COPS_API_URL` | `http://localhost:8081` | API 서버 URL |
+| `COPS_API_URL` | `http://localhost:8080` | API 서버 URL |
 | `COPS_API_TIMEOUT` | `30s` | API 서버 타임아웃 |
 
 ## Viper 동작 방식
@@ -37,7 +35,6 @@ v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 예시:
 - `logging.level` -> `COPS_LOGGING_LEVEL`
-- `collector.url` -> `COPS_COLLECTOR_URL`
 - `api.timeout` -> `COPS_API_TIMEOUT`
 
 ### 자동 환경 변수 바인딩
@@ -51,10 +48,10 @@ v.AutomaticEnv()
 
 ```go
 type Config struct {
-    App       AppConfig
-    Logging   LoggingConfig
-    Collector CollectorConfig
-    API       APIConfig
+    App     AppConfig
+    Logging LoggingConfig
+    API     APIConfig
+    Daemon  DaemonConfig
 }
 
 type AppConfig struct {
@@ -67,14 +64,13 @@ type LoggingConfig struct {
     Format string
 }
 
-type CollectorConfig struct {
+type APIConfig struct {
     URL     string
     Timeout time.Duration
 }
 
-type APIConfig struct {
-    URL     string
-    Timeout time.Duration
+type DaemonConfig struct {
+    BinaryPath string
 }
 ```
 
@@ -90,18 +86,6 @@ cops list
 ```bash
 export COPS_LOGGING_FORMAT=json
 cops list
-```
-
-### Collector 서버 URL 설정
-```bash
-export COPS_COLLECTOR_URL=http://collector.example.com:8080
-cops add . --sync
-```
-
-### Collector 타임아웃 설정
-```bash
-export COPS_COLLECTOR_TIMEOUT=60s
-cops add . --sync
 ```
 
 ## 고정 경로
