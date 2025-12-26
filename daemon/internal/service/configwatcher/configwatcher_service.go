@@ -63,7 +63,7 @@ func (s *Service) loadConfig(path string) (*domain.GlobalConfig, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			// Create empty config file if it doesn't exist
-			emptyConfig := &domain.GlobalConfig{Projects: []domain.ProjectConfig{}}
+			emptyConfig := &domain.GlobalConfig{Projects: []*shareddomain.Project{}}
 			if err := s.saveConfig(path, emptyConfig); err != nil {
 				return nil, fmt.Errorf("failed to create config file: %w", err)
 			}
@@ -97,6 +97,10 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 	var targets []domain.WatchTarget
 
 	for _, project := range cfg.Projects {
+		if project == nil {
+			continue
+		}
+
 		// Load ProjectID from local config - skip if not found
 		projectID, err := s.loadProjectID(project.Path)
 		if err != nil {

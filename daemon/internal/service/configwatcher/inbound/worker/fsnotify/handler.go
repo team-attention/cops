@@ -43,9 +43,12 @@ func NewConfigWatcherFsnotifyHandler(
 func (h *ConfigWatcherFsnotifyHandler) Start(ctx context.Context) error {
 	h.ctx, h.cancel = context.WithCancel(context.Background())
 
-	// Initial config load
+	// Initial config load - restore watches from saved config
+	h.logger.Info("loading initial config for watch restoration", slog.String("path", h.configPath))
 	if err := h.svc.HandleConfigChange(h.configPath); err != nil {
 		h.logger.Warn("initial config load failed", slog.Any("error", err))
+	} else {
+		h.logger.Info("initial config loaded, watch targets published")
 	}
 
 	// Watch config file

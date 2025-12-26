@@ -31,11 +31,11 @@ func newConfigModule() fx.Option {
 		// Service (pure business logic)
 		fx.Provide(configwatcher.NewService),
 
-		// Inbound: FsnotifyHandler with fx.Group
+		// Inbound: PublisherHandler - publishes to pubsub on config change
 		fx.Provide(fx.Annotate(
 			fsnotifyhandler.NewConfigWatcherFsnotifyHandler,
-			fx.As(new(FsnotifyHandler)),
-			fx.ResultTags(`group:"fsnotify_handlers"`),
+			fx.As(new(PublisherHandler)),
+			fx.ResultTags(`group:"publisher_handlers"`),
 		)),
 	)
 }

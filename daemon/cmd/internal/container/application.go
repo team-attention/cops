@@ -14,8 +14,8 @@ func Run() {
 		newConfigModule(),
 		newLogModule(),
 
-		// Handler registration
-		fx.Invoke(registerFsnotify),
+		// Handler registration (ordered: subscribers -> publishers -> fsnotify)
+		fx.Invoke(registerHandlers),
 
 		// Lifecycle timeouts
 		fx.StartTimeout(30*time.Second),

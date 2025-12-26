@@ -1,4 +1,1 @@
-- [ ] API 서버에 HealthCheck Handler가 Fiber에 붙어있음. gRPC (ConnectRPC)만 사용해야함.
-- [ ] CLI의 기본 설명이 Deprecated된 설명임
-- [ ] Planning할 때 기본적인 해당 디렉토리의 규칙이 잘 안들어감.
-  - [ ] ex. inbound/** 아래에 무슨 파일을 만들어야겠다고 할 때 Planning에는 잘못된 방식으로 들어감. 아마 Planning때 모든 규칙이 Load되지는 않기 때문인 것 같음.
+- [ ] Daemon이 Bootstrap 될 때 Watch 걸어뒀던 디렉토리가 Load되지 않음. (Daemon이 꺼졌다 켜지면 이전에 Watch 설정했던 디렉토리가 Watch되지 않고 있음)

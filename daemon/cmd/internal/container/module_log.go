@@ -55,11 +55,11 @@ func newLogModule() fx.Option {
 			fx.ResultTags(`group:"fsnotify_handlers"`),
 		)),
 
-		// Inbound 2: PubSub Handler (target changes → Service.UpdateTargets)
+		// Inbound 2: SubscriberHandler - subscribes to pubsub for target updates
 		fx.Provide(fx.Annotate(
 			pubsubhandler.NewLogPubsubHandler,
-			fx.As(new(FsnotifyHandler)),
-			fx.ResultTags(`group:"fsnotify_handlers"`),
+			fx.As(new(SubscriberHandler)),
+			fx.ResultTags(`group:"subscriber_handlers"`),
 		)),
 	)
 }
