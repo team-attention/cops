@@ -59,8 +59,7 @@ message SessionRecord {
 // LogBatch contains multiple session records for batch sending.
 message LogBatch {
   repeated SessionRecord records = 1;
-  string daemon_id = 2;
-  google.protobuf.Timestamp created_at = 3;
+  string project_id = 2;
 }
 
 // SendLogsReq is the request for sending logs.

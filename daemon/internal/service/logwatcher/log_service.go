@@ -8,7 +8,6 @@ import (
 	"log/slog"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/bytedance/sonic"
 	"github.com/google/uuid"
@@ -167,8 +166,7 @@ func (s *Service) Flush(ctx context.Context) error {
 
 	batch := domain.LogBatch{
 		Records:   records,
-		DaemonID:  s.daemonID,
-		CreatedAt: time.Now(),
+		ProjectID: "", // TODO: Implement project ID tracking from config
 	}
 
 	s.logger.Info("flushing log batch",

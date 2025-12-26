@@ -10,19 +10,19 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
 	shareddomain "github.com/team-attention/cops/shared/domain"
-	collectorv1 "github.com/team-attention/cops/shared/gen/grpcstub/collector/v1"
-	"github.com/team-attention/cops/shared/gen/grpcstub/collector/v1/collectorv1connect"
+	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
+	"github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1/aggregationv1connect"
 )
 
 // APIClient implements APIClientPort using ConnectRPC.
 type APIClient struct {
 	logger *slog.Logger
-	client collectorv1connect.CollectorServiceClient
+	client aggregationv1connect.AggregationServiceClient
 }
 
 // NewAPIClient creates a new ConnectRPC API client adapter.
 func NewAPIClient(l *slog.Logger, apiClient *setup.APIClient, cfg *setup.Config) *APIClient {
-	client := collectorv1connect.NewCollectorServiceClient(
+	client := aggregationv1connect.NewAggregationServiceClient(
 		apiClient.StandardHTTPClient(),
 		cfg.API.URL,
 	)
@@ -35,18 +35,14 @@ func NewAPIClient(l *slog.Logger, apiClient *setup.APIClient, cfg *setup.Config)
 
 // SendLogs sends a batch of logs to the API server.
 func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
-	// Note: Collector API uses SendRecords, adapt batch to match
-	req := &collectorv1.SendRecordsReq{
-		Project: &collectorv1.ProjectMetadata{
-			Id:         batch.ProjectID,
-			Name:       batch.ProjectName,
-			Path:       batch.ProjectPath,
-			GitProject: batch.IsGitProject,
+	req := &aggregationv1.SendLogsReq{
+		Batch: &aggregationv1.LogBatch{
+			Records:   convertRecords(batch.Records),
+			ProjectId: batch.ProjectID,
 		},
-		Records: convertRecords(batch.Records),
 	}
 
-	resp, err := c.client.SendRecords(ctx, connect.NewRequest(req))
+	resp, err := c.client.SendLogs(ctx, connect.NewRequest(req))
 	if err != nil {
 		return err
 	}
@@ -56,26 +52,26 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 	}
 
 	c.logger.Debug("logs sent",
-		slog.Int("processed", int(resp.Msg.RecordsReceived)),
+		slog.Int("processed", int(resp.Msg.ProcessedCount)),
 	)
 
 	return nil
 }
 
-func convertRecords(records []shareddomain.SessionRecord) []*collectorv1.SessionRecord {
-	result := make([]*collectorv1.SessionRecord, len(records))
+func convertRecords(records []shareddomain.SessionRecord) []*aggregationv1.SessionRecord {
+	result := make([]*aggregationv1.SessionRecord, len(records))
 	for i, r := range records {
 		result[i] = convertSessionRecord(r)
 	}
 	return result
 }
 
-func convertSessionRecord(r shareddomain.SessionRecord) *collectorv1.SessionRecord {
-	record := &collectorv1.SessionRecord{
+func convertSessionRecord(r shareddomain.SessionRecord) *aggregationv1.SessionRecord {
+	record := &aggregationv1.SessionRecord{
 		Uuid:        r.UUID,
 		ParentUuid:  r.ParentUUID,
 		SessionId:   r.SessionID,
-		Type:        string(r.Type),
+		Type:        convertSessionType(r.Type),
 		Timestamp:   timestamppb.New(r.Timestamp),
 		Cwd:         r.CWD,
 		GitBranch:   r.GitBranch,
@@ -85,31 +81,57 @@ func convertSessionRecord(r shareddomain.SessionRecord) *collectorv1.SessionReco
 		IsMeta:      r.IsMeta,
 		Slug:        r.Slug,
 		RequestId:   r.RequestID,
-	}
-
-	if r.Message != nil {
-		record.Role = r.Message.Role
-		if r.Message.Content != nil && !r.Message.Content.IsBlocks && r.Message.Content.Text != nil {
-			record.Content = *r.Message.Content.Text
-		}
-
-		if r.Message.Usage != nil {
-			record.Usage = &collectorv1.UsageMetadata{
-				InputTokens:              int32(r.Message.Usage.InputTokens),
-				OutputTokens:             int32(r.Message.Usage.OutputTokens),
-				CacheCreationInputTokens: int32(r.Message.Usage.CacheCreationInputTokens),
-				CacheReadInputTokens:     int32(r.Message.Usage.CacheReadInputTokens),
-				ServiceTier:              r.Message.Usage.ServiceTier,
-			}
-
-			if r.Message.Usage.CacheCreation != nil {
-				record.Usage.CacheCreation = &collectorv1.CacheCreation{
-					Ephemeral_5MInputTokens: int32(r.Message.Usage.CacheCreation.Ephemeral5mInputTokens),
-					Ephemeral_1HInputTokens: int32(r.Message.Usage.CacheCreation.Ephemeral1hInputTokens),
-				}
-			}
-		}
+		Message:     convertMessage(r.Message),
 	}
 
 	return record
+}
+
+func convertSessionType(t shareddomain.SessionType) aggregationv1.SessionType {
+	switch t {
+	case shareddomain.SessionTypeUser:
+		return aggregationv1.SessionType_SESSION_TYPE_USER
+	case shareddomain.SessionTypeAssistant:
+		return aggregationv1.SessionType_SESSION_TYPE_ASSISTANT
+	case shareddomain.SessionTypeSystem:
+		return aggregationv1.SessionType_SESSION_TYPE_SYSTEM
+	case shareddomain.SessionTypeSummary:
+		return aggregationv1.SessionType_SESSION_TYPE_SUMMARY
+	case shareddomain.SessionTypeFileHistorySnapshot:
+		return aggregationv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT
+	case shareddomain.SessionTypeQueueOperation:
+		return aggregationv1.SessionType_SESSION_TYPE_QUEUE_OPERATION
+	default:
+		return aggregationv1.SessionType_SESSION_TYPE_USER
+	}
+}
+
+func convertMessage(m *shareddomain.Message) *aggregationv1.Message {
+	if m == nil {
+		return nil
+	}
+
+	msg := &aggregationv1.Message{
+		Id:         m.ID,
+		Type:       m.Type,
+		Role:       m.Role,
+		Model:      m.Model,
+		StopReason: m.StopReason,
+	}
+
+	if m.Content != nil && !m.Content.IsBlocks && m.Content.Text != nil {
+		msg.Content = *m.Content.Text
+	}
+
+	if m.Usage != nil {
+		msg.Usage = &aggregationv1.Usage{
+			InputTokens:              int32(m.Usage.InputTokens),
+			OutputTokens:             int32(m.Usage.OutputTokens),
+			CacheCreationInputTokens: int32(m.Usage.CacheCreationInputTokens),
+			CacheReadInputTokens:     int32(m.Usage.CacheReadInputTokens),
+			ServiceTier:              m.Usage.ServiceTier,
+		}
+	}
+
+	return msg
 }

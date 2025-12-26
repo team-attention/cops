@@ -349,84 +349,11 @@ func (x *CacheCreation) GetEphemeral_1HInputTokens() int32 {
 	return 0
 }
 
-// ProjectMetadata contains project information.
-type ProjectMetadata struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Project identifier (MongoDB ObjectID, if exists)
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Project display name
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Project path (absolute path)
-	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	// Whether this is a Git repository
-	GitProject    bool `protobuf:"varint,4,opt,name=git_project,json=gitProject,proto3" json:"git_project,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ProjectMetadata) Reset() {
-	*x = ProjectMetadata{}
-	mi := &file_collector_v1_collector_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ProjectMetadata) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProjectMetadata) ProtoMessage() {}
-
-func (x *ProjectMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_collector_v1_collector_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProjectMetadata.ProtoReflect.Descriptor instead.
-func (*ProjectMetadata) Descriptor() ([]byte, []int) {
-	return file_collector_v1_collector_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *ProjectMetadata) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ProjectMetadata) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *ProjectMetadata) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
-
-func (x *ProjectMetadata) GetGitProject() bool {
-	if x != nil {
-		return x.GitProject
-	}
-	return false
-}
-
 // SendRecordsReq is the request message for SendRecords RPC.
 type SendRecordsReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Project metadata
-	Project *ProjectMetadata `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
+	// Project MongoDB ObjectID as hex string
+	ProjectId string `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Session records to send
 	Records       []*SessionRecord `protobuf:"bytes,2,rep,name=records,proto3" json:"records,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -435,7 +362,7 @@ type SendRecordsReq struct {
 
 func (x *SendRecordsReq) Reset() {
 	*x = SendRecordsReq{}
-	mi := &file_collector_v1_collector_proto_msgTypes[4]
+	mi := &file_collector_v1_collector_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -447,7 +374,7 @@ func (x *SendRecordsReq) String() string {
 func (*SendRecordsReq) ProtoMessage() {}
 
 func (x *SendRecordsReq) ProtoReflect() protoreflect.Message {
-	mi := &file_collector_v1_collector_proto_msgTypes[4]
+	mi := &file_collector_v1_collector_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -460,14 +387,14 @@ func (x *SendRecordsReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendRecordsReq.ProtoReflect.Descriptor instead.
 func (*SendRecordsReq) Descriptor() ([]byte, []int) {
-	return file_collector_v1_collector_proto_rawDescGZIP(), []int{4}
+	return file_collector_v1_collector_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SendRecordsReq) GetProject() *ProjectMetadata {
+func (x *SendRecordsReq) GetProjectId() string {
 	if x != nil {
-		return x.Project
+		return x.ProjectId
 	}
-	return nil
+	return ""
 }
 
 func (x *SendRecordsReq) GetRecords() []*SessionRecord {
@@ -490,7 +417,7 @@ type SendRecordsRes struct {
 
 func (x *SendRecordsRes) Reset() {
 	*x = SendRecordsRes{}
-	mi := &file_collector_v1_collector_proto_msgTypes[5]
+	mi := &file_collector_v1_collector_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -502,7 +429,7 @@ func (x *SendRecordsRes) String() string {
 func (*SendRecordsRes) ProtoMessage() {}
 
 func (x *SendRecordsRes) ProtoReflect() protoreflect.Message {
-	mi := &file_collector_v1_collector_proto_msgTypes[5]
+	mi := &file_collector_v1_collector_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -515,7 +442,7 @@ func (x *SendRecordsRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendRecordsRes.ProtoReflect.Descriptor instead.
 func (*SendRecordsRes) Descriptor() ([]byte, []int) {
-	return file_collector_v1_collector_proto_rawDescGZIP(), []int{5}
+	return file_collector_v1_collector_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SendRecordsRes) GetRecordsReceived() int32 {
@@ -568,15 +495,10 @@ const file_collector_v1_collector_proto_rawDesc = "" +
 	"\fservice_tier\x18\x06 \x01(\tR\vserviceTier\"\x85\x01\n" +
 	"\rCacheCreation\x129\n" +
 	"\x19ephemeral_5m_input_tokens\x18\x01 \x01(\x05R\x16ephemeral5mInputTokens\x129\n" +
-	"\x19ephemeral_1h_input_tokens\x18\x02 \x01(\x05R\x16ephemeral1hInputTokens\"j\n" +
-	"\x0fProjectMetadata\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
-	"\x04path\x18\x03 \x01(\tR\x04path\x12\x1f\n" +
-	"\vgit_project\x18\x04 \x01(\bR\n" +
-	"gitProject\"\x80\x01\n" +
-	"\x0eSendRecordsReq\x127\n" +
-	"\aproject\x18\x01 \x01(\v2\x1d.collector.v1.ProjectMetadataR\aproject\x125\n" +
+	"\x19ephemeral_1h_input_tokens\x18\x02 \x01(\x05R\x16ephemeral1hInputTokens\"f\n" +
+	"\x0eSendRecordsReq\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x125\n" +
 	"\arecords\x18\x02 \x03(\v2\x1b.collector.v1.SessionRecordR\arecords\"U\n" +
 	"\x0eSendRecordsRes\x12)\n" +
 	"\x10records_received\x18\x01 \x01(\x05R\x0frecordsReceived\x12\x18\n" +
@@ -597,29 +519,27 @@ func file_collector_v1_collector_proto_rawDescGZIP() []byte {
 	return file_collector_v1_collector_proto_rawDescData
 }
 
-var file_collector_v1_collector_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_collector_v1_collector_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_collector_v1_collector_proto_goTypes = []any{
 	(*SessionRecord)(nil),         // 0: collector.v1.SessionRecord
 	(*UsageMetadata)(nil),         // 1: collector.v1.UsageMetadata
 	(*CacheCreation)(nil),         // 2: collector.v1.CacheCreation
-	(*ProjectMetadata)(nil),       // 3: collector.v1.ProjectMetadata
-	(*SendRecordsReq)(nil),        // 4: collector.v1.SendRecordsReq
-	(*SendRecordsRes)(nil),        // 5: collector.v1.SendRecordsRes
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(*SendRecordsReq)(nil),        // 3: collector.v1.SendRecordsReq
+	(*SendRecordsRes)(nil),        // 4: collector.v1.SendRecordsRes
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
 }
 var file_collector_v1_collector_proto_depIdxs = []int32{
-	6, // 0: collector.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
+	5, // 0: collector.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
 	1, // 1: collector.v1.SessionRecord.usage:type_name -> collector.v1.UsageMetadata
 	2, // 2: collector.v1.UsageMetadata.cache_creation:type_name -> collector.v1.CacheCreation
-	3, // 3: collector.v1.SendRecordsReq.project:type_name -> collector.v1.ProjectMetadata
-	0, // 4: collector.v1.SendRecordsReq.records:type_name -> collector.v1.SessionRecord
-	4, // 5: collector.v1.CollectorService.SendRecords:input_type -> collector.v1.SendRecordsReq
-	5, // 6: collector.v1.CollectorService.SendRecords:output_type -> collector.v1.SendRecordsRes
-	6, // [6:7] is the sub-list for method output_type
-	5, // [5:6] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	0, // 3: collector.v1.SendRecordsReq.records:type_name -> collector.v1.SessionRecord
+	3, // 4: collector.v1.CollectorService.SendRecords:input_type -> collector.v1.SendRecordsReq
+	4, // 5: collector.v1.CollectorService.SendRecords:output_type -> collector.v1.SendRecordsRes
+	5, // [5:6] is the sub-list for method output_type
+	4, // [4:5] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_collector_v1_collector_proto_init() }
@@ -633,7 +553,7 @@ func file_collector_v1_collector_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_collector_v1_collector_proto_rawDesc), len(file_collector_v1_collector_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -34,15 +33,21 @@ func (r *MongoSessionRecordRepository) SaveBatch(ctx context.Context, batch *rep
 		return nil
 	}
 
+	// Convert project_id to ObjectID
+	projectObjID, err := bson.ObjectIDFromHex(batch.ProjectID)
+	if err != nil {
+		return fmt.Errorf("invalid project ID: %w", err)
+	}
+
 	docs := make([]interface{}, len(batch.Records))
 	for i, record := range batch.Records {
-		docs[i] = toDocument(record, batch.DaemonID)
+		docs[i] = toDocument(record, projectObjID)
 	}
 
 	result, err := r.collection.InsertMany(ctx, docs)
 	if err != nil {
 		r.logger.Error("failed to insert session records",
-			slog.String("daemonId", batch.DaemonID),
+			slog.String("projectId", batch.ProjectID),
 			slog.Int("count", len(batch.Records)),
 			slog.Any("error", err),
 		)
@@ -50,18 +55,19 @@ func (r *MongoSessionRecordRepository) SaveBatch(ctx context.Context, batch *rep
 	}
 
 	r.logger.Debug("inserted session records",
-		slog.String("daemonId", batch.DaemonID),
+		slog.String("projectId", batch.ProjectID),
 		slog.Int("count", len(result.InsertedIDs)),
 	)
 
 	return nil
 }
 
-func toDocument(record shareddomain.SessionRecord, daemonID string) bson.M {
+func toDocument(record shareddomain.SessionRecord, projectObjID bson.ObjectID) bson.M {
 	doc := bson.M{
 		mongoschema.SessionRecordUUIDField:        record.UUID,
 		mongoschema.SessionRecordParentUUIDField:  record.ParentUUID,
 		mongoschema.SessionRecordSessionIDField:   record.SessionID,
+		mongoschema.SessionRecordProjectIDField:   projectObjID,
 		mongoschema.SessionRecordTypeField:        string(record.Type),
 		mongoschema.SessionRecordTimestampField:   record.Timestamp,
 		mongoschema.SessionRecordCWDField:         record.CWD,
@@ -70,8 +76,6 @@ func toDocument(record shareddomain.SessionRecord, daemonID string) bson.M {
 		mongoschema.SessionRecordUserTypeField:    record.UserType,
 		mongoschema.SessionRecordIsSidechainField: record.IsSidechain,
 		mongoschema.SessionRecordIsMetaField:      record.IsMeta,
-		mongoschema.SessionRecordDaemonIDField:    daemonID,
-		mongoschema.SessionRecordCreatedAtField:   time.Now(),
 	}
 
 	if record.Slug != "" {

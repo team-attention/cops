@@ -415,8 +415,7 @@ func (x *SessionRecord) GetMessage() *Message {
 type LogBatch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Records       []*SessionRecord       `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
-	DaemonId      string                 `protobuf:"bytes,2,opt,name=daemon_id,json=daemonId,proto3" json:"daemon_id,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -458,18 +457,11 @@ func (x *LogBatch) GetRecords() []*SessionRecord {
 	return nil
 }
 
-func (x *LogBatch) GetDaemonId() string {
+func (x *LogBatch) GetProjectId() string {
 	if x != nil {
-		return x.DaemonId
+		return x.ProjectId
 	}
 	return ""
-}
-
-func (x *LogBatch) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
 }
 
 // SendLogsReq is the request for sending logs.
@@ -618,12 +610,11 @@ const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\x04slug\x18\f \x01(\tR\x04slug\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\r \x01(\tR\trequestId\x121\n" +
-	"\amessage\x18\x0e \x01(\v2\x17.aggregation.v1.MessageR\amessage\"\x9b\x01\n" +
+	"\amessage\x18\x0e \x01(\v2\x17.aggregation.v1.MessageR\amessage\"b\n" +
 	"\bLogBatch\x127\n" +
-	"\arecords\x18\x01 \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\x12\x1b\n" +
-	"\tdaemon_id\x18\x02 \x01(\tR\bdaemonId\x129\n" +
+	"\arecords\x18\x01 \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"=\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\"=\n" +
 	"\vSendLogsReq\x12.\n" +
 	"\x05batch\x18\x01 \x01(\v2\x18.aggregation.v1.LogBatchR\x05batch\"u\n" +
 	"\vSendLogsRes\x12\x18\n" +
@@ -672,15 +663,14 @@ var file_aggregation_v1_aggregation_proto_depIdxs = []int32{
 	7, // 2: aggregation.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
 	2, // 3: aggregation.v1.SessionRecord.message:type_name -> aggregation.v1.Message
 	3, // 4: aggregation.v1.LogBatch.records:type_name -> aggregation.v1.SessionRecord
-	7, // 5: aggregation.v1.LogBatch.created_at:type_name -> google.protobuf.Timestamp
-	4, // 6: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
-	5, // 7: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
-	6, // 8: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
-	8, // [8:9] is the sub-list for method output_type
-	7, // [7:8] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	4, // 5: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
+	5, // 6: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
+	6, // 7: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
+	7, // [7:8] is the sub-list for method output_type
+	6, // [6:7] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_aggregation_v1_aggregation_proto_init() }

@@ -9,8 +9,7 @@ import (
 // LogBatch represents a batch of session records from a daemon.
 type LogBatch struct {
 	Records   []shareddomain.SessionRecord
-	DaemonID  string
-	CreatedAt string
+	ProjectID string
 }
 
 // SessionRecordRepositoryPort defines the interface for session record persistence.

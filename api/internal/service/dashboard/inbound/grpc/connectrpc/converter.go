@@ -3,7 +3,7 @@ package connectrpc
 import (
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
-	collectorv1 "github.com/team-attention/cops/shared/gen/grpcstub/collector/v1"
+	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
 	dashboardv1 "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -59,7 +59,7 @@ func toProtoSessionSummary(s repository.SessionSummary) *dashboardv1.SessionSumm
 
 // toProtoSessionDetail converts repository session detail to protobuf.
 func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetail {
-	records := make([]*collectorv1.SessionRecord, len(s.Records))
+	records := make([]*aggregationv1.SessionRecord, len(s.Records))
 	for i, r := range s.Records {
 		records[i] = toProtoSessionRecord(r)
 	}
@@ -78,12 +78,12 @@ func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetai
 }
 
 // toProtoSessionRecord converts domain session record to protobuf.
-func toProtoSessionRecord(r shareddomain.SessionRecord) *collectorv1.SessionRecord {
-	record := &collectorv1.SessionRecord{
+func toProtoSessionRecord(r shareddomain.SessionRecord) *aggregationv1.SessionRecord {
+	record := &aggregationv1.SessionRecord{
 		Uuid:        r.UUID,
 		ParentUuid:  r.ParentUUID,
 		SessionId:   r.SessionID,
-		Type:        string(r.Type),
+		Type:        convertSessionType(r.Type),
 		Timestamp:   timestamppb.New(r.Timestamp),
 		Cwd:         r.CWD,
 		GitBranch:   r.GitBranch,
@@ -93,36 +93,59 @@ func toProtoSessionRecord(r shareddomain.SessionRecord) *collectorv1.SessionReco
 		IsMeta:      r.IsMeta,
 		Slug:        r.Slug,
 		RequestId:   r.RequestID,
-	}
-
-	// Add message data if available
-	if r.Message != nil {
-		record.Role = r.Message.Role
-		if r.Message.Content != nil && !r.Message.Content.IsBlocks && r.Message.Content.Text != nil {
-			record.Content = *r.Message.Content.Text
-		}
-
-		// Add usage metadata
-		if r.Message.Usage != nil {
-			record.Usage = &collectorv1.UsageMetadata{
-				InputTokens:              int32(r.Message.Usage.InputTokens),
-				OutputTokens:             int32(r.Message.Usage.OutputTokens),
-				CacheCreationInputTokens: int32(r.Message.Usage.CacheCreationInputTokens),
-				CacheReadInputTokens:     int32(r.Message.Usage.CacheReadInputTokens),
-				ServiceTier:              r.Message.Usage.ServiceTier,
-			}
-
-			// Add cache creation metadata if available
-			if r.Message.Usage.CacheCreation != nil {
-				record.Usage.CacheCreation = &collectorv1.CacheCreation{
-					Ephemeral_5MInputTokens: int32(r.Message.Usage.CacheCreation.Ephemeral5mInputTokens),
-					Ephemeral_1HInputTokens: int32(r.Message.Usage.CacheCreation.Ephemeral1hInputTokens),
-				}
-			}
-		}
+		Message:     convertMessage(r.Message),
 	}
 
 	return record
+}
+
+func convertSessionType(t shareddomain.SessionType) aggregationv1.SessionType {
+	switch t {
+	case shareddomain.SessionTypeUser:
+		return aggregationv1.SessionType_SESSION_TYPE_USER
+	case shareddomain.SessionTypeAssistant:
+		return aggregationv1.SessionType_SESSION_TYPE_ASSISTANT
+	case shareddomain.SessionTypeSystem:
+		return aggregationv1.SessionType_SESSION_TYPE_SYSTEM
+	case shareddomain.SessionTypeSummary:
+		return aggregationv1.SessionType_SESSION_TYPE_SUMMARY
+	case shareddomain.SessionTypeFileHistorySnapshot:
+		return aggregationv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT
+	case shareddomain.SessionTypeQueueOperation:
+		return aggregationv1.SessionType_SESSION_TYPE_QUEUE_OPERATION
+	default:
+		return aggregationv1.SessionType_SESSION_TYPE_USER
+	}
+}
+
+func convertMessage(m *shareddomain.Message) *aggregationv1.Message {
+	if m == nil {
+		return nil
+	}
+
+	msg := &aggregationv1.Message{
+		Id:         m.ID,
+		Type:       m.Type,
+		Role:       m.Role,
+		Model:      m.Model,
+		StopReason: m.StopReason,
+	}
+
+	if m.Content != nil && !m.Content.IsBlocks && m.Content.Text != nil {
+		msg.Content = *m.Content.Text
+	}
+
+	if m.Usage != nil {
+		msg.Usage = &aggregationv1.Usage{
+			InputTokens:              int32(m.Usage.InputTokens),
+			OutputTokens:             int32(m.Usage.OutputTokens),
+			CacheCreationInputTokens: int32(m.Usage.CacheCreationInputTokens),
+			CacheReadInputTokens:     int32(m.Usage.CacheReadInputTokens),
+			ServiceTier:              m.Usage.ServiceTier,
+		}
+	}
+
+	return msg
 }
 
 // toProtoPagination converts pagination metadata to protobuf.

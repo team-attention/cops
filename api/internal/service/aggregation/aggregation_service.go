@@ -38,13 +38,13 @@ func (s *Service) CollectLogs(ctx context.Context, batch *repository.LogBatch) *
 	}
 
 	s.logger.Info("collecting log batch",
-		slog.String("daemonId", batch.DaemonID),
+		slog.String("projectId", batch.ProjectID),
 		slog.Int("recordCount", len(batch.Records)),
 	)
 
 	if err := s.repo.SaveBatch(ctx, batch); err != nil {
 		s.logger.Error("failed to save log batch",
-			slog.String("daemonId", batch.DaemonID),
+			slog.String("projectId", batch.ProjectID),
 			slog.Any("error", err),
 		)
 		return &CollectLogsResult{

@@ -7,7 +7,7 @@
 package dashboardv1
 
 import (
-	v1 "github.com/team-attention/cops/shared/gen/grpcstub/collector/v1"
+	v1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -1178,7 +1178,7 @@ var File_dashboard_v1_dashboard_proto protoreflect.FileDescriptor
 
 const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdashboard/v1/dashboard.proto\x12\fdashboard.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1ccollector/v1/collector.proto\"\xe7\x01\n" +
+	"\x1cdashboard/v1/dashboard.proto\x12\fdashboard.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a aggregation/v1/aggregation.proto\"\xe7\x01\n" +
 	"\x11TokenUsageSummary\x12,\n" +
 	"\x12total_input_tokens\x18\x01 \x01(\x03R\x10totalInputTokens\x12.\n" +
 	"\x13total_output_tokens\x18\x02 \x01(\x03R\x11totalOutputTokens\x12=\n" +
@@ -1221,7 +1221,7 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x05usage\x18\x05 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
 	"started_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xe9\x02\n" +
+	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xeb\x02\n" +
 	"\rSessionDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1233,8 +1233,8 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x05usage\x18\x06 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
 	"started_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x125\n" +
-	"\arecords\x18\t \x03(\v2\x1b.collector.v1.SessionRecordR\arecords\"\x14\n" +
+	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x127\n" +
+	"\arecords\x18\t \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\"\x14\n" +
 	"\x12GetOverviewRequest\"\xaf\x02\n" +
 	"\x13GetOverviewResponse\x12@\n" +
 	"\vtotal_usage\x18\x01 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\n" +
@@ -1317,7 +1317,7 @@ var file_dashboard_v1_dashboard_proto_goTypes = []any{
 	(*GetSessionRequest)(nil),     // 15: dashboard.v1.GetSessionRequest
 	(*GetSessionResponse)(nil),    // 16: dashboard.v1.GetSessionResponse
 	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
-	(*v1.SessionRecord)(nil),      // 18: collector.v1.SessionRecord
+	(*v1.SessionRecord)(nil),      // 18: aggregation.v1.SessionRecord
 }
 var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 0: dashboard.v1.ProjectSummary.usage:type_name -> dashboard.v1.TokenUsageSummary
@@ -1331,7 +1331,7 @@ var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 8: dashboard.v1.SessionDetail.usage:type_name -> dashboard.v1.TokenUsageSummary
 	17, // 9: dashboard.v1.SessionDetail.started_at:type_name -> google.protobuf.Timestamp
 	17, // 10: dashboard.v1.SessionDetail.ended_at:type_name -> google.protobuf.Timestamp
-	18, // 11: dashboard.v1.SessionDetail.records:type_name -> collector.v1.SessionRecord
+	18, // 11: dashboard.v1.SessionDetail.records:type_name -> aggregation.v1.SessionRecord
 	0,  // 12: dashboard.v1.GetOverviewResponse.total_usage:type_name -> dashboard.v1.TokenUsageSummary
 	3,  // 13: dashboard.v1.GetOverviewResponse.recent_projects:type_name -> dashboard.v1.ProjectSummary
 	5,  // 14: dashboard.v1.GetOverviewResponse.recent_sessions:type_name -> dashboard.v1.SessionSummary

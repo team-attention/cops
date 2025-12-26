@@ -3,7 +3,7 @@ syntax = "proto3";
 package dashboard.v1;
 
 import "google/protobuf/timestamp.proto";
-import "collector/v1/collector.proto";
+import "aggregation/v1/aggregation.proto";
 
 option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1;dashboardv1";
 
@@ -145,7 +145,7 @@ message SessionDetail {
   google.protobuf.Timestamp ended_at = 8;
 
   // All session records
-  repeated collector.v1.SessionRecord records = 9;
+  repeated aggregation.v1.SessionRecord records = 9;
 }
 
 // GetOverviewRequest is the request for GetOverview RPC.

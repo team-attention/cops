@@ -81,8 +81,7 @@ func convertToDomain(pb *aggregationv1.LogBatch) *repository.LogBatch {
 
 	return &repository.LogBatch{
 		Records:   records,
-		DaemonID:  pb.GetDaemonId(),
-		CreatedAt: pb.GetCreatedAt().AsTime().String(),
+		ProjectID: pb.GetProjectId(),
 	}
 }
 
