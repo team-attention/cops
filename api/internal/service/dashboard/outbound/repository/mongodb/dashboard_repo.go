@@ -35,6 +35,7 @@ func NewMongoDashboardRepository(l *slog.Logger, db *mongo.Database) *MongoDashb
 
 // GetOverviewStats retrieves dashboard overview statistics.
 func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context) (*repository.OverviewStats, error) {
+	r.logger.Debug("GetOverviewStats called")
 	stats := &repository.OverviewStats{}
 
 	// Get total usage from session records
@@ -76,6 +77,9 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context) (*repos
 		return nil, fmt.Errorf("failed to count projects: %w", err)
 	}
 	stats.ProjectCount = int32(projectCount)
+	r.logger.Debug("overview stats counts",
+		slog.Int64("projectCount", projectCount),
+	)
 
 	// Get session count (distinct session_ids)
 	sessionPipeline := bson.A{
@@ -120,6 +124,10 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context) (*repos
 
 // ListProjects retrieves a paginated list of projects.
 func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repository.ListProjectsParams) (*repository.PaginatedProjects, error) {
+	r.logger.Debug("ListProjects called",
+		slog.Int("page", int(params.Page)),
+		slog.Int("pageSize", int(params.PageSize)),
+	)
 	// Single aggregation pipeline with $facet for count and data
 	pipeline := bson.A{
 		// Stage 1: Lookup session records with sub-pipeline for aggregation
@@ -209,6 +217,10 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 	if len(facetResult.Metadata) > 0 {
 		totalCount = facetResult.Metadata[0].TotalCount
 	}
+	r.logger.Debug("ListProjects results",
+		slog.Int64("totalCount", totalCount),
+		slog.Int("dataCount", len(facetResult.Data)),
+	)
 
 	// Convert to ProjectSummary slice
 	projects := make([]repository.ProjectSummary, 0, len(facetResult.Data))

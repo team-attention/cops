@@ -41,7 +41,7 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 	// Lifecycle hooks
 	params.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			addr := fmt.Sprintf(":%d", params.Config.Server.Port)
+			addr := fmt.Sprintf(":%d", params.Config.HTTP.Port)
 			logger.Info("Starting HTTP server", slog.String("addr", addr))
 
 			go func() {

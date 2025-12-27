@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 
@@ -14,19 +15,28 @@ import (
 func InitFiber(cfg *config.Config, logger *slog.Logger) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:               cfg.App.Name,
-		ReadTimeout:           cfg.Server.ReadTimeout,
-		WriteTimeout:          cfg.Server.WriteTimeout,
+		ReadTimeout:           cfg.HTTP.ReadTimeout,
+		WriteTimeout:          cfg.HTTP.WriteTimeout,
 		DisableStartupMessage: cfg.App.Env == "production",
 		ErrorHandler:          newErrorHandler(logger),
 	})
 
 	// Middleware
 	app.Use(recover.New())
+
+	// CORS middleware - must be before routes and other middleware
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: cfg.HTTP.CORSAllowOrigins,
+		AllowMethods: cfg.HTTP.CORSAllowMethods,
+		AllowHeaders: cfg.HTTP.CORSAllowHeaders,
+	}))
+
 	app.Use(requestid.New())
 
 	logger.Info("Fiber app initialized",
 		slog.String("name", cfg.App.Name),
 		slog.String("env", cfg.App.Env),
+		slog.String("cors_origins", cfg.HTTP.CORSAllowOrigins),
 	)
 
 	return app

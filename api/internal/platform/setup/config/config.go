@@ -10,7 +10,7 @@ import (
 // Config holds all API application configuration.
 type Config struct {
 	App     AppConfig
-	Server  ServerConfig
+	HTTP    HTTPConfig
 	Logging LoggingConfig
 	MongoDB MongoDBConfig
 }
@@ -22,12 +22,17 @@ type AppConfig struct {
 	Env     string `env:"APP_ENV" envDefault:"development"`
 }
 
-// ServerConfig holds HTTP server settings.
-type ServerConfig struct {
-	Port            int           `env:"SERVER_PORT" envDefault:"8080"`
-	ReadTimeout     time.Duration `env:"SERVER_READ_TIMEOUT" envDefault:"30s"`
-	WriteTimeout    time.Duration `env:"SERVER_WRITE_TIMEOUT" envDefault:"30s"`
-	ShutdownTimeout time.Duration `env:"SERVER_SHUTDOWN_TIMEOUT" envDefault:"30s"`
+// HTTPConfig holds HTTP server and CORS settings.
+type HTTPConfig struct {
+	Port            int           `env:"PORT" envDefault:"8080"`
+	ReadTimeout     time.Duration `env:"READ_TIMEOUT" envDefault:"30s"`
+	WriteTimeout    time.Duration `env:"WRITE_TIMEOUT" envDefault:"30s"`
+	ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"30s"`
+
+	// CORS settings
+	CORSAllowOrigins string `env:"CORS_ALLOW_ORIGINS" envDefault:"*"`
+	CORSAllowMethods string `env:"CORS_ALLOW_METHODS" envDefault:"GET,POST,PUT,DELETE,OPTIONS,PATCH"`
+	CORSAllowHeaders string `env:"CORS_ALLOW_HEADERS" envDefault:"Origin,Content-Type,Accept,Connect-Protocol-Version"`
 }
 
 // LoggingConfig holds logging settings.
@@ -79,8 +84,8 @@ func validateConfig(cfg *Config) error {
 	}
 
 	// Validate port range
-	if cfg.Server.Port < 1 || cfg.Server.Port > 65535 {
-		return fmt.Errorf("invalid port: %d (must be between 1 and 65535)", cfg.Server.Port)
+	if cfg.HTTP.Port < 1 || cfg.HTTP.Port > 65535 {
+		return fmt.Errorf("invalid port: %d (must be between 1 and 65535)", cfg.HTTP.Port)
 	}
 
 	return nil
