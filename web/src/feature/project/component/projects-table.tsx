@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { FolderGit2, Clock, ChevronUp, ChevronDown, Zap } from 'lucide-react'
 import {
   Table,
@@ -51,6 +51,8 @@ const SortableHeader = ({
 }
 
 export const ProjectsTable = ({ projects, sortBy, sortDesc, onSortChange }: ProjectsTableProps) => {
+  const navigate = useNavigate()
+
   if (projects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-zinc-600">
@@ -91,6 +93,7 @@ export const ProjectsTable = ({ projects, sortBy, sortDesc, onSortChange }: Proj
             <TableRow
               key={project.id}
               className="group cursor-pointer border-zinc-800/30 transition-colors hover:bg-zinc-800/30"
+              onClick={() => navigate({ to: '/projects/$projectId', params: { projectId: project.id } })}
             >
               <TableCell>
                 <Link
