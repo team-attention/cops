@@ -1,1 +1,4 @@
-- [ ] Daemon이 Bootstrap 될 때 Watch 걸어뒀던 디렉토리가 Load되지 않음. (Daemon이 꺼졌다 켜지면 이전에 Watch 설정했던 디렉토리가 Watch되지 않고 있음)
+- [ ] Project의 불필요한 필드 지우기
+  - ProjectClaudeDirField: 프로젝트 단위가 아니라 Sessions에나 의미가 있음(한 프로젝트가 여러 디렉토리에서 실행될 수 있기 때문에. ex. Sub Directory, Worktree 등의 모습으로)
+  - ProjectWorktreesField: 이걸 왜 서버에 저장해야 하는지 잘 모르겠음. 그냥 Local의 상태니까 Daemon에서만 Watch 잘 하면 될 것 같고, 여기서 관리하는 건 효율도 안좋고 의미도 없는듯.
+- [ ] Project의 필드 중 ProjectRegisteredAtField 값이 생성되지 않고 있는 것 같음. (웹 대시보드에서 이 값을 쓸 것으로 유추되는 필드가 1년 1월 1일(아마 기본값)로 표기됨)
