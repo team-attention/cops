@@ -138,3 +138,65 @@ func GetActualRemoteURL(repoPath string) string {
 	return strings.TrimSpace(string(output))
 }
 
+// FindGitReposInParents searches for Git repositories from dir up to (but not including) home directory.
+// Returns a slice of Git root paths found (ordered from closest to farthest).
+// Returns empty slice if no Git repos found.
+// Stops searching when:
+// - Home directory is reached (not included in results)
+// - Filesystem root is reached
+// - Permission denied on a parent directory
+func FindGitReposInParents(dir string) ([]string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, errors.New("failed to get home directory")
+	}
+
+	// Resolve symlinks for consistent comparison
+	resolvedDir, err := filepath.EvalSymlinks(dir)
+	if err != nil {
+		// If symlink resolution fails, use original path
+		resolvedDir = dir
+	}
+
+	absDir, err := filepath.Abs(resolvedDir)
+	if err != nil {
+		return nil, errors.New("failed to get absolute path")
+	}
+
+	resolvedHome, err := filepath.EvalSymlinks(homeDir)
+	if err != nil {
+		resolvedHome = homeDir
+	}
+
+	var gitRepos []string
+	currentDir := absDir
+
+	for {
+		// Stop if we've reached or passed the home directory
+		if currentDir == resolvedHome || currentDir == homeDir {
+			break
+		}
+
+		// Stop at filesystem root
+		parentDir := filepath.Dir(currentDir)
+		if parentDir == currentDir {
+			break
+		}
+
+		// Check if parent directory is accessible
+		if _, err := os.Stat(parentDir); err != nil {
+			// Permission denied or other error - stop search
+			break
+		}
+
+		// Check if parent is a git repo
+		if IsGitRepo(parentDir) {
+			gitRepos = append(gitRepos, parentDir)
+		}
+
+		currentDir = parentDir
+	}
+
+	return gitRepos, nil
+}
+

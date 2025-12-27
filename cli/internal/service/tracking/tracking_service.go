@@ -20,6 +20,7 @@ import (
 // AddProjectParams contains parameters for AddProject.
 type AddProjectParams struct {
 	Path  string
+	Name  string
 	NoGit bool
 	Sync  bool
 }
@@ -77,8 +78,11 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		isGitProject = false
 	}
 
-	// Use directory name as project name
-	name := filepath.Base(projectPath)
+	// Use provided name or fall back to directory name
+	name := params.Name
+	if name == "" {
+		name = filepath.Base(projectPath)
+	}
 
 	// Determine project ID
 	var projectID domain.ID
