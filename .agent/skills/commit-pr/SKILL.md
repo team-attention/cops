@@ -26,6 +26,8 @@ Handles git commit, push, and PR creation with smart commit message generation.
 
 - `$ARGUMENTS` (optional): Artifact ID for walkthrough mode (e.g., "20251226-123456")
 - `--push-only`: Only commit and push, skip PR creation
+- `--only-related`: Only commit files related to this workflow (excludes unrelated changes)
+- `--files <pattern>`: Only add files matching pattern (e.g., "api/**" or "*.go")
 
 ## Workflow
 
@@ -84,9 +86,28 @@ If no changes, exit with message: "No changes to commit".
 
 ### Step 4: Commit
 
-```bash
-git add .
+**Determine files to commit:**
 
+1. **If `--files <pattern>` provided:**
+   - Add only files matching the pattern: `git add <pattern>`
+
+2. **If `--only-related` provided (Walkthrough mode):**
+   - Read the walkthrough artifact to identify modified files
+   - Compare with `git status` output
+   - Add only files mentioned in the walkthrough
+   - Example:
+     ```bash
+     # Extract file paths from walkthrough's "Modified Files" section
+     # Add only those files that appear in git status
+     git add <file1> <file2> <file3>
+     ```
+   - If walkthrough doesn't list specific files, analyze git diff and ask user which files belong to this workflow
+
+3. **Default (no flags):**
+   - Add all changes: `git add .`
+
+**Create commit:**
+```bash
 git commit -m "$(cat <<'EOF'
 [generated commit message here]
 EOF
@@ -131,12 +152,21 @@ git push -u origin HEAD
 ## Example Usage
 
 ```bash
-# Standalone (no walkthrough)
+# Standalone (no walkthrough) - commits all changes
 /commit-pr
 
-# With walkthrough artifact
+# With walkthrough artifact - commits all changes
 /commit-pr 20251226-123456
 
-# Push only (no PR)
+# Only commit files related to this workflow (excludes unrelated changes)
+/commit-pr 20251226-123456 --only-related
+
+# Commit specific file pattern
+/commit-pr --files "api/**"
+
+# Push only (no PR) - commits all changes and pushes
 /commit-pr --push-only
+
+# Combine flags - only related files, no PR creation
+/commit-pr 20251226-123456 --only-related --push-only
 ```
