@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/bytedance/sonic"
+	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -457,11 +459,17 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, sessionID str
 				StopReason: mongoutil.Get[string](doc, mongoschema.SessionRecordStopReasonField),
 			}
 
-			// Reconstruct content if available (only text content is stored)
+			// Reconstruct content if available (supports both JSON and legacy plain text)
 			if content := mongoutil.Get[string](doc, mongoschema.SessionRecordMessageContentField); content != "" {
-				msg.Content = &shareddomain.MessageContent{
-					Text:     &content,
-					IsBlocks: false,
+				var mc shareddomain.MessageContent
+				if err := sonic.Unmarshal([]byte(content), &mc); err != nil {
+					// Fallback: treat as legacy plain text (backward compatibility)
+					msg.Content = &shareddomain.MessageContent{
+						Text:     lo.ToPtr(content),
+						IsBlocks: false,
+					}
+				} else {
+					msg.Content = &mc
 				}
 			}
 

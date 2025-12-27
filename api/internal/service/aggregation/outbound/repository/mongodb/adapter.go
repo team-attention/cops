@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/bytedance/sonic"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
@@ -102,8 +103,17 @@ func toDocument(record shareddomain.SessionRecord, projectObjID bson.ObjectID) b
 		if msg.StopReason != "" {
 			doc[mongoschema.SessionRecordStopReasonField] = msg.StopReason
 		}
-		if msg.Content != nil && !msg.Content.IsBlocks && msg.Content.Text != nil {
-			doc[mongoschema.SessionRecordMessageContentField] = *msg.Content.Text
+		if msg.Content != nil {
+			contentBytes, err := sonic.Marshal(msg.Content)
+			if err != nil {
+				// Log warning but continue - don't fail the batch for one message
+				slog.Warn("failed to serialize message content",
+					slog.String("messageId", msg.ID),
+					slog.Any("error", err),
+				)
+			} else {
+				doc[mongoschema.SessionRecordMessageContentField] = string(contentBytes)
+			}
 		}
 		if msg.Usage != nil {
 			doc[mongoschema.SessionRecordInputTokensField] = msg.Usage.InputTokens
