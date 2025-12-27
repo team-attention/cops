@@ -3,7 +3,7 @@ import { MessageSquare } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import type { SessionRecord } from '@/gen/grpcstub/collector/v1/collector_pb'
+import type { SessionRecord } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 import { MessageBubble } from './message-bubble'
 import { parseMessageContent, filterRecordsForChat } from '../util/parse-content'
 

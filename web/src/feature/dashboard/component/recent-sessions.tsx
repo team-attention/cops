@@ -11,31 +11,10 @@ import {
 } from '@/gen/shadcn/ui/table'
 import { Badge } from '@/gen/shadcn/ui/badge'
 import type { SessionSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
-import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { formatRelativeTime, truncateId } from '@/shared/util/format'
 
 interface RecentSessionsProps {
   sessions: SessionSummary[]
-}
-
-const formatTimestamp = (timestamp: Timestamp | undefined): string => {
-  if (!timestamp) return '—'
-  const date = new Date(Number(timestamp.seconds) * 1000)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
-
-const truncateId = (id: string): string => {
-  if (id.length <= 8) return id
-  return `${id.slice(0, 8)}...`
 }
 
 export const RecentSessions = ({ sessions }: RecentSessionsProps) => {
@@ -53,6 +32,7 @@ export const RecentSessions = ({ sessions }: RecentSessionsProps) => {
           </div>
           <Link
             to="/sessions"
+            search={{} as never}
             className="group flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-violet-400"
           >
             View all
@@ -129,7 +109,7 @@ export const RecentSessions = ({ sessions }: RecentSessionsProps) => {
                     <div className="flex items-center justify-end gap-1 text-zinc-500">
                       <Clock className="h-3 w-3" />
                       <span className="font-mono text-xs">
-                        {formatTimestamp(session.startedAt)}
+                        {formatRelativeTime(session.startedAt)}
                       </span>
                     </div>
                   </TableCell>

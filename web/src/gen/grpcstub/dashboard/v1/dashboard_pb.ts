@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dashboard/v1/dashboard.proto.
  */
 export const file_dashboard_v1_dashboard: GenFile = /*@__PURE__*/
-  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyI0ChFQYWdpbmF0aW9uUmVxdWVzdBIMCgRwYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBSJnChJQYWdpbmF0aW9uUmVzcG9uc2USFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi9AEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhEKCXdvcmt0cmVlcxgEIAMoCRIVCg1zZXNzaW9uX2NvdW50GAUgASgFEi4KBXVzYWdlGAYgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKDWxhc3RfYWN0aXZpdHkYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIukBCg5TZXNzaW9uU3VtbWFyeRIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSFQoNbWVzc2FnZV9jb3VudBgEIAEoBRIuCgV1c2FnZRgFIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAinwIKDVNlc3Npb25EZXRhaWwSCgoCaWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCRISCgpnaXRfYnJhbmNoGAMgASgJEgsKA2N3ZBgEIAEoCRIPCgd2ZXJzaW9uGAUgASgJEi4KBXVzYWdlGAYgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgdyZWNvcmRzGAkgAygLMh0uYWdncmVnYXRpb24udjEuU2Vzc2lvblJlY29yZCIUChJHZXRPdmVydmlld1JlcXVlc3Qi5wEKE0dldE92ZXJ2aWV3UmVzcG9uc2USNAoLdG90YWxfdXNhZ2UYASABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSFQoNcHJvamVjdF9jb3VudBgCIAEoBRIVCg1zZXNzaW9uX2NvdW50GAMgASgFEjUKD3JlY2VudF9wcm9qZWN0cxgEIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRI1Cg9yZWNlbnRfc2Vzc2lvbnMYBSADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkiSgoTTGlzdFByb2plY3RzUmVxdWVzdBIzCgpwYWdpbmF0aW9uGAEgASgLMh8uZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXF1ZXN0InwKFExpc3RQcm9qZWN0c1Jlc3BvbnNlEi4KCHByb2plY3RzGAEgAygLMhwuZGFzaGJvYXJkLnYxLlByb2plY3RTdW1tYXJ5EjQKCnBhZ2luYXRpb24YAiABKAsyIC5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlc3BvbnNlIicKEUdldFByb2plY3RSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiQgoSR2V0UHJvamVjdFJlc3BvbnNlEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKCAQoTTGlzdFNlc3Npb25zUmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEjMKCnBhZ2luYXRpb24YAiABKAsyHy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcXVlc3QSDwoHc29ydF9ieRgDIAEoCRIRCglzb3J0X2Rlc2MYBCABKAgifAoUTGlzdFNlc3Npb25zUmVzcG9uc2USLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSNAoKcGFnaW5hdGlvbhgCIAEoCzIgLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzcG9uc2UiJwoRR2V0U2Vzc2lvblJlcXVlc3QSEgoKc2Vzc2lvbl9pZBgBIAEoCSJCChJHZXRTZXNzaW9uUmVzcG9uc2USLAoHc2Vzc2lvbhgBIAEoCzIbLmRhc2hib2FyZC52MS5TZXNzaW9uRGV0YWlsMrYDChBEYXNoYm9hcmRTZXJ2aWNlElIKC0dldE92ZXJ2aWV3EiAuZGFzaGJvYXJkLnYxLkdldE92ZXJ2aWV3UmVxdWVzdBohLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1Jlc3BvbnNlElUKDExpc3RQcm9qZWN0cxIhLmRhc2hib2FyZC52MS5MaXN0UHJvamVjdHNSZXF1ZXN0GiIuZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1Jlc3BvbnNlEk8KCkdldFByb2plY3QSHy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcXVlc3QaIC5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlc3BvbnNlElUKDExpc3RTZXNzaW9ucxIhLmRhc2hib2FyZC52MS5MaXN0U2Vzc2lvbnNSZXF1ZXN0GiIuZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1Jlc3BvbnNlEk8KCkdldFNlc3Npb24SHy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcXVlc3QaIC5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlc3BvbnNlQsABChBjb20uZGFzaGJvYXJkLnYxQg5EYXNoYm9hcmRQcm90b1ABWktnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9kYXNoYm9hcmQvdjE7ZGFzaGJvYXJkdjGiAgNEWFiqAgxEYXNoYm9hcmQuVjHKAgxEYXNoYm9hcmRcVjHiAhhEYXNoYm9hcmRcVjFcR1BCTWV0YWRhdGHqAg1EYXNoYm9hcmQ6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_aggregation_v1_aggregation]);
+  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi9AEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhEKCXdvcmt0cmVlcxgEIAMoCRIVCg1zZXNzaW9uX2NvdW50GAUgASgFEi4KBXVzYWdlGAYgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKDWxhc3RfYWN0aXZpdHkYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIukBCg5TZXNzaW9uU3VtbWFyeRIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSFQoNbWVzc2FnZV9jb3VudBgEIAEoBRIuCgV1c2FnZRgFIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAinwIKDVNlc3Npb25EZXRhaWwSCgoCaWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCRISCgpnaXRfYnJhbmNoGAMgASgJEgsKA2N3ZBgEIAEoCRIPCgd2ZXJzaW9uGAUgASgJEi4KBXVzYWdlGAYgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgdyZWNvcmRzGAkgAygLMh0uYWdncmVnYXRpb24udjEuU2Vzc2lvblJlY29yZCIQCg5HZXRPdmVydmlld1JlcSLiAQoOR2V0T3ZlcnZpZXdSZXMSNAoLdG90YWxfdXNhZ2UYASABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSFQoNcHJvamVjdF9jb3VudBgCIAEoBRIVCg1zZXNzaW9uX2NvdW50GAMgASgFEjUKD3JlY2VudF9wcm9qZWN0cxgEIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRI1Cg9yZWNlbnRfc2Vzc2lvbnMYBSADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkiQgoPTGlzdFByb2plY3RzUmVxEi8KCnBhZ2luYXRpb24YASABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcSJyCg9MaXN0UHJvamVjdHNSZXMSLgoIcHJvamVjdHMYASADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIiMKDUdldFByb2plY3RSZXESEgoKcHJvamVjdF9pZBgBIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCJ6Cg9MaXN0U2Vzc2lvbnNSZXESEgoKcHJvamVjdF9pZBgBIAEoCRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXESDwoHc29ydF9ieRgDIAEoCRIRCglzb3J0X2Rlc2MYBCABKAgicgoPTGlzdFNlc3Npb25zUmVzEi4KCHNlc3Npb25zGAEgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5Ei8KCnBhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcyIjCg1HZXRTZXNzaW9uUmVxEhIKCnNlc3Npb25faWQYASABKAkiPQoNR2V0U2Vzc2lvblJlcxIsCgdzZXNzaW9uGAEgASgLMhsuZGFzaGJvYXJkLnYxLlNlc3Npb25EZXRhaWwyiQMKEERhc2hib2FyZFNlcnZpY2USSQoLR2V0T3ZlcnZpZXcSHC5kYXNoYm9hcmQudjEuR2V0T3ZlcnZpZXdSZXEaHC5kYXNoYm9hcmQudjEuR2V0T3ZlcnZpZXdSZXMSTAoMTGlzdFByb2plY3RzEh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcRodLmRhc2hib2FyZC52MS5MaXN0UHJvamVjdHNSZXMSRgoKR2V0UHJvamVjdBIbLmRhc2hib2FyZC52MS5HZXRQcm9qZWN0UmVxGhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXMSTAoMTGlzdFNlc3Npb25zEh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcRodLmRhc2hib2FyZC52MS5MaXN0U2Vzc2lvbnNSZXMSRgoKR2V0U2Vzc2lvbhIbLmRhc2hib2FyZC52MS5HZXRTZXNzaW9uUmVxGhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXNCwAEKEGNvbS5kYXNoYm9hcmQudjFCDkRhc2hib2FyZFByb3RvUAFaS2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2Rhc2hib2FyZC92MTtkYXNoYm9hcmR2MaICA0RYWKoCDERhc2hib2FyZC5WMcoCDERhc2hib2FyZFxWMeICGERhc2hib2FyZFxWMVxHUEJNZXRhZGF0YeoCDURhc2hib2FyZDo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp, file_aggregation_v1_aggregation]);
 
 /**
  * TokenUsageSummary aggregates token usage statistics.
@@ -59,11 +59,11 @@ export const TokenUsageSummarySchema: GenMessage<TokenUsageSummary> = /*@__PURE_
   messageDesc(file_dashboard_v1_dashboard, 0);
 
 /**
- * PaginationRequest contains pagination parameters.
+ * PaginationReq contains pagination parameters.
  *
- * @generated from message dashboard.v1.PaginationRequest
+ * @generated from message dashboard.v1.PaginationReq
  */
-export type PaginationRequest = Message<"dashboard.v1.PaginationRequest"> & {
+export type PaginationReq = Message<"dashboard.v1.PaginationReq"> & {
   /**
    * Page number (1-based)
    *
@@ -80,18 +80,18 @@ export type PaginationRequest = Message<"dashboard.v1.PaginationRequest"> & {
 };
 
 /**
- * Describes the message dashboard.v1.PaginationRequest.
- * Use `create(PaginationRequestSchema)` to create a new message.
+ * Describes the message dashboard.v1.PaginationReq.
+ * Use `create(PaginationReqSchema)` to create a new message.
  */
-export const PaginationRequestSchema: GenMessage<PaginationRequest> = /*@__PURE__*/
+export const PaginationReqSchema: GenMessage<PaginationReq> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 1);
 
 /**
- * PaginationResponse contains pagination metadata.
+ * PaginationRes contains pagination metadata.
  *
- * @generated from message dashboard.v1.PaginationResponse
+ * @generated from message dashboard.v1.PaginationRes
  */
-export type PaginationResponse = Message<"dashboard.v1.PaginationResponse"> & {
+export type PaginationRes = Message<"dashboard.v1.PaginationRes"> & {
   /**
    * Current page number
    *
@@ -122,10 +122,10 @@ export type PaginationResponse = Message<"dashboard.v1.PaginationResponse"> & {
 };
 
 /**
- * Describes the message dashboard.v1.PaginationResponse.
- * Use `create(PaginationResponseSchema)` to create a new message.
+ * Describes the message dashboard.v1.PaginationRes.
+ * Use `create(PaginationResSchema)` to create a new message.
  */
-export const PaginationResponseSchema: GenMessage<PaginationResponse> = /*@__PURE__*/
+export const PaginationResSchema: GenMessage<PaginationRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 2);
 
 /**
@@ -395,26 +395,26 @@ export const SessionDetailSchema: GenMessage<SessionDetail> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 6);
 
 /**
- * GetOverviewRequest is the request for GetOverview RPC.
+ * GetOverviewReq is the request for GetOverview RPC.
  *
- * @generated from message dashboard.v1.GetOverviewRequest
+ * @generated from message dashboard.v1.GetOverviewReq
  */
-export type GetOverviewRequest = Message<"dashboard.v1.GetOverviewRequest"> & {
+export type GetOverviewReq = Message<"dashboard.v1.GetOverviewReq"> & {
 };
 
 /**
- * Describes the message dashboard.v1.GetOverviewRequest.
- * Use `create(GetOverviewRequestSchema)` to create a new message.
+ * Describes the message dashboard.v1.GetOverviewReq.
+ * Use `create(GetOverviewReqSchema)` to create a new message.
  */
-export const GetOverviewRequestSchema: GenMessage<GetOverviewRequest> = /*@__PURE__*/
+export const GetOverviewReqSchema: GenMessage<GetOverviewReq> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 7);
 
 /**
- * GetOverviewResponse is the response for GetOverview RPC.
+ * GetOverviewRes is the response for GetOverview RPC.
  *
- * @generated from message dashboard.v1.GetOverviewResponse
+ * @generated from message dashboard.v1.GetOverviewRes
  */
-export type GetOverviewResponse = Message<"dashboard.v1.GetOverviewResponse"> & {
+export type GetOverviewRes = Message<"dashboard.v1.GetOverviewRes"> & {
   /**
    * Total token usage across all projects
    *
@@ -452,39 +452,39 @@ export type GetOverviewResponse = Message<"dashboard.v1.GetOverviewResponse"> & 
 };
 
 /**
- * Describes the message dashboard.v1.GetOverviewResponse.
- * Use `create(GetOverviewResponseSchema)` to create a new message.
+ * Describes the message dashboard.v1.GetOverviewRes.
+ * Use `create(GetOverviewResSchema)` to create a new message.
  */
-export const GetOverviewResponseSchema: GenMessage<GetOverviewResponse> = /*@__PURE__*/
+export const GetOverviewResSchema: GenMessage<GetOverviewRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 8);
 
 /**
- * ListProjectsRequest is the request for ListProjects RPC.
+ * ListProjectsReq is the request for ListProjects RPC.
  *
- * @generated from message dashboard.v1.ListProjectsRequest
+ * @generated from message dashboard.v1.ListProjectsReq
  */
-export type ListProjectsRequest = Message<"dashboard.v1.ListProjectsRequest"> & {
+export type ListProjectsReq = Message<"dashboard.v1.ListProjectsReq"> & {
   /**
    * Pagination parameters
    *
-   * @generated from field: dashboard.v1.PaginationRequest pagination = 1;
+   * @generated from field: dashboard.v1.PaginationReq pagination = 1;
    */
-  pagination?: PaginationRequest;
+  pagination?: PaginationReq;
 };
 
 /**
- * Describes the message dashboard.v1.ListProjectsRequest.
- * Use `create(ListProjectsRequestSchema)` to create a new message.
+ * Describes the message dashboard.v1.ListProjectsReq.
+ * Use `create(ListProjectsReqSchema)` to create a new message.
  */
-export const ListProjectsRequestSchema: GenMessage<ListProjectsRequest> = /*@__PURE__*/
+export const ListProjectsReqSchema: GenMessage<ListProjectsReq> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 9);
 
 /**
- * ListProjectsResponse is the response for ListProjects RPC.
+ * ListProjectsRes is the response for ListProjects RPC.
  *
- * @generated from message dashboard.v1.ListProjectsResponse
+ * @generated from message dashboard.v1.ListProjectsRes
  */
-export type ListProjectsResponse = Message<"dashboard.v1.ListProjectsResponse"> & {
+export type ListProjectsRes = Message<"dashboard.v1.ListProjectsRes"> & {
   /**
    * List of projects
    *
@@ -495,24 +495,24 @@ export type ListProjectsResponse = Message<"dashboard.v1.ListProjectsResponse"> 
   /**
    * Pagination metadata
    *
-   * @generated from field: dashboard.v1.PaginationResponse pagination = 2;
+   * @generated from field: dashboard.v1.PaginationRes pagination = 2;
    */
-  pagination?: PaginationResponse;
+  pagination?: PaginationRes;
 };
 
 /**
- * Describes the message dashboard.v1.ListProjectsResponse.
- * Use `create(ListProjectsResponseSchema)` to create a new message.
+ * Describes the message dashboard.v1.ListProjectsRes.
+ * Use `create(ListProjectsResSchema)` to create a new message.
  */
-export const ListProjectsResponseSchema: GenMessage<ListProjectsResponse> = /*@__PURE__*/
+export const ListProjectsResSchema: GenMessage<ListProjectsRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 10);
 
 /**
- * GetProjectRequest is the request for GetProject RPC.
+ * GetProjectReq is the request for GetProject RPC.
  *
- * @generated from message dashboard.v1.GetProjectRequest
+ * @generated from message dashboard.v1.GetProjectReq
  */
-export type GetProjectRequest = Message<"dashboard.v1.GetProjectRequest"> & {
+export type GetProjectReq = Message<"dashboard.v1.GetProjectReq"> & {
   /**
    * Project identifier
    *
@@ -522,18 +522,18 @@ export type GetProjectRequest = Message<"dashboard.v1.GetProjectRequest"> & {
 };
 
 /**
- * Describes the message dashboard.v1.GetProjectRequest.
- * Use `create(GetProjectRequestSchema)` to create a new message.
+ * Describes the message dashboard.v1.GetProjectReq.
+ * Use `create(GetProjectReqSchema)` to create a new message.
  */
-export const GetProjectRequestSchema: GenMessage<GetProjectRequest> = /*@__PURE__*/
+export const GetProjectReqSchema: GenMessage<GetProjectReq> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 11);
 
 /**
- * GetProjectResponse is the response for GetProject RPC.
+ * GetProjectRes is the response for GetProject RPC.
  *
- * @generated from message dashboard.v1.GetProjectResponse
+ * @generated from message dashboard.v1.GetProjectRes
  */
-export type GetProjectResponse = Message<"dashboard.v1.GetProjectResponse"> & {
+export type GetProjectRes = Message<"dashboard.v1.GetProjectRes"> & {
   /**
    * Project details
    *
@@ -543,18 +543,18 @@ export type GetProjectResponse = Message<"dashboard.v1.GetProjectResponse"> & {
 };
 
 /**
- * Describes the message dashboard.v1.GetProjectResponse.
- * Use `create(GetProjectResponseSchema)` to create a new message.
+ * Describes the message dashboard.v1.GetProjectRes.
+ * Use `create(GetProjectResSchema)` to create a new message.
  */
-export const GetProjectResponseSchema: GenMessage<GetProjectResponse> = /*@__PURE__*/
+export const GetProjectResSchema: GenMessage<GetProjectRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 12);
 
 /**
- * ListSessionsRequest is the request for ListSessions RPC.
+ * ListSessionsReq is the request for ListSessions RPC.
  *
- * @generated from message dashboard.v1.ListSessionsRequest
+ * @generated from message dashboard.v1.ListSessionsReq
  */
-export type ListSessionsRequest = Message<"dashboard.v1.ListSessionsRequest"> & {
+export type ListSessionsReq = Message<"dashboard.v1.ListSessionsReq"> & {
   /**
    * Project identifier
    *
@@ -565,9 +565,9 @@ export type ListSessionsRequest = Message<"dashboard.v1.ListSessionsRequest"> & 
   /**
    * Pagination parameters
    *
-   * @generated from field: dashboard.v1.PaginationRequest pagination = 2;
+   * @generated from field: dashboard.v1.PaginationReq pagination = 2;
    */
-  pagination?: PaginationRequest;
+  pagination?: PaginationReq;
 
   /**
    * Sort field: "started_at", "message_count", "usage"
@@ -585,18 +585,18 @@ export type ListSessionsRequest = Message<"dashboard.v1.ListSessionsRequest"> & 
 };
 
 /**
- * Describes the message dashboard.v1.ListSessionsRequest.
- * Use `create(ListSessionsRequestSchema)` to create a new message.
+ * Describes the message dashboard.v1.ListSessionsReq.
+ * Use `create(ListSessionsReqSchema)` to create a new message.
  */
-export const ListSessionsRequestSchema: GenMessage<ListSessionsRequest> = /*@__PURE__*/
+export const ListSessionsReqSchema: GenMessage<ListSessionsReq> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 13);
 
 /**
- * ListSessionsResponse is the response for ListSessions RPC.
+ * ListSessionsRes is the response for ListSessions RPC.
  *
- * @generated from message dashboard.v1.ListSessionsResponse
+ * @generated from message dashboard.v1.ListSessionsRes
  */
-export type ListSessionsResponse = Message<"dashboard.v1.ListSessionsResponse"> & {
+export type ListSessionsRes = Message<"dashboard.v1.ListSessionsRes"> & {
   /**
    * List of sessions
    *
@@ -607,24 +607,24 @@ export type ListSessionsResponse = Message<"dashboard.v1.ListSessionsResponse"> 
   /**
    * Pagination metadata
    *
-   * @generated from field: dashboard.v1.PaginationResponse pagination = 2;
+   * @generated from field: dashboard.v1.PaginationRes pagination = 2;
    */
-  pagination?: PaginationResponse;
+  pagination?: PaginationRes;
 };
 
 /**
- * Describes the message dashboard.v1.ListSessionsResponse.
- * Use `create(ListSessionsResponseSchema)` to create a new message.
+ * Describes the message dashboard.v1.ListSessionsRes.
+ * Use `create(ListSessionsResSchema)` to create a new message.
  */
-export const ListSessionsResponseSchema: GenMessage<ListSessionsResponse> = /*@__PURE__*/
+export const ListSessionsResSchema: GenMessage<ListSessionsRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 14);
 
 /**
- * GetSessionRequest is the request for GetSession RPC.
+ * GetSessionReq is the request for GetSession RPC.
  *
- * @generated from message dashboard.v1.GetSessionRequest
+ * @generated from message dashboard.v1.GetSessionReq
  */
-export type GetSessionRequest = Message<"dashboard.v1.GetSessionRequest"> & {
+export type GetSessionReq = Message<"dashboard.v1.GetSessionReq"> & {
   /**
    * Session identifier
    *
@@ -634,18 +634,18 @@ export type GetSessionRequest = Message<"dashboard.v1.GetSessionRequest"> & {
 };
 
 /**
- * Describes the message dashboard.v1.GetSessionRequest.
- * Use `create(GetSessionRequestSchema)` to create a new message.
+ * Describes the message dashboard.v1.GetSessionReq.
+ * Use `create(GetSessionReqSchema)` to create a new message.
  */
-export const GetSessionRequestSchema: GenMessage<GetSessionRequest> = /*@__PURE__*/
+export const GetSessionReqSchema: GenMessage<GetSessionReq> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 15);
 
 /**
- * GetSessionResponse is the response for GetSession RPC.
+ * GetSessionRes is the response for GetSession RPC.
  *
- * @generated from message dashboard.v1.GetSessionResponse
+ * @generated from message dashboard.v1.GetSessionRes
  */
-export type GetSessionResponse = Message<"dashboard.v1.GetSessionResponse"> & {
+export type GetSessionRes = Message<"dashboard.v1.GetSessionRes"> & {
   /**
    * Session details with records
    *
@@ -655,10 +655,10 @@ export type GetSessionResponse = Message<"dashboard.v1.GetSessionResponse"> & {
 };
 
 /**
- * Describes the message dashboard.v1.GetSessionResponse.
- * Use `create(GetSessionResponseSchema)` to create a new message.
+ * Describes the message dashboard.v1.GetSessionRes.
+ * Use `create(GetSessionResSchema)` to create a new message.
  */
-export const GetSessionResponseSchema: GenMessage<GetSessionResponse> = /*@__PURE__*/
+export const GetSessionResSchema: GenMessage<GetSessionRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 16);
 
 /**
@@ -674,8 +674,8 @@ export const DashboardService: GenService<{
    */
   getOverview: {
     methodKind: "unary";
-    input: typeof GetOverviewRequestSchema;
-    output: typeof GetOverviewResponseSchema;
+    input: typeof GetOverviewReqSchema;
+    output: typeof GetOverviewResSchema;
   },
   /**
    * ListProjects returns a paginated list of projects.
@@ -684,8 +684,8 @@ export const DashboardService: GenService<{
    */
   listProjects: {
     methodKind: "unary";
-    input: typeof ListProjectsRequestSchema;
-    output: typeof ListProjectsResponseSchema;
+    input: typeof ListProjectsReqSchema;
+    output: typeof ListProjectsResSchema;
   },
   /**
    * GetProject returns detailed project information.
@@ -694,8 +694,8 @@ export const DashboardService: GenService<{
    */
   getProject: {
     methodKind: "unary";
-    input: typeof GetProjectRequestSchema;
-    output: typeof GetProjectResponseSchema;
+    input: typeof GetProjectReqSchema;
+    output: typeof GetProjectResSchema;
   },
   /**
    * ListSessions returns sessions for a project.
@@ -704,8 +704,8 @@ export const DashboardService: GenService<{
    */
   listSessions: {
     methodKind: "unary";
-    input: typeof ListSessionsRequestSchema;
-    output: typeof ListSessionsResponseSchema;
+    input: typeof ListSessionsReqSchema;
+    output: typeof ListSessionsResSchema;
   },
   /**
    * GetSession returns detailed session information with records.
@@ -714,8 +714,8 @@ export const DashboardService: GenService<{
    */
   getSession: {
     methodKind: "unary";
-    input: typeof GetSessionRequestSchema;
-    output: typeof GetSessionResponseSchema;
+    input: typeof GetSessionReqSchema;
+    output: typeof GetSessionResSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_dashboard_v1_dashboard, 0);

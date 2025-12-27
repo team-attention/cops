@@ -22,8 +22,8 @@ message TokenUsageSummary {
   int64 total_cache_read_tokens = 4;
 }
 
-// PaginationRequest contains pagination parameters.
-message PaginationRequest {
+// PaginationReq contains pagination parameters.
+message PaginationReq {
   // Page number (1-based)
   int32 page = 1;
 
@@ -31,8 +31,8 @@ message PaginationRequest {
   int32 page_size = 2;
 }
 
-// PaginationResponse contains pagination metadata.
-message PaginationResponse {
+// PaginationRes contains pagination metadata.
+message PaginationRes {
   // Current page number
   int32 current_page = 1;
 
@@ -148,11 +148,11 @@ message SessionDetail {
   repeated aggregation.v1.SessionRecord records = 9;
 }
 
-// GetOverviewRequest is the request for GetOverview RPC.
-message GetOverviewRequest {}
+// GetOverviewReq is the request for GetOverview RPC.
+message GetOverviewReq {}
 
-// GetOverviewResponse is the response for GetOverview RPC.
-message GetOverviewResponse {
+// GetOverviewRes is the response for GetOverview RPC.
+message GetOverviewRes {
   // Total token usage across all projects
   TokenUsageSummary total_usage = 1;
 
@@ -169,40 +169,40 @@ message GetOverviewResponse {
   repeated SessionSummary recent_sessions = 5;
 }
 
-// ListProjectsRequest is the request for ListProjects RPC.
-message ListProjectsRequest {
+// ListProjectsReq is the request for ListProjects RPC.
+message ListProjectsReq {
   // Pagination parameters
-  PaginationRequest pagination = 1;
+  PaginationReq pagination = 1;
 }
 
-// ListProjectsResponse is the response for ListProjects RPC.
-message ListProjectsResponse {
+// ListProjectsRes is the response for ListProjects RPC.
+message ListProjectsRes {
   // List of projects
   repeated ProjectSummary projects = 1;
 
   // Pagination metadata
-  PaginationResponse pagination = 2;
+  PaginationRes pagination = 2;
 }
 
-// GetProjectRequest is the request for GetProject RPC.
-message GetProjectRequest {
+// GetProjectReq is the request for GetProject RPC.
+message GetProjectReq {
   // Project identifier
   string project_id = 1;
 }
 
-// GetProjectResponse is the response for GetProject RPC.
-message GetProjectResponse {
+// GetProjectRes is the response for GetProject RPC.
+message GetProjectRes {
   // Project details
   ProjectDetail project = 1;
 }
 
-// ListSessionsRequest is the request for ListSessions RPC.
-message ListSessionsRequest {
+// ListSessionsReq is the request for ListSessions RPC.
+message ListSessionsReq {
   // Project identifier
   string project_id = 1;
 
   // Pagination parameters
-  PaginationRequest pagination = 2;
+  PaginationReq pagination = 2;
 
   // Sort field: "started_at", "message_count", "usage"
   string sort_by = 3;
@@ -211,23 +211,23 @@ message ListSessionsRequest {
   bool sort_desc = 4;
 }
 
-// ListSessionsResponse is the response for ListSessions RPC.
-message ListSessionsResponse {
+// ListSessionsRes is the response for ListSessions RPC.
+message ListSessionsRes {
   // List of sessions
   repeated SessionSummary sessions = 1;
 
   // Pagination metadata
-  PaginationResponse pagination = 2;
+  PaginationRes pagination = 2;
 }
 
-// GetSessionRequest is the request for GetSession RPC.
-message GetSessionRequest {
+// GetSessionReq is the request for GetSession RPC.
+message GetSessionReq {
   // Session identifier
   string session_id = 1;
 }
 
-// GetSessionResponse is the response for GetSession RPC.
-message GetSessionResponse {
+// GetSessionRes is the response for GetSession RPC.
+message GetSessionRes {
   // Session details with records
   SessionDetail session = 1;
 }
@@ -235,17 +235,17 @@ message GetSessionResponse {
 // DashboardService provides dashboard data access.
 service DashboardService {
   // GetOverview returns dashboard summary statistics.
-  rpc GetOverview(GetOverviewRequest) returns (GetOverviewResponse);
+  rpc GetOverview(GetOverviewReq) returns (GetOverviewRes);
 
   // ListProjects returns a paginated list of projects.
-  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+  rpc ListProjects(ListProjectsReq) returns (ListProjectsRes);
 
   // GetProject returns detailed project information.
-  rpc GetProject(GetProjectRequest) returns (GetProjectResponse);
+  rpc GetProject(GetProjectReq) returns (GetProjectRes);
 
   // ListSessions returns sessions for a project.
-  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+  rpc ListSessions(ListSessionsReq) returns (ListSessionsRes);
 
   // GetSession returns detailed session information with records.
-  rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
+  rpc GetSession(GetSessionReq) returns (GetSessionRes);
 }

@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { FolderGit2, GitBranch, Clock, ChevronRight, Terminal } from 'lucide-react'
-import { Badge } from '@/gen/shadcn/ui/badge'
+import { FolderGit2, Clock, ChevronRight, Terminal } from 'lucide-react'
 import type { ProjectDetail, TokenUsageSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 
@@ -58,6 +57,7 @@ export const ProjectHeader = ({ project }: ProjectHeaderProps) => {
         <ChevronRight className="h-3 w-3" />
         <Link
           to="/projects"
+          search={{} as never}
           className="transition-colors hover:text-cyan-400"
         >
           Projects
@@ -98,15 +98,6 @@ export const ProjectHeader = ({ project }: ProjectHeaderProps) => {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
-                {/* Git Branch Badge */}
-                <Badge
-                  variant="outline"
-                  className="border-violet-500/30 bg-violet-500/10 text-violet-300"
-                >
-                  <GitBranch className="mr-1 h-3 w-3" />
-                  {project.gitBranch || 'main'}
-                </Badge>
-
                 {/* Last Activity */}
                 <div className="flex items-center gap-1.5 text-xs text-zinc-500">
                   <Clock className="h-3 w-3" />

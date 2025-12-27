@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { FolderGit2, GitBranch, ChevronRight, Clock } from 'lucide-react'
+import { FolderGit2, ChevronRight, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import {
   Table,
@@ -9,35 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/gen/shadcn/ui/table'
-import { Badge } from '@/gen/shadcn/ui/badge'
 import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
-import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { formatRelativeTime, truncatePath } from '@/shared/util/format'
 
 interface ProjectListProps {
   projects: ProjectSummary[]
-}
-
-const formatTimestamp = (timestamp: Timestamp | undefined): string => {
-  if (!timestamp) return '—'
-  const date = new Date(Number(timestamp.seconds) * 1000)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
-
-const truncatePath = (path: string, maxLength = 40): string => {
-  if (path.length <= maxLength) return path
-  const parts = path.split('/')
-  if (parts.length <= 3) return path
-  return `.../${parts.slice(-2).join('/')}`
 }
 
 export const ProjectList = ({ projects }: ProjectListProps) => {
@@ -55,6 +31,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
           </div>
           <Link
             to="/projects"
+            search={{} as never}
             className="group flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-cyan-400"
           >
             View all
@@ -110,13 +87,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
                     </Link>
                   </TableCell>
                   <TableCell className="py-3">
-                    <Badge
-                      variant="outline"
-                      className="border-zinc-700/50 bg-zinc-800/50 font-mono text-[10px] text-zinc-400"
-                    >
-                      <GitBranch className="mr-1 h-3 w-3" />
-                      {project.gitBranch || 'main'}
-                    </Badge>
+                    <span className="font-mono text-sm text-zinc-500">-</span>
                   </TableCell>
                   <TableCell className="py-3 text-right">
                     <span className="font-mono text-sm text-zinc-300">
@@ -127,7 +98,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
                     <div className="flex items-center justify-end gap-1 text-zinc-500">
                       <Clock className="h-3 w-3" />
                       <span className="font-mono text-xs">
-                        {formatTimestamp(project.lastActivity)}
+                        {formatRelativeTime(project.lastActivity)}
                       </span>
                     </div>
                   </TableCell>

@@ -96,8 +96,8 @@ func (x *TokenUsageSummary) GetTotalCacheReadTokens() int64 {
 	return 0
 }
 
-// PaginationRequest contains pagination parameters.
-type PaginationRequest struct {
+// PaginationReq contains pagination parameters.
+type PaginationReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Page number (1-based)
 	Page int32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
@@ -107,20 +107,20 @@ type PaginationRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PaginationRequest) Reset() {
-	*x = PaginationRequest{}
+func (x *PaginationReq) Reset() {
+	*x = PaginationReq{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PaginationRequest) String() string {
+func (x *PaginationReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PaginationRequest) ProtoMessage() {}
+func (*PaginationReq) ProtoMessage() {}
 
-func (x *PaginationRequest) ProtoReflect() protoreflect.Message {
+func (x *PaginationReq) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -132,27 +132,27 @@ func (x *PaginationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PaginationRequest.ProtoReflect.Descriptor instead.
-func (*PaginationRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use PaginationReq.ProtoReflect.Descriptor instead.
+func (*PaginationReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *PaginationRequest) GetPage() int32 {
+func (x *PaginationReq) GetPage() int32 {
 	if x != nil {
 		return x.Page
 	}
 	return 0
 }
 
-func (x *PaginationRequest) GetPageSize() int32 {
+func (x *PaginationReq) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
 	}
 	return 0
 }
 
-// PaginationResponse contains pagination metadata.
-type PaginationResponse struct {
+// PaginationRes contains pagination metadata.
+type PaginationRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Current page number
 	CurrentPage int32 `protobuf:"varint,1,opt,name=current_page,json=currentPage,proto3" json:"current_page,omitempty"`
@@ -166,20 +166,20 @@ type PaginationResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PaginationResponse) Reset() {
-	*x = PaginationResponse{}
+func (x *PaginationRes) Reset() {
+	*x = PaginationRes{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PaginationResponse) String() string {
+func (x *PaginationRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PaginationResponse) ProtoMessage() {}
+func (*PaginationRes) ProtoMessage() {}
 
-func (x *PaginationResponse) ProtoReflect() protoreflect.Message {
+func (x *PaginationRes) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -191,33 +191,33 @@ func (x *PaginationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PaginationResponse.ProtoReflect.Descriptor instead.
-func (*PaginationResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use PaginationRes.ProtoReflect.Descriptor instead.
+func (*PaginationRes) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *PaginationResponse) GetCurrentPage() int32 {
+func (x *PaginationRes) GetCurrentPage() int32 {
 	if x != nil {
 		return x.CurrentPage
 	}
 	return 0
 }
 
-func (x *PaginationResponse) GetPageSize() int32 {
+func (x *PaginationRes) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
 	}
 	return 0
 }
 
-func (x *PaginationResponse) GetTotalPages() int32 {
+func (x *PaginationRes) GetTotalPages() int32 {
 	if x != nil {
 		return x.TotalPages
 	}
 	return 0
 }
 
-func (x *PaginationResponse) GetTotalCount() int64 {
+func (x *PaginationRes) GetTotalCount() int64 {
 	if x != nil {
 		return x.TotalCount
 	}
@@ -642,27 +642,27 @@ func (x *SessionDetail) GetRecords() []*v1.SessionRecord {
 	return nil
 }
 
-// GetOverviewRequest is the request for GetOverview RPC.
-type GetOverviewRequest struct {
+// GetOverviewReq is the request for GetOverview RPC.
+type GetOverviewReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetOverviewRequest) Reset() {
-	*x = GetOverviewRequest{}
+func (x *GetOverviewReq) Reset() {
+	*x = GetOverviewReq{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetOverviewRequest) String() string {
+func (x *GetOverviewReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetOverviewRequest) ProtoMessage() {}
+func (*GetOverviewReq) ProtoMessage() {}
 
-func (x *GetOverviewRequest) ProtoReflect() protoreflect.Message {
+func (x *GetOverviewReq) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -674,13 +674,13 @@ func (x *GetOverviewRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetOverviewRequest.ProtoReflect.Descriptor instead.
-func (*GetOverviewRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetOverviewReq.ProtoReflect.Descriptor instead.
+func (*GetOverviewReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{7}
 }
 
-// GetOverviewResponse is the response for GetOverview RPC.
-type GetOverviewResponse struct {
+// GetOverviewRes is the response for GetOverview RPC.
+type GetOverviewRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Total token usage across all projects
 	TotalUsage *TokenUsageSummary `protobuf:"bytes,1,opt,name=total_usage,json=totalUsage,proto3" json:"total_usage,omitempty"`
@@ -696,20 +696,20 @@ type GetOverviewResponse struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *GetOverviewResponse) Reset() {
-	*x = GetOverviewResponse{}
+func (x *GetOverviewRes) Reset() {
+	*x = GetOverviewRes{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetOverviewResponse) String() string {
+func (x *GetOverviewRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetOverviewResponse) ProtoMessage() {}
+func (*GetOverviewRes) ProtoMessage() {}
 
-func (x *GetOverviewResponse) ProtoReflect() protoreflect.Message {
+func (x *GetOverviewRes) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -721,69 +721,69 @@ func (x *GetOverviewResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetOverviewResponse.ProtoReflect.Descriptor instead.
-func (*GetOverviewResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetOverviewRes.ProtoReflect.Descriptor instead.
+func (*GetOverviewRes) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *GetOverviewResponse) GetTotalUsage() *TokenUsageSummary {
+func (x *GetOverviewRes) GetTotalUsage() *TokenUsageSummary {
 	if x != nil {
 		return x.TotalUsage
 	}
 	return nil
 }
 
-func (x *GetOverviewResponse) GetProjectCount() int32 {
+func (x *GetOverviewRes) GetProjectCount() int32 {
 	if x != nil {
 		return x.ProjectCount
 	}
 	return 0
 }
 
-func (x *GetOverviewResponse) GetSessionCount() int32 {
+func (x *GetOverviewRes) GetSessionCount() int32 {
 	if x != nil {
 		return x.SessionCount
 	}
 	return 0
 }
 
-func (x *GetOverviewResponse) GetRecentProjects() []*ProjectSummary {
+func (x *GetOverviewRes) GetRecentProjects() []*ProjectSummary {
 	if x != nil {
 		return x.RecentProjects
 	}
 	return nil
 }
 
-func (x *GetOverviewResponse) GetRecentSessions() []*SessionSummary {
+func (x *GetOverviewRes) GetRecentSessions() []*SessionSummary {
 	if x != nil {
 		return x.RecentSessions
 	}
 	return nil
 }
 
-// ListProjectsRequest is the request for ListProjects RPC.
-type ListProjectsRequest struct {
+// ListProjectsReq is the request for ListProjects RPC.
+type ListProjectsReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Pagination parameters
-	Pagination    *PaginationRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination    *PaginationReq `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ListProjectsRequest) Reset() {
-	*x = ListProjectsRequest{}
+func (x *ListProjectsReq) Reset() {
+	*x = ListProjectsReq{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListProjectsRequest) String() string {
+func (x *ListProjectsReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListProjectsRequest) ProtoMessage() {}
+func (*ListProjectsReq) ProtoMessage() {}
 
-func (x *ListProjectsRequest) ProtoReflect() protoreflect.Message {
+func (x *ListProjectsReq) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -795,43 +795,43 @@ func (x *ListProjectsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListProjectsRequest.ProtoReflect.Descriptor instead.
-func (*ListProjectsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListProjectsReq.ProtoReflect.Descriptor instead.
+func (*ListProjectsReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *ListProjectsRequest) GetPagination() *PaginationRequest {
+func (x *ListProjectsReq) GetPagination() *PaginationReq {
 	if x != nil {
 		return x.Pagination
 	}
 	return nil
 }
 
-// ListProjectsResponse is the response for ListProjects RPC.
-type ListProjectsResponse struct {
+// ListProjectsRes is the response for ListProjects RPC.
+type ListProjectsRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// List of projects
 	Projects []*ProjectSummary `protobuf:"bytes,1,rep,name=projects,proto3" json:"projects,omitempty"`
 	// Pagination metadata
-	Pagination    *PaginationResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination    *PaginationRes `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ListProjectsResponse) Reset() {
-	*x = ListProjectsResponse{}
+func (x *ListProjectsRes) Reset() {
+	*x = ListProjectsRes{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListProjectsResponse) String() string {
+func (x *ListProjectsRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListProjectsResponse) ProtoMessage() {}
+func (*ListProjectsRes) ProtoMessage() {}
 
-func (x *ListProjectsResponse) ProtoReflect() protoreflect.Message {
+func (x *ListProjectsRes) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -843,27 +843,27 @@ func (x *ListProjectsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListProjectsResponse.ProtoReflect.Descriptor instead.
-func (*ListProjectsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListProjectsRes.ProtoReflect.Descriptor instead.
+func (*ListProjectsRes) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *ListProjectsResponse) GetProjects() []*ProjectSummary {
+func (x *ListProjectsRes) GetProjects() []*ProjectSummary {
 	if x != nil {
 		return x.Projects
 	}
 	return nil
 }
 
-func (x *ListProjectsResponse) GetPagination() *PaginationResponse {
+func (x *ListProjectsRes) GetPagination() *PaginationRes {
 	if x != nil {
 		return x.Pagination
 	}
 	return nil
 }
 
-// GetProjectRequest is the request for GetProject RPC.
-type GetProjectRequest struct {
+// GetProjectReq is the request for GetProject RPC.
+type GetProjectReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Project identifier
 	ProjectId     string `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
@@ -871,20 +871,20 @@ type GetProjectRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetProjectRequest) Reset() {
-	*x = GetProjectRequest{}
+func (x *GetProjectReq) Reset() {
+	*x = GetProjectReq{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetProjectRequest) String() string {
+func (x *GetProjectReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetProjectRequest) ProtoMessage() {}
+func (*GetProjectReq) ProtoMessage() {}
 
-func (x *GetProjectRequest) ProtoReflect() protoreflect.Message {
+func (x *GetProjectReq) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -896,20 +896,20 @@ func (x *GetProjectRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetProjectRequest.ProtoReflect.Descriptor instead.
-func (*GetProjectRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetProjectReq.ProtoReflect.Descriptor instead.
+func (*GetProjectReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetProjectRequest) GetProjectId() string {
+func (x *GetProjectReq) GetProjectId() string {
 	if x != nil {
 		return x.ProjectId
 	}
 	return ""
 }
 
-// GetProjectResponse is the response for GetProject RPC.
-type GetProjectResponse struct {
+// GetProjectRes is the response for GetProject RPC.
+type GetProjectRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Project details
 	Project       *ProjectDetail `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
@@ -917,20 +917,20 @@ type GetProjectResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetProjectResponse) Reset() {
-	*x = GetProjectResponse{}
+func (x *GetProjectRes) Reset() {
+	*x = GetProjectRes{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetProjectResponse) String() string {
+func (x *GetProjectRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetProjectResponse) ProtoMessage() {}
+func (*GetProjectRes) ProtoMessage() {}
 
-func (x *GetProjectResponse) ProtoReflect() protoreflect.Message {
+func (x *GetProjectRes) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -942,25 +942,25 @@ func (x *GetProjectResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetProjectResponse.ProtoReflect.Descriptor instead.
-func (*GetProjectResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetProjectRes.ProtoReflect.Descriptor instead.
+func (*GetProjectRes) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetProjectResponse) GetProject() *ProjectDetail {
+func (x *GetProjectRes) GetProject() *ProjectDetail {
 	if x != nil {
 		return x.Project
 	}
 	return nil
 }
 
-// ListSessionsRequest is the request for ListSessions RPC.
-type ListSessionsRequest struct {
+// ListSessionsReq is the request for ListSessions RPC.
+type ListSessionsReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Project identifier
 	ProjectId string `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Pagination parameters
-	Pagination *PaginationRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *PaginationReq `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	// Sort field: "started_at", "message_count", "usage"
 	SortBy string `protobuf:"bytes,3,opt,name=sort_by,json=sortBy,proto3" json:"sort_by,omitempty"`
 	// Sort in descending order
@@ -969,20 +969,20 @@ type ListSessionsRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ListSessionsRequest) Reset() {
-	*x = ListSessionsRequest{}
+func (x *ListSessionsReq) Reset() {
+	*x = ListSessionsReq{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListSessionsRequest) String() string {
+func (x *ListSessionsReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListSessionsRequest) ProtoMessage() {}
+func (*ListSessionsReq) ProtoMessage() {}
 
-func (x *ListSessionsRequest) ProtoReflect() protoreflect.Message {
+func (x *ListSessionsReq) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -994,64 +994,64 @@ func (x *ListSessionsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSessionsRequest.ProtoReflect.Descriptor instead.
-func (*ListSessionsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListSessionsReq.ProtoReflect.Descriptor instead.
+func (*ListSessionsReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *ListSessionsRequest) GetProjectId() string {
+func (x *ListSessionsReq) GetProjectId() string {
 	if x != nil {
 		return x.ProjectId
 	}
 	return ""
 }
 
-func (x *ListSessionsRequest) GetPagination() *PaginationRequest {
+func (x *ListSessionsReq) GetPagination() *PaginationReq {
 	if x != nil {
 		return x.Pagination
 	}
 	return nil
 }
 
-func (x *ListSessionsRequest) GetSortBy() string {
+func (x *ListSessionsReq) GetSortBy() string {
 	if x != nil {
 		return x.SortBy
 	}
 	return ""
 }
 
-func (x *ListSessionsRequest) GetSortDesc() bool {
+func (x *ListSessionsReq) GetSortDesc() bool {
 	if x != nil {
 		return x.SortDesc
 	}
 	return false
 }
 
-// ListSessionsResponse is the response for ListSessions RPC.
-type ListSessionsResponse struct {
+// ListSessionsRes is the response for ListSessions RPC.
+type ListSessionsRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// List of sessions
 	Sessions []*SessionSummary `protobuf:"bytes,1,rep,name=sessions,proto3" json:"sessions,omitempty"`
 	// Pagination metadata
-	Pagination    *PaginationResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination    *PaginationRes `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ListSessionsResponse) Reset() {
-	*x = ListSessionsResponse{}
+func (x *ListSessionsRes) Reset() {
+	*x = ListSessionsRes{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListSessionsResponse) String() string {
+func (x *ListSessionsRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListSessionsResponse) ProtoMessage() {}
+func (*ListSessionsRes) ProtoMessage() {}
 
-func (x *ListSessionsResponse) ProtoReflect() protoreflect.Message {
+func (x *ListSessionsRes) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1063,27 +1063,27 @@ func (x *ListSessionsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListSessionsResponse.ProtoReflect.Descriptor instead.
-func (*ListSessionsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListSessionsRes.ProtoReflect.Descriptor instead.
+func (*ListSessionsRes) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *ListSessionsResponse) GetSessions() []*SessionSummary {
+func (x *ListSessionsRes) GetSessions() []*SessionSummary {
 	if x != nil {
 		return x.Sessions
 	}
 	return nil
 }
 
-func (x *ListSessionsResponse) GetPagination() *PaginationResponse {
+func (x *ListSessionsRes) GetPagination() *PaginationRes {
 	if x != nil {
 		return x.Pagination
 	}
 	return nil
 }
 
-// GetSessionRequest is the request for GetSession RPC.
-type GetSessionRequest struct {
+// GetSessionReq is the request for GetSession RPC.
+type GetSessionReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Session identifier
 	SessionId     string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
@@ -1091,20 +1091,20 @@ type GetSessionRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetSessionRequest) Reset() {
-	*x = GetSessionRequest{}
+func (x *GetSessionReq) Reset() {
+	*x = GetSessionReq{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetSessionRequest) String() string {
+func (x *GetSessionReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSessionRequest) ProtoMessage() {}
+func (*GetSessionReq) ProtoMessage() {}
 
-func (x *GetSessionRequest) ProtoReflect() protoreflect.Message {
+func (x *GetSessionReq) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1116,20 +1116,20 @@ func (x *GetSessionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSessionRequest.ProtoReflect.Descriptor instead.
-func (*GetSessionRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetSessionReq.ProtoReflect.Descriptor instead.
+func (*GetSessionReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *GetSessionRequest) GetSessionId() string {
+func (x *GetSessionReq) GetSessionId() string {
 	if x != nil {
 		return x.SessionId
 	}
 	return ""
 }
 
-// GetSessionResponse is the response for GetSession RPC.
-type GetSessionResponse struct {
+// GetSessionRes is the response for GetSession RPC.
+type GetSessionRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Session details with records
 	Session       *SessionDetail `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
@@ -1137,20 +1137,20 @@ type GetSessionResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetSessionResponse) Reset() {
-	*x = GetSessionResponse{}
+func (x *GetSessionRes) Reset() {
+	*x = GetSessionRes{}
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetSessionResponse) String() string {
+func (x *GetSessionRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSessionResponse) ProtoMessage() {}
+func (*GetSessionRes) ProtoMessage() {}
 
-func (x *GetSessionResponse) ProtoReflect() protoreflect.Message {
+func (x *GetSessionRes) ProtoReflect() protoreflect.Message {
 	mi := &file_dashboard_v1_dashboard_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1162,12 +1162,12 @@ func (x *GetSessionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSessionResponse.ProtoReflect.Descriptor instead.
-func (*GetSessionResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetSessionRes.ProtoReflect.Descriptor instead.
+func (*GetSessionRes) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *GetSessionResponse) GetSession() *SessionDetail {
+func (x *GetSessionRes) GetSession() *SessionDetail {
 	if x != nil {
 		return x.Session
 	}
@@ -1183,11 +1183,11 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x12total_input_tokens\x18\x01 \x01(\x03R\x10totalInputTokens\x12.\n" +
 	"\x13total_output_tokens\x18\x02 \x01(\x03R\x11totalOutputTokens\x12=\n" +
 	"\x1btotal_cache_creation_tokens\x18\x03 \x01(\x03R\x18totalCacheCreationTokens\x125\n" +
-	"\x17total_cache_read_tokens\x18\x04 \x01(\x03R\x14totalCacheReadTokens\"D\n" +
-	"\x11PaginationRequest\x12\x12\n" +
+	"\x17total_cache_read_tokens\x18\x04 \x01(\x03R\x14totalCacheReadTokens\"@\n" +
+	"\rPaginationReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x96\x01\n" +
-	"\x12PaginationResponse\x12!\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x91\x01\n" +
+	"\rPaginationRes\x12!\n" +
 	"\fcurrent_page\x18\x01 \x01(\x05R\vcurrentPage\x12\x1b\n" +
 	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1f\n" +
 	"\vtotal_pages\x18\x03 \x01(\x05R\n" +
@@ -1234,55 +1234,55 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
 	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x127\n" +
-	"\arecords\x18\t \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\"\x14\n" +
-	"\x12GetOverviewRequest\"\xaf\x02\n" +
-	"\x13GetOverviewResponse\x12@\n" +
+	"\arecords\x18\t \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\"\x10\n" +
+	"\x0eGetOverviewReq\"\xaa\x02\n" +
+	"\x0eGetOverviewRes\x12@\n" +
 	"\vtotal_usage\x18\x01 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\n" +
 	"totalUsage\x12#\n" +
 	"\rproject_count\x18\x02 \x01(\x05R\fprojectCount\x12#\n" +
 	"\rsession_count\x18\x03 \x01(\x05R\fsessionCount\x12E\n" +
 	"\x0frecent_projects\x18\x04 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\x0erecentProjects\x12E\n" +
-	"\x0frecent_sessions\x18\x05 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\x0erecentSessions\"V\n" +
-	"\x13ListProjectsRequest\x12?\n" +
+	"\x0frecent_sessions\x18\x05 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\x0erecentSessions\"N\n" +
+	"\x0fListProjectsReq\x12;\n" +
 	"\n" +
-	"pagination\x18\x01 \x01(\v2\x1f.dashboard.v1.PaginationRequestR\n" +
-	"pagination\"\x92\x01\n" +
-	"\x14ListProjectsResponse\x128\n" +
-	"\bprojects\x18\x01 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\bprojects\x12@\n" +
+	"pagination\x18\x01 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
+	"pagination\"\x88\x01\n" +
+	"\x0fListProjectsRes\x128\n" +
+	"\bprojects\x18\x01 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\bprojects\x12;\n" +
 	"\n" +
-	"pagination\x18\x02 \x01(\v2 .dashboard.v1.PaginationResponseR\n" +
-	"pagination\"2\n" +
-	"\x11GetProjectRequest\x12\x1d\n" +
+	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\n" +
+	"pagination\".\n" +
+	"\rGetProjectReq\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\"K\n" +
-	"\x12GetProjectResponse\x125\n" +
-	"\aproject\x18\x01 \x01(\v2\x1b.dashboard.v1.ProjectDetailR\aproject\"\xab\x01\n" +
-	"\x13ListSessionsRequest\x12\x1d\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\"F\n" +
+	"\rGetProjectRes\x125\n" +
+	"\aproject\x18\x01 \x01(\v2\x1b.dashboard.v1.ProjectDetailR\aproject\"\xa3\x01\n" +
+	"\x0fListSessionsReq\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\x12?\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12;\n" +
 	"\n" +
-	"pagination\x18\x02 \x01(\v2\x1f.dashboard.v1.PaginationRequestR\n" +
+	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
 	"pagination\x12\x17\n" +
 	"\asort_by\x18\x03 \x01(\tR\x06sortBy\x12\x1b\n" +
-	"\tsort_desc\x18\x04 \x01(\bR\bsortDesc\"\x92\x01\n" +
-	"\x14ListSessionsResponse\x128\n" +
-	"\bsessions\x18\x01 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\bsessions\x12@\n" +
+	"\tsort_desc\x18\x04 \x01(\bR\bsortDesc\"\x88\x01\n" +
+	"\x0fListSessionsRes\x128\n" +
+	"\bsessions\x18\x01 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\bsessions\x12;\n" +
 	"\n" +
-	"pagination\x18\x02 \x01(\v2 .dashboard.v1.PaginationResponseR\n" +
-	"pagination\"2\n" +
-	"\x11GetSessionRequest\x12\x1d\n" +
+	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\n" +
+	"pagination\".\n" +
+	"\rGetSessionReq\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\"K\n" +
-	"\x12GetSessionResponse\x125\n" +
-	"\asession\x18\x01 \x01(\v2\x1b.dashboard.v1.SessionDetailR\asession2\xb6\x03\n" +
-	"\x10DashboardService\x12R\n" +
-	"\vGetOverview\x12 .dashboard.v1.GetOverviewRequest\x1a!.dashboard.v1.GetOverviewResponse\x12U\n" +
-	"\fListProjects\x12!.dashboard.v1.ListProjectsRequest\x1a\".dashboard.v1.ListProjectsResponse\x12O\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"F\n" +
+	"\rGetSessionRes\x125\n" +
+	"\asession\x18\x01 \x01(\v2\x1b.dashboard.v1.SessionDetailR\asession2\x89\x03\n" +
+	"\x10DashboardService\x12I\n" +
+	"\vGetOverview\x12\x1c.dashboard.v1.GetOverviewReq\x1a\x1c.dashboard.v1.GetOverviewRes\x12L\n" +
+	"\fListProjects\x12\x1d.dashboard.v1.ListProjectsReq\x1a\x1d.dashboard.v1.ListProjectsRes\x12F\n" +
 	"\n" +
-	"GetProject\x12\x1f.dashboard.v1.GetProjectRequest\x1a .dashboard.v1.GetProjectResponse\x12U\n" +
-	"\fListSessions\x12!.dashboard.v1.ListSessionsRequest\x1a\".dashboard.v1.ListSessionsResponse\x12O\n" +
+	"GetProject\x12\x1b.dashboard.v1.GetProjectReq\x1a\x1b.dashboard.v1.GetProjectRes\x12L\n" +
+	"\fListSessions\x12\x1d.dashboard.v1.ListSessionsReq\x1a\x1d.dashboard.v1.ListSessionsRes\x12F\n" +
 	"\n" +
-	"GetSession\x12\x1f.dashboard.v1.GetSessionRequest\x1a .dashboard.v1.GetSessionResponseB\xc0\x01\n" +
+	"GetSession\x12\x1b.dashboard.v1.GetSessionReq\x1a\x1b.dashboard.v1.GetSessionResB\xc0\x01\n" +
 	"\x10com.dashboard.v1B\x0eDashboardProtoP\x01ZKgithub.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1;dashboardv1\xa2\x02\x03DXX\xaa\x02\fDashboard.V1\xca\x02\fDashboard\\V1\xe2\x02\x18Dashboard\\V1\\GPBMetadata\xea\x02\rDashboard::V1b\x06proto3"
 
 var (
@@ -1300,22 +1300,22 @@ func file_dashboard_v1_dashboard_proto_rawDescGZIP() []byte {
 var file_dashboard_v1_dashboard_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_dashboard_v1_dashboard_proto_goTypes = []any{
 	(*TokenUsageSummary)(nil),     // 0: dashboard.v1.TokenUsageSummary
-	(*PaginationRequest)(nil),     // 1: dashboard.v1.PaginationRequest
-	(*PaginationResponse)(nil),    // 2: dashboard.v1.PaginationResponse
+	(*PaginationReq)(nil),         // 1: dashboard.v1.PaginationReq
+	(*PaginationRes)(nil),         // 2: dashboard.v1.PaginationRes
 	(*ProjectSummary)(nil),        // 3: dashboard.v1.ProjectSummary
 	(*ProjectDetail)(nil),         // 4: dashboard.v1.ProjectDetail
 	(*SessionSummary)(nil),        // 5: dashboard.v1.SessionSummary
 	(*SessionDetail)(nil),         // 6: dashboard.v1.SessionDetail
-	(*GetOverviewRequest)(nil),    // 7: dashboard.v1.GetOverviewRequest
-	(*GetOverviewResponse)(nil),   // 8: dashboard.v1.GetOverviewResponse
-	(*ListProjectsRequest)(nil),   // 9: dashboard.v1.ListProjectsRequest
-	(*ListProjectsResponse)(nil),  // 10: dashboard.v1.ListProjectsResponse
-	(*GetProjectRequest)(nil),     // 11: dashboard.v1.GetProjectRequest
-	(*GetProjectResponse)(nil),    // 12: dashboard.v1.GetProjectResponse
-	(*ListSessionsRequest)(nil),   // 13: dashboard.v1.ListSessionsRequest
-	(*ListSessionsResponse)(nil),  // 14: dashboard.v1.ListSessionsResponse
-	(*GetSessionRequest)(nil),     // 15: dashboard.v1.GetSessionRequest
-	(*GetSessionResponse)(nil),    // 16: dashboard.v1.GetSessionResponse
+	(*GetOverviewReq)(nil),        // 7: dashboard.v1.GetOverviewReq
+	(*GetOverviewRes)(nil),        // 8: dashboard.v1.GetOverviewRes
+	(*ListProjectsReq)(nil),       // 9: dashboard.v1.ListProjectsReq
+	(*ListProjectsRes)(nil),       // 10: dashboard.v1.ListProjectsRes
+	(*GetProjectReq)(nil),         // 11: dashboard.v1.GetProjectReq
+	(*GetProjectRes)(nil),         // 12: dashboard.v1.GetProjectRes
+	(*ListSessionsReq)(nil),       // 13: dashboard.v1.ListSessionsReq
+	(*ListSessionsRes)(nil),       // 14: dashboard.v1.ListSessionsRes
+	(*GetSessionReq)(nil),         // 15: dashboard.v1.GetSessionReq
+	(*GetSessionRes)(nil),         // 16: dashboard.v1.GetSessionRes
 	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
 	(*v1.SessionRecord)(nil),      // 18: aggregation.v1.SessionRecord
 }
@@ -1332,27 +1332,27 @@ var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	17, // 9: dashboard.v1.SessionDetail.started_at:type_name -> google.protobuf.Timestamp
 	17, // 10: dashboard.v1.SessionDetail.ended_at:type_name -> google.protobuf.Timestamp
 	18, // 11: dashboard.v1.SessionDetail.records:type_name -> aggregation.v1.SessionRecord
-	0,  // 12: dashboard.v1.GetOverviewResponse.total_usage:type_name -> dashboard.v1.TokenUsageSummary
-	3,  // 13: dashboard.v1.GetOverviewResponse.recent_projects:type_name -> dashboard.v1.ProjectSummary
-	5,  // 14: dashboard.v1.GetOverviewResponse.recent_sessions:type_name -> dashboard.v1.SessionSummary
-	1,  // 15: dashboard.v1.ListProjectsRequest.pagination:type_name -> dashboard.v1.PaginationRequest
-	3,  // 16: dashboard.v1.ListProjectsResponse.projects:type_name -> dashboard.v1.ProjectSummary
-	2,  // 17: dashboard.v1.ListProjectsResponse.pagination:type_name -> dashboard.v1.PaginationResponse
-	4,  // 18: dashboard.v1.GetProjectResponse.project:type_name -> dashboard.v1.ProjectDetail
-	1,  // 19: dashboard.v1.ListSessionsRequest.pagination:type_name -> dashboard.v1.PaginationRequest
-	5,  // 20: dashboard.v1.ListSessionsResponse.sessions:type_name -> dashboard.v1.SessionSummary
-	2,  // 21: dashboard.v1.ListSessionsResponse.pagination:type_name -> dashboard.v1.PaginationResponse
-	6,  // 22: dashboard.v1.GetSessionResponse.session:type_name -> dashboard.v1.SessionDetail
-	7,  // 23: dashboard.v1.DashboardService.GetOverview:input_type -> dashboard.v1.GetOverviewRequest
-	9,  // 24: dashboard.v1.DashboardService.ListProjects:input_type -> dashboard.v1.ListProjectsRequest
-	11, // 25: dashboard.v1.DashboardService.GetProject:input_type -> dashboard.v1.GetProjectRequest
-	13, // 26: dashboard.v1.DashboardService.ListSessions:input_type -> dashboard.v1.ListSessionsRequest
-	15, // 27: dashboard.v1.DashboardService.GetSession:input_type -> dashboard.v1.GetSessionRequest
-	8,  // 28: dashboard.v1.DashboardService.GetOverview:output_type -> dashboard.v1.GetOverviewResponse
-	10, // 29: dashboard.v1.DashboardService.ListProjects:output_type -> dashboard.v1.ListProjectsResponse
-	12, // 30: dashboard.v1.DashboardService.GetProject:output_type -> dashboard.v1.GetProjectResponse
-	14, // 31: dashboard.v1.DashboardService.ListSessions:output_type -> dashboard.v1.ListSessionsResponse
-	16, // 32: dashboard.v1.DashboardService.GetSession:output_type -> dashboard.v1.GetSessionResponse
+	0,  // 12: dashboard.v1.GetOverviewRes.total_usage:type_name -> dashboard.v1.TokenUsageSummary
+	3,  // 13: dashboard.v1.GetOverviewRes.recent_projects:type_name -> dashboard.v1.ProjectSummary
+	5,  // 14: dashboard.v1.GetOverviewRes.recent_sessions:type_name -> dashboard.v1.SessionSummary
+	1,  // 15: dashboard.v1.ListProjectsReq.pagination:type_name -> dashboard.v1.PaginationReq
+	3,  // 16: dashboard.v1.ListProjectsRes.projects:type_name -> dashboard.v1.ProjectSummary
+	2,  // 17: dashboard.v1.ListProjectsRes.pagination:type_name -> dashboard.v1.PaginationRes
+	4,  // 18: dashboard.v1.GetProjectRes.project:type_name -> dashboard.v1.ProjectDetail
+	1,  // 19: dashboard.v1.ListSessionsReq.pagination:type_name -> dashboard.v1.PaginationReq
+	5,  // 20: dashboard.v1.ListSessionsRes.sessions:type_name -> dashboard.v1.SessionSummary
+	2,  // 21: dashboard.v1.ListSessionsRes.pagination:type_name -> dashboard.v1.PaginationRes
+	6,  // 22: dashboard.v1.GetSessionRes.session:type_name -> dashboard.v1.SessionDetail
+	7,  // 23: dashboard.v1.DashboardService.GetOverview:input_type -> dashboard.v1.GetOverviewReq
+	9,  // 24: dashboard.v1.DashboardService.ListProjects:input_type -> dashboard.v1.ListProjectsReq
+	11, // 25: dashboard.v1.DashboardService.GetProject:input_type -> dashboard.v1.GetProjectReq
+	13, // 26: dashboard.v1.DashboardService.ListSessions:input_type -> dashboard.v1.ListSessionsReq
+	15, // 27: dashboard.v1.DashboardService.GetSession:input_type -> dashboard.v1.GetSessionReq
+	8,  // 28: dashboard.v1.DashboardService.GetOverview:output_type -> dashboard.v1.GetOverviewRes
+	10, // 29: dashboard.v1.DashboardService.ListProjects:output_type -> dashboard.v1.ListProjectsRes
+	12, // 30: dashboard.v1.DashboardService.GetProject:output_type -> dashboard.v1.GetProjectRes
+	14, // 31: dashboard.v1.DashboardService.ListSessions:output_type -> dashboard.v1.ListSessionsRes
+	16, // 32: dashboard.v1.DashboardService.GetSession:output_type -> dashboard.v1.GetSessionRes
 	28, // [28:33] is the sub-list for method output_type
 	23, // [23:28] is the sub-list for method input_type
 	23, // [23:23] is the sub-list for extension type_name

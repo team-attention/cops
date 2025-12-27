@@ -296,26 +296,30 @@ func (r *MongoDashboardRepository) GetProject(ctx context.Context, projectID str
 
 // ListSessions retrieves paginated sessions for a project.
 func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repository.ListSessionsParams) (*repository.PaginatedSessions, error) {
-	projectOID, err := bson.ObjectIDFromHex(params.Query.ProjectID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid project ID: %w", err)
+	// Build aggregation pipeline
+	pipeline := bson.A{}
+
+	// Only filter by project if projectID is provided
+	if params.Query.ProjectID != "" {
+		projectOID, err := bson.ObjectIDFromHex(params.Query.ProjectID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid project ID: %w", err)
+		}
+		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.SessionRecordProjectIDField: projectOID}})
 	}
 
-	// Aggregate sessions from session_records
-	pipeline := bson.A{
-		bson.M{"$match": bson.M{mongoschema.SessionRecordProjectIDField: projectOID}},
-		bson.M{"$group": bson.M{
-			"_id":                                   "$" + mongoschema.SessionRecordSessionIDField,
-			"messageCount":                          bson.M{"$sum": 1},
-			"startedAt":                             bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
-			"endedAt":                               bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-			mongoschema.SessionRecordProjectIDField: bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
-			mongoschema.SessionRecordGitBranchField: bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
-			mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
-			mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
-			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
-		}},
-	}
+	// Add group stage
+	pipeline = append(pipeline, bson.M{"$group": bson.M{
+		"_id":                                   "$" + mongoschema.SessionRecordSessionIDField,
+		"messageCount":                          bson.M{"$sum": 1},
+		"startedAt":                             bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
+		"endedAt":                               bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
+		mongoschema.SessionRecordProjectIDField: bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
+		mongoschema.SessionRecordGitBranchField: bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
+		mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
+		mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
+		mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
+	}})
 
 	// Add sort
 	sortField := "startedAt"

@@ -11,34 +11,10 @@ import {
 } from '@/gen/shadcn/ui/table'
 import { Badge } from '@/gen/shadcn/ui/badge'
 import type { SessionSummary, TokenUsageSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
-import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { formatRelativeTime, formatTokenCount } from '@/shared/util/format'
 
 interface SessionListProps {
   sessions: SessionSummary[]
-}
-
-const formatTokenCount = (value: bigint | undefined): string => {
-  if (!value) return '0'
-  const num = Number(value)
-  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`
-  if (num >= 1_000) return `${(num / 1_000).toFixed(0)}K`
-  return num.toLocaleString()
-}
-
-const formatRelativeTime = (timestamp: Timestamp | undefined): string => {
-  if (!timestamp) return '-'
-  const date = new Date(Number(timestamp.seconds) * 1000)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
 }
 
 const getTotalTokens = (usage: TokenUsageSummary | undefined): bigint => {

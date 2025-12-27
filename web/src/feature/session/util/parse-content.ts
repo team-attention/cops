@@ -1,4 +1,5 @@
-import type { SessionRecord } from '@/gen/grpcstub/collector/v1/collector_pb'
+import { SessionType } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
+import type { SessionRecord } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 import type {
   ParsedMessage,
   ContentBlock,
@@ -25,10 +26,11 @@ const isValidContentBlock = (block: unknown): block is ContentBlock => {
 
 // Parse a single SessionRecord into a renderable ParsedMessage
 export const parseMessageContent = (record: SessionRecord): ParsedMessage => {
-  const content = tryParseJSON(record.content)
+  const contentStr = record.message?.content || ''
+  const content = tryParseJSON(contentStr)
 
-  if (record.type === 'user') {
-    const text = typeof content === 'string' ? content : record.content
+  if (record.type === SessionType.USER) {
+    const text = typeof content === 'string' ? content : contentStr
     return {
       uuid: record.uuid,
       type: 'user',
@@ -39,38 +41,24 @@ export const parseMessageContent = (record: SessionRecord): ParsedMessage => {
     }
   }
 
-  if (record.type === 'assistant') {
+  if (record.type === SessionType.ASSISTANT) {
     const blocks = Array.isArray(content)
       ? content.filter(isValidContentBlock)
-      : [{ type: 'text' as const, text: record.content }]
+      : [{ type: 'text' as const, text: contentStr }]
     return {
       uuid: record.uuid,
       type: 'assistant',
       timestamp: record.timestamp,
       isMeta: record.isMeta,
       isSidechain: record.isSidechain,
-      usage: record.usage,
+      usage: record.message?.usage,
       content: blocks,
     }
   }
 
-  if (record.type === 'tool_result') {
-    const resultContent = typeof content === 'string' ? content : record.content
-    return {
-      uuid: record.uuid,
-      type: 'tool_result',
-      timestamp: record.timestamp,
-      isMeta: record.isMeta,
-      isSidechain: record.isSidechain,
-      toolName: record.slug,
-      parentToolUseId: record.parentUuid,
-      content: [{
-        type: 'tool_result',
-        tool_use_id: record.parentUuid,
-        content: resultContent,
-      }],
-    }
-  }
+  // Note: tool_result is not a separate SessionType in aggregation schema
+  // Tool results are embedded in assistant message content blocks
+  // This code path may not be reached with aggregation.v1.SessionRecord
 
   // Fallback for system/summary/other types
   return {
@@ -79,7 +67,7 @@ export const parseMessageContent = (record: SessionRecord): ParsedMessage => {
     timestamp: record.timestamp,
     isMeta: record.isMeta,
     isSidechain: record.isSidechain,
-    content: [{ type: 'text', text: record.content }],
+    content: [{ type: 'text', text: contentStr }],
   }
 }
 
@@ -94,8 +82,9 @@ export const extractToolCalls = (records: SessionRecord[]): LinkedToolCall[] => 
 
   // First pass: collect all tool_use blocks from assistant messages
   for (const record of records) {
-    if (record.type === 'assistant') {
-      const content = tryParseJSON(record.content)
+    if (record.type === SessionType.ASSISTANT) {
+      const contentStr = record.message?.content || ''
+      const content = tryParseJSON(contentStr)
       if (Array.isArray(content)) {
         for (const block of content) {
           if (isValidContentBlock(block) && block.type === 'tool_use') {
@@ -110,15 +99,20 @@ export const extractToolCalls = (records: SessionRecord[]): LinkedToolCall[] => 
     }
   }
 
-  // Second pass: collect tool_result records
+  // Second pass: collect tool_result blocks from assistant messages
+  // In aggregation schema, tool_result is embedded in content, not a separate record type
   for (const record of records) {
-    if (record.type === 'tool_result') {
-      const content = tryParseJSON(record.content)
-      toolResults.set(record.parentUuid, {
-        type: 'tool_result',
-        tool_use_id: record.parentUuid,
-        content: typeof content === 'string' ? content : record.content,
-      })
+    if (record.type === SessionType.ASSISTANT) {
+      const contentStr = record.message?.content || ''
+      const content = tryParseJSON(contentStr)
+      if (Array.isArray(content)) {
+        for (const block of content) {
+          if (isValidContentBlock(block) && block.type === 'tool_result') {
+            const resultBlock = block as ToolResultContentBlock
+            toolResults.set(resultBlock.tool_use_id, resultBlock)
+          }
+        }
+      }
     }
   }
 
@@ -135,11 +129,11 @@ export const extractToolCalls = (records: SessionRecord[]): LinkedToolCall[] => 
 export const filterRecordsForChat = (records: SessionRecord[]): SessionRecord[] => {
   return records.filter((record) => {
     // Exclude summary and file-history-snapshot types
-    if (record.type === 'summary' || record.type === 'file-history-snapshot') {
+    if (record.type === SessionType.SUMMARY || record.type === SessionType.FILE_HISTORY_SNAPSHOT) {
       return false
     }
     // Exclude queue-operation types
-    if (record.type === 'queue-operation') {
+    if (record.type === SessionType.QUEUE_OPERATION) {
       return false
     }
     return true

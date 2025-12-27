@@ -65,7 +65,7 @@ export const SessionHeader = ({ session }: SessionHeaderProps) => {
           Dashboard
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <Link to="/projects" className="transition-colors hover:text-cyan-400">
+        <Link to="/projects" search={{} as never} className="transition-colors hover:text-cyan-400">
           Projects
         </Link>
         <ChevronRight className="h-3 w-3" />

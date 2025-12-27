@@ -35,8 +35,8 @@ func (h *DashboardGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string
 // GetOverview returns dashboard summary statistics.
 func (h *DashboardGRPCHandler) GetOverview(
 	ctx context.Context,
-	req *connect.Request[dashboardv1.GetOverviewRequest],
-) (*connect.Response[dashboardv1.GetOverviewResponse], error) {
+	req *connect.Request[dashboardv1.GetOverviewReq],
+) (*connect.Response[dashboardv1.GetOverviewRes], error) {
 	// Call service
 	stats, err := h.svc.GetOverview(ctx)
 	if err != nil {
@@ -56,7 +56,7 @@ func (h *DashboardGRPCHandler) GetOverview(
 	}
 
 	// Build response
-	res := &dashboardv1.GetOverviewResponse{
+	res := &dashboardv1.GetOverviewRes{
 		TotalUsage:     toProtoTokenUsageSummary(stats.TotalUsage),
 		ProjectCount:   stats.ProjectCount,
 		SessionCount:   stats.SessionCount,
@@ -70,8 +70,8 @@ func (h *DashboardGRPCHandler) GetOverview(
 // ListProjects returns a paginated list of projects.
 func (h *DashboardGRPCHandler) ListProjects(
 	ctx context.Context,
-	req *connect.Request[dashboardv1.ListProjectsRequest],
-) (*connect.Response[dashboardv1.ListProjectsResponse], error) {
+	req *connect.Request[dashboardv1.ListProjectsReq],
+) (*connect.Response[dashboardv1.ListProjectsRes], error) {
 	// Parse request
 	msg := req.Msg
 	params := repository.ListProjectsParams{
@@ -93,7 +93,7 @@ func (h *DashboardGRPCHandler) ListProjects(
 	}
 
 	// Build response
-	res := &dashboardv1.ListProjectsResponse{
+	res := &dashboardv1.ListProjectsRes{
 		Projects:   projects,
 		Pagination: toProtoPagination(result.CurrentPage, result.PageSize, result.TotalPages, result.TotalCount),
 	}
@@ -104,8 +104,8 @@ func (h *DashboardGRPCHandler) ListProjects(
 // GetProject returns detailed project information.
 func (h *DashboardGRPCHandler) GetProject(
 	ctx context.Context,
-	req *connect.Request[dashboardv1.GetProjectRequest],
-) (*connect.Response[dashboardv1.GetProjectResponse], error) {
+	req *connect.Request[dashboardv1.GetProjectReq],
+) (*connect.Response[dashboardv1.GetProjectRes], error) {
 	// Parse request
 	projectID := req.Msg.GetProjectId()
 
@@ -116,7 +116,7 @@ func (h *DashboardGRPCHandler) GetProject(
 	}
 
 	// Build response
-	res := &dashboardv1.GetProjectResponse{
+	res := &dashboardv1.GetProjectRes{
 		Project: toProtoProjectDetail(project),
 	}
 
@@ -126,8 +126,8 @@ func (h *DashboardGRPCHandler) GetProject(
 // ListSessions returns sessions for a project.
 func (h *DashboardGRPCHandler) ListSessions(
 	ctx context.Context,
-	req *connect.Request[dashboardv1.ListSessionsRequest],
-) (*connect.Response[dashboardv1.ListSessionsResponse], error) {
+	req *connect.Request[dashboardv1.ListSessionsReq],
+) (*connect.Response[dashboardv1.ListSessionsRes], error) {
 	// Parse request
 	msg := req.Msg
 	params := repository.ListSessionsParams{
@@ -153,7 +153,7 @@ func (h *DashboardGRPCHandler) ListSessions(
 	}
 
 	// Build response
-	res := &dashboardv1.ListSessionsResponse{
+	res := &dashboardv1.ListSessionsRes{
 		Sessions:   sessions,
 		Pagination: toProtoPagination(result.CurrentPage, result.PageSize, result.TotalPages, result.TotalCount),
 	}
@@ -164,8 +164,8 @@ func (h *DashboardGRPCHandler) ListSessions(
 // GetSession returns detailed session information with records.
 func (h *DashboardGRPCHandler) GetSession(
 	ctx context.Context,
-	req *connect.Request[dashboardv1.GetSessionRequest],
-) (*connect.Response[dashboardv1.GetSessionResponse], error) {
+	req *connect.Request[dashboardv1.GetSessionReq],
+) (*connect.Response[dashboardv1.GetSessionRes], error) {
 	// Parse request
 	sessionID := req.Msg.GetSessionId()
 
@@ -176,7 +176,7 @@ func (h *DashboardGRPCHandler) GetSession(
 	}
 
 	// Build response
-	res := &dashboardv1.GetSessionResponse{
+	res := &dashboardv1.GetSessionRes{
 		Session: toProtoSessionDetail(session),
 	}
 

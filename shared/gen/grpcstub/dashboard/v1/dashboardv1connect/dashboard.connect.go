@@ -53,15 +53,15 @@ const (
 // DashboardServiceClient is a client for the dashboard.v1.DashboardService service.
 type DashboardServiceClient interface {
 	// GetOverview returns dashboard summary statistics.
-	GetOverview(context.Context, *connect.Request[v1.GetOverviewRequest]) (*connect.Response[v1.GetOverviewResponse], error)
+	GetOverview(context.Context, *connect.Request[v1.GetOverviewReq]) (*connect.Response[v1.GetOverviewRes], error)
 	// ListProjects returns a paginated list of projects.
-	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
+	ListProjects(context.Context, *connect.Request[v1.ListProjectsReq]) (*connect.Response[v1.ListProjectsRes], error)
 	// GetProject returns detailed project information.
-	GetProject(context.Context, *connect.Request[v1.GetProjectRequest]) (*connect.Response[v1.GetProjectResponse], error)
+	GetProject(context.Context, *connect.Request[v1.GetProjectReq]) (*connect.Response[v1.GetProjectRes], error)
 	// ListSessions returns sessions for a project.
-	ListSessions(context.Context, *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error)
+	ListSessions(context.Context, *connect.Request[v1.ListSessionsReq]) (*connect.Response[v1.ListSessionsRes], error)
 	// GetSession returns detailed session information with records.
-	GetSession(context.Context, *connect.Request[v1.GetSessionRequest]) (*connect.Response[v1.GetSessionResponse], error)
+	GetSession(context.Context, *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error)
 }
 
 // NewDashboardServiceClient constructs a client for the dashboard.v1.DashboardService service. By
@@ -75,31 +75,31 @@ func NewDashboardServiceClient(httpClient connect.HTTPClient, baseURL string, op
 	baseURL = strings.TrimRight(baseURL, "/")
 	dashboardServiceMethods := v1.File_dashboard_v1_dashboard_proto.Services().ByName("DashboardService").Methods()
 	return &dashboardServiceClient{
-		getOverview: connect.NewClient[v1.GetOverviewRequest, v1.GetOverviewResponse](
+		getOverview: connect.NewClient[v1.GetOverviewReq, v1.GetOverviewRes](
 			httpClient,
 			baseURL+DashboardServiceGetOverviewProcedure,
 			connect.WithSchema(dashboardServiceMethods.ByName("GetOverview")),
 			connect.WithClientOptions(opts...),
 		),
-		listProjects: connect.NewClient[v1.ListProjectsRequest, v1.ListProjectsResponse](
+		listProjects: connect.NewClient[v1.ListProjectsReq, v1.ListProjectsRes](
 			httpClient,
 			baseURL+DashboardServiceListProjectsProcedure,
 			connect.WithSchema(dashboardServiceMethods.ByName("ListProjects")),
 			connect.WithClientOptions(opts...),
 		),
-		getProject: connect.NewClient[v1.GetProjectRequest, v1.GetProjectResponse](
+		getProject: connect.NewClient[v1.GetProjectReq, v1.GetProjectRes](
 			httpClient,
 			baseURL+DashboardServiceGetProjectProcedure,
 			connect.WithSchema(dashboardServiceMethods.ByName("GetProject")),
 			connect.WithClientOptions(opts...),
 		),
-		listSessions: connect.NewClient[v1.ListSessionsRequest, v1.ListSessionsResponse](
+		listSessions: connect.NewClient[v1.ListSessionsReq, v1.ListSessionsRes](
 			httpClient,
 			baseURL+DashboardServiceListSessionsProcedure,
 			connect.WithSchema(dashboardServiceMethods.ByName("ListSessions")),
 			connect.WithClientOptions(opts...),
 		),
-		getSession: connect.NewClient[v1.GetSessionRequest, v1.GetSessionResponse](
+		getSession: connect.NewClient[v1.GetSessionReq, v1.GetSessionRes](
 			httpClient,
 			baseURL+DashboardServiceGetSessionProcedure,
 			connect.WithSchema(dashboardServiceMethods.ByName("GetSession")),
@@ -110,50 +110,50 @@ func NewDashboardServiceClient(httpClient connect.HTTPClient, baseURL string, op
 
 // dashboardServiceClient implements DashboardServiceClient.
 type dashboardServiceClient struct {
-	getOverview  *connect.Client[v1.GetOverviewRequest, v1.GetOverviewResponse]
-	listProjects *connect.Client[v1.ListProjectsRequest, v1.ListProjectsResponse]
-	getProject   *connect.Client[v1.GetProjectRequest, v1.GetProjectResponse]
-	listSessions *connect.Client[v1.ListSessionsRequest, v1.ListSessionsResponse]
-	getSession   *connect.Client[v1.GetSessionRequest, v1.GetSessionResponse]
+	getOverview  *connect.Client[v1.GetOverviewReq, v1.GetOverviewRes]
+	listProjects *connect.Client[v1.ListProjectsReq, v1.ListProjectsRes]
+	getProject   *connect.Client[v1.GetProjectReq, v1.GetProjectRes]
+	listSessions *connect.Client[v1.ListSessionsReq, v1.ListSessionsRes]
+	getSession   *connect.Client[v1.GetSessionReq, v1.GetSessionRes]
 }
 
 // GetOverview calls dashboard.v1.DashboardService.GetOverview.
-func (c *dashboardServiceClient) GetOverview(ctx context.Context, req *connect.Request[v1.GetOverviewRequest]) (*connect.Response[v1.GetOverviewResponse], error) {
+func (c *dashboardServiceClient) GetOverview(ctx context.Context, req *connect.Request[v1.GetOverviewReq]) (*connect.Response[v1.GetOverviewRes], error) {
 	return c.getOverview.CallUnary(ctx, req)
 }
 
 // ListProjects calls dashboard.v1.DashboardService.ListProjects.
-func (c *dashboardServiceClient) ListProjects(ctx context.Context, req *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error) {
+func (c *dashboardServiceClient) ListProjects(ctx context.Context, req *connect.Request[v1.ListProjectsReq]) (*connect.Response[v1.ListProjectsRes], error) {
 	return c.listProjects.CallUnary(ctx, req)
 }
 
 // GetProject calls dashboard.v1.DashboardService.GetProject.
-func (c *dashboardServiceClient) GetProject(ctx context.Context, req *connect.Request[v1.GetProjectRequest]) (*connect.Response[v1.GetProjectResponse], error) {
+func (c *dashboardServiceClient) GetProject(ctx context.Context, req *connect.Request[v1.GetProjectReq]) (*connect.Response[v1.GetProjectRes], error) {
 	return c.getProject.CallUnary(ctx, req)
 }
 
 // ListSessions calls dashboard.v1.DashboardService.ListSessions.
-func (c *dashboardServiceClient) ListSessions(ctx context.Context, req *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error) {
+func (c *dashboardServiceClient) ListSessions(ctx context.Context, req *connect.Request[v1.ListSessionsReq]) (*connect.Response[v1.ListSessionsRes], error) {
 	return c.listSessions.CallUnary(ctx, req)
 }
 
 // GetSession calls dashboard.v1.DashboardService.GetSession.
-func (c *dashboardServiceClient) GetSession(ctx context.Context, req *connect.Request[v1.GetSessionRequest]) (*connect.Response[v1.GetSessionResponse], error) {
+func (c *dashboardServiceClient) GetSession(ctx context.Context, req *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error) {
 	return c.getSession.CallUnary(ctx, req)
 }
 
 // DashboardServiceHandler is an implementation of the dashboard.v1.DashboardService service.
 type DashboardServiceHandler interface {
 	// GetOverview returns dashboard summary statistics.
-	GetOverview(context.Context, *connect.Request[v1.GetOverviewRequest]) (*connect.Response[v1.GetOverviewResponse], error)
+	GetOverview(context.Context, *connect.Request[v1.GetOverviewReq]) (*connect.Response[v1.GetOverviewRes], error)
 	// ListProjects returns a paginated list of projects.
-	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
+	ListProjects(context.Context, *connect.Request[v1.ListProjectsReq]) (*connect.Response[v1.ListProjectsRes], error)
 	// GetProject returns detailed project information.
-	GetProject(context.Context, *connect.Request[v1.GetProjectRequest]) (*connect.Response[v1.GetProjectResponse], error)
+	GetProject(context.Context, *connect.Request[v1.GetProjectReq]) (*connect.Response[v1.GetProjectRes], error)
 	// ListSessions returns sessions for a project.
-	ListSessions(context.Context, *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error)
+	ListSessions(context.Context, *connect.Request[v1.ListSessionsReq]) (*connect.Response[v1.ListSessionsRes], error)
 	// GetSession returns detailed session information with records.
-	GetSession(context.Context, *connect.Request[v1.GetSessionRequest]) (*connect.Response[v1.GetSessionResponse], error)
+	GetSession(context.Context, *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error)
 }
 
 // NewDashboardServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -214,22 +214,22 @@ func NewDashboardServiceHandler(svc DashboardServiceHandler, opts ...connect.Han
 // UnimplementedDashboardServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedDashboardServiceHandler struct{}
 
-func (UnimplementedDashboardServiceHandler) GetOverview(context.Context, *connect.Request[v1.GetOverviewRequest]) (*connect.Response[v1.GetOverviewResponse], error) {
+func (UnimplementedDashboardServiceHandler) GetOverview(context.Context, *connect.Request[v1.GetOverviewReq]) (*connect.Response[v1.GetOverviewRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.GetOverview is not implemented"))
 }
 
-func (UnimplementedDashboardServiceHandler) ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error) {
+func (UnimplementedDashboardServiceHandler) ListProjects(context.Context, *connect.Request[v1.ListProjectsReq]) (*connect.Response[v1.ListProjectsRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.ListProjects is not implemented"))
 }
 
-func (UnimplementedDashboardServiceHandler) GetProject(context.Context, *connect.Request[v1.GetProjectRequest]) (*connect.Response[v1.GetProjectResponse], error) {
+func (UnimplementedDashboardServiceHandler) GetProject(context.Context, *connect.Request[v1.GetProjectReq]) (*connect.Response[v1.GetProjectRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.GetProject is not implemented"))
 }
 
-func (UnimplementedDashboardServiceHandler) ListSessions(context.Context, *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error) {
+func (UnimplementedDashboardServiceHandler) ListSessions(context.Context, *connect.Request[v1.ListSessionsReq]) (*connect.Response[v1.ListSessionsRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.ListSessions is not implemented"))
 }
 
-func (UnimplementedDashboardServiceHandler) GetSession(context.Context, *connect.Request[v1.GetSessionRequest]) (*connect.Response[v1.GetSessionResponse], error) {
+func (UnimplementedDashboardServiceHandler) GetSession(context.Context, *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.GetSession is not implemented"))
 }

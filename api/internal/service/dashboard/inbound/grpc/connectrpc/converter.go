@@ -149,8 +149,8 @@ func convertMessage(m *shareddomain.Message) *aggregationv1.Message {
 }
 
 // toProtoPagination converts pagination metadata to protobuf.
-func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64) *dashboardv1.PaginationResponse {
-	return &dashboardv1.PaginationResponse{
+func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64) *dashboardv1.PaginationRes {
+	return &dashboardv1.PaginationRes{
 		CurrentPage: currentPage,
 		PageSize:    pageSize,
 		TotalPages:  totalPages,
