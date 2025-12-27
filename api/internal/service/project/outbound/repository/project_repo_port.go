@@ -2,10 +2,21 @@ package repository
 
 import "context"
 
+// FindOrCreateParams contains parameters for FindOrCreate operation.
+type FindOrCreateParams struct {
+	ConfiguredURL string
+	ActualURL     string
+	ExistingID    string
+	Name          string
+	IsGitProject  bool
+}
+
 // FindOrCreateResult contains the result of find-or-create operation.
 type FindOrCreateResult struct {
-	ProjectID string
-	IsNew     bool
+	ProjectID    string
+	IsNew        bool
+	Name         string
+	IsGitProject bool
 }
 
 // ProjectRepositoryPort defines the interface for project data persistence.
@@ -15,5 +26,5 @@ type ProjectRepositoryPort interface {
 	// 1. By remote URL (either configured or actual)
 	// 2. By existing project ID (if provided)
 	// 3. Create new if not found
-	FindOrCreate(ctx context.Context, configuredURL, actualURL, existingID string) (*FindOrCreateResult, error)
+	FindOrCreate(ctx context.Context, params FindOrCreateParams) (*FindOrCreateResult, error)
 }

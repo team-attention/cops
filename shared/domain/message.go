@@ -62,6 +62,12 @@ func (c *MessageContent) UnmarshalJSON(data []byte) error {
 				return fmt.Errorf("failed to parse tool_result block %d: %w", i, err)
 			}
 			block = &tb
+		case ContentBlockTypeThinking:
+			var tb ThinkingContentBlock
+			if err := json.Unmarshal(raw, &tb); err != nil {
+				return fmt.Errorf("failed to parse thinking block %d: %w", i, err)
+			}
+			block = &tb
 		default:
 			// Unknown type - skip for forward compatibility
 			continue
@@ -75,12 +81,16 @@ func (c *MessageContent) UnmarshalJSON(data []byte) error {
 // MarshalJSON implements custom marshaling for polymorphic content.
 func (c MessageContent) MarshalJSON() ([]byte, error) {
 	if c.IsBlocks {
+		if c.Blocks == nil {
+			return json.Marshal([]ContentBlock{})
+		}
 		return json.Marshal(c.Blocks)
 	}
 	if c.Text != nil {
 		return json.Marshal(*c.Text)
 	}
-	return json.Marshal("")
+	// Return null instead of empty string for uninitialized content
+	return []byte("null"), nil
 }
 
 // Message contains the role and content of a session message.

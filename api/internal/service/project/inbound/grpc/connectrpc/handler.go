@@ -42,6 +42,8 @@ func (h *ProjectGRPCHandler) RegisterProject(
 		ConfiguredRemoteURL: msg.GetConfiguredRemoteUrl(),
 		ActualRemoteURL:     msg.GetActualRemoteUrl(),
 		ExistingProjectID:   msg.GetExistingProjectId(),
+		Name:                msg.GetName(),
+		IsGitProject:        msg.GetIsGitProject(),
 	}
 
 	// Call service
@@ -52,8 +54,10 @@ func (h *ProjectGRPCHandler) RegisterProject(
 
 	// Build response
 	res := &projectv1.RegisterProjectRes{
-		ProjectId: result.ProjectID,
-		IsNew:     result.IsNew,
+		ProjectId:    result.ProjectID,
+		IsNew:        result.IsNew,
+		Name:         result.Name,
+		IsGitProject: result.IsGitProject,
 	}
 
 	return connect.NewResponse(res), nil

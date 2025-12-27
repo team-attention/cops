@@ -41,6 +41,8 @@ func (c *ProjectClient) RegisterProject(ctx context.Context, params api.Register
 		ConfiguredRemoteUrl: params.ConfiguredRemoteURL,
 		ActualRemoteUrl:     params.ActualRemoteURL,
 		ExistingProjectId:   params.ExistingProjectID,
+		Name:                params.Name,
+		IsGitProject:        params.IsGitProject,
 	})
 
 	resp, err := c.client.RegisterProject(ctx, req)
@@ -50,8 +52,10 @@ func (c *ProjectClient) RegisterProject(ctx context.Context, params api.Register
 	}
 
 	result := &api.RegisterProjectResult{
-		ProjectID: domain.ID(resp.Msg.ProjectId),
-		IsNew:     resp.Msg.IsNew,
+		ProjectID:    domain.ID(resp.Msg.ProjectId),
+		IsNew:        resp.Msg.IsNew,
+		Name:         resp.Msg.Name,
+		IsGitProject: resp.Msg.IsGitProject,
 	}
 
 	c.logger.Info("project registered successfully",

@@ -17,6 +17,13 @@ message RegisterProjectReq {
   // existing_project_id is optional - from local config if available
   // Used as fallback for finding existing projects
   string existing_project_id = 3;
+
+  // name is the human-readable project name
+  // If empty, the server will generate a default from the remote URL
+  string name = 4;
+
+  // is_git_project indicates whether this is a git repository
+  bool is_git_project = 5;
 }
 
 // RegisterProjectRes contains the result of project registration.
@@ -26,6 +33,12 @@ message RegisterProjectRes {
 
   // is_new indicates whether a new project was created (true) or existing found (false)
   bool is_new = 2;
+
+  // name is the project name (either provided or generated)
+  string name = 3;
+
+  // is_git_project indicates whether this is a git repository
+  bool is_git_project = 4;
 }
 
 // ProjectService handles project registration and management.

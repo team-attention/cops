@@ -7,6 +7,7 @@ const (
 	ContentBlockTypeText       ContentBlockType = "text"
 	ContentBlockTypeToolUse    ContentBlockType = "tool_use"
 	ContentBlockTypeToolResult ContentBlockType = "tool_result"
+	ContentBlockTypeThinking   ContentBlockType = "thinking"
 )
 
 // ContentBlock is the interface implemented by all content block types.
@@ -44,3 +45,16 @@ type ToolResultContentBlock struct {
 
 // BlockType implements ContentBlock interface.
 func (b *ToolResultContentBlock) BlockType() ContentBlockType { return ContentBlockTypeToolResult }
+
+// ThinkingContentBlock represents a thinking content block from extended thinking models.
+type ThinkingContentBlock struct {
+	Type      ContentBlockType `json:"type"`
+	Thinking  string           `json:"thinking"`
+	Signature string           `json:"signature,omitempty"`
+}
+
+// BlockType implements ContentBlock interface.
+func (b *ThinkingContentBlock) BlockType() ContentBlockType { return ContentBlockTypeThinking }
+
+// Compile-time verification that ThinkingContentBlock implements ContentBlock.
+var _ ContentBlock = (*ThinkingContentBlock)(nil)

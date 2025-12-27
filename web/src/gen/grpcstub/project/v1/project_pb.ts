@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file project/v1/project.proto.
  */
 export const file_project_v1_project: GenFile = /*@__PURE__*/
-  fileDesc("Chhwcm9qZWN0L3YxL3Byb2plY3QucHJvdG8SCnByb2plY3QudjEiawoSUmVnaXN0ZXJQcm9qZWN0UmVxEh0KFWNvbmZpZ3VyZWRfcmVtb3RlX3VybBgBIAEoCRIZChFhY3R1YWxfcmVtb3RlX3VybBgCIAEoCRIbChNleGlzdGluZ19wcm9qZWN0X2lkGAMgASgJIjgKElJlZ2lzdGVyUHJvamVjdFJlcxISCgpwcm9qZWN0X2lkGAEgASgJEg4KBmlzX25ldxgCIAEoCDJjCg5Qcm9qZWN0U2VydmljZRJRCg9SZWdpc3RlclByb2plY3QSHi5wcm9qZWN0LnYxLlJlZ2lzdGVyUHJvamVjdFJlcRoeLnByb2plY3QudjEuUmVnaXN0ZXJQcm9qZWN0UmVzQrABCg5jb20ucHJvamVjdC52MUIMUHJvamVjdFByb3RvUAFaR2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL3Byb2plY3QvdjE7cHJvamVjdHYxogIDUFhYqgIKUHJvamVjdC5WMcoCClByb2plY3RcVjHiAhZQcm9qZWN0XFYxXEdQQk1ldGFkYXRh6gILUHJvamVjdDo6VjFiBnByb3RvMw");
+  fileDesc("Chhwcm9qZWN0L3YxL3Byb2plY3QucHJvdG8SCnByb2plY3QudjEikQEKElJlZ2lzdGVyUHJvamVjdFJlcRIdChVjb25maWd1cmVkX3JlbW90ZV91cmwYASABKAkSGQoRYWN0dWFsX3JlbW90ZV91cmwYAiABKAkSGwoTZXhpc3RpbmdfcHJvamVjdF9pZBgDIAEoCRIMCgRuYW1lGAQgASgJEhYKDmlzX2dpdF9wcm9qZWN0GAUgASgIIl4KElJlZ2lzdGVyUHJvamVjdFJlcxISCgpwcm9qZWN0X2lkGAEgASgJEg4KBmlzX25ldxgCIAEoCBIMCgRuYW1lGAMgASgJEhYKDmlzX2dpdF9wcm9qZWN0GAQgASgIMmMKDlByb2plY3RTZXJ2aWNlElEKD1JlZ2lzdGVyUHJvamVjdBIeLnByb2plY3QudjEuUmVnaXN0ZXJQcm9qZWN0UmVxGh4ucHJvamVjdC52MS5SZWdpc3RlclByb2plY3RSZXNCsAEKDmNvbS5wcm9qZWN0LnYxQgxQcm9qZWN0UHJvdG9QAVpHZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvcHJvamVjdC92MTtwcm9qZWN0djGiAgNQWFiqAgpQcm9qZWN0LlYxygIKUHJvamVjdFxWMeICFlByb2plY3RcVjFcR1BCTWV0YWRhdGHqAgtQcm9qZWN0OjpWMWIGcHJvdG8z");
 
 /**
  * RegisterProjectReq contains parameters for registering a project with the API server.
@@ -41,6 +41,21 @@ export type RegisterProjectReq = Message<"project.v1.RegisterProjectReq"> & {
    * @generated from field: string existing_project_id = 3;
    */
   existingProjectId: string;
+
+  /**
+   * name is the human-readable project name
+   * If empty, the server will generate a default from the remote URL
+   *
+   * @generated from field: string name = 4;
+   */
+  name: string;
+
+  /**
+   * is_git_project indicates whether this is a git repository
+   *
+   * @generated from field: bool is_git_project = 5;
+   */
+  isGitProject: boolean;
 };
 
 /**
@@ -69,6 +84,20 @@ export type RegisterProjectRes = Message<"project.v1.RegisterProjectRes"> & {
    * @generated from field: bool is_new = 2;
    */
   isNew: boolean;
+
+  /**
+   * name is the project name (either provided or generated)
+   *
+   * @generated from field: string name = 3;
+   */
+  name: string;
+
+  /**
+   * is_git_project indicates whether this is a git repository
+   *
+   * @generated from field: bool is_git_project = 4;
+   */
+  isGitProject: boolean;
 };
 
 /**

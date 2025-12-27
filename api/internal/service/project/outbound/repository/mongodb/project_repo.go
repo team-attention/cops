@@ -31,21 +31,21 @@ func NewMongoProjectRepository(l *slog.Logger, db *mongo.Database) *MongoProject
 // 1. By remote URL (either configured or actual)
 // 2. By existing project ID (if provided)
 // 3. Create new if not found
-func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, configuredURL, actualURL, existingID string) (*repository.FindOrCreateResult, error) {
+func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, params repository.FindOrCreateParams) (*repository.FindOrCreateResult, error) {
 	// Build $or conditions array with all search criteria
 	conditions := []bson.M{}
 
 	// Add remote URL conditions
-	if configuredURL != "" {
-		conditions = append(conditions, bson.M{mongoschema.ProjectRemoteURLField: configuredURL})
+	if params.ConfiguredURL != "" {
+		conditions = append(conditions, bson.M{mongoschema.ProjectRemoteURLField: params.ConfiguredURL})
 	}
-	if actualURL != "" && actualURL != configuredURL {
-		conditions = append(conditions, bson.M{mongoschema.ProjectRemoteURLField: actualURL})
+	if params.ActualURL != "" && params.ActualURL != params.ConfiguredURL {
+		conditions = append(conditions, bson.M{mongoschema.ProjectRemoteURLField: params.ActualURL})
 	}
 
 	// Add existing ID condition if valid
-	if existingID != "" {
-		if objectID, err := bson.ObjectIDFromHex(existingID); err == nil {
+	if params.ExistingID != "" {
+		if objectID, err := bson.ObjectIDFromHex(params.ExistingID); err == nil {
 			conditions = append(conditions, bson.M{mongoschema.ProjectIDField: objectID})
 		}
 	}
@@ -63,11 +63,16 @@ func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, configuredURL
 	// If found, return existing project
 	if err == nil {
 		projectID := doc[mongoschema.ProjectIDField].(bson.ObjectID).Hex()
+		name := doc[mongoschema.ProjectNameField].(string)
+		isGitProject := doc[mongoschema.ProjectIsGitProjectField].(bool)
+
 		r.logger.Info("found existing project",
 			slog.String("projectID", projectID))
 		return &repository.FindOrCreateResult{
-			ProjectID: projectID,
-			IsNew:     false,
+			ProjectID:    projectID,
+			IsNew:        false,
+			Name:         name,
+			IsGitProject: isGitProject,
 		}, nil
 	}
 
@@ -79,13 +84,15 @@ func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, configuredURL
 
 	// Not found, create new document
 	// Prefer configured URL, fallback to actual URL
-	remoteURL := configuredURL
+	remoteURL := params.ConfiguredURL
 	if remoteURL == "" {
-		remoteURL = actualURL
+		remoteURL = params.ActualURL
 	}
 
 	newDoc := bson.M{
-		mongoschema.ProjectRemoteURLField: remoteURL,
+		mongoschema.ProjectRemoteURLField:    remoteURL,
+		mongoschema.ProjectNameField:         params.Name,
+		mongoschema.ProjectIsGitProjectField: params.IsGitProject,
 	}
 
 	result, err := r.projectsColl.InsertOne(ctx, newDoc)
@@ -97,11 +104,15 @@ func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, configuredURL
 	newID := result.InsertedID.(bson.ObjectID).Hex()
 	r.logger.Info("created new project",
 		slog.String("projectID", newID),
-		slog.String("remoteURL", remoteURL))
+		slog.String("name", params.Name),
+		slog.String("remoteURL", remoteURL),
+		slog.Bool("isGitProject", params.IsGitProject))
 
 	return &repository.FindOrCreateResult{
-		ProjectID: newID,
-		IsNew:     true,
+		ProjectID:    newID,
+		IsNew:        true,
+		Name:         params.Name,
+		IsGitProject: params.IsGitProject,
 	}, nil
 }
 

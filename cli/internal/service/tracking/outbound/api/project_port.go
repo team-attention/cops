@@ -18,12 +18,20 @@ type RegisterProjectParams struct {
 	// ExistingProjectID is optional - from local config if available
 	// Used as fallback for finding existing projects
 	ExistingProjectID string
+
+	// Name is the human-readable project name
+	Name string
+
+	// IsGitProject indicates whether this is a git repository
+	IsGitProject bool
 }
 
 // RegisterProjectResult contains the result of project registration.
 type RegisterProjectResult struct {
-	ProjectID domain.ID
-	IsNew     bool
+	ProjectID    domain.ID
+	IsNew        bool
+	Name         string
+	IsGitProject bool
 }
 
 // ProjectPort defines the interface for project API operations.

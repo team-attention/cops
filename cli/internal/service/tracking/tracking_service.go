@@ -110,6 +110,8 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		ConfiguredRemoteURL: configuredURL,
 		ActualRemoteURL:     actualURL,
 		ExistingProjectID:   existingProjectID,
+		Name:                name,
+		IsGitProject:        isGitProject,
 	})
 	if err != nil {
 		// If we have an existing local ID, use it
