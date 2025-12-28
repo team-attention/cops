@@ -312,8 +312,8 @@ var _ = Describe("MessageContent", func() {
 			Expect(scanner.Err()).NotTo(HaveOccurred())
 		})
 
-		It("should have exactly 8 session records", func() {
-			Expect(sessionRecords).To(HaveLen(8))
+		It("should have exactly 10 session records", func() {
+			Expect(sessionRecords).To(HaveLen(10))
 		})
 
 		Context("Line 1: text block in array", func() {
@@ -592,6 +592,117 @@ var _ = Describe("MessageContent", func() {
 				// Verify they match
 				Expect(toolResultBlock.ToolUseID).To(Equal(toolUseBlock.ID),
 					"tool_result.tool_use_id should match tool_use.id")
+			})
+		})
+
+		Context("Line 9: tool_result block with system-reminder (NEW)", func() {
+			It("parses tool_result content block with system-reminder warning", func() {
+				record := sessionRecords[8]
+				message := record["message"].(map[string]any)
+				contentJSON, err := json.Marshal(message["content"])
+				Expect(err).NotTo(HaveOccurred())
+
+				var content domain.MessageContent
+				err = json.Unmarshal(contentJSON, &content)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(content.IsBlocks).To(BeTrue(), "User message with tool_result should have content blocks")
+				Expect(content.Blocks).To(HaveLen(1), "Should have exactly 1 tool_result block")
+
+				toolResultBlock, ok := content.Blocks[0].(*domain.ToolResultContentBlock)
+				Expect(ok).To(BeTrue(), "Content block should be ToolResultContentBlock")
+				Expect(toolResultBlock.Type).To(Equal(domain.ContentBlockTypeToolResult))
+				Expect(toolResultBlock.ToolUseID).To(Equal("toolu_0132LNaBuQmQpDv81PoV7Ymd"))
+				Expect(toolResultBlock.Content).To(ContainSubstring("<system-reminder>"))
+				Expect(toolResultBlock.Content).To(ContainSubstring("Warning: the file exists but is shorter"))
+			})
+
+			It("preserves toolUseResult file metadata in record", func() {
+				record := sessionRecords[8]
+
+				Expect(record).To(HaveKey("toolUseResult"))
+				toolUseResult := record["toolUseResult"].(map[string]any)
+				Expect(toolUseResult).To(HaveKeyWithValue("type", "text"))
+				Expect(toolUseResult).To(HaveKey("file"))
+
+				file := toolUseResult["file"].(map[string]any)
+				Expect(file).To(HaveKey("filePath"))
+				Expect(file).To(HaveKey("numLines"))
+			})
+		})
+
+		Context("Line 10: tool_use block with Read tool (NEW)", func() {
+			It("parses tool_use content block for Read operation", func() {
+				record := sessionRecords[9]
+				message := record["message"].(map[string]any)
+				contentJSON, err := json.Marshal(message["content"])
+				Expect(err).NotTo(HaveOccurred())
+
+				var content domain.MessageContent
+				err = json.Unmarshal(contentJSON, &content)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(content.IsBlocks).To(BeTrue(), "Assistant message should have content blocks")
+				Expect(content.Blocks).To(HaveLen(1), "Should have exactly 1 tool_use block")
+
+				toolUseBlock, ok := content.Blocks[0].(*domain.ToolUseContentBlock)
+				Expect(ok).To(BeTrue(), "Content block should be ToolUseContentBlock")
+				Expect(toolUseBlock.Type).To(Equal(domain.ContentBlockTypeToolUse))
+				Expect(toolUseBlock.ID).To(Equal("toolu_0132LNaBuQmQpDv81PoV7Ymd"))
+				Expect(toolUseBlock.Name).To(Equal("Read"))
+			})
+
+			It("correctly parses file_path input for Read tool", func() {
+				record := sessionRecords[9]
+				message := record["message"].(map[string]any)
+				contentJSON, err := json.Marshal(message["content"])
+				Expect(err).NotTo(HaveOccurred())
+
+				var content domain.MessageContent
+				err = json.Unmarshal(contentJSON, &content)
+				Expect(err).NotTo(HaveOccurred())
+
+				toolUseBlock := content.Blocks[0].(*domain.ToolUseContentBlock)
+
+				Expect(toolUseBlock.Input).To(HaveKey("file_path"))
+				filePath, ok := toolUseBlock.Input["file_path"].(string)
+				Expect(ok).To(BeTrue(), "file_path should be a string")
+				Expect(filePath).To(ContainSubstring(".agent/artifacts"))
+				Expect(filePath).To(ContainSubstring("05_walkthrough.md"))
+			})
+
+			It("verifies tool_use links to corresponding tool_result", func() {
+				// Line 10 has tool_use, Line 9 has tool_result - they should match
+				toolUseRecord := sessionRecords[9]
+				toolResultRecord := sessionRecords[8]
+
+				// Extract tool_use ID
+				toolUseMessage := toolUseRecord["message"].(map[string]any)
+				toolUseContentJSON, _ := json.Marshal(toolUseMessage["content"])
+				var toolUseContent domain.MessageContent
+				json.Unmarshal(toolUseContentJSON, &toolUseContent)
+				toolUseBlock := toolUseContent.Blocks[0].(*domain.ToolUseContentBlock)
+
+				// Extract tool_result tool_use_id
+				toolResultMessage := toolResultRecord["message"].(map[string]any)
+				toolResultContentJSON, _ := json.Marshal(toolResultMessage["content"])
+				var toolResultContent domain.MessageContent
+				json.Unmarshal(toolResultContentJSON, &toolResultContent)
+				toolResultBlock := toolResultContent.Blocks[0].(*domain.ToolResultContentBlock)
+
+				// Verify they match
+				Expect(toolResultBlock.ToolUseID).To(Equal(toolUseBlock.ID),
+					"tool_result.tool_use_id should match tool_use.id")
+			})
+
+			It("preserves usage metadata in assistant message", func() {
+				record := sessionRecords[9]
+				message := record["message"].(map[string]any)
+
+				Expect(message).To(HaveKey("usage"))
+				usage := message["usage"].(map[string]any)
+				Expect(usage).To(HaveKey("input_tokens"))
+				Expect(usage).To(HaveKey("output_tokens"))
 			})
 		})
 

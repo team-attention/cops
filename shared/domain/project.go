@@ -14,10 +14,8 @@ type ProjectAbstract struct {
 // Embeds ProjectAbstract for basic identification.
 type Project struct {
 	ProjectAbstract
-	IsGitProject bool      `json:"gitProject"`          // true if git repo, false otherwise
-	ClaudeDir    string    `json:"claudeDir"`           // Claude project directory path
-	Worktrees    []string  `json:"worktrees,omitempty"` // Worktree paths for git projects
-	RegisteredAt time.Time `json:"registeredAt"`        // When the project was registered
+	IsGitProject bool      `json:"gitProject"`   // true if git repo, false otherwise
+	RegisteredAt time.Time `json:"registeredAt"` // When the project was registered
 }
 
 // ProjectWithWorktrees represents a project with dynamically discovered worktrees.

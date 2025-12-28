@@ -12,7 +12,7 @@ import type { Message as Message$1 } from "@bufbuild/protobuf";
  * Describes the file aggregation/v1/aggregation.proto.
  */
 export const file_aggregation_v1_aggregation: GenFile = /*@__PURE__*/
-  fileDesc("CiBhZ2dyZWdhdGlvbi92MS9hZ2dyZWdhdGlvbi5wcm90bxIOYWdncmVnYXRpb24udjEikAEKBVVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAkiowEKB01lc3NhZ2USCgoCaWQYASABKAkSDAoEdHlwZRgCIAEoCRIMCgRyb2xlGAMgASgJEg0KBW1vZGVsGAQgASgJEg8KB2NvbnRlbnQYBSABKAkSEwoLc3RvcF9yZWFzb24YBiABKAkSFQoNc3RvcF9zZXF1ZW5jZRgHIAEoCRIkCgV1c2FnZRgIIAEoCzIVLmFnZ3JlZ2F0aW9uLnYxLlVzYWdlItgCCg1TZXNzaW9uUmVjb3JkEgwKBHV1aWQYASABKAkSEwoLcGFyZW50X3V1aWQYAiABKAkSEgoKc2Vzc2lvbl9pZBgDIAEoCRIpCgR0eXBlGAQgASgOMhsuYWdncmVnYXRpb24udjEuU2Vzc2lvblR5cGUSLQoJdGltZXN0YW1wGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBILCgNjd2QYBiABKAkSEgoKZ2l0X2JyYW5jaBgHIAEoCRIPCgd2ZXJzaW9uGAggASgJEhEKCXVzZXJfdHlwZRgJIAEoCRIUCgxpc19zaWRlY2hhaW4YCiABKAgSDwoHaXNfbWV0YRgLIAEoCBIMCgRzbHVnGAwgASgJEhIKCnJlcXVlc3RfaWQYDSABKAkSKAoHbWVzc2FnZRgOIAEoCzIXLmFnZ3JlZ2F0aW9uLnYxLk1lc3NhZ2UiTgoITG9nQmF0Y2gSLgoHcmVjb3JkcxgBIAMoCzIdLmFnZ3JlZ2F0aW9uLnYxLlNlc3Npb25SZWNvcmQSEgoKcHJvamVjdF9pZBgCIAEoCSI2CgtTZW5kTG9nc1JlcRInCgViYXRjaBgBIAEoCzIYLmFnZ3JlZ2F0aW9uLnYxLkxvZ0JhdGNoIk4KC1NlbmRMb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSFQoNZXJyb3JfbWVzc2FnZRgCIAEoCRIXCg9wcm9jZXNzZWRfY291bnQYAyABKAUq2wEKC1Nlc3Npb25UeXBlEhwKGFNFU1NJT05fVFlQRV9VTlNQRUNJRklFRBAAEhUKEVNFU1NJT05fVFlQRV9VU0VSEAESGgoWU0VTU0lPTl9UWVBFX0FTU0lTVEFOVBACEhcKE1NFU1NJT05fVFlQRV9TWVNURU0QAxIYChRTRVNTSU9OX1RZUEVfU1VNTUFSWRAEEiYKIlNFU1NJT05fVFlQRV9GSUxFX0hJU1RPUllfU05BUFNIT1QQBRIgChxTRVNTSU9OX1RZUEVfUVVFVUVfT1BFUkFUSU9OEAYyWgoSQWdncmVnYXRpb25TZXJ2aWNlEkQKCFNlbmRMb2dzEhsuYWdncmVnYXRpb24udjEuU2VuZExvZ3NSZXEaGy5hZ2dyZWdhdGlvbi52MS5TZW5kTG9nc1Jlc0LQAQoSY29tLmFnZ3JlZ2F0aW9uLnYxQhBBZ2dyZWdhdGlvblByb3RvUAFaT2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2FnZ3JlZ2F0aW9uL3YxO2FnZ3JlZ2F0aW9udjGiAgNBWFiqAg5BZ2dyZWdhdGlvbi5WMcoCDkFnZ3JlZ2F0aW9uXFYx4gIaQWdncmVnYXRpb25cVjFcR1BCTWV0YWRhdGHqAg9BZ2dyZWdhdGlvbjo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("CiBhZ2dyZWdhdGlvbi92MS9hZ2dyZWdhdGlvbi5wcm90bxIOYWdncmVnYXRpb24udjEikAEKBVVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAkiIAoQVGV4dENvbnRlbnRCbG9jaxIMCgR0ZXh0GAEgASgJIkMKE1Rvb2xVc2VDb250ZW50QmxvY2sSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRISCgppbnB1dF9qc29uGAMgASgJIlAKFlRvb2xSZXN1bHRDb250ZW50QmxvY2sSEwoLdG9vbF91c2VfaWQYASABKAkSDwoHY29udGVudBgCIAEoCRIQCghpc19lcnJvchgDIAEoCCI7ChRUaGlua2luZ0NvbnRlbnRCbG9jaxIQCgh0aGlua2luZxgBIAEoCRIRCglzaWduYXR1cmUYAiABKAkiqwIKDENvbnRlbnRCbG9jaxIuCgR0eXBlGAEgASgOMiAuYWdncmVnYXRpb24udjEuQ29udGVudEJsb2NrVHlwZRIwCgR0ZXh0GAIgASgLMiAuYWdncmVnYXRpb24udjEuVGV4dENvbnRlbnRCbG9ja0gAEjcKCHRvb2xfdXNlGAMgASgLMiMuYWdncmVnYXRpb24udjEuVG9vbFVzZUNvbnRlbnRCbG9ja0gAEj0KC3Rvb2xfcmVzdWx0GAQgASgLMiYuYWdncmVnYXRpb24udjEuVG9vbFJlc3VsdENvbnRlbnRCbG9ja0gAEjgKCHRoaW5raW5nGAUgASgLMiQuYWdncmVnYXRpb24udjEuVGhpbmtpbmdDb250ZW50QmxvY2tIAEIHCgVibG9jayLWAQoHTWVzc2FnZRIKCgJpZBgBIAEoCRIMCgR0eXBlGAIgASgJEgwKBHJvbGUYAyABKAkSDQoFbW9kZWwYBCABKAkSDAoEdGV4dBgFIAEoCRITCgtzdG9wX3JlYXNvbhgGIAEoCRIVCg1zdG9wX3NlcXVlbmNlGAcgASgJEiQKBXVzYWdlGAggASgLMhUuYWdncmVnYXRpb24udjEuVXNhZ2USNAoOY29udGVudF9ibG9ja3MYCSADKAsyHC5hZ2dyZWdhdGlvbi52MS5Db250ZW50QmxvY2si2AIKDVNlc3Npb25SZWNvcmQSDAoEdXVpZBgBIAEoCRITCgtwYXJlbnRfdXVpZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEikKBHR5cGUYBCABKA4yGy5hZ2dyZWdhdGlvbi52MS5TZXNzaW9uVHlwZRItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgsKA2N3ZBgGIAEoCRISCgpnaXRfYnJhbmNoGAcgASgJEg8KB3ZlcnNpb24YCCABKAkSEQoJdXNlcl90eXBlGAkgASgJEhQKDGlzX3NpZGVjaGFpbhgKIAEoCBIPCgdpc19tZXRhGAsgASgIEgwKBHNsdWcYDCABKAkSEgoKcmVxdWVzdF9pZBgNIAEoCRIoCgdtZXNzYWdlGA4gASgLMhcuYWdncmVnYXRpb24udjEuTWVzc2FnZSJOCghMb2dCYXRjaBIuCgdyZWNvcmRzGAEgAygLMh0uYWdncmVnYXRpb24udjEuU2Vzc2lvblJlY29yZBISCgpwcm9qZWN0X2lkGAIgASgJIjYKC1NlbmRMb2dzUmVxEicKBWJhdGNoGAEgASgLMhguYWdncmVnYXRpb24udjEuTG9nQmF0Y2giTgoLU2VuZExvZ3NSZXMSDwoHc3VjY2VzcxgBIAEoCBIVCg1lcnJvcl9tZXNzYWdlGAIgASgJEhcKD3Byb2Nlc3NlZF9jb3VudBgDIAEoBSrbAQoLU2Vzc2lvblR5cGUSHAoYU0VTU0lPTl9UWVBFX1VOU1BFQ0lGSUVEEAASFQoRU0VTU0lPTl9UWVBFX1VTRVIQARIaChZTRVNTSU9OX1RZUEVfQVNTSVNUQU5UEAISFwoTU0VTU0lPTl9UWVBFX1NZU1RFTRADEhgKFFNFU1NJT05fVFlQRV9TVU1NQVJZEAQSJgoiU0VTU0lPTl9UWVBFX0ZJTEVfSElTVE9SWV9TTkFQU0hPVBAFEiAKHFNFU1NJT05fVFlQRV9RVUVVRV9PUEVSQVRJT04QBiq5AQoQQ29udGVudEJsb2NrVHlwZRIiCh5DT05URU5UX0JMT0NLX1RZUEVfVU5TUEVDSUZJRUQQABIbChdDT05URU5UX0JMT0NLX1RZUEVfVEVYVBABEh8KG0NPTlRFTlRfQkxPQ0tfVFlQRV9UT09MX1VTRRACEiIKHkNPTlRFTlRfQkxPQ0tfVFlQRV9UT09MX1JFU1VMVBADEh8KG0NPTlRFTlRfQkxPQ0tfVFlQRV9USElOS0lORxAEMloKEkFnZ3JlZ2F0aW9uU2VydmljZRJECghTZW5kTG9ncxIbLmFnZ3JlZ2F0aW9uLnYxLlNlbmRMb2dzUmVxGhsuYWdncmVnYXRpb24udjEuU2VuZExvZ3NSZXNC0AEKEmNvbS5hZ2dyZWdhdGlvbi52MUIQQWdncmVnYXRpb25Qcm90b1ABWk9naXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9hZ2dyZWdhdGlvbi92MTthZ2dyZWdhdGlvbnYxogIDQVhYqgIOQWdncmVnYXRpb24uVjHKAg5BZ2dyZWdhdGlvblxWMeICGkFnZ3JlZ2F0aW9uXFYxXEdQQk1ldGFkYXRh6gIPQWdncmVnYXRpb246OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * Usage contains token usage information.
@@ -54,6 +54,157 @@ export const UsageSchema: GenMessage<Usage> = /*@__PURE__*/
   messageDesc(file_aggregation_v1_aggregation, 0);
 
 /**
+ * TextContentBlock represents a text content block.
+ *
+ * @generated from message aggregation.v1.TextContentBlock
+ */
+export type TextContentBlock = Message$1<"aggregation.v1.TextContentBlock"> & {
+  /**
+   * @generated from field: string text = 1;
+   */
+  text: string;
+};
+
+/**
+ * Describes the message aggregation.v1.TextContentBlock.
+ * Use `create(TextContentBlockSchema)` to create a new message.
+ */
+export const TextContentBlockSchema: GenMessage<TextContentBlock> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 1);
+
+/**
+ * ToolUseContentBlock represents a tool use content block.
+ *
+ * @generated from message aggregation.v1.ToolUseContentBlock
+ */
+export type ToolUseContentBlock = Message$1<"aggregation.v1.ToolUseContentBlock"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * JSON string for flexible input structure
+   *
+   * @generated from field: string input_json = 3;
+   */
+  inputJson: string;
+};
+
+/**
+ * Describes the message aggregation.v1.ToolUseContentBlock.
+ * Use `create(ToolUseContentBlockSchema)` to create a new message.
+ */
+export const ToolUseContentBlockSchema: GenMessage<ToolUseContentBlock> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 2);
+
+/**
+ * ToolResultContentBlock represents a tool result content block.
+ *
+ * @generated from message aggregation.v1.ToolResultContentBlock
+ */
+export type ToolResultContentBlock = Message$1<"aggregation.v1.ToolResultContentBlock"> & {
+  /**
+   * @generated from field: string tool_use_id = 1;
+   */
+  toolUseId: string;
+
+  /**
+   * @generated from field: string content = 2;
+   */
+  content: string;
+
+  /**
+   * @generated from field: bool is_error = 3;
+   */
+  isError: boolean;
+};
+
+/**
+ * Describes the message aggregation.v1.ToolResultContentBlock.
+ * Use `create(ToolResultContentBlockSchema)` to create a new message.
+ */
+export const ToolResultContentBlockSchema: GenMessage<ToolResultContentBlock> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 3);
+
+/**
+ * ThinkingContentBlock represents a thinking content block.
+ *
+ * @generated from message aggregation.v1.ThinkingContentBlock
+ */
+export type ThinkingContentBlock = Message$1<"aggregation.v1.ThinkingContentBlock"> & {
+  /**
+   * @generated from field: string thinking = 1;
+   */
+  thinking: string;
+
+  /**
+   * @generated from field: string signature = 2;
+   */
+  signature: string;
+};
+
+/**
+ * Describes the message aggregation.v1.ThinkingContentBlock.
+ * Use `create(ThinkingContentBlockSchema)` to create a new message.
+ */
+export const ThinkingContentBlockSchema: GenMessage<ThinkingContentBlock> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 4);
+
+/**
+ * ContentBlock represents a polymorphic content block using oneof.
+ *
+ * @generated from message aggregation.v1.ContentBlock
+ */
+export type ContentBlock = Message$1<"aggregation.v1.ContentBlock"> & {
+  /**
+   * @generated from field: aggregation.v1.ContentBlockType type = 1;
+   */
+  type: ContentBlockType;
+
+  /**
+   * @generated from oneof aggregation.v1.ContentBlock.block
+   */
+  block: {
+    /**
+     * @generated from field: aggregation.v1.TextContentBlock text = 2;
+     */
+    value: TextContentBlock;
+    case: "text";
+  } | {
+    /**
+     * @generated from field: aggregation.v1.ToolUseContentBlock tool_use = 3;
+     */
+    value: ToolUseContentBlock;
+    case: "toolUse";
+  } | {
+    /**
+     * @generated from field: aggregation.v1.ToolResultContentBlock tool_result = 4;
+     */
+    value: ToolResultContentBlock;
+    case: "toolResult";
+  } | {
+    /**
+     * @generated from field: aggregation.v1.ThinkingContentBlock thinking = 5;
+     */
+    value: ThinkingContentBlock;
+    case: "thinking";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message aggregation.v1.ContentBlock.
+ * Use `create(ContentBlockSchema)` to create a new message.
+ */
+export const ContentBlockSchema: GenMessage<ContentBlock> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 5);
+
+/**
  * Message contains the role and content of a session message.
  *
  * @generated from message aggregation.v1.Message
@@ -80,9 +231,9 @@ export type Message = Message$1<"aggregation.v1.Message"> & {
   model: string;
 
   /**
-   * @generated from field: string content = 5;
+   * @generated from field: string text = 5;
    */
-  content: string;
+  text: string;
 
   /**
    * @generated from field: string stop_reason = 6;
@@ -98,6 +249,11 @@ export type Message = Message$1<"aggregation.v1.Message"> & {
    * @generated from field: aggregation.v1.Usage usage = 8;
    */
   usage?: Usage;
+
+  /**
+   * @generated from field: repeated aggregation.v1.ContentBlock content_blocks = 9;
+   */
+  contentBlocks: ContentBlock[];
 };
 
 /**
@@ -105,7 +261,7 @@ export type Message = Message$1<"aggregation.v1.Message"> & {
  * Use `create(MessageSchema)` to create a new message.
  */
 export const MessageSchema: GenMessage<Message> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 1);
+  messageDesc(file_aggregation_v1_aggregation, 6);
 
 /**
  * SessionRecord represents a single Claude Code JSONL entry.
@@ -189,7 +345,7 @@ export type SessionRecord = Message$1<"aggregation.v1.SessionRecord"> & {
  * Use `create(SessionRecordSchema)` to create a new message.
  */
 export const SessionRecordSchema: GenMessage<SessionRecord> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 2);
+  messageDesc(file_aggregation_v1_aggregation, 7);
 
 /**
  * LogBatch contains multiple session records for batch sending.
@@ -213,7 +369,7 @@ export type LogBatch = Message$1<"aggregation.v1.LogBatch"> & {
  * Use `create(LogBatchSchema)` to create a new message.
  */
 export const LogBatchSchema: GenMessage<LogBatch> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 3);
+  messageDesc(file_aggregation_v1_aggregation, 8);
 
 /**
  * SendLogsReq is the request for sending logs.
@@ -232,7 +388,7 @@ export type SendLogsReq = Message$1<"aggregation.v1.SendLogsReq"> & {
  * Use `create(SendLogsReqSchema)` to create a new message.
  */
 export const SendLogsReqSchema: GenMessage<SendLogsReq> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 4);
+  messageDesc(file_aggregation_v1_aggregation, 9);
 
 /**
  * SendLogsRes is the response for sending logs.
@@ -261,7 +417,7 @@ export type SendLogsRes = Message$1<"aggregation.v1.SendLogsRes"> & {
  * Use `create(SendLogsResSchema)` to create a new message.
  */
 export const SendLogsResSchema: GenMessage<SendLogsRes> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 5);
+  messageDesc(file_aggregation_v1_aggregation, 10);
 
 /**
  * SessionType represents the type of session message.
@@ -310,6 +466,44 @@ export enum SessionType {
  */
 export const SessionTypeSchema: GenEnum<SessionType> = /*@__PURE__*/
   enumDesc(file_aggregation_v1_aggregation, 0);
+
+/**
+ * ContentBlockType represents the type of content block.
+ *
+ * @generated from enum aggregation.v1.ContentBlockType
+ */
+export enum ContentBlockType {
+  /**
+   * @generated from enum value: CONTENT_BLOCK_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: CONTENT_BLOCK_TYPE_TEXT = 1;
+   */
+  TEXT = 1,
+
+  /**
+   * @generated from enum value: CONTENT_BLOCK_TYPE_TOOL_USE = 2;
+   */
+  TOOL_USE = 2,
+
+  /**
+   * @generated from enum value: CONTENT_BLOCK_TYPE_TOOL_RESULT = 3;
+   */
+  TOOL_RESULT = 3,
+
+  /**
+   * @generated from enum value: CONTENT_BLOCK_TYPE_THINKING = 4;
+   */
+  THINKING = 4,
+}
+
+/**
+ * Describes the enum aggregation.v1.ContentBlockType.
+ */
+export const ContentBlockTypeSchema: GenEnum<ContentBlockType> = /*@__PURE__*/
+  enumDesc(file_aggregation_v1_aggregation, 1);
 
 /**
  * AggregationService handles log aggregation from daemons.

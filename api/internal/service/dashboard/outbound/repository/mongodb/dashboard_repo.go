@@ -275,8 +275,6 @@ func (r *MongoDashboardRepository) GetProject(ctx context.Context, projectID str
 				Path: mongoutil.Get[string](doc, mongoschema.ProjectPathField),
 			},
 			IsGitProject: mongoutil.Get[bool](doc, mongoschema.ProjectIsGitProjectField),
-			ClaudeDir:    mongoutil.Get[string](doc, mongoschema.ProjectClaudeDirField),
-			Worktrees:    mongoutil.GetSlice[string](doc, mongoschema.ProjectWorktreesField),
 			RegisteredAt: mongoutil.Get[time.Time](doc, mongoschema.ProjectRegisteredAtField),
 		},
 	}

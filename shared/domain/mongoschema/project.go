@@ -14,10 +14,8 @@ const (
 	ProjectNameField         = "name"
 	ProjectPathField         = "path"
 	ProjectIsGitProjectField = "isGitProject"
-	ProjectClaudeDirField    = "claudeDir"
 	ProjectRegisteredAtField = "registeredAt"
 	ProjectGitBranchField    = "git_branch"
-	ProjectWorktreesField    = "worktrees"
 	ProjectRemoteURLField    = "remoteUrl"
 )
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -93,6 +94,7 @@ func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, params reposi
 		mongoschema.ProjectRemoteURLField:    remoteURL,
 		mongoschema.ProjectNameField:         params.Name,
 		mongoschema.ProjectIsGitProjectField: params.IsGitProject,
+		mongoschema.ProjectRegisteredAtField: time.Now(),
 	}
 
 	result, err := r.projectsColl.InsertOne(ctx, newDoc)

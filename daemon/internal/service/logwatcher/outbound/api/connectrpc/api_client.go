@@ -120,7 +120,7 @@ func convertMessage(m *shareddomain.Message) *aggregationv1.Message {
 	}
 
 	if m.Content != nil && !m.Content.IsBlocks && m.Content.Text != nil {
-		msg.Content = *m.Content.Text
+		msg.Text = *m.Content.Text
 	}
 
 	if m.Usage != nil {

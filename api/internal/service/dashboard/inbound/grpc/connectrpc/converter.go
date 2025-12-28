@@ -1,6 +1,7 @@
 package connectrpc
 
 import (
+	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
 	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
@@ -36,7 +37,6 @@ func toProtoProjectDetail(p *repository.ProjectDetail) *dashboardv1.ProjectDetai
 		Id:           string(p.Project.ID),
 		Name:         p.Project.Name,
 		Path:         p.Project.Path,
-		Worktrees:    p.Project.Worktrees,
 		SessionCount: p.ProjectAggregation.SessionCount,
 		Usage:        toProtoTokenUsageSummary(p.ProjectAggregation.Usage),
 		CreatedAt:    timestamppb.New(p.Project.RegisteredAt),
@@ -131,8 +131,12 @@ func convertMessage(m *shareddomain.Message) *aggregationv1.Message {
 		StopReason: m.StopReason,
 	}
 
-	if m.Content != nil && !m.Content.IsBlocks && m.Content.Text != nil {
-		msg.Content = *m.Content.Text
+	if m.Content != nil {
+		if m.Content.IsBlocks {
+			msg.ContentBlocks = convertContentBlocks(m.Content.Blocks)
+		} else if m.Content.Text != nil {
+			msg.Text = *m.Content.Text
+		}
 	}
 
 	if m.Usage != nil {
@@ -155,5 +159,76 @@ func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64
 		PageSize:    pageSize,
 		TotalPages:  totalPages,
 		TotalCount:  totalCount,
+	}
+}
+
+// convertContentBlocks converts domain ContentBlocks to protobuf ContentBlocks.
+func convertContentBlocks(blocks []shareddomain.ContentBlock) []*aggregationv1.ContentBlock {
+	if len(blocks) == 0 {
+		return nil
+	}
+
+	result := make([]*aggregationv1.ContentBlock, 0, len(blocks))
+	for _, block := range blocks {
+		pb := convertContentBlock(block)
+		if pb != nil {
+			result = append(result, pb)
+		}
+	}
+	return result
+}
+
+// convertContentBlock converts a single domain ContentBlock to protobuf.
+func convertContentBlock(block shareddomain.ContentBlock) *aggregationv1.ContentBlock {
+	switch b := block.(type) {
+	case *shareddomain.TextContentBlock:
+		return &aggregationv1.ContentBlock{
+			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_TEXT,
+			Block: &aggregationv1.ContentBlock_Text{
+				Text: &aggregationv1.TextContentBlock{
+					Text: b.Text,
+				},
+			},
+		}
+	case *shareddomain.ToolUseContentBlock:
+		inputJSON := ""
+		if b.Input != nil {
+			if bytes, err := sonic.Marshal(b.Input); err == nil {
+				inputJSON = string(bytes)
+			}
+		}
+		return &aggregationv1.ContentBlock{
+			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_TOOL_USE,
+			Block: &aggregationv1.ContentBlock_ToolUse{
+				ToolUse: &aggregationv1.ToolUseContentBlock{
+					Id:        b.ID,
+					Name:      b.Name,
+					InputJson: inputJSON,
+				},
+			},
+		}
+	case *shareddomain.ToolResultContentBlock:
+		return &aggregationv1.ContentBlock{
+			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_TOOL_RESULT,
+			Block: &aggregationv1.ContentBlock_ToolResult{
+				ToolResult: &aggregationv1.ToolResultContentBlock{
+					ToolUseId: b.ToolUseID,
+					Content:   b.Content,
+					IsError:   b.IsError,
+				},
+			},
+		}
+	case *shareddomain.ThinkingContentBlock:
+		return &aggregationv1.ContentBlock{
+			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_THINKING,
+			Block: &aggregationv1.ContentBlock_Thinking{
+				Thinking: &aggregationv1.ThinkingContentBlock{
+					Thinking:  b.Thinking,
+					Signature: b.Signature,
+				},
+			},
+		}
+	default:
+		return nil
 	}
 }

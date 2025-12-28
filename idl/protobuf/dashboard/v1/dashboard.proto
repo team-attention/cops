@@ -78,9 +78,6 @@ message ProjectDetail {
   // Project path
   string path = 3;
 
-  // List of git worktrees
-  repeated string worktrees = 4;
-
   // Number of sessions in this project
   int32 session_count = 5;
 

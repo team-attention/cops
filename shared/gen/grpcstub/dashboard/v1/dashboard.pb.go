@@ -324,8 +324,6 @@ type ProjectDetail struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Project path
 	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	// List of git worktrees
-	Worktrees []string `protobuf:"bytes,4,rep,name=worktrees,proto3" json:"worktrees,omitempty"`
 	// Number of sessions in this project
 	SessionCount int32 `protobuf:"varint,5,opt,name=session_count,json=sessionCount,proto3" json:"session_count,omitempty"`
 	// Aggregated token usage
@@ -387,13 +385,6 @@ func (x *ProjectDetail) GetPath() string {
 		return x.Path
 	}
 	return ""
-}
-
-func (x *ProjectDetail) GetWorktrees() []string {
-	if x != nil {
-		return x.Worktrees
-	}
-	return nil
 }
 
 func (x *ProjectDetail) GetSessionCount() int32 {
@@ -1200,12 +1191,11 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x04path\x18\x03 \x01(\tR\x04path\x12#\n" +
 	"\rsession_count\x18\x04 \x01(\x05R\fsessionCount\x125\n" +
 	"\x05usage\x18\x05 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x12?\n" +
-	"\rlast_activity\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\"\xbd\x02\n" +
+	"\rlast_activity\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\flastActivity\"\x9f\x02\n" +
 	"\rProjectDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
-	"\x04path\x18\x03 \x01(\tR\x04path\x12\x1c\n" +
-	"\tworktrees\x18\x04 \x03(\tR\tworktrees\x12#\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\x12#\n" +
 	"\rsession_count\x18\x05 \x01(\x05R\fsessionCount\x125\n" +
 	"\x05usage\x18\x06 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +

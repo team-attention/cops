@@ -84,6 +84,62 @@ func (SessionType) EnumDescriptor() ([]byte, []int) {
 	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{0}
 }
 
+// ContentBlockType represents the type of content block.
+type ContentBlockType int32
+
+const (
+	ContentBlockType_CONTENT_BLOCK_TYPE_UNSPECIFIED ContentBlockType = 0
+	ContentBlockType_CONTENT_BLOCK_TYPE_TEXT        ContentBlockType = 1
+	ContentBlockType_CONTENT_BLOCK_TYPE_TOOL_USE    ContentBlockType = 2
+	ContentBlockType_CONTENT_BLOCK_TYPE_TOOL_RESULT ContentBlockType = 3
+	ContentBlockType_CONTENT_BLOCK_TYPE_THINKING    ContentBlockType = 4
+)
+
+// Enum value maps for ContentBlockType.
+var (
+	ContentBlockType_name = map[int32]string{
+		0: "CONTENT_BLOCK_TYPE_UNSPECIFIED",
+		1: "CONTENT_BLOCK_TYPE_TEXT",
+		2: "CONTENT_BLOCK_TYPE_TOOL_USE",
+		3: "CONTENT_BLOCK_TYPE_TOOL_RESULT",
+		4: "CONTENT_BLOCK_TYPE_THINKING",
+	}
+	ContentBlockType_value = map[string]int32{
+		"CONTENT_BLOCK_TYPE_UNSPECIFIED": 0,
+		"CONTENT_BLOCK_TYPE_TEXT":        1,
+		"CONTENT_BLOCK_TYPE_TOOL_USE":    2,
+		"CONTENT_BLOCK_TYPE_TOOL_RESULT": 3,
+		"CONTENT_BLOCK_TYPE_THINKING":    4,
+	}
+)
+
+func (x ContentBlockType) Enum() *ContentBlockType {
+	p := new(ContentBlockType)
+	*p = x
+	return p
+}
+
+func (x ContentBlockType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ContentBlockType) Descriptor() protoreflect.EnumDescriptor {
+	return file_aggregation_v1_aggregation_proto_enumTypes[1].Descriptor()
+}
+
+func (ContentBlockType) Type() protoreflect.EnumType {
+	return &file_aggregation_v1_aggregation_proto_enumTypes[1]
+}
+
+func (x ContentBlockType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ContentBlockType.Descriptor instead.
+func (ContentBlockType) EnumDescriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{1}
+}
+
 // Usage contains token usage information.
 type Usage struct {
 	state                    protoimpl.MessageState `protogen:"open.v1"`
@@ -161,6 +217,349 @@ func (x *Usage) GetServiceTier() string {
 	return ""
 }
 
+// TextContentBlock represents a text content block.
+type TextContentBlock struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TextContentBlock) Reset() {
+	*x = TextContentBlock{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TextContentBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TextContentBlock) ProtoMessage() {}
+
+func (x *TextContentBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TextContentBlock.ProtoReflect.Descriptor instead.
+func (*TextContentBlock) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TextContentBlock) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+// ToolUseContentBlock represents a tool use content block.
+type ToolUseContentBlock struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	InputJson     string                 `protobuf:"bytes,3,opt,name=input_json,json=inputJson,proto3" json:"input_json,omitempty"` // JSON string for flexible input structure
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolUseContentBlock) Reset() {
+	*x = ToolUseContentBlock{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolUseContentBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolUseContentBlock) ProtoMessage() {}
+
+func (x *ToolUseContentBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolUseContentBlock.ProtoReflect.Descriptor instead.
+func (*ToolUseContentBlock) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ToolUseContentBlock) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ToolUseContentBlock) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ToolUseContentBlock) GetInputJson() string {
+	if x != nil {
+		return x.InputJson
+	}
+	return ""
+}
+
+// ToolResultContentBlock represents a tool result content block.
+type ToolResultContentBlock struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ToolUseId     string                 `protobuf:"bytes,1,opt,name=tool_use_id,json=toolUseId,proto3" json:"tool_use_id,omitempty"`
+	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	IsError       bool                   `protobuf:"varint,3,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolResultContentBlock) Reset() {
+	*x = ToolResultContentBlock{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolResultContentBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolResultContentBlock) ProtoMessage() {}
+
+func (x *ToolResultContentBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolResultContentBlock.ProtoReflect.Descriptor instead.
+func (*ToolResultContentBlock) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ToolResultContentBlock) GetToolUseId() string {
+	if x != nil {
+		return x.ToolUseId
+	}
+	return ""
+}
+
+func (x *ToolResultContentBlock) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *ToolResultContentBlock) GetIsError() bool {
+	if x != nil {
+		return x.IsError
+	}
+	return false
+}
+
+// ThinkingContentBlock represents a thinking content block.
+type ThinkingContentBlock struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Thinking      string                 `protobuf:"bytes,1,opt,name=thinking,proto3" json:"thinking,omitempty"`
+	Signature     string                 `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ThinkingContentBlock) Reset() {
+	*x = ThinkingContentBlock{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ThinkingContentBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ThinkingContentBlock) ProtoMessage() {}
+
+func (x *ThinkingContentBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ThinkingContentBlock.ProtoReflect.Descriptor instead.
+func (*ThinkingContentBlock) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ThinkingContentBlock) GetThinking() string {
+	if x != nil {
+		return x.Thinking
+	}
+	return ""
+}
+
+func (x *ThinkingContentBlock) GetSignature() string {
+	if x != nil {
+		return x.Signature
+	}
+	return ""
+}
+
+// ContentBlock represents a polymorphic content block using oneof.
+type ContentBlock struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Type  ContentBlockType       `protobuf:"varint,1,opt,name=type,proto3,enum=aggregation.v1.ContentBlockType" json:"type,omitempty"`
+	// Types that are valid to be assigned to Block:
+	//
+	//	*ContentBlock_Text
+	//	*ContentBlock_ToolUse
+	//	*ContentBlock_ToolResult
+	//	*ContentBlock_Thinking
+	Block         isContentBlock_Block `protobuf_oneof:"block"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContentBlock) Reset() {
+	*x = ContentBlock{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContentBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContentBlock) ProtoMessage() {}
+
+func (x *ContentBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContentBlock.ProtoReflect.Descriptor instead.
+func (*ContentBlock) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ContentBlock) GetType() ContentBlockType {
+	if x != nil {
+		return x.Type
+	}
+	return ContentBlockType_CONTENT_BLOCK_TYPE_UNSPECIFIED
+}
+
+func (x *ContentBlock) GetBlock() isContentBlock_Block {
+	if x != nil {
+		return x.Block
+	}
+	return nil
+}
+
+func (x *ContentBlock) GetText() *TextContentBlock {
+	if x != nil {
+		if x, ok := x.Block.(*ContentBlock_Text); ok {
+			return x.Text
+		}
+	}
+	return nil
+}
+
+func (x *ContentBlock) GetToolUse() *ToolUseContentBlock {
+	if x != nil {
+		if x, ok := x.Block.(*ContentBlock_ToolUse); ok {
+			return x.ToolUse
+		}
+	}
+	return nil
+}
+
+func (x *ContentBlock) GetToolResult() *ToolResultContentBlock {
+	if x != nil {
+		if x, ok := x.Block.(*ContentBlock_ToolResult); ok {
+			return x.ToolResult
+		}
+	}
+	return nil
+}
+
+func (x *ContentBlock) GetThinking() *ThinkingContentBlock {
+	if x != nil {
+		if x, ok := x.Block.(*ContentBlock_Thinking); ok {
+			return x.Thinking
+		}
+	}
+	return nil
+}
+
+type isContentBlock_Block interface {
+	isContentBlock_Block()
+}
+
+type ContentBlock_Text struct {
+	Text *TextContentBlock `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
+}
+
+type ContentBlock_ToolUse struct {
+	ToolUse *ToolUseContentBlock `protobuf:"bytes,3,opt,name=tool_use,json=toolUse,proto3,oneof"`
+}
+
+type ContentBlock_ToolResult struct {
+	ToolResult *ToolResultContentBlock `protobuf:"bytes,4,opt,name=tool_result,json=toolResult,proto3,oneof"`
+}
+
+type ContentBlock_Thinking struct {
+	Thinking *ThinkingContentBlock `protobuf:"bytes,5,opt,name=thinking,proto3,oneof"`
+}
+
+func (*ContentBlock_Text) isContentBlock_Block() {}
+
+func (*ContentBlock_ToolUse) isContentBlock_Block() {}
+
+func (*ContentBlock_ToolResult) isContentBlock_Block() {}
+
+func (*ContentBlock_Thinking) isContentBlock_Block() {}
+
 // Message contains the role and content of a session message.
 type Message struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -168,17 +567,18 @@ type Message struct {
 	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
 	Model         string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
-	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
+	Text          string                 `protobuf:"bytes,5,opt,name=text,proto3" json:"text,omitempty"`
 	StopReason    string                 `protobuf:"bytes,6,opt,name=stop_reason,json=stopReason,proto3" json:"stop_reason,omitempty"`
 	StopSequence  string                 `protobuf:"bytes,7,opt,name=stop_sequence,json=stopSequence,proto3" json:"stop_sequence,omitempty"`
 	Usage         *Usage                 `protobuf:"bytes,8,opt,name=usage,proto3" json:"usage,omitempty"`
+	ContentBlocks []*ContentBlock        `protobuf:"bytes,9,rep,name=content_blocks,json=contentBlocks,proto3" json:"content_blocks,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Message) Reset() {
 	*x = Message{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -190,7 +590,7 @@ func (x *Message) String() string {
 func (*Message) ProtoMessage() {}
 
 func (x *Message) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -203,7 +603,7 @@ func (x *Message) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Message.ProtoReflect.Descriptor instead.
 func (*Message) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{1}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Message) GetId() string {
@@ -234,9 +634,9 @@ func (x *Message) GetModel() string {
 	return ""
 }
 
-func (x *Message) GetContent() string {
+func (x *Message) GetText() string {
 	if x != nil {
-		return x.Content
+		return x.Text
 	}
 	return ""
 }
@@ -258,6 +658,13 @@ func (x *Message) GetStopSequence() string {
 func (x *Message) GetUsage() *Usage {
 	if x != nil {
 		return x.Usage
+	}
+	return nil
+}
+
+func (x *Message) GetContentBlocks() []*ContentBlock {
+	if x != nil {
+		return x.ContentBlocks
 	}
 	return nil
 }
@@ -285,7 +692,7 @@ type SessionRecord struct {
 
 func (x *SessionRecord) Reset() {
 	*x = SessionRecord{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -297,7 +704,7 @@ func (x *SessionRecord) String() string {
 func (*SessionRecord) ProtoMessage() {}
 
 func (x *SessionRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +717,7 @@ func (x *SessionRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionRecord.ProtoReflect.Descriptor instead.
 func (*SessionRecord) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{2}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SessionRecord) GetUuid() string {
@@ -422,7 +829,7 @@ type LogBatch struct {
 
 func (x *LogBatch) Reset() {
 	*x = LogBatch{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -434,7 +841,7 @@ func (x *LogBatch) String() string {
 func (*LogBatch) ProtoMessage() {}
 
 func (x *LogBatch) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -447,7 +854,7 @@ func (x *LogBatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogBatch.ProtoReflect.Descriptor instead.
 func (*LogBatch) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{3}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *LogBatch) GetRecords() []*SessionRecord {
@@ -474,7 +881,7 @@ type SendLogsReq struct {
 
 func (x *SendLogsReq) Reset() {
 	*x = SendLogsReq{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -486,7 +893,7 @@ func (x *SendLogsReq) String() string {
 func (*SendLogsReq) ProtoMessage() {}
 
 func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +906,7 @@ func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendLogsReq.ProtoReflect.Descriptor instead.
 func (*SendLogsReq) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{4}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SendLogsReq) GetBatch() *LogBatch {
@@ -521,7 +928,7 @@ type SendLogsRes struct {
 
 func (x *SendLogsRes) Reset() {
 	*x = SendLogsRes{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -533,7 +940,7 @@ func (x *SendLogsRes) String() string {
 func (*SendLogsRes) ProtoMessage() {}
 
 func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -546,7 +953,7 @@ func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendLogsRes.ProtoReflect.Descriptor instead.
 func (*SendLogsRes) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{5}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SendLogsRes) GetSuccess() bool {
@@ -580,17 +987,40 @@ const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\routput_tokens\x18\x02 \x01(\x05R\foutputTokens\x12=\n" +
 	"\x1bcache_creation_input_tokens\x18\x03 \x01(\x05R\x18cacheCreationInputTokens\x125\n" +
 	"\x17cache_read_input_tokens\x18\x04 \x01(\x05R\x14cacheReadInputTokens\x12!\n" +
-	"\fservice_tier\x18\x05 \x01(\tR\vserviceTier\"\xe4\x01\n" +
+	"\fservice_tier\x18\x05 \x01(\tR\vserviceTier\"&\n" +
+	"\x10TextContentBlock\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\"X\n" +
+	"\x13ToolUseContentBlock\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"input_json\x18\x03 \x01(\tR\tinputJson\"m\n" +
+	"\x16ToolResultContentBlock\x12\x1e\n" +
+	"\vtool_use_id\x18\x01 \x01(\tR\ttoolUseId\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12\x19\n" +
+	"\bis_error\x18\x03 \x01(\bR\aisError\"P\n" +
+	"\x14ThinkingContentBlock\x12\x1a\n" +
+	"\bthinking\x18\x01 \x01(\tR\bthinking\x12\x1c\n" +
+	"\tsignature\x18\x02 \x01(\tR\tsignature\"\xd6\x02\n" +
+	"\fContentBlock\x124\n" +
+	"\x04type\x18\x01 \x01(\x0e2 .aggregation.v1.ContentBlockTypeR\x04type\x126\n" +
+	"\x04text\x18\x02 \x01(\v2 .aggregation.v1.TextContentBlockH\x00R\x04text\x12@\n" +
+	"\btool_use\x18\x03 \x01(\v2#.aggregation.v1.ToolUseContentBlockH\x00R\atoolUse\x12I\n" +
+	"\vtool_result\x18\x04 \x01(\v2&.aggregation.v1.ToolResultContentBlockH\x00R\n" +
+	"toolResult\x12B\n" +
+	"\bthinking\x18\x05 \x01(\v2$.aggregation.v1.ThinkingContentBlockH\x00R\bthinkingB\a\n" +
+	"\x05block\"\xa3\x02\n" +
 	"\aMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x12\n" +
 	"\x04role\x18\x03 \x01(\tR\x04role\x12\x14\n" +
-	"\x05model\x18\x04 \x01(\tR\x05model\x12\x18\n" +
-	"\acontent\x18\x05 \x01(\tR\acontent\x12\x1f\n" +
+	"\x05model\x18\x04 \x01(\tR\x05model\x12\x12\n" +
+	"\x04text\x18\x05 \x01(\tR\x04text\x12\x1f\n" +
 	"\vstop_reason\x18\x06 \x01(\tR\n" +
 	"stopReason\x12#\n" +
 	"\rstop_sequence\x18\a \x01(\tR\fstopSequence\x12+\n" +
-	"\x05usage\x18\b \x01(\v2\x15.aggregation.v1.UsageR\x05usage\"\xd8\x03\n" +
+	"\x05usage\x18\b \x01(\v2\x15.aggregation.v1.UsageR\x05usage\x12C\n" +
+	"\x0econtent_blocks\x18\t \x03(\v2\x1c.aggregation.v1.ContentBlockR\rcontentBlocks\"\xd8\x03\n" +
 	"\rSessionRecord\x12\x12\n" +
 	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x1f\n" +
 	"\vparent_uuid\x18\x02 \x01(\tR\n" +
@@ -628,7 +1058,13 @@ const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\x13SESSION_TYPE_SYSTEM\x10\x03\x12\x18\n" +
 	"\x14SESSION_TYPE_SUMMARY\x10\x04\x12&\n" +
 	"\"SESSION_TYPE_FILE_HISTORY_SNAPSHOT\x10\x05\x12 \n" +
-	"\x1cSESSION_TYPE_QUEUE_OPERATION\x10\x062Z\n" +
+	"\x1cSESSION_TYPE_QUEUE_OPERATION\x10\x06*\xb9\x01\n" +
+	"\x10ContentBlockType\x12\"\n" +
+	"\x1eCONTENT_BLOCK_TYPE_UNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17CONTENT_BLOCK_TYPE_TEXT\x10\x01\x12\x1f\n" +
+	"\x1bCONTENT_BLOCK_TYPE_TOOL_USE\x10\x02\x12\"\n" +
+	"\x1eCONTENT_BLOCK_TYPE_TOOL_RESULT\x10\x03\x12\x1f\n" +
+	"\x1bCONTENT_BLOCK_TYPE_THINKING\x10\x042Z\n" +
 	"\x12AggregationService\x12D\n" +
 	"\bSendLogs\x12\x1b.aggregation.v1.SendLogsReq\x1a\x1b.aggregation.v1.SendLogsResB\xd0\x01\n" +
 	"\x12com.aggregation.v1B\x10AggregationProtoP\x01ZOgithub.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1;aggregationv1\xa2\x02\x03AXX\xaa\x02\x0eAggregation.V1\xca\x02\x0eAggregation\\V1\xe2\x02\x1aAggregation\\V1\\GPBMetadata\xea\x02\x0fAggregation::V1b\x06proto3"
@@ -645,32 +1081,44 @@ func file_aggregation_v1_aggregation_proto_rawDescGZIP() []byte {
 	return file_aggregation_v1_aggregation_proto_rawDescData
 }
 
-var file_aggregation_v1_aggregation_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_aggregation_v1_aggregation_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_aggregation_v1_aggregation_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_aggregation_v1_aggregation_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_aggregation_v1_aggregation_proto_goTypes = []any{
-	(SessionType)(0),              // 0: aggregation.v1.SessionType
-	(*Usage)(nil),                 // 1: aggregation.v1.Usage
-	(*Message)(nil),               // 2: aggregation.v1.Message
-	(*SessionRecord)(nil),         // 3: aggregation.v1.SessionRecord
-	(*LogBatch)(nil),              // 4: aggregation.v1.LogBatch
-	(*SendLogsReq)(nil),           // 5: aggregation.v1.SendLogsReq
-	(*SendLogsRes)(nil),           // 6: aggregation.v1.SendLogsRes
-	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
+	(SessionType)(0),               // 0: aggregation.v1.SessionType
+	(ContentBlockType)(0),          // 1: aggregation.v1.ContentBlockType
+	(*Usage)(nil),                  // 2: aggregation.v1.Usage
+	(*TextContentBlock)(nil),       // 3: aggregation.v1.TextContentBlock
+	(*ToolUseContentBlock)(nil),    // 4: aggregation.v1.ToolUseContentBlock
+	(*ToolResultContentBlock)(nil), // 5: aggregation.v1.ToolResultContentBlock
+	(*ThinkingContentBlock)(nil),   // 6: aggregation.v1.ThinkingContentBlock
+	(*ContentBlock)(nil),           // 7: aggregation.v1.ContentBlock
+	(*Message)(nil),                // 8: aggregation.v1.Message
+	(*SessionRecord)(nil),          // 9: aggregation.v1.SessionRecord
+	(*LogBatch)(nil),               // 10: aggregation.v1.LogBatch
+	(*SendLogsReq)(nil),            // 11: aggregation.v1.SendLogsReq
+	(*SendLogsRes)(nil),            // 12: aggregation.v1.SendLogsRes
+	(*timestamppb.Timestamp)(nil),  // 13: google.protobuf.Timestamp
 }
 var file_aggregation_v1_aggregation_proto_depIdxs = []int32{
-	1, // 0: aggregation.v1.Message.usage:type_name -> aggregation.v1.Usage
-	0, // 1: aggregation.v1.SessionRecord.type:type_name -> aggregation.v1.SessionType
-	7, // 2: aggregation.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
-	2, // 3: aggregation.v1.SessionRecord.message:type_name -> aggregation.v1.Message
-	3, // 4: aggregation.v1.LogBatch.records:type_name -> aggregation.v1.SessionRecord
-	4, // 5: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
-	5, // 6: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
-	6, // 7: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
-	7, // [7:8] is the sub-list for method output_type
-	6, // [6:7] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	1,  // 0: aggregation.v1.ContentBlock.type:type_name -> aggregation.v1.ContentBlockType
+	3,  // 1: aggregation.v1.ContentBlock.text:type_name -> aggregation.v1.TextContentBlock
+	4,  // 2: aggregation.v1.ContentBlock.tool_use:type_name -> aggregation.v1.ToolUseContentBlock
+	5,  // 3: aggregation.v1.ContentBlock.tool_result:type_name -> aggregation.v1.ToolResultContentBlock
+	6,  // 4: aggregation.v1.ContentBlock.thinking:type_name -> aggregation.v1.ThinkingContentBlock
+	2,  // 5: aggregation.v1.Message.usage:type_name -> aggregation.v1.Usage
+	7,  // 6: aggregation.v1.Message.content_blocks:type_name -> aggregation.v1.ContentBlock
+	0,  // 7: aggregation.v1.SessionRecord.type:type_name -> aggregation.v1.SessionType
+	13, // 8: aggregation.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
+	8,  // 9: aggregation.v1.SessionRecord.message:type_name -> aggregation.v1.Message
+	9,  // 10: aggregation.v1.LogBatch.records:type_name -> aggregation.v1.SessionRecord
+	10, // 11: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
+	11, // 12: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
+	12, // 13: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
+	13, // [13:14] is the sub-list for method output_type
+	12, // [12:13] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_aggregation_v1_aggregation_proto_init() }
@@ -678,13 +1126,19 @@ func file_aggregation_v1_aggregation_proto_init() {
 	if File_aggregation_v1_aggregation_proto != nil {
 		return
 	}
+	file_aggregation_v1_aggregation_proto_msgTypes[5].OneofWrappers = []any{
+		(*ContentBlock_Text)(nil),
+		(*ContentBlock_ToolUse)(nil),
+		(*ContentBlock_ToolResult)(nil),
+		(*ContentBlock_Thinking)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_aggregation_v1_aggregation_proto_rawDesc), len(file_aggregation_v1_aggregation_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   6,
+			NumEnums:      2,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

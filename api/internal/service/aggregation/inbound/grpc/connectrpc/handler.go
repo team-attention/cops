@@ -120,7 +120,7 @@ func convertMessage(m *aggregationv1.Message) *shareddomain.Message {
 		}
 	}
 
-	content := m.GetContent()
+	text := m.GetText()
 	return &shareddomain.Message{
 		ID:         m.GetId(),
 		Type:       m.GetType(),
@@ -130,7 +130,7 @@ func convertMessage(m *aggregationv1.Message) *shareddomain.Message {
 		Usage:      usage,
 		Content: &shareddomain.MessageContent{
 			IsBlocks: false,
-			Text:     &content,
+			Text:     &text,
 		},
 	}
 }

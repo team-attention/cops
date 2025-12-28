@@ -26,16 +26,62 @@ message Usage {
   string service_tier = 5;
 }
 
+// ContentBlockType represents the type of content block.
+enum ContentBlockType {
+  CONTENT_BLOCK_TYPE_UNSPECIFIED = 0;
+  CONTENT_BLOCK_TYPE_TEXT = 1;
+  CONTENT_BLOCK_TYPE_TOOL_USE = 2;
+  CONTENT_BLOCK_TYPE_TOOL_RESULT = 3;
+  CONTENT_BLOCK_TYPE_THINKING = 4;
+}
+
+// TextContentBlock represents a text content block.
+message TextContentBlock {
+  string text = 1;
+}
+
+// ToolUseContentBlock represents a tool use content block.
+message ToolUseContentBlock {
+  string id = 1;
+  string name = 2;
+  string input_json = 3;  // JSON string for flexible input structure
+}
+
+// ToolResultContentBlock represents a tool result content block.
+message ToolResultContentBlock {
+  string tool_use_id = 1;
+  string content = 2;
+  bool is_error = 3;
+}
+
+// ThinkingContentBlock represents a thinking content block.
+message ThinkingContentBlock {
+  string thinking = 1;
+  string signature = 2;
+}
+
+// ContentBlock represents a polymorphic content block using oneof.
+message ContentBlock {
+  ContentBlockType type = 1;
+  oneof block {
+    TextContentBlock text = 2;
+    ToolUseContentBlock tool_use = 3;
+    ToolResultContentBlock tool_result = 4;
+    ThinkingContentBlock thinking = 5;
+  }
+}
+
 // Message contains the role and content of a session message.
 message Message {
   string id = 1;
   string type = 2;
   string role = 3;
   string model = 4;
-  string content = 5;
+  string text = 5;
   string stop_reason = 6;
   string stop_sequence = 7;
   Usage usage = 8;
+  repeated ContentBlock content_blocks = 9;
 }
 
 // SessionRecord represents a single Claude Code JSONL entry.

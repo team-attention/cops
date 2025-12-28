@@ -137,13 +137,6 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		return nil, errutil.Internalf("failed to save local config: %v", err)
 	}
 
-	// Get Claude directory for this project
-	claudeBaseDir, err := pathutil.DefaultClaudeDir()
-	if err != nil {
-		return nil, errutil.Internalf("failed to get Claude dir: %v", err)
-	}
-	claudeProjectDir := pathutil.GetClaudeProjectDir(claudeBaseDir, projectPath)
-
 	// Create project
 	project := &domain.Project{
 		ProjectAbstract: domain.ProjectAbstract{
@@ -152,7 +145,6 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 			Path: projectPath,
 		},
 		IsGitProject: isGitProject,
-		ClaudeDir:    claudeProjectDir,
 		RegisteredAt: time.Now(),
 	}
 
