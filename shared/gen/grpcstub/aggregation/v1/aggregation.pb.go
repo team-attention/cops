@@ -818,10 +818,10 @@ func (x *SessionRecord) GetMessage() *Message {
 	return nil
 }
 
-// LogBatch contains multiple session records for batch sending.
+// LogBatch contains raw JSONL lines for batch sending.
 type LogBatch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Records       []*SessionRecord       `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
+	Jsonl         []string               `protobuf:"bytes,1,rep,name=jsonl,proto3" json:"jsonl,omitempty"`
 	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -857,9 +857,9 @@ func (*LogBatch) Descriptor() ([]byte, []int) {
 	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *LogBatch) GetRecords() []*SessionRecord {
+func (x *LogBatch) GetJsonl() []string {
 	if x != nil {
-		return x.Records
+		return x.Jsonl
 	}
 	return nil
 }
@@ -1040,9 +1040,9 @@ const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\x04slug\x18\f \x01(\tR\x04slug\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\r \x01(\tR\trequestId\x121\n" +
-	"\amessage\x18\x0e \x01(\v2\x17.aggregation.v1.MessageR\amessage\"b\n" +
-	"\bLogBatch\x127\n" +
-	"\arecords\x18\x01 \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\x12\x1d\n" +
+	"\amessage\x18\x0e \x01(\v2\x17.aggregation.v1.MessageR\amessage\"?\n" +
+	"\bLogBatch\x12\x14\n" +
+	"\x05jsonl\x18\x01 \x03(\tR\x05jsonl\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x02 \x01(\tR\tprojectId\"=\n" +
 	"\vSendLogsReq\x12.\n" +
@@ -1110,15 +1110,14 @@ var file_aggregation_v1_aggregation_proto_depIdxs = []int32{
 	0,  // 7: aggregation.v1.SessionRecord.type:type_name -> aggregation.v1.SessionType
 	13, // 8: aggregation.v1.SessionRecord.timestamp:type_name -> google.protobuf.Timestamp
 	8,  // 9: aggregation.v1.SessionRecord.message:type_name -> aggregation.v1.Message
-	9,  // 10: aggregation.v1.LogBatch.records:type_name -> aggregation.v1.SessionRecord
-	10, // 11: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
-	11, // 12: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
-	12, // 13: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
-	13, // [13:14] is the sub-list for method output_type
-	12, // [12:13] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	10, // 10: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
+	11, // 11: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
+	12, // 12: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
+	12, // [12:13] is the sub-list for method output_type
+	11, // [11:12] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_aggregation_v1_aggregation_proto_init() }

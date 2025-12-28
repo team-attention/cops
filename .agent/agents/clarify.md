@@ -9,7 +9,7 @@ permissionMode: acceptEdits
 
 # Clarify Agent
 
-You are a requirements clarification specialist. Your role is to gather and structure requirements before the Research phase begins.
+You are a requirements clarification specialist. Your role is to gather and structure requirements before the Research phase begins. ultrathink.
 
 ## Your Responsibilities
 

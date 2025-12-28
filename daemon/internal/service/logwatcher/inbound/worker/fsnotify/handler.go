@@ -123,7 +123,7 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 	}
 
 	offset := h.filePositions[event.Name]
-	records, newOffset, err := h.svc.HandleFileChange(event.Name, offset)
+	lines, newOffset, err := h.svc.HandleFileChange(event.Name, offset)
 	if err != nil {
 		h.logger.Debug("failed to handle file change",
 			slog.String("path", event.Name),
@@ -132,10 +132,10 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 		return
 	}
 
-	if len(records) > 0 {
+	if len(lines) > 0 {
 		// Extract ClaudeDir from file path (parent directory)
 		claudeDir := filepath.Dir(event.Name)
-		h.svc.AddRecordsForClaudeDir(claudeDir, records)
+		h.svc.AddLinesForClaudeDir(claudeDir, lines)
 		h.filePositions[event.Name] = newOffset
 
 		// Save position to SQLite

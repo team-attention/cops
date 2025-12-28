@@ -2,10 +2,12 @@ package connectrpc
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"connectrpc.com/connect"
+	"github.com/bytedance/sonic"
 
 	aggregationservice "github.com/team-attention/cops/api/internal/service/aggregation"
 	"github.com/team-attention/cops/api/internal/service/aggregation/outbound/repository"
@@ -46,7 +48,18 @@ func (h *AggregationGRPCHandler) SendLogs(
 		}), nil
 	}
 
-	batch := convertToDomain(pbBatch)
+	batch, parseErrors := h.parseJSONLLines(pbBatch.GetJsonl(), pbBatch.GetProjectId())
+
+	// Log parse errors at ERROR level (Fire & Forget)
+	if len(parseErrors) > 0 {
+		h.logger.Error("failed to parse some JSONL lines",
+			slog.String("projectId", pbBatch.GetProjectId()),
+			slog.Int("failedCount", len(parseErrors)),
+			slog.Int("totalCount", len(pbBatch.GetJsonl())),
+			slog.String("sampleError", parseErrors[0].Error()),
+		)
+	}
+
 	result := h.svc.CollectLogs(ctx, batch)
 
 	res := &aggregationv1.SendLogsRes{
@@ -58,81 +71,30 @@ func (h *AggregationGRPCHandler) SendLogs(
 	return connect.NewResponse(res), nil
 }
 
-func convertToDomain(pb *aggregationv1.LogBatch) *repository.LogBatch {
-	records := make([]shareddomain.SessionRecord, len(pb.GetRecords()))
-	for i, r := range pb.GetRecords() {
-		records[i] = shareddomain.SessionRecord{
-			UUID:        r.GetUuid(),
-			ParentUUID:  r.GetParentUuid(),
-			SessionID:   r.GetSessionId(),
-			Type:        convertSessionType(r.GetType()),
-			Timestamp:   r.GetTimestamp().AsTime(),
-			CWD:         r.GetCwd(),
-			GitBranch:   r.GetGitBranch(),
-			Version:     r.GetVersion(),
-			UserType:    r.GetUserType(),
-			IsSidechain: r.GetIsSidechain(),
-			IsMeta:      r.GetIsMeta(),
-			Slug:        r.GetSlug(),
-			RequestID:   r.GetRequestId(),
-			Message:     convertMessage(r.GetMessage()),
+// parseJSONLLines parses raw JSONL lines into SessionRecord domain objects.
+// Returns the parsed batch and any parse errors encountered.
+func (h *AggregationGRPCHandler) parseJSONLLines(lines []string, projectID string) (*repository.LogBatch, []error) {
+	var records []shareddomain.SessionRecord
+	var parseErrors []error
+
+	for _, line := range lines {
+		if line == "" {
+			continue
 		}
+
+		var record shareddomain.SessionRecord
+		if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+			parseErrors = append(parseErrors, fmt.Errorf("parse error: %s (line: %.100s...)", err.Error(), line))
+			continue
+		}
+
+		records = append(records, record)
 	}
 
 	return &repository.LogBatch{
 		Records:   records,
-		ProjectID: pb.GetProjectId(),
-	}
-}
-
-func convertSessionType(t aggregationv1.SessionType) shareddomain.SessionType {
-	switch t {
-	case aggregationv1.SessionType_SESSION_TYPE_USER:
-		return shareddomain.SessionTypeUser
-	case aggregationv1.SessionType_SESSION_TYPE_ASSISTANT:
-		return shareddomain.SessionTypeAssistant
-	case aggregationv1.SessionType_SESSION_TYPE_SYSTEM:
-		return shareddomain.SessionTypeSystem
-	case aggregationv1.SessionType_SESSION_TYPE_SUMMARY:
-		return shareddomain.SessionTypeSummary
-	case aggregationv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT:
-		return shareddomain.SessionTypeFileHistorySnapshot
-	case aggregationv1.SessionType_SESSION_TYPE_QUEUE_OPERATION:
-		return shareddomain.SessionTypeQueueOperation
-	default:
-		return shareddomain.SessionTypeUser
-	}
-}
-
-func convertMessage(m *aggregationv1.Message) *shareddomain.Message {
-	if m == nil {
-		return nil
-	}
-
-	var usage *shareddomain.Usage
-	if m.GetUsage() != nil {
-		usage = &shareddomain.Usage{
-			InputTokens:              int(m.GetUsage().GetInputTokens()),
-			OutputTokens:             int(m.GetUsage().GetOutputTokens()),
-			CacheCreationInputTokens: int(m.GetUsage().GetCacheCreationInputTokens()),
-			CacheReadInputTokens:     int(m.GetUsage().GetCacheReadInputTokens()),
-			ServiceTier:              m.GetUsage().GetServiceTier(),
-		}
-	}
-
-	text := m.GetText()
-	return &shareddomain.Message{
-		ID:         m.GetId(),
-		Type:       m.GetType(),
-		Role:       m.GetRole(),
-		Model:      m.GetModel(),
-		StopReason: m.GetStopReason(),
-		Usage:      usage,
-		Content: &shareddomain.MessageContent{
-			IsBlocks: false,
-			Text:     &text,
-		},
-	}
+		ProjectID: projectID,
+	}, parseErrors
 }
 
 // Compile-time interface verification.

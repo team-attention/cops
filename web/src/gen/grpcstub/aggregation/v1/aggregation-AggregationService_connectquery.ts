@@ -5,7 +5,7 @@
 import { AggregationService } from "./aggregation_pb";
 
 /**
- * SendLogs sends a batch of session records to the API server.
+ * SendLogs sends a batch of raw JSONL lines to the API server.
  *
  * @generated from rpc aggregation.v1.AggregationService.SendLogs
  */

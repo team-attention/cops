@@ -102,9 +102,9 @@ message SessionRecord {
   Message message = 14;
 }
 
-// LogBatch contains multiple session records for batch sending.
+// LogBatch contains raw JSONL lines for batch sending.
 message LogBatch {
-  repeated SessionRecord records = 1;
+  repeated string jsonl = 1;
   string project_id = 2;
 }
 
@@ -122,6 +122,6 @@ message SendLogsRes {
 
 // AggregationService handles log aggregation from daemons.
 service AggregationService {
-  // SendLogs sends a batch of session records to the API server.
+  // SendLogs sends a batch of raw JSONL lines to the API server.
   rpc SendLogs(SendLogsReq) returns (SendLogsRes);
 }

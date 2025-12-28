@@ -16,9 +16,9 @@ const (
 
 // SessionRecord represents a single entry from Claude Code JSONL.
 type SessionRecord struct {
+	SessionID     string         `json:"sessionId"`
 	UUID          string         `json:"uuid"`
 	ParentUUID    string         `json:"parentUuid"`
-	SessionID     string         `json:"sessionId"`
 	Type          SessionType    `json:"type"`
 	Timestamp     time.Time      `json:"timestamp"`
 	CWD           string         `json:"cwd"`

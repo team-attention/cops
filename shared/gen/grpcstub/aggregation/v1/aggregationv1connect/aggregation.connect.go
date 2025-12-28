@@ -40,7 +40,7 @@ const (
 
 // AggregationServiceClient is a client for the aggregation.v1.AggregationService service.
 type AggregationServiceClient interface {
-	// SendLogs sends a batch of session records to the API server.
+	// SendLogs sends a batch of raw JSONL lines to the API server.
 	SendLogs(context.Context, *connect.Request[v1.SendLogsReq]) (*connect.Response[v1.SendLogsRes], error)
 }
 
@@ -76,7 +76,7 @@ func (c *aggregationServiceClient) SendLogs(ctx context.Context, req *connect.Re
 
 // AggregationServiceHandler is an implementation of the aggregation.v1.AggregationService service.
 type AggregationServiceHandler interface {
-	// SendLogs sends a batch of session records to the API server.
+	// SendLogs sends a batch of raw JSONL lines to the API server.
 	SendLogs(context.Context, *connect.Request[v1.SendLogsReq]) (*connect.Response[v1.SendLogsRes], error)
 }
 

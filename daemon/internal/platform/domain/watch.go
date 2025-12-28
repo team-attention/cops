@@ -33,8 +33,8 @@ type FilePosition struct {
 	UpdatedAt time.Time // Last update time
 }
 
-// LogBatch contains multiple session records for API transmission.
+// LogBatch contains raw JSONL lines for API transmission.
 type LogBatch struct {
-	Records   []shareddomain.SessionRecord // Session records from shared domain
-	ProjectID shareddomain.ID              // Project ID (for aggregation API)
+	Lines     []string        // Raw JSONL lines (unparsed)
+	ProjectID shareddomain.ID // Project ID (for aggregation API)
 }
