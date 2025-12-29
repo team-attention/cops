@@ -15,6 +15,8 @@ func (m addModel) View() string {
 	var b strings.Builder
 
 	switch m.step {
+	case stepParentDetection:
+		b.WriteString(m.viewParentConfirmation())
 	case stepGitSelection:
 		b.WriteString(m.viewGitSelection())
 	case stepNameInput:
@@ -156,4 +158,43 @@ func countLevelsUp(dir, repo string) int {
 		return levels
 	}
 	return 0
+}
+
+// viewParentConfirmation renders the parent project confirmation view.
+func (m addModel) viewParentConfirmation() string {
+	var b strings.Builder
+
+	if m.parentProject == nil {
+		b.WriteString("Checking for parent projects...\n")
+		return b.String()
+	}
+
+	b.WriteString(m.titleStyle.Render("Parent Project Detected"))
+	b.WriteString("\n\n")
+
+	b.WriteString("This directory is already being tracked as a subdirectory of:\n")
+	b.WriteString(fmt.Sprintf("  Project: %s\n", m.parentProject.Name))
+	b.WriteString(fmt.Sprintf("  Path:    %s\n", m.parentProject.Path))
+	b.WriteString("\n")
+
+	b.WriteString("Do you want to register it as a separate project?\n\n")
+
+	options := []string{
+		"Yes - Register as separate project",
+		"No - Cancel registration",
+	}
+
+	for i, opt := range options {
+		cursor := "  "
+		if m.parentCursor == i {
+			cursor = m.cursorStyle.Render("> ")
+		}
+		b.WriteString(fmt.Sprintf("%s%s\n", cursor, opt))
+	}
+
+	b.WriteString("\n")
+	b.WriteString(m.helpStyle.Render("up/down: navigate | enter: select | y/n: quick select | ctrl+c: cancel"))
+	b.WriteString("\n")
+
+	return b.String()
 }

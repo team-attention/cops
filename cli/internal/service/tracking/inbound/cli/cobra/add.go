@@ -39,7 +39,7 @@ Examples:
 			}
 
 			// Run the TUI
-			result, err := runAddTUI(path, noGit)
+			result, err := runAddTUI(path, noGit, h.svc)
 			if err != nil {
 				return err
 			}

@@ -25,6 +25,13 @@ type AddProjectParams struct {
 	Sync  bool
 }
 
+// ParentProjectInfo contains information about a parent project.
+type ParentProjectInfo struct {
+	ID   domain.ID
+	Name string
+	Path string
+}
+
 // Service provides tracking operations.
 type Service struct {
 	logger *slog.Logger
@@ -306,4 +313,48 @@ func (s *Service) RemoveProjectByPath(ctx context.Context, params RemoveProjectB
 // This feature is not yet implemented.
 func (s *Service) SyncProject(ctx context.Context, projectID domain.ID) error {
 	return errutil.Internalf("sync is not yet implemented")
+}
+
+// FindParentProject checks if any parent directory of the target path is already registered.
+// Returns parent project info if found, nil otherwise.
+func (s *Service) FindParentProject(targetPath string) (*ParentProjectInfo, error) {
+	// Expand and validate path
+	absPath, err := pathutil.ExpandPath(targetPath)
+	if err != nil {
+		return nil, errutil.BadRequestf("invalid path: %v", err)
+	}
+
+	// Load global config
+	globalConfig, err := s.configRepo.LoadGlobalConfig()
+	if err != nil {
+		return nil, errutil.Internalf("failed to load global config: %v", err)
+	}
+
+	// Walk up directory tree from parent of target path
+	current := filepath.Dir(absPath)
+
+	for current != "/" && current != "." {
+		// Check if this directory matches any registered project
+		for _, project := range globalConfig.Projects {
+			if project.Path == current {
+				// Found a parent project
+				return &ParentProjectInfo{
+					ID:   project.ID,
+					Name: project.Name,
+					Path: project.Path,
+				}, nil
+			}
+		}
+
+		// Move to parent directory
+		parent := filepath.Dir(current)
+		if parent == current {
+			// Reached root
+			break
+		}
+		current = parent
+	}
+
+	// No parent project found
+	return nil, nil
 }

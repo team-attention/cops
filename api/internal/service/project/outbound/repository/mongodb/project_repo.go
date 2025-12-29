@@ -13,13 +13,11 @@ import (
 	"github.com/team-attention/cops/shared/domain/mongoschema"
 )
 
-// MongoProjectRepository implements ProjectRepositoryPort using MongoDB.
 type MongoProjectRepository struct {
 	logger       *slog.Logger
 	projectsColl *mongo.Collection
 }
 
-// NewMongoProjectRepository creates a new MongoDB project repository adapter.
 func NewMongoProjectRepository(l *slog.Logger, db *mongo.Database) *MongoProjectRepository {
 	return &MongoProjectRepository{
 		logger:       l.With(slog.String("name", "project.repository.mongodb")),
@@ -27,63 +25,84 @@ func NewMongoProjectRepository(l *slog.Logger, db *mongo.Database) *MongoProject
 	}
 }
 
-// FindOrCreate finds existing project or creates new one.
-// Search order:
-// 1. By remote URL (either configured or actual)
-// 2. By existing project ID (if provided)
-// 3. Create new if not found
+// FindOrCreate finds existing project by ID or URLs, or creates a new one.
+// No business logic - just builds query from provided parameters.
+// Empty values are naturally filtered out when building conditions.
 func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, params repository.FindOrCreateParams) (*repository.FindOrCreateResult, error) {
-	// Build $or conditions array with all search criteria
-	conditions := []bson.M{}
+	// Build $or conditions from provided parameters
+	conditions := r.buildSearchConditions(params)
 
-	// Add remote URL conditions
-	if params.ConfiguredURL != "" {
-		conditions = append(conditions, bson.M{mongoschema.ProjectRemoteURLField: params.ConfiguredURL})
-	}
-	if params.ActualURL != "" && params.ActualURL != params.ConfiguredURL {
-		conditions = append(conditions, bson.M{mongoschema.ProjectRemoteURLField: params.ActualURL})
+	// If we have search conditions, try to find existing project
+	if len(conditions) > 0 {
+		project, err := r.findByConditions(ctx, conditions)
+		if err != nil {
+			return nil, err
+		}
+		if project != nil {
+			r.logger.Info("found existing project",
+				slog.String("projectID", project.ProjectID))
+			return project, nil
+		}
 	}
 
-	// Add existing ID condition if valid
+	// Not found, create new project
+	return r.createProject(ctx, params)
+}
+
+// buildSearchConditions creates $or conditions from params.
+// Only adds conditions for non-empty values.
+func (r *MongoProjectRepository) buildSearchConditions(params repository.FindOrCreateParams) []bson.M {
+	conditions := make([]bson.M, 0, 2)
+
+	// Add ID condition if provided
 	if params.ExistingID != "" {
 		if objectID, err := bson.ObjectIDFromHex(params.ExistingID); err == nil {
 			conditions = append(conditions, bson.M{mongoschema.ProjectIDField: objectID})
 		}
 	}
 
-	// Validate at least one condition exists
-	if len(conditions) == 0 {
-		return nil, fmt.Errorf("no search criteria provided: at least one of configuredURL, actualURL, or existingID must be valid")
+	// Add URL conditions if provided (using $in for multiple URLs)
+	urls := r.collectNonEmptyURLs(params.ConfiguredURL, params.ActualURL)
+	if len(urls) > 0 {
+		conditions = append(conditions, bson.M{
+			mongoschema.ProjectRemoteURLField: bson.M{"$in": urls},
+		})
 	}
 
-	// Execute single findOne with $or filter
+	return conditions
+}
+
+// collectNonEmptyURLs gathers non-empty, unique URLs.
+func (r *MongoProjectRepository) collectNonEmptyURLs(configuredURL, actualURL string) []string {
+	urls := make([]string, 0, 2)
+	if configuredURL != "" {
+		urls = append(urls, configuredURL)
+	}
+	if actualURL != "" && actualURL != configuredURL {
+		urls = append(urls, actualURL)
+	}
+	return urls
+}
+
+// findByConditions executes the $or query.
+func (r *MongoProjectRepository) findByConditions(ctx context.Context, conditions []bson.M) (*repository.FindOrCreateResult, error) {
 	filter := bson.M{"$or": conditions}
 	var doc bson.M
 	err := r.projectsColl.FindOne(ctx, filter).Decode(&doc)
 
-	// If found, return existing project
-	if err == nil {
-		projectID := doc[mongoschema.ProjectIDField].(bson.ObjectID).Hex()
-		name := doc[mongoschema.ProjectNameField].(string)
-		isGitProject := doc[mongoschema.ProjectIsGitProjectField].(bool)
-
-		r.logger.Info("found existing project",
-			slog.String("projectID", projectID))
-		return &repository.FindOrCreateResult{
-			ProjectID:    projectID,
-			IsNew:        false,
-			Name:         name,
-			IsGitProject: isGitProject,
-		}, nil
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
 	}
-
-	// If error is not "not found", return error
-	if err != mongo.ErrNoDocuments {
+	if err != nil {
 		r.logger.Error("failed to find project", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to find project: %w", err)
 	}
 
-	// Not found, create new document
+	return r.docToResult(doc), nil
+}
+
+// createProject inserts a new project document.
+func (r *MongoProjectRepository) createProject(ctx context.Context, params repository.FindOrCreateParams) (*repository.FindOrCreateResult, error) {
 	// Prefer configured URL, fallback to actual URL
 	remoteURL := params.ConfiguredURL
 	if remoteURL == "" {
@@ -106,9 +125,7 @@ func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, params reposi
 	newID := result.InsertedID.(bson.ObjectID).Hex()
 	r.logger.Info("created new project",
 		slog.String("projectID", newID),
-		slog.String("name", params.Name),
-		slog.String("remoteURL", remoteURL),
-		slog.Bool("isGitProject", params.IsGitProject))
+		slog.String("name", params.Name))
 
 	return &repository.FindOrCreateResult{
 		ProjectID:    newID,
@@ -118,5 +135,14 @@ func (r *MongoProjectRepository) FindOrCreate(ctx context.Context, params reposi
 	}, nil
 }
 
-// Compile-time interface verification
+// docToResult converts a MongoDB document to FindOrCreateResult.
+func (r *MongoProjectRepository) docToResult(doc bson.M) *repository.FindOrCreateResult {
+	return &repository.FindOrCreateResult{
+		ProjectID:    doc[mongoschema.ProjectIDField].(bson.ObjectID).Hex(),
+		IsNew:        false,
+		Name:         doc[mongoschema.ProjectNameField].(string),
+		IsGitProject: doc[mongoschema.ProjectIsGitProjectField].(bool),
+	}
+}
+
 var _ repository.ProjectRepositoryPort = (*MongoProjectRepository)(nil)

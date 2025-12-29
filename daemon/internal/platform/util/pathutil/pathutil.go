@@ -32,3 +32,37 @@ func GetClaudeProjectsBaseDir() string {
 	}
 	return filepath.Join(home, ".claude", "projects")
 }
+
+// DecodeClaudeProjectDir decodes a Claude Code project directory path back to the original file system path.
+// e.g., "~/.claude/projects/-Users-jayce-project" → "/Users/jayce/project"
+// Returns empty string if the path is not a valid Claude project directory.
+func DecodeClaudeProjectDir(claudeDir string) string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+
+	// Build expected prefix
+	prefix := filepath.Join(home, ".claude", "projects") + string(filepath.Separator)
+
+	// Check if claudeDir starts with prefix
+	if !strings.HasPrefix(claudeDir, prefix) {
+		return ""
+	}
+
+	// Extract encoded portion
+	encoded := strings.TrimPrefix(claudeDir, prefix)
+	if encoded == "" {
+		return ""
+	}
+
+	// Decode: replace all '-' with '/'
+	decoded := strings.ReplaceAll(encoded, "-", "/")
+
+	// Ensure it starts with '/'
+	if !strings.HasPrefix(decoded, "/") {
+		return ""
+	}
+
+	return decoded
+}

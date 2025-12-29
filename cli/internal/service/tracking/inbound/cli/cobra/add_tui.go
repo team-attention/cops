@@ -11,11 +11,13 @@ import (
 	"golang.org/x/term"
 
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
+	"github.com/team-attention/cops/cli/internal/service/tracking"
 )
 
 // TUI step constants
 const (
-	stepGitSelection = iota
+	stepParentDetection = iota
+	stepGitSelection
 	stepNameInput
 	stepSyncSelection
 	stepCompleted
@@ -37,6 +39,11 @@ type addModel struct {
 
 	// Error state
 	err error
+
+	// Parent detection results
+	parentProject *tracking.ParentProjectInfo // Result from service
+	parentCursor  int                          // 0=Yes, 1=No
+	service       *tracking.Service            // Reference to service for parent detection
 
 	// Git detection results
 	gitRepos       []string // Found git repos in parents (closest first)
@@ -63,16 +70,17 @@ type addModel struct {
 }
 
 // newAddModel creates a new add TUI model.
-func newAddModel(dir string, noGitFlag bool) addModel {
+func newAddModel(dir string, noGitFlag bool, service *tracking.Service) addModel {
 	ti := textinput.New()
 	ti.Placeholder = "project-name"
 	ti.CharLimit = 100
 	ti.Width = 40
 
 	m := addModel{
-		step:           stepGitSelection,
+		step:           stepParentDetection,
 		currentDir:     dir,
 		noGitFlag:      noGitFlag,
+		service:        service,
 		selectedGitIdx: -1,
 		nameInput:      ti,
 		titleStyle:     lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("205")),
@@ -87,7 +95,19 @@ func newAddModel(dir string, noGitFlag bool) addModel {
 
 // Init implements tea.Model.
 func (m addModel) Init() tea.Cmd {
-	return m.detectGitRepos
+	return m.detectParentProject
+}
+
+// parentDetectionMsg is sent when parent detection completes.
+type parentDetectionMsg struct {
+	parent *tracking.ParentProjectInfo
+	err    error
+}
+
+// detectParentProject is a command that checks for parent projects.
+func (m addModel) detectParentProject() tea.Msg {
+	parent, err := m.service.FindParentProject(m.currentDir)
+	return parentDetectionMsg{parent: parent, err: err}
 }
 
 // detectGitRepos is a command that searches for git repos in parent directories.
@@ -143,13 +163,13 @@ type gitDetectionMsg struct {
 
 // runAddTUI runs the add command TUI and returns the result.
 // Returns an error if the terminal is not interactive.
-func runAddTUI(dir string, noGitFlag bool) (*addTUIResult, error) {
+func runAddTUI(dir string, noGitFlag bool, service *tracking.Service) (*addTUIResult, error) {
 	// Check if running in an interactive terminal
 	if !term.IsTerminal(int(os.Stdout.Fd())) {
 		return nil, fmt.Errorf("cops add requires an interactive terminal. Use SSH with -t flag or run in a terminal emulator")
 	}
 
-	model := newAddModel(dir, noGitFlag)
+	model := newAddModel(dir, noGitFlag, service)
 	p := tea.NewProgram(model)
 
 	finalModel, err := p.Run()

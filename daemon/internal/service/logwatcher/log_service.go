@@ -7,10 +7,12 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/filesystem"
 	shareddomain "github.com/team-attention/cops/shared/domain"
@@ -24,6 +26,7 @@ type Service struct {
 	apiClient          api.APIClientPort        // Outbound: API transmission
 	watchedDirs        map[string]bool
 	claudeDirToProject map[string]shareddomain.ID
+	projectPathToID    map[string]shareddomain.ID // ProjectPath -> ProjectID mapping for hierarchical matching
 	bufferByProject    map[shareddomain.ID][]string
 	mu                 sync.Mutex
 }
@@ -41,6 +44,7 @@ func NewService(
 		apiClient:          apiClient,
 		watchedDirs:        make(map[string]bool),
 		claudeDirToProject: make(map[string]shareddomain.ID),
+		projectPathToID:    make(map[string]shareddomain.ID),
 		bufferByProject:    make(map[shareddomain.ID][]string),
 	}
 }
@@ -51,12 +55,15 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Build set of new directories and ProjectID mapping
+	// Build set of new directories and ProjectID mappings
 	newDirs := make(map[string]bool)
-	newMapping := make(map[string]shareddomain.ID)
+	newClaudeDirMapping := make(map[string]shareddomain.ID)
+	newProjectPathMapping := make(map[string]shareddomain.ID)
+
 	for _, t := range targets {
 		newDirs[t.ClaudeDir] = true
-		newMapping[t.ClaudeDir] = t.ProjectID
+		newClaudeDirMapping[t.ClaudeDir] = t.ProjectID
+		newProjectPathMapping[t.ProjectPath] = t.ProjectID
 	}
 
 	// Remove watches for directories no longer in targets
@@ -87,12 +94,14 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 		}
 	}
 
-	// Update ClaudeDir to ProjectID mapping
-	s.claudeDirToProject = newMapping
+	// Update mappings
+	s.claudeDirToProject = newClaudeDirMapping
+	s.projectPathToID = newProjectPathMapping
 
 	s.logger.Info("updated watch targets",
 		slog.Int("watching", len(s.watchedDirs)),
-		slog.Int("mappings", len(s.claudeDirToProject)),
+		slog.Int("claudeDirMappings", len(s.claudeDirToProject)),
+		slog.Int("projectPathMappings", len(s.projectPathToID)),
 	)
 
 	return nil
@@ -204,9 +213,47 @@ func (s *Service) Flush(ctx context.Context) error {
 }
 
 // GetProjectIDForClaudeDir returns the ProjectID for a given ClaudeDir.
+// Uses hierarchical matching: first tries exact match, then finds longest path prefix.
 // Returns empty ID if not found.
 func (s *Service) GetProjectIDForClaudeDir(claudeDir string) shareddomain.ID {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.claudeDirToProject[claudeDir]
+
+	// Try exact match first
+	if projectID, ok := s.claudeDirToProject[claudeDir]; ok {
+		return projectID
+	}
+
+	// No exact match - try hierarchical matching
+	// Decode claudeDir to original path
+	decodedPath := pathutil.DecodeClaudeProjectDir(claudeDir)
+	if decodedPath == "" {
+		// Invalid Claude directory format
+		return ""
+	}
+
+	// Find all matching parent paths
+	var longestMatch string
+	var matchedID shareddomain.ID
+
+	for projectPath, projectID := range s.projectPathToID {
+		// Check if projectPath is a prefix of decodedPath
+		// Must be exact match OR decodedPath must start with projectPath followed by separator
+		if projectPath == decodedPath {
+			// Exact match (already checked above, but keep for completeness)
+			return projectID
+		}
+
+		// Check if it's a proper prefix (with separator)
+		if strings.HasPrefix(decodedPath, projectPath+"/") {
+			// This is a parent directory match
+			// Keep the longest (most specific) match
+			if len(projectPath) > len(longestMatch) {
+				longestMatch = projectPath
+				matchedID = projectID
+			}
+		}
+	}
+
+	return matchedID
 }

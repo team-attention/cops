@@ -11,6 +11,20 @@ import (
 // Update implements tea.Model.
 func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case parentDetectionMsg:
+		if msg.err != nil {
+			m.err = msg.err
+			return m, tea.Quit
+		}
+		m.parentProject = msg.parent
+		if msg.parent == nil {
+			// No parent found, proceed to git detection
+			m.step = stepGitSelection
+			return m, m.detectGitRepos
+		}
+		// Parent found, stay on stepParentDetection for user confirmation
+		return m, nil
+
 	case gitDetectionMsg:
 		if msg.err != nil {
 			m.err = msg.err
@@ -21,6 +35,8 @@ func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch m.step {
+		case stepParentDetection:
+			return m.updateParentSelection(msg)
 		case stepGitSelection:
 			return m.updateGitSelection(msg)
 		case stepNameInput:
@@ -155,6 +171,44 @@ func (m addModel) updateSyncSelection(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.result.SyncPastLogs = false
 		m.step = stepCompleted
 		return m, tea.Quit
+	}
+
+	return m, nil
+}
+
+// updateParentSelection handles input during parent project detection step.
+func (m addModel) updateParentSelection(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "ctrl+c", "esc", "n", "N":
+		// User cancelled or said No
+		m.result.Cancelled = true
+		return m, tea.Quit
+
+	case "up", "k":
+		if m.parentCursor > 0 {
+			m.parentCursor--
+		}
+
+	case "down", "j":
+		if m.parentCursor < 1 {
+			m.parentCursor++
+		}
+
+	case "enter":
+		if m.parentCursor == 0 {
+			// Yes - proceed to git detection
+			m.step = stepGitSelection
+			return m, m.detectGitRepos
+		} else {
+			// No - cancel
+			m.result.Cancelled = true
+			return m, tea.Quit
+		}
+
+	case "y", "Y":
+		// Yes - proceed to git detection
+		m.step = stepGitSelection
+		return m, m.detectGitRepos
 	}
 
 	return m, nil
