@@ -1,172 +1,147 @@
 ---
 name: commit-pr
 description: |
-  Create git commit and optionally push & create PR.
-  Standalone mode: generates commit message from git diff.
-  With walkthrough: uses walkthrough artifact for rich commit details.
+  Commit changes with artifact-based message and create PR (or push to main)
 ---
 
-# Commit & PR Skill
+# Commit-PR Skill
 
-Handles git commit, push, and PR creation with smart commit message generation.
+Commits staged changes with a message generated from artifact files, then handles push/PR based on current branch.
 
-## Modes
+## Input
 
-### Standalone Mode
-- No walkthrough artifact available
-- Generates commit message from `git diff`
-- Asks user for PR creation
+- `$ARTIFACT_ID` - Artifact directory identifier for the current work session
 
-### Walkthrough Mode
-- Walkthrough artifact exists
-- Uses artifact for rich commit message and PR body
-- Automatically creates PR
+## Process
 
-## Arguments
+### Step 1: Read Artifact Files
 
-- `$ARGUMENTS` (optional): Artifact ID for walkthrough mode (e.g., "20251226-123456")
-- `--push-only`: Only commit and push, skip PR creation
-- `--only-related`: Only commit files related to this workflow (excludes unrelated changes)
-- `--files <pattern>`: Only add files matching pattern (e.g., "api/**" or "*.go")
-
-## Workflow
-
-### Step 1: Detect Mode
-
-Check if artifact ID provided:
+List and read artifact files to understand the work done:
 ```bash
-if [ -n "$ARGUMENTS" ] && [ -f ".agent/artifacts/$ARGUMENTS/XX_walkthrough.md" ]; then
-  MODE="walkthrough"
+ARTIFACT_DIR=".agent/artifacts/$ARTIFACT_ID"
+ls -1 "$ARTIFACT_DIR"
+```
+
+Read artifact files in order of priority:
+1. `*_walkthrough.md` - Primary source for commit summary
+2. other files - Implementation, Planning, Requirements details
+
+Summarize the changes made based on artifact content.
+
+### Step 2: Check Git Status and Branch
+
+```bash
+# Check current branch
+CURRENT_BRANCH=$(git branch --show-current)
+
+# Check for uncommitted changes
+git status --short
+
+# Determine branch type
+if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+  IS_MAIN_BRANCH=true
 else
-  MODE="standalone"
+  IS_MAIN_BRANCH=false
 fi
 ```
 
-### Step 2: Check Git Status
+### Step 3: Stage and Commit Changes
 
+Stage all changes including artifact files:
 ```bash
-# Run git status to see changes
-git status
-
-# Run git diff to see changes
-git diff
+git add -A
 ```
 
-If no changes, exit with message: "No changes to commit".
+Generate commit message using conventional commit format:
+- Analyze artifact content to determine type (feat, fix, refactor, docs, etc.)
+- Optionally add scope in parentheses: `{type}(scope):`
+- Create descriptive summary from walkthrough
+- Include Artifact-ID in commit body
 
-### Step 3: Generate Commit Message
-
-**Standalone Mode:**
-- Summarize `git diff` output in 1-2 sentences
-- Use format:
-  ```
-  [type]: [brief summary]
-
-  - [key change 1]
-  - [key change 2]
-
-  🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-  Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
-  ```
-
-**Walkthrough Mode:**
-- Read walkthrough artifact at `.agent/artifacts/$ARGUMENTS/*_walkthrough.md`
-- Extract title and summary
-- Use format:
-  ```
-  [type]: [title from walkthrough]
-
-  [summary from walkthrough]
-
-  🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-  Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
-  ```
-
-### Step 4: Commit
-
-**Determine files to commit:**
-
-1. **If `--files <pattern>` provided:**
-   - Add only files matching the pattern: `git add <pattern>`
-
-2. **If `--only-related` provided (Walkthrough mode):**
-   - Read the walkthrough artifact to identify modified files
-   - Compare with `git status` output
-   - Add only files mentioned in the walkthrough
-   - Example:
-     ```bash
-     # Extract file paths from walkthrough's "Modified Files" section
-     # Add only those files that appear in git status
-     git add <file1> <file2> <file3>
-     ```
-   - If walkthrough doesn't list specific files, analyze git diff and ask user which files belong to this workflow
-
-3. **Default (no flags):**
-   - Add all changes: `git add .`
-
-**Create commit:**
 ```bash
 git commit -m "$(cat <<'EOF'
-[generated commit message here]
+{type}(scope): {brief description}
+
+Artifact-ID: $ARTIFACT_ID
+
+{detailed summary from artifacts}
+
 EOF
 )"
 ```
 
-### Step 5: Push
+### Step 4: Branch-Based Action
 
+#### If Main Branch ($IS_MAIN_BRANCH = true)
+
+Ask user whether to push:
+```
+Use AskUserQuestion tool:
+- questions:
+  - question: "Changes committed. Push to remote?"
+    header: "Push"
+    options:
+      - label: "Push"
+        description: "Push commits to remote main branch"
+      - label: "Skip"
+        description: "Keep commits local for now"
+    multiSelect: false
+```
+
+**If Push selected:**
+```bash
+git push
+```
+
+#### If Feature Branch ($IS_MAIN_BRANCH = false)
+
+Ask user whether to create PR:
+```
+Use AskUserQuestion tool:
+- questions:
+  - question: "Changes committed. How would you like to proceed?"
+    header: "Next Step"
+    options:
+      - label: "Create PR"
+        description: "Push and create a Pull Request"
+      - label: "Push Only"
+        description: "Push to remote without creating PR"
+      - label: "Skip"
+        description: "Keep commits local for now"
+    multiSelect: false
+```
+
+**If Create PR selected:**
+```bash
+# Push with upstream tracking
+git push -u origin HEAD
+
+# Create PR with artifact-informed content
+gh pr create --title "{type}(scope): {brief description}" --body "$(cat <<'EOF'
+Artifact-ID: $ARTIFACT_ID
+
+## Summary
+{bullet points from walkthrough}
+
+EOF
+)"
+```
+
+**If Push Only selected:**
 ```bash
 git push -u origin HEAD
 ```
 
-### Step 6: Create PR (Conditional)
+## Output
 
-**If `--push-only` flag:** Skip PR creation
+Report completion summary:
+```
+Commit-PR completed.
 
-**Else if Walkthrough Mode:**
-- Extract PR body from walkthrough artifact
-- Create PR:
-  ```bash
-  gh pr create \
-    --title "[Title from walkthrough]" \
-    --body "$(cat .agent/artifacts/$ARGUMENTS/*_walkthrough.md)"
-  ```
-
-**Else (Standalone Mode):**
-- Ask user:
-  ```
-  Use AskUserQuestion tool:
-  - Question: "Create pull request?"
-  - Header: "PR Creation"
-  - Options:
-    - label: "Yes", description: "Create PR now"
-    - label: "No", description: "Skip PR creation"
-  - multiSelect: false
-  ```
-- If Yes:
-  ```bash
-  gh pr create --fill  # Use commit message as PR title/body
-  ```
-
-## Example Usage
-
-```bash
-# Standalone (no walkthrough) - commits all changes
-/commit-pr
-
-# With walkthrough artifact - commits all changes
-/commit-pr 20251226-123456
-
-# Only commit files related to this workflow (excludes unrelated changes)
-/commit-pr 20251226-123456 --only-related
-
-# Commit specific file pattern
-/commit-pr --files "api/**"
-
-# Push only (no PR) - commits all changes and pushes
-/commit-pr --push-only
-
-# Combine flags - only related files, no PR creation
-/commit-pr 20251226-123456 --only-related --push-only
+## Summary
+- Commit: {commit hash}
+- Branch: $CURRENT_BRANCH
+- Action: {Push / PR Created / Skipped}
+- PR URL: {URL if PR created}
+- Artifact-ID: $ARTIFACT_ID
 ```

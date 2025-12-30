@@ -48,23 +48,46 @@ gh pr view --json reviews,comments
 
 ### 2. Find Related Artifacts
 
-Search for artifacts that were committed with or around the reviewed code to understand implementation context:
+Find artifacts related to the reviewed code by checking commit messages and PR body for Artifact ID.
+
+#### 2-A. Try to Find Artifact ID from Messages
+
+First, check if commits or PR contain an Artifact ID (format: `Artifact-ID: YYYYMMDD-HHMMSS`):
+
+```bash
+# Search for Artifact-ID in commit messages on this branch
+git log main..HEAD --format="%B" | grep -oE "Artifact-ID: [0-9]{8}-[0-9]{6}" | head -1
+
+# If in GitHub PR mode, also check PR body
+gh pr view --json body --jq '.body' | grep -oE "Artifact-ID: [0-9]{8}-[0-9]{6}" | head -1
+```
+
+If found, extract the ID and read artifacts directly:
+```bash
+ARTIFACT_ID="YYYYMMDD-HHMMSS"  # extracted value
+ls -la ".agent/artifacts/$ARTIFACT_ID/"
+```
+
+#### 2-B. Fallback: Search Artifacts Directory
+
+If no Artifact ID is found in messages, search for artifacts manually:
 
 ```bash
 # Get recent commits on this branch
 git log --oneline main..HEAD
 
-# For each commit, check if artifacts exist
-# Look for .agent/artifacts/{ARTIFACT_ID}/ directories
+# List all artifact directories
 ls -la .agent/artifacts/
 ```
 
-**Important:** Not all co-committed artifacts are related to the reviewed code. Analyze:
+**Important:** When searching manually, not all artifacts are related to the reviewed code. Analyze:
 - Commit timestamps and messages
 - File paths mentioned in artifacts vs PR changes
 - Requirements and plan content relevance
 
-Read relevant artifacts:
+#### 2-C. Read Relevant Artifacts
+
+Read artifact files to understand implementation context:
 - `NN_requirements.md` - Understand original intent
 - `NN_plan.md` - Understand design decisions
 - Other planning documents - Context for architectural choices
