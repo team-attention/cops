@@ -8,13 +8,3 @@ type ID string
 func (id ID) String() string {
 	return string(id)
 }
-
-// IsEmpty checks if the ID is empty.
-func (id ID) IsEmpty() bool {
-	return id == ""
-}
-
-// NewID creates a new ID from a string value.
-func NewID(s string) ID {
-	return ID(s)
-}

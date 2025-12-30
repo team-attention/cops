@@ -5,14 +5,15 @@ import "time"
 // ------- Type FileHistorySnapshot -------
 
 type FileHistorySnapshotTrackedBackups struct {
-	BackupFileName *string   `json:"backupFileName,omitempty" bson:"backupFileName,omitempty"`
+	// BackupFileName null or string
+	BackupFileName *string   `json:"backupFileName" bson:"backupFileName"`
 	Version        int       `json:"version" bson:"version"`
 	BackupTime     time.Time `json:"backupTime" bson:"backupTime"`
 }
 
 type FileHistorySnapshot struct {
-	MessageID          string                                       `json:"messageId" bson:"messageId"`
-	TrackedFileBackups map[string]FileHistorySnapshotTrackedBackups `json:"trackedFileBackups" bson:"trackedFileBackups"`
+	MessageID          string                                        `json:"messageId" bson:"messageId"`
+	TrackedFileBackups map[string]*FileHistorySnapshotTrackedBackups `json:"trackedFileBackups" bson:"trackedFileBackups"`
 }
 
 type FileHistorySnapshotRecord struct {
