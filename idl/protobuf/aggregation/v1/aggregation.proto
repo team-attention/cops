@@ -6,19 +6,74 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1;aggregationv1";
 
-// SessionType represents the type of session message.
-enum SessionType {
-  SESSION_TYPE_UNSPECIFIED = 0;
-  SESSION_TYPE_USER = 1;
-  SESSION_TYPE_ASSISTANT = 2;
-  SESSION_TYPE_SYSTEM = 3;
-  SESSION_TYPE_SUMMARY = 4;
-  SESSION_TYPE_FILE_HISTORY_SNAPSHOT = 5;
-  SESSION_TYPE_QUEUE_OPERATION = 6;
+// RecordType represents the type discriminator for records.
+enum RecordType {
+  RECORD_TYPE_UNSPECIFIED = 0;
+  RECORD_TYPE_USER = 1;
+  RECORD_TYPE_ASSISTANT = 2;
+  RECORD_TYPE_FILE_HISTORY_SNAPSHOT = 3;
 }
 
-// Usage contains token usage information.
-message Usage {
+// MessageMetadata contains common metadata fields for user and assistant records.
+message MessageMetadata {
+  string parent_uuid = 1;
+  bool is_sidechain = 2;
+  string user_type = 3;
+  string session_id = 4;
+  string version = 5;
+  string git_branch = 6;
+  string uuid = 7;
+  google.protobuf.Timestamp timestamp = 8;
+}
+
+// UserMessage contains user message content.
+message UserMessage {
+  string role = 1;
+  string content = 2;
+}
+
+// UserRecordThinkingMetadataTrigger contains trigger information.
+message UserRecordThinkingMetadataTrigger {
+  int32 start = 1;
+  int32 end = 2;
+  string text = 3;
+}
+
+// UserRecordThinkingMetadata contains thinking metadata.
+message UserRecordThinkingMetadata {
+  string level = 1;
+  bool disabled = 2;
+  repeated UserRecordThinkingMetadataTrigger triggers = 3;
+}
+
+// UserRecordTodo contains todo item.
+message UserRecordTodo {
+  string content = 1;
+  string status = 2;
+  string active_form = 3;
+}
+
+// UserRecordData contains user-specific record data.
+message UserRecordData {
+  MessageMetadata metadata = 1;
+  UserMessage message = 2;
+  bool is_meta = 3;
+  UserRecordThinkingMetadata thinking_metadata = 4;
+  repeated UserRecordTodo todos = 5;
+}
+
+// AssistantMessageContent contains assistant message content block.
+message AssistantMessageContent {
+  string type = 1;
+  string text = 2;
+  string thinking = 3;
+  string tool_use_id = 4;
+  string tool_use_name = 5;
+  string tool_use_input_json = 6;
+}
+
+// AssistantMessageUsage contains token usage information.
+message AssistantMessageUsage {
   int32 input_tokens = 1;
   int32 output_tokens = 2;
   int32 cache_creation_input_tokens = 3;
@@ -26,80 +81,53 @@ message Usage {
   string service_tier = 5;
 }
 
-// ContentBlockType represents the type of content block.
-enum ContentBlockType {
-  CONTENT_BLOCK_TYPE_UNSPECIFIED = 0;
-  CONTENT_BLOCK_TYPE_TEXT = 1;
-  CONTENT_BLOCK_TYPE_TOOL_USE = 2;
-  CONTENT_BLOCK_TYPE_TOOL_RESULT = 3;
-  CONTENT_BLOCK_TYPE_THINKING = 4;
-}
-
-// TextContentBlock represents a text content block.
-message TextContentBlock {
-  string text = 1;
-}
-
-// ToolUseContentBlock represents a tool use content block.
-message ToolUseContentBlock {
-  string id = 1;
-  string name = 2;
-  string input_json = 3;  // JSON string for flexible input structure
-}
-
-// ToolResultContentBlock represents a tool result content block.
-message ToolResultContentBlock {
-  string tool_use_id = 1;
-  string content = 2;
-  bool is_error = 3;
-}
-
-// ThinkingContentBlock represents a thinking content block.
-message ThinkingContentBlock {
-  string thinking = 1;
-  string signature = 2;
-}
-
-// ContentBlock represents a polymorphic content block using oneof.
-message ContentBlock {
-  ContentBlockType type = 1;
-  oneof block {
-    TextContentBlock text = 2;
-    ToolUseContentBlock tool_use = 3;
-    ToolResultContentBlock tool_result = 4;
-    ThinkingContentBlock thinking = 5;
-  }
-}
-
-// Message contains the role and content of a session message.
-message Message {
-  string id = 1;
-  string type = 2;
-  string role = 3;
-  string model = 4;
-  string text = 5;
+// AssistantMessage contains assistant message.
+message AssistantMessage {
+  string model = 1;
+  string id = 2;
+  string type = 3;
+  string role = 4;
+  repeated AssistantMessageContent content = 5;
   string stop_reason = 6;
-  string stop_sequence = 7;
-  Usage usage = 8;
-  repeated ContentBlock content_blocks = 9;
+  int32 stop_sequence = 7;
+  AssistantMessageUsage usage = 8;
 }
 
-// SessionRecord represents a single Claude Code JSONL entry.
-message SessionRecord {
-  string uuid = 1;
-  string parent_uuid = 2;
-  string session_id = 3;
-  SessionType type = 4;
-  google.protobuf.Timestamp timestamp = 5;
-  string cwd = 6;
-  string git_branch = 7;
-  string version = 8;
-  string user_type = 9;
-  bool is_sidechain = 10;
-  bool is_meta = 11;
-  string slug = 12;
-  string request_id = 13;
-  Message message = 14;
+// AssistantRecordData contains assistant-specific record data.
+message AssistantRecordData {
+  MessageMetadata metadata = 1;
+  string request_id = 2;
+  AssistantMessage message = 3;
+}
+
+// FileHistorySnapshotTrackedBackup contains file backup information.
+message FileHistorySnapshotTrackedBackup {
+  string backup_file_name = 1;
+  int32 version = 2;
+  google.protobuf.Timestamp backup_time = 3;
+}
+
+// FileHistorySnapshot contains snapshot data.
+message FileHistorySnapshot {
+  string message_id = 1;
+  map<string, FileHistorySnapshotTrackedBackup> tracked_file_backups = 2;
+}
+
+// FileHistorySnapshotRecordData contains file-history-snapshot-specific record data.
+message FileHistorySnapshotRecordData {
+  string message_id = 1;
+  FileHistorySnapshot snapshot = 2;
+  bool is_snapshot_update = 3;
+}
+
+// Record represents a single Claude Code JSONL entry with type-specific data.
+message Record {
+  RecordType type = 1;
+  oneof data {
+    UserRecordData user_data = 2;
+    AssistantRecordData assistant_data = 3;
+    FileHistorySnapshotRecordData file_history_snapshot_data = 4;
+  }
 }
 
 // LogBatch contains raw JSONL lines for batch sending.

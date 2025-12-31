@@ -6,20 +6,268 @@ import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobu
 import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message as Message$1 } from "@bufbuild/protobuf";
+import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file aggregation/v1/aggregation.proto.
  */
 export const file_aggregation_v1_aggregation: GenFile = /*@__PURE__*/
-  fileDesc("CiBhZ2dyZWdhdGlvbi92MS9hZ2dyZWdhdGlvbi5wcm90bxIOYWdncmVnYXRpb24udjEikAEKBVVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAkiIAoQVGV4dENvbnRlbnRCbG9jaxIMCgR0ZXh0GAEgASgJIkMKE1Rvb2xVc2VDb250ZW50QmxvY2sSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRISCgppbnB1dF9qc29uGAMgASgJIlAKFlRvb2xSZXN1bHRDb250ZW50QmxvY2sSEwoLdG9vbF91c2VfaWQYASABKAkSDwoHY29udGVudBgCIAEoCRIQCghpc19lcnJvchgDIAEoCCI7ChRUaGlua2luZ0NvbnRlbnRCbG9jaxIQCgh0aGlua2luZxgBIAEoCRIRCglzaWduYXR1cmUYAiABKAkiqwIKDENvbnRlbnRCbG9jaxIuCgR0eXBlGAEgASgOMiAuYWdncmVnYXRpb24udjEuQ29udGVudEJsb2NrVHlwZRIwCgR0ZXh0GAIgASgLMiAuYWdncmVnYXRpb24udjEuVGV4dENvbnRlbnRCbG9ja0gAEjcKCHRvb2xfdXNlGAMgASgLMiMuYWdncmVnYXRpb24udjEuVG9vbFVzZUNvbnRlbnRCbG9ja0gAEj0KC3Rvb2xfcmVzdWx0GAQgASgLMiYuYWdncmVnYXRpb24udjEuVG9vbFJlc3VsdENvbnRlbnRCbG9ja0gAEjgKCHRoaW5raW5nGAUgASgLMiQuYWdncmVnYXRpb24udjEuVGhpbmtpbmdDb250ZW50QmxvY2tIAEIHCgVibG9jayLWAQoHTWVzc2FnZRIKCgJpZBgBIAEoCRIMCgR0eXBlGAIgASgJEgwKBHJvbGUYAyABKAkSDQoFbW9kZWwYBCABKAkSDAoEdGV4dBgFIAEoCRITCgtzdG9wX3JlYXNvbhgGIAEoCRIVCg1zdG9wX3NlcXVlbmNlGAcgASgJEiQKBXVzYWdlGAggASgLMhUuYWdncmVnYXRpb24udjEuVXNhZ2USNAoOY29udGVudF9ibG9ja3MYCSADKAsyHC5hZ2dyZWdhdGlvbi52MS5Db250ZW50QmxvY2si2AIKDVNlc3Npb25SZWNvcmQSDAoEdXVpZBgBIAEoCRITCgtwYXJlbnRfdXVpZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEikKBHR5cGUYBCABKA4yGy5hZ2dyZWdhdGlvbi52MS5TZXNzaW9uVHlwZRItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgsKA2N3ZBgGIAEoCRISCgpnaXRfYnJhbmNoGAcgASgJEg8KB3ZlcnNpb24YCCABKAkSEQoJdXNlcl90eXBlGAkgASgJEhQKDGlzX3NpZGVjaGFpbhgKIAEoCBIPCgdpc19tZXRhGAsgASgIEgwKBHNsdWcYDCABKAkSEgoKcmVxdWVzdF9pZBgNIAEoCRIoCgdtZXNzYWdlGA4gASgLMhcuYWdncmVnYXRpb24udjEuTWVzc2FnZSItCghMb2dCYXRjaBINCgVqc29ubBgBIAMoCRISCgpwcm9qZWN0X2lkGAIgASgJIjYKC1NlbmRMb2dzUmVxEicKBWJhdGNoGAEgASgLMhguYWdncmVnYXRpb24udjEuTG9nQmF0Y2giTgoLU2VuZExvZ3NSZXMSDwoHc3VjY2VzcxgBIAEoCBIVCg1lcnJvcl9tZXNzYWdlGAIgASgJEhcKD3Byb2Nlc3NlZF9jb3VudBgDIAEoBSrbAQoLU2Vzc2lvblR5cGUSHAoYU0VTU0lPTl9UWVBFX1VOU1BFQ0lGSUVEEAASFQoRU0VTU0lPTl9UWVBFX1VTRVIQARIaChZTRVNTSU9OX1RZUEVfQVNTSVNUQU5UEAISFwoTU0VTU0lPTl9UWVBFX1NZU1RFTRADEhgKFFNFU1NJT05fVFlQRV9TVU1NQVJZEAQSJgoiU0VTU0lPTl9UWVBFX0ZJTEVfSElTVE9SWV9TTkFQU0hPVBAFEiAKHFNFU1NJT05fVFlQRV9RVUVVRV9PUEVSQVRJT04QBiq5AQoQQ29udGVudEJsb2NrVHlwZRIiCh5DT05URU5UX0JMT0NLX1RZUEVfVU5TUEVDSUZJRUQQABIbChdDT05URU5UX0JMT0NLX1RZUEVfVEVYVBABEh8KG0NPTlRFTlRfQkxPQ0tfVFlQRV9UT09MX1VTRRACEiIKHkNPTlRFTlRfQkxPQ0tfVFlQRV9UT09MX1JFU1VMVBADEh8KG0NPTlRFTlRfQkxPQ0tfVFlQRV9USElOS0lORxAEMloKEkFnZ3JlZ2F0aW9uU2VydmljZRJECghTZW5kTG9ncxIbLmFnZ3JlZ2F0aW9uLnYxLlNlbmRMb2dzUmVxGhsuYWdncmVnYXRpb24udjEuU2VuZExvZ3NSZXNC0AEKEmNvbS5hZ2dyZWdhdGlvbi52MUIQQWdncmVnYXRpb25Qcm90b1ABWk9naXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9hZ2dyZWdhdGlvbi92MTthZ2dyZWdhdGlvbnYxogIDQVhYqgIOQWdncmVnYXRpb24uVjHKAg5BZ2dyZWdhdGlvblxWMeICGkFnZ3JlZ2F0aW9uXFYxXEdQQk1ldGFkYXRh6gIPQWdncmVnYXRpb246OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+  fileDesc("CiBhZ2dyZWdhdGlvbi92MS9hZ2dyZWdhdGlvbi5wcm90bxIOYWdncmVnYXRpb24udjEixQEKD01lc3NhZ2VNZXRhZGF0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIUCgxpc19zaWRlY2hhaW4YAiABKAgSEQoJdXNlcl90eXBlGAMgASgJEhIKCnNlc3Npb25faWQYBCABKAkSDwoHdmVyc2lvbhgFIAEoCRISCgpnaXRfYnJhbmNoGAYgASgJEgwKBHV1aWQYByABKAkSLQoJdGltZXN0YW1wGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCIsCgtVc2VyTWVzc2FnZRIMCgRyb2xlGAEgASgJEg8KB2NvbnRlbnQYAiABKAkiTQohVXNlclJlY29yZFRoaW5raW5nTWV0YWRhdGFUcmlnZ2VyEg0KBXN0YXJ0GAEgASgFEgsKA2VuZBgCIAEoBRIMCgR0ZXh0GAMgASgJIoIBChpVc2VyUmVjb3JkVGhpbmtpbmdNZXRhZGF0YRINCgVsZXZlbBgBIAEoCRIQCghkaXNhYmxlZBgCIAEoCBJDCgh0cmlnZ2VycxgDIAMoCzIxLmFnZ3JlZ2F0aW9uLnYxLlVzZXJSZWNvcmRUaGlua2luZ01ldGFkYXRhVHJpZ2dlciJGCg5Vc2VyUmVjb3JkVG9kbxIPCgdjb250ZW50GAEgASgJEg4KBnN0YXR1cxgCIAEoCRITCgthY3RpdmVfZm9ybRgDIAEoCSL4AQoOVXNlclJlY29yZERhdGESMQoIbWV0YWRhdGEYASABKAsyHy5hZ2dyZWdhdGlvbi52MS5NZXNzYWdlTWV0YWRhdGESLAoHbWVzc2FnZRgCIAEoCzIbLmFnZ3JlZ2F0aW9uLnYxLlVzZXJNZXNzYWdlEg8KB2lzX21ldGEYAyABKAgSRQoRdGhpbmtpbmdfbWV0YWRhdGEYBCABKAsyKi5hZ2dyZWdhdGlvbi52MS5Vc2VyUmVjb3JkVGhpbmtpbmdNZXRhZGF0YRItCgV0b2RvcxgFIAMoCzIeLmFnZ3JlZ2F0aW9uLnYxLlVzZXJSZWNvcmRUb2RvIpABChdBc3Npc3RhbnRNZXNzYWdlQ29udGVudBIMCgR0eXBlGAEgASgJEgwKBHRleHQYAiABKAkSEAoIdGhpbmtpbmcYAyABKAkSEwoLdG9vbF91c2VfaWQYBCABKAkSFQoNdG9vbF91c2VfbmFtZRgFIAEoCRIbChN0b29sX3VzZV9pbnB1dF9qc29uGAYgASgJIqABChVBc3Npc3RhbnRNZXNzYWdlVXNhZ2USFAoMaW5wdXRfdG9rZW5zGAEgASgFEhUKDW91dHB1dF90b2tlbnMYAiABKAUSIwobY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zGAMgASgFEh8KF2NhY2hlX3JlYWRfaW5wdXRfdG9rZW5zGAQgASgFEhQKDHNlcnZpY2VfdGllchgFIAEoCSLlAQoQQXNzaXN0YW50TWVzc2FnZRINCgVtb2RlbBgBIAEoCRIKCgJpZBgCIAEoCRIMCgR0eXBlGAMgASgJEgwKBHJvbGUYBCABKAkSOAoHY29udGVudBgFIAMoCzInLmFnZ3JlZ2F0aW9uLnYxLkFzc2lzdGFudE1lc3NhZ2VDb250ZW50EhMKC3N0b3BfcmVhc29uGAYgASgJEhUKDXN0b3Bfc2VxdWVuY2UYByABKAUSNAoFdXNhZ2UYCCABKAsyJS5hZ2dyZWdhdGlvbi52MS5Bc3Npc3RhbnRNZXNzYWdlVXNhZ2UijwEKE0Fzc2lzdGFudFJlY29yZERhdGESMQoIbWV0YWRhdGEYASABKAsyHy5hZ2dyZWdhdGlvbi52MS5NZXNzYWdlTWV0YWRhdGESEgoKcmVxdWVzdF9pZBgCIAEoCRIxCgdtZXNzYWdlGAMgASgLMiAuYWdncmVnYXRpb24udjEuQXNzaXN0YW50TWVzc2FnZSJ+CiBGaWxlSGlzdG9yeVNuYXBzaG90VHJhY2tlZEJhY2t1cBIYChBiYWNrdXBfZmlsZV9uYW1lGAEgASgJEg8KB3ZlcnNpb24YAiABKAUSLwoLYmFja3VwX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIvEBChNGaWxlSGlzdG9yeVNuYXBzaG90EhIKCm1lc3NhZ2VfaWQYASABKAkSWQoUdHJhY2tlZF9maWxlX2JhY2t1cHMYAiADKAsyOy5hZ2dyZWdhdGlvbi52MS5GaWxlSGlzdG9yeVNuYXBzaG90LlRyYWNrZWRGaWxlQmFja3Vwc0VudHJ5GmsKF1RyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EgsKA2tleRgBIAEoCRI/CgV2YWx1ZRgCIAEoCzIwLmFnZ3JlZ2F0aW9uLnYxLkZpbGVIaXN0b3J5U25hcHNob3RUcmFja2VkQmFja3VwOgI4ASKGAQodRmlsZUhpc3RvcnlTbmFwc2hvdFJlY29yZERhdGESEgoKbWVzc2FnZV9pZBgBIAEoCRI1CghzbmFwc2hvdBgCIAEoCzIjLmFnZ3JlZ2F0aW9uLnYxLkZpbGVIaXN0b3J5U25hcHNob3QSGgoSaXNfc25hcHNob3RfdXBkYXRlGAMgASgIIoMCCgZSZWNvcmQSKAoEdHlwZRgBIAEoDjIaLmFnZ3JlZ2F0aW9uLnYxLlJlY29yZFR5cGUSMwoJdXNlcl9kYXRhGAIgASgLMh4uYWdncmVnYXRpb24udjEuVXNlclJlY29yZERhdGFIABI9Cg5hc3Npc3RhbnRfZGF0YRgDIAEoCzIjLmFnZ3JlZ2F0aW9uLnYxLkFzc2lzdGFudFJlY29yZERhdGFIABJTChpmaWxlX2hpc3Rvcnlfc25hcHNob3RfZGF0YRgEIAEoCzItLmFnZ3JlZ2F0aW9uLnYxLkZpbGVIaXN0b3J5U25hcHNob3RSZWNvcmREYXRhSABCBgoEZGF0YSItCghMb2dCYXRjaBINCgVqc29ubBgBIAMoCRISCgpwcm9qZWN0X2lkGAIgASgJIjYKC1NlbmRMb2dzUmVxEicKBWJhdGNoGAEgASgLMhguYWdncmVnYXRpb24udjEuTG9nQmF0Y2giTgoLU2VuZExvZ3NSZXMSDwoHc3VjY2VzcxgBIAEoCBIVCg1lcnJvcl9tZXNzYWdlGAIgASgJEhcKD3Byb2Nlc3NlZF9jb3VudBgDIAEoBSqBAQoKUmVjb3JkVHlwZRIbChdSRUNPUkRfVFlQRV9VTlNQRUNJRklFRBAAEhQKEFJFQ09SRF9UWVBFX1VTRVIQARIZChVSRUNPUkRfVFlQRV9BU1NJU1RBTlQQAhIlCiFSRUNPUkRfVFlQRV9GSUxFX0hJU1RPUllfU05BUFNIT1QQAzJaChJBZ2dyZWdhdGlvblNlcnZpY2USRAoIU2VuZExvZ3MSGy5hZ2dyZWdhdGlvbi52MS5TZW5kTG9nc1JlcRobLmFnZ3JlZ2F0aW9uLnYxLlNlbmRMb2dzUmVzQtABChJjb20uYWdncmVnYXRpb24udjFCEEFnZ3JlZ2F0aW9uUHJvdG9QAVpPZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvYWdncmVnYXRpb24vdjE7YWdncmVnYXRpb252MaICA0FYWKoCDkFnZ3JlZ2F0aW9uLlYxygIOQWdncmVnYXRpb25cVjHiAhpBZ2dyZWdhdGlvblxWMVxHUEJNZXRhZGF0YeoCD0FnZ3JlZ2F0aW9uOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
 
 /**
- * Usage contains token usage information.
+ * MessageMetadata contains common metadata fields for user and assistant records.
  *
- * @generated from message aggregation.v1.Usage
+ * @generated from message aggregation.v1.MessageMetadata
  */
-export type Usage = Message$1<"aggregation.v1.Usage"> & {
+export type MessageMetadata = Message<"aggregation.v1.MessageMetadata"> & {
+  /**
+   * @generated from field: string parent_uuid = 1;
+   */
+  parentUuid: string;
+
+  /**
+   * @generated from field: bool is_sidechain = 2;
+   */
+  isSidechain: boolean;
+
+  /**
+   * @generated from field: string user_type = 3;
+   */
+  userType: string;
+
+  /**
+   * @generated from field: string session_id = 4;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string version = 5;
+   */
+  version: string;
+
+  /**
+   * @generated from field: string git_branch = 6;
+   */
+  gitBranch: string;
+
+  /**
+   * @generated from field: string uuid = 7;
+   */
+  uuid: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp timestamp = 8;
+   */
+  timestamp?: Timestamp;
+};
+
+/**
+ * Describes the message aggregation.v1.MessageMetadata.
+ * Use `create(MessageMetadataSchema)` to create a new message.
+ */
+export const MessageMetadataSchema: GenMessage<MessageMetadata> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 0);
+
+/**
+ * UserMessage contains user message content.
+ *
+ * @generated from message aggregation.v1.UserMessage
+ */
+export type UserMessage = Message<"aggregation.v1.UserMessage"> & {
+  /**
+   * @generated from field: string role = 1;
+   */
+  role: string;
+
+  /**
+   * @generated from field: string content = 2;
+   */
+  content: string;
+};
+
+/**
+ * Describes the message aggregation.v1.UserMessage.
+ * Use `create(UserMessageSchema)` to create a new message.
+ */
+export const UserMessageSchema: GenMessage<UserMessage> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 1);
+
+/**
+ * UserRecordThinkingMetadataTrigger contains trigger information.
+ *
+ * @generated from message aggregation.v1.UserRecordThinkingMetadataTrigger
+ */
+export type UserRecordThinkingMetadataTrigger = Message<"aggregation.v1.UserRecordThinkingMetadataTrigger"> & {
+  /**
+   * @generated from field: int32 start = 1;
+   */
+  start: number;
+
+  /**
+   * @generated from field: int32 end = 2;
+   */
+  end: number;
+
+  /**
+   * @generated from field: string text = 3;
+   */
+  text: string;
+};
+
+/**
+ * Describes the message aggregation.v1.UserRecordThinkingMetadataTrigger.
+ * Use `create(UserRecordThinkingMetadataTriggerSchema)` to create a new message.
+ */
+export const UserRecordThinkingMetadataTriggerSchema: GenMessage<UserRecordThinkingMetadataTrigger> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 2);
+
+/**
+ * UserRecordThinkingMetadata contains thinking metadata.
+ *
+ * @generated from message aggregation.v1.UserRecordThinkingMetadata
+ */
+export type UserRecordThinkingMetadata = Message<"aggregation.v1.UserRecordThinkingMetadata"> & {
+  /**
+   * @generated from field: string level = 1;
+   */
+  level: string;
+
+  /**
+   * @generated from field: bool disabled = 2;
+   */
+  disabled: boolean;
+
+  /**
+   * @generated from field: repeated aggregation.v1.UserRecordThinkingMetadataTrigger triggers = 3;
+   */
+  triggers: UserRecordThinkingMetadataTrigger[];
+};
+
+/**
+ * Describes the message aggregation.v1.UserRecordThinkingMetadata.
+ * Use `create(UserRecordThinkingMetadataSchema)` to create a new message.
+ */
+export const UserRecordThinkingMetadataSchema: GenMessage<UserRecordThinkingMetadata> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 3);
+
+/**
+ * UserRecordTodo contains todo item.
+ *
+ * @generated from message aggregation.v1.UserRecordTodo
+ */
+export type UserRecordTodo = Message<"aggregation.v1.UserRecordTodo"> & {
+  /**
+   * @generated from field: string content = 1;
+   */
+  content: string;
+
+  /**
+   * @generated from field: string status = 2;
+   */
+  status: string;
+
+  /**
+   * @generated from field: string active_form = 3;
+   */
+  activeForm: string;
+};
+
+/**
+ * Describes the message aggregation.v1.UserRecordTodo.
+ * Use `create(UserRecordTodoSchema)` to create a new message.
+ */
+export const UserRecordTodoSchema: GenMessage<UserRecordTodo> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 4);
+
+/**
+ * UserRecordData contains user-specific record data.
+ *
+ * @generated from message aggregation.v1.UserRecordData
+ */
+export type UserRecordData = Message<"aggregation.v1.UserRecordData"> & {
+  /**
+   * @generated from field: aggregation.v1.MessageMetadata metadata = 1;
+   */
+  metadata?: MessageMetadata;
+
+  /**
+   * @generated from field: aggregation.v1.UserMessage message = 2;
+   */
+  message?: UserMessage;
+
+  /**
+   * @generated from field: bool is_meta = 3;
+   */
+  isMeta: boolean;
+
+  /**
+   * @generated from field: aggregation.v1.UserRecordThinkingMetadata thinking_metadata = 4;
+   */
+  thinkingMetadata?: UserRecordThinkingMetadata;
+
+  /**
+   * @generated from field: repeated aggregation.v1.UserRecordTodo todos = 5;
+   */
+  todos: UserRecordTodo[];
+};
+
+/**
+ * Describes the message aggregation.v1.UserRecordData.
+ * Use `create(UserRecordDataSchema)` to create a new message.
+ */
+export const UserRecordDataSchema: GenMessage<UserRecordData> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 5);
+
+/**
+ * AssistantMessageContent contains assistant message content block.
+ *
+ * @generated from message aggregation.v1.AssistantMessageContent
+ */
+export type AssistantMessageContent = Message<"aggregation.v1.AssistantMessageContent"> & {
+  /**
+   * @generated from field: string type = 1;
+   */
+  type: string;
+
+  /**
+   * @generated from field: string text = 2;
+   */
+  text: string;
+
+  /**
+   * @generated from field: string thinking = 3;
+   */
+  thinking: string;
+
+  /**
+   * @generated from field: string tool_use_id = 4;
+   */
+  toolUseId: string;
+
+  /**
+   * @generated from field: string tool_use_name = 5;
+   */
+  toolUseName: string;
+
+  /**
+   * @generated from field: string tool_use_input_json = 6;
+   */
+  toolUseInputJson: string;
+};
+
+/**
+ * Describes the message aggregation.v1.AssistantMessageContent.
+ * Use `create(AssistantMessageContentSchema)` to create a new message.
+ */
+export const AssistantMessageContentSchema: GenMessage<AssistantMessageContent> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 6);
+
+/**
+ * AssistantMessageUsage contains token usage information.
+ *
+ * @generated from message aggregation.v1.AssistantMessageUsage
+ */
+export type AssistantMessageUsage = Message<"aggregation.v1.AssistantMessageUsage"> & {
   /**
    * @generated from field: int32 input_tokens = 1;
    */
@@ -47,193 +295,42 @@ export type Usage = Message$1<"aggregation.v1.Usage"> & {
 };
 
 /**
- * Describes the message aggregation.v1.Usage.
- * Use `create(UsageSchema)` to create a new message.
+ * Describes the message aggregation.v1.AssistantMessageUsage.
+ * Use `create(AssistantMessageUsageSchema)` to create a new message.
  */
-export const UsageSchema: GenMessage<Usage> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 0);
+export const AssistantMessageUsageSchema: GenMessage<AssistantMessageUsage> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 7);
 
 /**
- * TextContentBlock represents a text content block.
+ * AssistantMessage contains assistant message.
  *
- * @generated from message aggregation.v1.TextContentBlock
+ * @generated from message aggregation.v1.AssistantMessage
  */
-export type TextContentBlock = Message$1<"aggregation.v1.TextContentBlock"> & {
+export type AssistantMessage = Message<"aggregation.v1.AssistantMessage"> & {
   /**
-   * @generated from field: string text = 1;
-   */
-  text: string;
-};
-
-/**
- * Describes the message aggregation.v1.TextContentBlock.
- * Use `create(TextContentBlockSchema)` to create a new message.
- */
-export const TextContentBlockSchema: GenMessage<TextContentBlock> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 1);
-
-/**
- * ToolUseContentBlock represents a tool use content block.
- *
- * @generated from message aggregation.v1.ToolUseContentBlock
- */
-export type ToolUseContentBlock = Message$1<"aggregation.v1.ToolUseContentBlock"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
-
-  /**
-   * JSON string for flexible input structure
-   *
-   * @generated from field: string input_json = 3;
-   */
-  inputJson: string;
-};
-
-/**
- * Describes the message aggregation.v1.ToolUseContentBlock.
- * Use `create(ToolUseContentBlockSchema)` to create a new message.
- */
-export const ToolUseContentBlockSchema: GenMessage<ToolUseContentBlock> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 2);
-
-/**
- * ToolResultContentBlock represents a tool result content block.
- *
- * @generated from message aggregation.v1.ToolResultContentBlock
- */
-export type ToolResultContentBlock = Message$1<"aggregation.v1.ToolResultContentBlock"> & {
-  /**
-   * @generated from field: string tool_use_id = 1;
-   */
-  toolUseId: string;
-
-  /**
-   * @generated from field: string content = 2;
-   */
-  content: string;
-
-  /**
-   * @generated from field: bool is_error = 3;
-   */
-  isError: boolean;
-};
-
-/**
- * Describes the message aggregation.v1.ToolResultContentBlock.
- * Use `create(ToolResultContentBlockSchema)` to create a new message.
- */
-export const ToolResultContentBlockSchema: GenMessage<ToolResultContentBlock> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 3);
-
-/**
- * ThinkingContentBlock represents a thinking content block.
- *
- * @generated from message aggregation.v1.ThinkingContentBlock
- */
-export type ThinkingContentBlock = Message$1<"aggregation.v1.ThinkingContentBlock"> & {
-  /**
-   * @generated from field: string thinking = 1;
-   */
-  thinking: string;
-
-  /**
-   * @generated from field: string signature = 2;
-   */
-  signature: string;
-};
-
-/**
- * Describes the message aggregation.v1.ThinkingContentBlock.
- * Use `create(ThinkingContentBlockSchema)` to create a new message.
- */
-export const ThinkingContentBlockSchema: GenMessage<ThinkingContentBlock> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 4);
-
-/**
- * ContentBlock represents a polymorphic content block using oneof.
- *
- * @generated from message aggregation.v1.ContentBlock
- */
-export type ContentBlock = Message$1<"aggregation.v1.ContentBlock"> & {
-  /**
-   * @generated from field: aggregation.v1.ContentBlockType type = 1;
-   */
-  type: ContentBlockType;
-
-  /**
-   * @generated from oneof aggregation.v1.ContentBlock.block
-   */
-  block: {
-    /**
-     * @generated from field: aggregation.v1.TextContentBlock text = 2;
-     */
-    value: TextContentBlock;
-    case: "text";
-  } | {
-    /**
-     * @generated from field: aggregation.v1.ToolUseContentBlock tool_use = 3;
-     */
-    value: ToolUseContentBlock;
-    case: "toolUse";
-  } | {
-    /**
-     * @generated from field: aggregation.v1.ToolResultContentBlock tool_result = 4;
-     */
-    value: ToolResultContentBlock;
-    case: "toolResult";
-  } | {
-    /**
-     * @generated from field: aggregation.v1.ThinkingContentBlock thinking = 5;
-     */
-    value: ThinkingContentBlock;
-    case: "thinking";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message aggregation.v1.ContentBlock.
- * Use `create(ContentBlockSchema)` to create a new message.
- */
-export const ContentBlockSchema: GenMessage<ContentBlock> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 5);
-
-/**
- * Message contains the role and content of a session message.
- *
- * @generated from message aggregation.v1.Message
- */
-export type Message = Message$1<"aggregation.v1.Message"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string type = 2;
-   */
-  type: string;
-
-  /**
-   * @generated from field: string role = 3;
-   */
-  role: string;
-
-  /**
-   * @generated from field: string model = 4;
+   * @generated from field: string model = 1;
    */
   model: string;
 
   /**
-   * @generated from field: string text = 5;
+   * @generated from field: string id = 2;
    */
-  text: string;
+  id: string;
+
+  /**
+   * @generated from field: string type = 3;
+   */
+  type: string;
+
+  /**
+   * @generated from field: string role = 4;
+   */
+  role: string;
+
+  /**
+   * @generated from field: repeated aggregation.v1.AssistantMessageContent content = 5;
+   */
+  content: AssistantMessageContent[];
 
   /**
    * @generated from field: string stop_reason = 6;
@@ -241,118 +338,182 @@ export type Message = Message$1<"aggregation.v1.Message"> & {
   stopReason: string;
 
   /**
-   * @generated from field: string stop_sequence = 7;
+   * @generated from field: int32 stop_sequence = 7;
    */
-  stopSequence: string;
+  stopSequence: number;
 
   /**
-   * @generated from field: aggregation.v1.Usage usage = 8;
+   * @generated from field: aggregation.v1.AssistantMessageUsage usage = 8;
    */
-  usage?: Usage;
-
-  /**
-   * @generated from field: repeated aggregation.v1.ContentBlock content_blocks = 9;
-   */
-  contentBlocks: ContentBlock[];
+  usage?: AssistantMessageUsage;
 };
 
 /**
- * Describes the message aggregation.v1.Message.
- * Use `create(MessageSchema)` to create a new message.
+ * Describes the message aggregation.v1.AssistantMessage.
+ * Use `create(AssistantMessageSchema)` to create a new message.
  */
-export const MessageSchema: GenMessage<Message> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 6);
+export const AssistantMessageSchema: GenMessage<AssistantMessage> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 8);
 
 /**
- * SessionRecord represents a single Claude Code JSONL entry.
+ * AssistantRecordData contains assistant-specific record data.
  *
- * @generated from message aggregation.v1.SessionRecord
+ * @generated from message aggregation.v1.AssistantRecordData
  */
-export type SessionRecord = Message$1<"aggregation.v1.SessionRecord"> & {
+export type AssistantRecordData = Message<"aggregation.v1.AssistantRecordData"> & {
   /**
-   * @generated from field: string uuid = 1;
+   * @generated from field: aggregation.v1.MessageMetadata metadata = 1;
    */
-  uuid: string;
+  metadata?: MessageMetadata;
 
   /**
-   * @generated from field: string parent_uuid = 2;
-   */
-  parentUuid: string;
-
-  /**
-   * @generated from field: string session_id = 3;
-   */
-  sessionId: string;
-
-  /**
-   * @generated from field: aggregation.v1.SessionType type = 4;
-   */
-  type: SessionType;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp timestamp = 5;
-   */
-  timestamp?: Timestamp;
-
-  /**
-   * @generated from field: string cwd = 6;
-   */
-  cwd: string;
-
-  /**
-   * @generated from field: string git_branch = 7;
-   */
-  gitBranch: string;
-
-  /**
-   * @generated from field: string version = 8;
-   */
-  version: string;
-
-  /**
-   * @generated from field: string user_type = 9;
-   */
-  userType: string;
-
-  /**
-   * @generated from field: bool is_sidechain = 10;
-   */
-  isSidechain: boolean;
-
-  /**
-   * @generated from field: bool is_meta = 11;
-   */
-  isMeta: boolean;
-
-  /**
-   * @generated from field: string slug = 12;
-   */
-  slug: string;
-
-  /**
-   * @generated from field: string request_id = 13;
+   * @generated from field: string request_id = 2;
    */
   requestId: string;
 
   /**
-   * @generated from field: aggregation.v1.Message message = 14;
+   * @generated from field: aggregation.v1.AssistantMessage message = 3;
    */
-  message?: Message;
+  message?: AssistantMessage;
 };
 
 /**
- * Describes the message aggregation.v1.SessionRecord.
- * Use `create(SessionRecordSchema)` to create a new message.
+ * Describes the message aggregation.v1.AssistantRecordData.
+ * Use `create(AssistantRecordDataSchema)` to create a new message.
  */
-export const SessionRecordSchema: GenMessage<SessionRecord> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 7);
+export const AssistantRecordDataSchema: GenMessage<AssistantRecordData> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 9);
+
+/**
+ * FileHistorySnapshotTrackedBackup contains file backup information.
+ *
+ * @generated from message aggregation.v1.FileHistorySnapshotTrackedBackup
+ */
+export type FileHistorySnapshotTrackedBackup = Message<"aggregation.v1.FileHistorySnapshotTrackedBackup"> & {
+  /**
+   * @generated from field: string backup_file_name = 1;
+   */
+  backupFileName: string;
+
+  /**
+   * @generated from field: int32 version = 2;
+   */
+  version: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp backup_time = 3;
+   */
+  backupTime?: Timestamp;
+};
+
+/**
+ * Describes the message aggregation.v1.FileHistorySnapshotTrackedBackup.
+ * Use `create(FileHistorySnapshotTrackedBackupSchema)` to create a new message.
+ */
+export const FileHistorySnapshotTrackedBackupSchema: GenMessage<FileHistorySnapshotTrackedBackup> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 10);
+
+/**
+ * FileHistorySnapshot contains snapshot data.
+ *
+ * @generated from message aggregation.v1.FileHistorySnapshot
+ */
+export type FileHistorySnapshot = Message<"aggregation.v1.FileHistorySnapshot"> & {
+  /**
+   * @generated from field: string message_id = 1;
+   */
+  messageId: string;
+
+  /**
+   * @generated from field: map<string, aggregation.v1.FileHistorySnapshotTrackedBackup> tracked_file_backups = 2;
+   */
+  trackedFileBackups: { [key: string]: FileHistorySnapshotTrackedBackup };
+};
+
+/**
+ * Describes the message aggregation.v1.FileHistorySnapshot.
+ * Use `create(FileHistorySnapshotSchema)` to create a new message.
+ */
+export const FileHistorySnapshotSchema: GenMessage<FileHistorySnapshot> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 11);
+
+/**
+ * FileHistorySnapshotRecordData contains file-history-snapshot-specific record data.
+ *
+ * @generated from message aggregation.v1.FileHistorySnapshotRecordData
+ */
+export type FileHistorySnapshotRecordData = Message<"aggregation.v1.FileHistorySnapshotRecordData"> & {
+  /**
+   * @generated from field: string message_id = 1;
+   */
+  messageId: string;
+
+  /**
+   * @generated from field: aggregation.v1.FileHistorySnapshot snapshot = 2;
+   */
+  snapshot?: FileHistorySnapshot;
+
+  /**
+   * @generated from field: bool is_snapshot_update = 3;
+   */
+  isSnapshotUpdate: boolean;
+};
+
+/**
+ * Describes the message aggregation.v1.FileHistorySnapshotRecordData.
+ * Use `create(FileHistorySnapshotRecordDataSchema)` to create a new message.
+ */
+export const FileHistorySnapshotRecordDataSchema: GenMessage<FileHistorySnapshotRecordData> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 12);
+
+/**
+ * Record represents a single Claude Code JSONL entry with type-specific data.
+ *
+ * @generated from message aggregation.v1.Record
+ */
+export type Record = Message<"aggregation.v1.Record"> & {
+  /**
+   * @generated from field: aggregation.v1.RecordType type = 1;
+   */
+  type: RecordType;
+
+  /**
+   * @generated from oneof aggregation.v1.Record.data
+   */
+  data: {
+    /**
+     * @generated from field: aggregation.v1.UserRecordData user_data = 2;
+     */
+    value: UserRecordData;
+    case: "userData";
+  } | {
+    /**
+     * @generated from field: aggregation.v1.AssistantRecordData assistant_data = 3;
+     */
+    value: AssistantRecordData;
+    case: "assistantData";
+  } | {
+    /**
+     * @generated from field: aggregation.v1.FileHistorySnapshotRecordData file_history_snapshot_data = 4;
+     */
+    value: FileHistorySnapshotRecordData;
+    case: "fileHistorySnapshotData";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message aggregation.v1.Record.
+ * Use `create(RecordSchema)` to create a new message.
+ */
+export const RecordSchema: GenMessage<Record> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 13);
 
 /**
  * LogBatch contains raw JSONL lines for batch sending.
  *
  * @generated from message aggregation.v1.LogBatch
  */
-export type LogBatch = Message$1<"aggregation.v1.LogBatch"> & {
+export type LogBatch = Message<"aggregation.v1.LogBatch"> & {
   /**
    * @generated from field: repeated string jsonl = 1;
    */
@@ -369,14 +530,14 @@ export type LogBatch = Message$1<"aggregation.v1.LogBatch"> & {
  * Use `create(LogBatchSchema)` to create a new message.
  */
 export const LogBatchSchema: GenMessage<LogBatch> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 8);
+  messageDesc(file_aggregation_v1_aggregation, 14);
 
 /**
  * SendLogsReq is the request for sending logs.
  *
  * @generated from message aggregation.v1.SendLogsReq
  */
-export type SendLogsReq = Message$1<"aggregation.v1.SendLogsReq"> & {
+export type SendLogsReq = Message<"aggregation.v1.SendLogsReq"> & {
   /**
    * @generated from field: aggregation.v1.LogBatch batch = 1;
    */
@@ -388,14 +549,14 @@ export type SendLogsReq = Message$1<"aggregation.v1.SendLogsReq"> & {
  * Use `create(SendLogsReqSchema)` to create a new message.
  */
 export const SendLogsReqSchema: GenMessage<SendLogsReq> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 9);
+  messageDesc(file_aggregation_v1_aggregation, 15);
 
 /**
  * SendLogsRes is the response for sending logs.
  *
  * @generated from message aggregation.v1.SendLogsRes
  */
-export type SendLogsRes = Message$1<"aggregation.v1.SendLogsRes"> & {
+export type SendLogsRes = Message<"aggregation.v1.SendLogsRes"> & {
   /**
    * @generated from field: bool success = 1;
    */
@@ -417,93 +578,40 @@ export type SendLogsRes = Message$1<"aggregation.v1.SendLogsRes"> & {
  * Use `create(SendLogsResSchema)` to create a new message.
  */
 export const SendLogsResSchema: GenMessage<SendLogsRes> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 10);
+  messageDesc(file_aggregation_v1_aggregation, 16);
 
 /**
- * SessionType represents the type of session message.
+ * RecordType represents the type discriminator for records.
  *
- * @generated from enum aggregation.v1.SessionType
+ * @generated from enum aggregation.v1.RecordType
  */
-export enum SessionType {
+export enum RecordType {
   /**
-   * @generated from enum value: SESSION_TYPE_UNSPECIFIED = 0;
+   * @generated from enum value: RECORD_TYPE_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: SESSION_TYPE_USER = 1;
+   * @generated from enum value: RECORD_TYPE_USER = 1;
    */
   USER = 1,
 
   /**
-   * @generated from enum value: SESSION_TYPE_ASSISTANT = 2;
+   * @generated from enum value: RECORD_TYPE_ASSISTANT = 2;
    */
   ASSISTANT = 2,
 
   /**
-   * @generated from enum value: SESSION_TYPE_SYSTEM = 3;
+   * @generated from enum value: RECORD_TYPE_FILE_HISTORY_SNAPSHOT = 3;
    */
-  SYSTEM = 3,
-
-  /**
-   * @generated from enum value: SESSION_TYPE_SUMMARY = 4;
-   */
-  SUMMARY = 4,
-
-  /**
-   * @generated from enum value: SESSION_TYPE_FILE_HISTORY_SNAPSHOT = 5;
-   */
-  FILE_HISTORY_SNAPSHOT = 5,
-
-  /**
-   * @generated from enum value: SESSION_TYPE_QUEUE_OPERATION = 6;
-   */
-  QUEUE_OPERATION = 6,
+  FILE_HISTORY_SNAPSHOT = 3,
 }
 
 /**
- * Describes the enum aggregation.v1.SessionType.
+ * Describes the enum aggregation.v1.RecordType.
  */
-export const SessionTypeSchema: GenEnum<SessionType> = /*@__PURE__*/
+export const RecordTypeSchema: GenEnum<RecordType> = /*@__PURE__*/
   enumDesc(file_aggregation_v1_aggregation, 0);
-
-/**
- * ContentBlockType represents the type of content block.
- *
- * @generated from enum aggregation.v1.ContentBlockType
- */
-export enum ContentBlockType {
-  /**
-   * @generated from enum value: CONTENT_BLOCK_TYPE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: CONTENT_BLOCK_TYPE_TEXT = 1;
-   */
-  TEXT = 1,
-
-  /**
-   * @generated from enum value: CONTENT_BLOCK_TYPE_TOOL_USE = 2;
-   */
-  TOOL_USE = 2,
-
-  /**
-   * @generated from enum value: CONTENT_BLOCK_TYPE_TOOL_RESULT = 3;
-   */
-  TOOL_RESULT = 3,
-
-  /**
-   * @generated from enum value: CONTENT_BLOCK_TYPE_THINKING = 4;
-   */
-  THINKING = 4,
-}
-
-/**
- * Describes the enum aggregation.v1.ContentBlockType.
- */
-export const ContentBlockTypeSchema: GenEnum<ContentBlockType> = /*@__PURE__*/
-  enumDesc(file_aggregation_v1_aggregation, 1);
 
 /**
  * AggregationService handles log aggregation from daemons.

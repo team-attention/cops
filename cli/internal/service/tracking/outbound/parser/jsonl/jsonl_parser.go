@@ -25,8 +25,8 @@ func NewJSONLParser(l *slog.Logger) *JSONLParser {
 }
 
 // ParseSessionFiles parses all JSONL files in a project's Claude directory.
-func (p *JSONLParser) ParseSessionFiles(claudeProjectDir string) ([]*domain.SessionRecord, error) {
-	var records []*domain.SessionRecord
+func (p *JSONLParser) ParseSessionFiles(claudeProjectDir string) ([]*domain.Record, error) {
+	var records []*domain.Record
 
 	// Check if directory exists
 	if _, err := os.Stat(claudeProjectDir); os.IsNotExist(err) {
@@ -58,14 +58,14 @@ func (p *JSONLParser) ParseSessionFiles(claudeProjectDir string) ([]*domain.Sess
 	return records, nil
 }
 
-func (p *JSONLParser) parseFile(filePath string) ([]*domain.SessionRecord, error) {
+func (p *JSONLParser) parseFile(filePath string) ([]*domain.Record, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var records []*domain.SessionRecord
+	var records []*domain.Record
 	scanner := bufio.NewScanner(file)
 	// Increase buffer for large lines (Claude messages can be very long)
 	scanner.Buffer(make([]byte, 1024*1024), 10*1024*1024)
@@ -78,7 +78,7 @@ func (p *JSONLParser) parseFile(filePath string) ([]*domain.SessionRecord, error
 			continue
 		}
 
-		var record domain.SessionRecord
+		var record domain.Record
 		if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 			p.logger.Debug("skipping malformed line",
 				slog.String("file", filePath),
@@ -87,13 +87,9 @@ func (p *JSONLParser) parseFile(filePath string) ([]*domain.SessionRecord, error
 			continue
 		}
 
-		// Only include user/assistant/system messages
-		// Skip file-history-snapshot, tool-use, etc.
-		if record.Type == domain.SessionTypeUser ||
-			record.Type == domain.SessionTypeAssistant ||
-			record.Type == domain.SessionTypeSystem {
-			records = append(records, &record)
-		}
+		// Parse ALL record types (user, assistant, file-history-snapshot)
+		// The Record.UnmarshalJSON handles type dispatch automatically
+		records = append(records, &record)
 	}
 
 	if err := scanner.Err(); err != nil {

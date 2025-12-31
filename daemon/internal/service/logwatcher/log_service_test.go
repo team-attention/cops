@@ -33,7 +33,7 @@ var _ = Describe("LogService Integration", func() {
 
 	Describe("parsing real JSONL files", func() {
 		Context("when processing user messages", func() {
-			It("parses string content correctly", func() {
+			It("parses user records correctly", func() {
 				for _, jsonlFile := range jsonlFiles {
 					file, err := os.Open(jsonlFile)
 					if err != nil {
@@ -51,17 +51,16 @@ var _ = Describe("LogService Integration", func() {
 							continue
 						}
 
-						var record shareddomain.SessionRecord
+						var record shareddomain.Record
 						if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 							continue
 						}
 
-						if record.Type == shareddomain.SessionTypeUser && record.Message != nil {
-							// User messages should have Text content
-							if record.Message.Content != nil && !record.Message.Content.IsBlocks {
-								Expect(record.Message.Content.Text).NotTo(BeNil(),
-									"User message should have Text field populated")
-							}
+						if record.Type == shareddomain.RecordTypeUser {
+							userRec, ok := record.Data.(*shareddomain.UserRecord)
+							Expect(ok).To(BeTrue(), "User record should have UserRecord data")
+							Expect(userRec.Message.Content).NotTo(BeEmpty(),
+								"User message should have content")
 							return // Found and validated at least one
 						}
 					}
@@ -69,9 +68,9 @@ var _ = Describe("LogService Integration", func() {
 			})
 		})
 
-		Context("when processing assistant messages with tool_use", func() {
-			It("parses block content with tool_use correctly", func() {
-				foundToolUse := false
+		Context("when processing assistant messages", func() {
+			It("parses assistant records correctly", func() {
+				foundAssistant := false
 
 				for _, jsonlFile := range jsonlFiles {
 					file, err := os.Open(jsonlFile)
@@ -90,44 +89,79 @@ var _ = Describe("LogService Integration", func() {
 							continue
 						}
 
-						var record shareddomain.SessionRecord
+						var record shareddomain.Record
 						if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 							continue
 						}
 
-						if record.Type == shareddomain.SessionTypeAssistant && record.Message != nil {
-							content := record.Message.Content
-							if content != nil && content.IsBlocks {
-								for _, block := range content.Blocks {
-									if block.BlockType() == shareddomain.ContentBlockTypeToolUse {
-										toolUse, ok := block.(*shareddomain.ToolUseContentBlock)
-										Expect(ok).To(BeTrue())
-										Expect(toolUse.ID).NotTo(BeEmpty())
-										Expect(toolUse.Name).NotTo(BeEmpty())
-										foundToolUse = true
-										break
-									}
-								}
-							}
-						}
-						if foundToolUse {
+						if record.Type == shareddomain.RecordTypeMessage {
+							assistantRec, ok := record.Data.(*shareddomain.AssistantRecord)
+							Expect(ok).To(BeTrue(), "Assistant record should have AssistantRecord data")
+							Expect(assistantRec.Message.Model).NotTo(BeEmpty())
+							// RequestID may be empty in some records
+							foundAssistant = true
 							break
 						}
 					}
-					if foundToolUse {
+					if foundAssistant {
 						break
 					}
 				}
 
-				if !foundToolUse {
-					Skip("No tool_use blocks found in JSONL files")
+				if !foundAssistant {
+					Skip("No assistant records found in JSONL files")
+				}
+			})
+		})
+
+		Context("when processing file-history-snapshot records", func() {
+			It("parses snapshot records correctly", func() {
+				foundSnapshot := false
+
+				for _, jsonlFile := range jsonlFiles {
+					file, err := os.Open(jsonlFile)
+					if err != nil {
+						continue
+					}
+					defer file.Close()
+
+					scanner := bufio.NewScanner(file)
+					buf := make([]byte, 0, 64*1024)
+					scanner.Buffer(buf, 1024*1024)
+
+					for scanner.Scan() {
+						line := scanner.Text()
+						if line == "" {
+							continue
+						}
+
+						var record shareddomain.Record
+						if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+							continue
+						}
+
+						if record.Type == shareddomain.RecordTypeFileHistorySnapshot {
+							snapshotRec, ok := record.Data.(*shareddomain.FileHistorySnapshotRecord)
+							Expect(ok).To(BeTrue(), "Snapshot record should have FileHistorySnapshotRecord data")
+							Expect(snapshotRec.MessageID).NotTo(BeEmpty())
+							foundSnapshot = true
+							break
+						}
+					}
+					if foundSnapshot {
+						break
+					}
+				}
+
+				if !foundSnapshot {
+					Skip("No file-history-snapshot records found in JSONL files")
 				}
 			})
 		})
 	})
 
 	Describe("serialization round-trip", func() {
-		It("preserves content through sonic.Marshal/Unmarshal", func() {
+		It("preserves records through sonic.Marshal/Unmarshal", func() {
 			for _, jsonlFile := range jsonlFiles {
 				file, err := os.Open(jsonlFile)
 				if err != nil {
@@ -146,28 +180,25 @@ var _ = Describe("LogService Integration", func() {
 						continue
 					}
 
-					var record shareddomain.SessionRecord
+					var record shareddomain.Record
 					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 						continue
 					}
 
-					if record.Message != nil && record.Message.Content != nil {
-						// Marshal the content
-						contentBytes, err := sonic.Marshal(record.Message.Content)
+					if record.Data != nil {
+						// Marshal the record
+						recordBytes, err := sonic.Marshal(record)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(string(contentBytes)).NotTo(Equal(`""`),
-							"Content should not serialize to empty string")
+						Expect(string(recordBytes)).NotTo(Equal(`""`),
+							"Record should not serialize to empty string")
 
 						// Unmarshal back
-						var restored shareddomain.MessageContent
-						err = sonic.Unmarshal(contentBytes, &restored)
+						var restored shareddomain.Record
+						err = sonic.Unmarshal(recordBytes, &restored)
 						Expect(err).NotTo(HaveOccurred())
 
 						// Verify structure preserved
-						Expect(restored.IsBlocks).To(Equal(record.Message.Content.IsBlocks))
-						if restored.IsBlocks {
-							Expect(restored.Blocks).To(HaveLen(len(record.Message.Content.Blocks)))
-						}
+						Expect(restored.Type).To(Equal(record.Type))
 
 						testedCount++
 					}

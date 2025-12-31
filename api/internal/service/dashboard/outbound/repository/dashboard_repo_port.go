@@ -61,10 +61,9 @@ type SessionSummary struct {
 // Embeds SessionBase for common identification.
 type SessionDetail struct {
 	SessionBase
-	CWD     string
 	Version string
 	Usage   TokenUsageSummary
-	Records []shareddomain.SessionRecord
+	Records []shareddomain.Record
 }
 
 // OverviewStats contains dashboard overview statistics.

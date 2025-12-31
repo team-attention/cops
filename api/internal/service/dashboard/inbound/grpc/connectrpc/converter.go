@@ -59,16 +59,12 @@ func toProtoSessionSummary(s repository.SessionSummary) *dashboardv1.SessionSumm
 
 // toProtoSessionDetail converts repository session detail to protobuf.
 func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetail {
-	records := make([]*aggregationv1.SessionRecord, len(s.Records))
-	for i, r := range s.Records {
-		records[i] = toProtoSessionRecord(r)
-	}
+	records := toProtoRecords(s.Records)
 
 	return &dashboardv1.SessionDetail{
 		Id:        s.SessionBase.ID,
 		ProjectId: s.SessionBase.ProjectID,
 		GitBranch: s.SessionBase.GitBranch,
-		Cwd:       s.CWD,
 		Version:   s.Version,
 		Usage:     toProtoTokenUsageSummary(s.Usage),
 		StartedAt: timestamppb.New(s.SessionBase.StartedAt),
@@ -77,79 +73,206 @@ func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetai
 	}
 }
 
-// toProtoSessionRecord converts domain session record to protobuf.
-func toProtoSessionRecord(r shareddomain.SessionRecord) *aggregationv1.SessionRecord {
-	record := &aggregationv1.SessionRecord{
-		Uuid:        r.UUID,
-		ParentUuid:  r.ParentUUID,
-		SessionId:   r.SessionID,
-		Type:        convertSessionType(r.Type),
-		Timestamp:   timestamppb.New(r.Timestamp),
-		Cwd:         r.CWD,
-		GitBranch:   r.GitBranch,
-		Version:     r.Version,
-		UserType:    r.UserType,
-		IsSidechain: r.IsSidechain,
-		IsMeta:      r.IsMeta,
-		Slug:        r.Slug,
-		RequestId:   r.RequestID,
-		Message:     convertMessage(r.Message),
+// toProtoRecords converts domain Records to protobuf Records.
+func toProtoRecords(records []shareddomain.Record) []*aggregationv1.Record {
+	result := make([]*aggregationv1.Record, 0, len(records))
+	for _, record := range records {
+		protoRec := toProtoRecord(record)
+		if protoRec != nil {
+			result = append(result, protoRec)
+		}
 	}
-
-	return record
+	return result
 }
 
-func convertSessionType(t shareddomain.SessionType) aggregationv1.SessionType {
-	switch t {
-	case shareddomain.SessionTypeUser:
-		return aggregationv1.SessionType_SESSION_TYPE_USER
-	case shareddomain.SessionTypeAssistant:
-		return aggregationv1.SessionType_SESSION_TYPE_ASSISTANT
-	case shareddomain.SessionTypeSystem:
-		return aggregationv1.SessionType_SESSION_TYPE_SYSTEM
-	case shareddomain.SessionTypeSummary:
-		return aggregationv1.SessionType_SESSION_TYPE_SUMMARY
-	case shareddomain.SessionTypeFileHistorySnapshot:
-		return aggregationv1.SessionType_SESSION_TYPE_FILE_HISTORY_SNAPSHOT
-	case shareddomain.SessionTypeQueueOperation:
-		return aggregationv1.SessionType_SESSION_TYPE_QUEUE_OPERATION
+// toProtoRecord converts a single domain Record to protobuf.
+func toProtoRecord(r shareddomain.Record) *aggregationv1.Record {
+	proto := &aggregationv1.Record{}
+
+	// Set Type based on r.Type
+	switch r.Type {
+	case shareddomain.RecordTypeUser:
+		proto.Type = aggregationv1.RecordType_RECORD_TYPE_USER
+		if userRec, ok := r.Data.(*shareddomain.UserRecord); ok {
+			proto.Data = &aggregationv1.Record_UserData{
+				UserData: toProtoUserRecordData(userRec),
+			}
+		}
+	case shareddomain.RecordTypeMessage:
+		proto.Type = aggregationv1.RecordType_RECORD_TYPE_ASSISTANT
+		if assistantRec, ok := r.Data.(*shareddomain.AssistantRecord); ok {
+			proto.Data = &aggregationv1.Record_AssistantData{
+				AssistantData: toProtoAssistantRecordData(assistantRec),
+			}
+		}
+	case shareddomain.RecordTypeFileHistorySnapshot:
+		proto.Type = aggregationv1.RecordType_RECORD_TYPE_FILE_HISTORY_SNAPSHOT
+		if fileHistoryRec, ok := r.Data.(*shareddomain.FileHistorySnapshotRecord); ok {
+			proto.Data = &aggregationv1.Record_FileHistorySnapshotData{
+				FileHistorySnapshotData: toProtoFileHistorySnapshotRecordData(fileHistoryRec),
+			}
+		}
 	default:
-		return aggregationv1.SessionType_SESSION_TYPE_USER
+		proto.Type = aggregationv1.RecordType_RECORD_TYPE_UNSPECIFIED
 	}
+
+	return proto
 }
 
-func convertMessage(m *shareddomain.Message) *aggregationv1.Message {
-	if m == nil {
-		return nil
+// toProtoUserRecordData converts UserRecord to proto UserRecordData.
+func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecordData {
+	data := &aggregationv1.UserRecordData{
+		Metadata: &aggregationv1.MessageMetadata{
+			ParentUuid:  "",
+			IsSidechain: u.IsSidechain,
+			UserType:    string(u.UserType),
+			SessionId:   u.SessionID,
+			Version:     u.Version,
+			GitBranch:   u.GitBranch,
+			Uuid:        u.UUID,
+			Timestamp:   timestamppb.New(u.Timestamp),
+		},
+		Message: &aggregationv1.UserMessage{
+			Role:    string(u.Message.Role),
+			Content: u.Message.Content,
+		},
+		IsMeta: u.IsMeta,
 	}
 
-	msg := &aggregationv1.Message{
-		Id:         m.ID,
-		Type:       m.Type,
-		Role:       m.Role,
-		Model:      m.Model,
-		StopReason: m.StopReason,
+	if u.ParentUUID != nil {
+		data.Metadata.ParentUuid = *u.ParentUUID
 	}
 
-	if m.Content != nil {
-		if m.Content.IsBlocks {
-			msg.ContentBlocks = convertContentBlocks(m.Content.Blocks)
-		} else if m.Content.Text != nil {
-			msg.Text = *m.Content.Text
+	if u.ThinkingMetadata != nil {
+		data.ThinkingMetadata = &aggregationv1.UserRecordThinkingMetadata{
+			Level:    u.ThinkingMetadata.Level,
+			Disabled: u.ThinkingMetadata.Disabled,
+		}
+		if len(u.ThinkingMetadata.Triggers) > 0 {
+			data.ThinkingMetadata.Triggers = make([]*aggregationv1.UserRecordThinkingMetadataTrigger, len(u.ThinkingMetadata.Triggers))
+			for i, trigger := range u.ThinkingMetadata.Triggers {
+				data.ThinkingMetadata.Triggers[i] = &aggregationv1.UserRecordThinkingMetadataTrigger{
+					Start: int32(trigger.Start),
+					End:   int32(trigger.End),
+					Text:  trigger.Text,
+				}
+			}
 		}
 	}
 
-	if m.Usage != nil {
-		msg.Usage = &aggregationv1.Usage{
-			InputTokens:              int32(m.Usage.InputTokens),
-			OutputTokens:             int32(m.Usage.OutputTokens),
-			CacheCreationInputTokens: int32(m.Usage.CacheCreationInputTokens),
-			CacheReadInputTokens:     int32(m.Usage.CacheReadInputTokens),
-			ServiceTier:              m.Usage.ServiceTier,
+	if len(u.Todos) > 0 {
+		data.Todos = make([]*aggregationv1.UserRecordTodo, len(u.Todos))
+		for i, todo := range u.Todos {
+			data.Todos[i] = &aggregationv1.UserRecordTodo{
+				Content:    todo.Content,
+				Status:     todo.Status,
+				ActiveForm: todo.ActiveForm,
+			}
 		}
 	}
 
-	return msg
+	return data
+}
+
+// toProtoAssistantRecordData converts AssistantRecord to proto AssistantRecordData.
+func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *aggregationv1.AssistantRecordData {
+	data := &aggregationv1.AssistantRecordData{
+		Metadata: &aggregationv1.MessageMetadata{
+			ParentUuid:  "",
+			IsSidechain: a.IsSidechain,
+			UserType:    string(a.UserType),
+			SessionId:   a.SessionID,
+			Version:     a.Version,
+			GitBranch:   a.GitBranch,
+			Uuid:        a.UUID,
+			Timestamp:   timestamppb.New(a.Timestamp),
+		},
+		RequestId: a.RequestID,
+		Message: &aggregationv1.AssistantMessage{
+			Model: a.Message.Model,
+			Id:    a.Message.ID,
+			Type:  string(a.Message.Type),
+			Role:  string(a.Message.Role),
+			Usage: &aggregationv1.AssistantMessageUsage{
+				InputTokens:              int32(a.Message.Usage.InputTokens),
+				OutputTokens:             int32(a.Message.Usage.OutputTokens),
+				CacheCreationInputTokens: int32(a.Message.Usage.CacheCreationInputTokens),
+				CacheReadInputTokens:     int32(a.Message.Usage.CacheReadInputTokens),
+				ServiceTier:              a.Message.Usage.ServiceTier,
+			},
+		},
+	}
+
+	if a.ParentUUID != nil {
+		data.Metadata.ParentUuid = *a.ParentUUID
+	}
+
+	if a.Message.StopReason != nil {
+		data.Message.StopReason = *a.Message.StopReason
+	}
+
+	if a.Message.StopSequence != nil {
+		data.Message.StopSequence = int32(*a.Message.StopSequence)
+	}
+
+	// Convert content blocks
+	if len(a.Message.Content) > 0 {
+		data.Message.Content = make([]*aggregationv1.AssistantMessageContent, len(a.Message.Content))
+		for i, content := range a.Message.Content {
+			protoContent := &aggregationv1.AssistantMessageContent{
+				Type: string(content.Type),
+			}
+
+			switch content.Type {
+			case shareddomain.AssistantMessageContentTypeText:
+				if content.Text != nil {
+					protoContent.Text = *content.Text
+				}
+			case shareddomain.AssistantMessageContentTypeTool:
+				if content.Thinking != nil {
+					protoContent.Thinking = *content.Thinking
+				}
+			case shareddomain.AssistantMessageContentTypeToolUse:
+				if content.AssistantMessageToolUseContent != nil {
+					protoContent.ToolUseId = content.ID
+					protoContent.ToolUseName = content.Name
+					if inputBytes, err := sonic.Marshal(content.Input); err == nil {
+						protoContent.ToolUseInputJson = string(inputBytes)
+					}
+				}
+			}
+
+			data.Message.Content[i] = protoContent
+		}
+	}
+
+	return data
+}
+
+// toProtoFileHistorySnapshotRecordData converts FileHistorySnapshotRecord to proto.
+func toProtoFileHistorySnapshotRecordData(f *shareddomain.FileHistorySnapshotRecord) *aggregationv1.FileHistorySnapshotRecordData {
+	data := &aggregationv1.FileHistorySnapshotRecordData{
+		MessageId:         f.MessageID,
+		IsSnapshotUpdate: f.IsSnapshotUpdate,
+		Snapshot: &aggregationv1.FileHistorySnapshot{
+			MessageId:          f.Snapshot.MessageID,
+			TrackedFileBackups: make(map[string]*aggregationv1.FileHistorySnapshotTrackedBackup),
+		},
+	}
+
+	for path, backup := range f.Snapshot.TrackedFileBackups {
+		backupFileName := ""
+		if backup.BackupFileName != nil {
+			backupFileName = *backup.BackupFileName
+		}
+		data.Snapshot.TrackedFileBackups[path] = &aggregationv1.FileHistorySnapshotTrackedBackup{
+			BackupFileName: backupFileName,
+			Version:        int32(backup.Version),
+			BackupTime:     timestamppb.New(backup.BackupTime),
+		}
+	}
+
+	return data
 }
 
 // toProtoPagination converts pagination metadata to protobuf.
@@ -159,76 +282,5 @@ func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64
 		PageSize:    pageSize,
 		TotalPages:  totalPages,
 		TotalCount:  totalCount,
-	}
-}
-
-// convertContentBlocks converts domain ContentBlocks to protobuf ContentBlocks.
-func convertContentBlocks(blocks []shareddomain.ContentBlock) []*aggregationv1.ContentBlock {
-	if len(blocks) == 0 {
-		return nil
-	}
-
-	result := make([]*aggregationv1.ContentBlock, 0, len(blocks))
-	for _, block := range blocks {
-		pb := convertContentBlock(block)
-		if pb != nil {
-			result = append(result, pb)
-		}
-	}
-	return result
-}
-
-// convertContentBlock converts a single domain ContentBlock to protobuf.
-func convertContentBlock(block shareddomain.ContentBlock) *aggregationv1.ContentBlock {
-	switch b := block.(type) {
-	case *shareddomain.TextContentBlock:
-		return &aggregationv1.ContentBlock{
-			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_TEXT,
-			Block: &aggregationv1.ContentBlock_Text{
-				Text: &aggregationv1.TextContentBlock{
-					Text: b.Text,
-				},
-			},
-		}
-	case *shareddomain.ToolUseContentBlock:
-		inputJSON := ""
-		if b.Input != nil {
-			if bytes, err := sonic.Marshal(b.Input); err == nil {
-				inputJSON = string(bytes)
-			}
-		}
-		return &aggregationv1.ContentBlock{
-			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_TOOL_USE,
-			Block: &aggregationv1.ContentBlock_ToolUse{
-				ToolUse: &aggregationv1.ToolUseContentBlock{
-					Id:        b.ID,
-					Name:      b.Name,
-					InputJson: inputJSON,
-				},
-			},
-		}
-	case *shareddomain.ToolResultContentBlock:
-		return &aggregationv1.ContentBlock{
-			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_TOOL_RESULT,
-			Block: &aggregationv1.ContentBlock_ToolResult{
-				ToolResult: &aggregationv1.ToolResultContentBlock{
-					ToolUseId: b.ToolUseID,
-					Content:   b.Content,
-					IsError:   b.IsError,
-				},
-			},
-		}
-	case *shareddomain.ThinkingContentBlock:
-		return &aggregationv1.ContentBlock{
-			Type: aggregationv1.ContentBlockType_CONTENT_BLOCK_TYPE_THINKING,
-			Block: &aggregationv1.ContentBlock_Thinking{
-				Thinking: &aggregationv1.ThinkingContentBlock{
-					Thinking:  b.Thinking,
-					Signature: b.Signature,
-				},
-			},
-		}
-	default:
-		return nil
 	}
 }

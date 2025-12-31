@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/bytedance/sonic"
-	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -31,7 +30,7 @@ func NewMongoDashboardRepository(l *slog.Logger, db *mongo.Database) *MongoDashb
 	return &MongoDashboardRepository{
 		logger:             l.With(slog.String("name", "dashboard.repository.mongodb")),
 		projectsColl:       db.Collection(mongoschema.ProjectCollectionName),
-		sessionRecordsColl: db.Collection(mongoschema.SessionRecordCollectionName),
+		sessionRecordsColl: db.Collection(mongoschema.RecordCollectionName),
 	}
 }
 
@@ -44,9 +43,9 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context) (*repos
 	usagePipeline := bson.A{
 		bson.M{"$group": bson.M{
 			"_id":                  nil,
-			"totalInputTokens":     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
-			"totalOutputTokens":    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
-			"totalCacheReadTokens": bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
+			"totalInputTokens":     bson.M{"$sum": "$" + mongoschema.MessageUsageInputTokensPath},
+			"totalOutputTokens":    bson.M{"$sum": "$" + mongoschema.MessageUsageOutputTokensPath},
+			"totalCacheReadTokens": bson.M{"$sum": "$" + mongoschema.MessageUsageCacheReadTokensPath},
 		}},
 	}
 
@@ -85,7 +84,7 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context) (*repos
 
 	// Get session count (distinct session_ids)
 	sessionPipeline := bson.A{
-		bson.M{"$group": bson.M{"_id": "$" + mongoschema.SessionRecordSessionIDField}},
+		bson.M{"$group": bson.M{"_id": "$" + mongoschema.RecordSessionIDField}},
 		bson.M{"$count": "count"},
 	}
 
@@ -134,27 +133,27 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 	pipeline := bson.A{
 		// Stage 1: Lookup session records with sub-pipeline for aggregation
 		bson.M{"$lookup": bson.M{
-			"from": mongoschema.SessionRecordCollectionName,
+			"from": mongoschema.RecordCollectionName,
 			"let":  bson.M{"projectId": "$_id"},
 			"pipeline": bson.A{
 				bson.M{"$match": bson.M{
-					"$expr": bson.M{"$eq": bson.A{"$" + mongoschema.SessionRecordProjectIDField, "$$projectId"}},
+					"$expr": bson.M{"$eq": bson.A{"$" + mongoschema.RecordProjectIDField, "$$projectId"}},
 				}},
 				bson.M{"$group": bson.M{
 					"_id":          nil,
-					"sessionIds":   bson.M{"$addToSet": "$" + mongoschema.SessionRecordSessionIDField},
-					"lastActivity": bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-					mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
-					mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
-					mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
+					"sessionIds":   bson.M{"$addToSet": "$" + mongoschema.RecordSessionIDField},
+					"lastActivity": bson.M{"$max": "$" + mongoschema.RecordTimestampField},
+					mongoschema.MessageUsageInputTokensPath:     bson.M{"$sum": "$" + mongoschema.MessageUsageInputTokensPath},
+					mongoschema.MessageUsageOutputTokensPath:    bson.M{"$sum": "$" + mongoschema.MessageUsageOutputTokensPath},
+					mongoschema.MessageUsageCacheReadTokensPath: bson.M{"$sum": "$" + mongoschema.MessageUsageCacheReadTokensPath},
 				}},
 				bson.M{"$project": bson.M{
 					"_id":          0,
 					"sessionCount": bson.M{"$size": "$sessionIds"},
 					"lastActivity": 1,
-					mongoschema.SessionRecordInputTokensField:     1,
-					mongoschema.SessionRecordOutputTokensField:    1,
-					mongoschema.SessionRecordCacheReadTokensField: 1,
+					mongoschema.MessageUsageInputTokensPath:     1,
+					mongoschema.MessageUsageOutputTokensPath:    1,
+					mongoschema.MessageUsageCacheReadTokensPath: 1,
 				}},
 			},
 			"as": "stats",
@@ -174,9 +173,9 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 			mongoschema.ProjectGitBranchField:             1,
 			"sessionCount":                                bson.M{"$ifNull": bson.A{"$stats.sessionCount", 0}},
 			"lastActivity":                                bson.M{"$ifNull": bson.A{"$stats.lastActivity", nil}},
-			mongoschema.SessionRecordInputTokensField:     bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordInputTokensField, 0}},
-			mongoschema.SessionRecordOutputTokensField:    bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordOutputTokensField, 0}},
-			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$ifNull": bson.A{"$stats." + mongoschema.SessionRecordCacheReadTokensField, 0}},
+			mongoschema.MessageUsageInputTokensPath:     bson.M{"$ifNull": bson.A{"$stats." + mongoschema.MessageUsageInputTokensPath, 0}},
+			mongoschema.MessageUsageOutputTokensPath:    bson.M{"$ifNull": bson.A{"$stats." + mongoschema.MessageUsageOutputTokensPath, 0}},
+			mongoschema.MessageUsageCacheReadTokensPath: bson.M{"$ifNull": bson.A{"$stats." + mongoschema.MessageUsageCacheReadTokensPath, 0}},
 		}},
 
 		// Stage 5: Facet for count and paginated data
@@ -238,9 +237,9 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 				SessionCount: mongoutil.Get[int32](doc, "sessionCount"),
 				LastActivity: mongoutil.Get[time.Time](doc, "lastActivity"),
 				Usage: repository.TokenUsageSummary{
-					TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.SessionRecordInputTokensField),
-					TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.SessionRecordOutputTokensField),
-					TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.SessionRecordCacheReadTokensField),
+					TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.MessageUsageInputTokensPath),
+					TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.MessageUsageOutputTokensPath),
+					TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.MessageUsageCacheReadTokensPath),
 				},
 			},
 		}
@@ -303,20 +302,20 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 		if err != nil {
 			return nil, fmt.Errorf("invalid project ID: %w", err)
 		}
-		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.SessionRecordProjectIDField: projectOID}})
+		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.RecordProjectIDField: projectOID}})
 	}
 
 	// Add group stage
 	pipeline = append(pipeline, bson.M{"$group": bson.M{
-		"_id":                                   "$" + mongoschema.SessionRecordSessionIDField,
+		"_id":                                   "$" + mongoschema.RecordSessionIDField,
 		"messageCount":                          bson.M{"$sum": 1},
-		"startedAt":                             bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
-		"endedAt":                               bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-		mongoschema.SessionRecordProjectIDField: bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
-		mongoschema.SessionRecordGitBranchField: bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
-		mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
-		mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
-		mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
+		"startedAt":                             bson.M{"$min": "$" + mongoschema.RecordTimestampField},
+		"endedAt":                               bson.M{"$max": "$" + mongoschema.RecordTimestampField},
+		mongoschema.RecordProjectIDField: bson.M{"$first": "$" + mongoschema.RecordProjectIDField},
+		mongoschema.RecordGitBranchField: bson.M{"$first": "$" + mongoschema.RecordGitBranchField},
+		mongoschema.MessageUsageInputTokensPath:     bson.M{"$sum": "$" + mongoschema.MessageUsageInputTokensPath},
+		mongoschema.MessageUsageOutputTokensPath:    bson.M{"$sum": "$" + mongoschema.MessageUsageOutputTokensPath},
+		mongoschema.MessageUsageCacheReadTokensPath: bson.M{"$sum": "$" + mongoschema.MessageUsageCacheReadTokensPath},
 	}})
 
 	// Add sort
@@ -372,16 +371,16 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 		session := repository.SessionSummary{
 			SessionBase: repository.SessionBase{
 				ID:        mongoutil.Get[string](doc, "_id"),
-				ProjectID: doc[mongoschema.SessionRecordProjectIDField].(bson.ObjectID).Hex(),
-				GitBranch: mongoutil.Get[string](doc, mongoschema.SessionRecordGitBranchField),
+				ProjectID: doc[mongoschema.RecordProjectIDField].(bson.ObjectID).Hex(),
+				GitBranch: mongoutil.Get[string](doc, mongoschema.RecordGitBranchField),
 				StartedAt: mongoutil.Get[time.Time](doc, "startedAt"),
 				EndedAt:   mongoutil.Get[time.Time](doc, "endedAt"),
 			},
 			MessageCount: mongoutil.Get[int32](doc, "messageCount"),
 			Usage: repository.TokenUsageSummary{
-				TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.SessionRecordInputTokensField),
-				TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.SessionRecordOutputTokensField),
-				TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.SessionRecordCacheReadTokensField),
+				TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.MessageUsageInputTokensPath),
+				TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.MessageUsageOutputTokensPath),
+				TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.MessageUsageCacheReadTokensPath),
 			},
 		}
 
@@ -394,14 +393,14 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 // GetSession retrieves detailed session information with all records.
 func (r *MongoDashboardRepository) GetSession(ctx context.Context, sessionID string) (*repository.SessionDetail, error) {
 	// Find all records for this session
-	cursor, err := r.sessionRecordsColl.Find(ctx, bson.M{mongoschema.SessionRecordSessionIDField: sessionID}, options.Find().SetSort(bson.M{mongoschema.SessionRecordTimestampField: 1}))
+	cursor, err := r.sessionRecordsColl.Find(ctx, bson.M{mongoschema.RecordSessionIDField: sessionID}, options.Find().SetSort(bson.M{mongoschema.RecordTimestampField: 1}))
 	if err != nil {
 		r.logger.Error("failed to find session records", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to find session records: %w", err)
 	}
 	defer cursor.Close(ctx)
 
-	var records []shareddomain.SessionRecord
+	var records []shareddomain.Record
 	var detail *repository.SessionDetail
 
 	for cursor.Next(ctx) {
@@ -413,7 +412,7 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, sessionID str
 		// Initialize detail from first record
 		if detail == nil {
 			projectID := ""
-			if oid, ok := doc[mongoschema.SessionRecordProjectIDField].(bson.ObjectID); ok {
+			if oid, ok := doc[mongoschema.RecordProjectIDField].(bson.ObjectID); ok {
 				projectID = oid.Hex()
 			}
 
@@ -421,72 +420,33 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, sessionID str
 				SessionBase: repository.SessionBase{
 					ID:        sessionID,
 					ProjectID: projectID,
-					GitBranch: mongoutil.Get[string](doc, mongoschema.SessionRecordGitBranchField),
+					GitBranch: mongoutil.Get[string](doc, mongoschema.RecordGitBranchField),
 				},
-				CWD:     mongoutil.Get[string](doc, mongoschema.SessionRecordCWDField),
-				Version: mongoutil.Get[string](doc, mongoschema.SessionRecordVersionField),
+				Version: mongoutil.Get[string](doc, mongoschema.RecordVersionField),
 			}
 		}
 
-		// Convert to domain SessionRecord
-		record := shareddomain.SessionRecord{
-			UUID:        mongoutil.Get[string](doc, mongoschema.SessionRecordUUIDField),
-			ParentUUID:  mongoutil.Get[string](doc, mongoschema.SessionRecordParentUUIDField),
-			SessionID:   mongoutil.Get[string](doc, mongoschema.SessionRecordSessionIDField),
-			Type:        shareddomain.SessionType(mongoutil.Get[string](doc, mongoschema.SessionRecordTypeField)),
-			Timestamp:   mongoutil.Get[time.Time](doc, mongoschema.SessionRecordTimestampField),
-			CWD:         mongoutil.Get[string](doc, mongoschema.SessionRecordCWDField),
-			GitBranch:   mongoutil.Get[string](doc, mongoschema.SessionRecordGitBranchField),
-			Version:     mongoutil.Get[string](doc, mongoschema.SessionRecordVersionField),
-			UserType:    mongoutil.Get[string](doc, mongoschema.SessionRecordUserTypeField),
-			IsSidechain: mongoutil.Get[bool](doc, mongoschema.SessionRecordIsSidechainField),
-			IsMeta:      mongoutil.Get[bool](doc, mongoschema.SessionRecordIsMetaField),
-			Slug:        mongoutil.Get[string](doc, mongoschema.SessionRecordSlugField),
-			RequestID:   mongoutil.Get[string](doc, mongoschema.SessionRecordRequestIDField),
+		// Reconstruct domain.Record from document
+		// Read "type" field to determine RecordType
+		recordType := shareddomain.RecordType(mongoutil.Get[string](doc, mongoschema.RecordTypeField))
+
+		// Marshal document back to JSON
+		docBytes, err := sonic.Marshal(doc)
+		if err != nil {
+			r.logger.Error("failed to marshal document to JSON",
+				slog.String("sessionID", sessionID),
+				slog.Any("error", err))
+			continue
 		}
 
-		// Reconstruct message if any message field exists
-		hasMessage := mongoutil.Get[string](doc, mongoschema.SessionRecordMessageIDField) != "" ||
-			mongoutil.Get[string](doc, mongoschema.SessionRecordMessageRoleField) != "" ||
-			mongoutil.Get[string](doc, mongoschema.SessionRecordMessageTypeField) != "" ||
-			mongoutil.Get[int](doc, mongoschema.SessionRecordInputTokensField) > 0 ||
-			mongoutil.Get[int](doc, mongoschema.SessionRecordOutputTokensField) > 0
-
-		if hasMessage {
-			msg := &shareddomain.Message{
-				ID:         mongoutil.Get[string](doc, mongoschema.SessionRecordMessageIDField),
-				Type:       mongoutil.Get[string](doc, mongoschema.SessionRecordMessageTypeField),
-				Role:       mongoutil.Get[string](doc, mongoschema.SessionRecordMessageRoleField),
-				Model:      mongoutil.Get[string](doc, mongoschema.SessionRecordMessageModelField),
-				StopReason: mongoutil.Get[string](doc, mongoschema.SessionRecordStopReasonField),
-			}
-
-			// Reconstruct content if available (supports both JSON and legacy plain text)
-			if content := mongoutil.Get[string](doc, mongoschema.SessionRecordMessageContentField); content != "" {
-				var mc shareddomain.MessageContent
-				if err := sonic.Unmarshal([]byte(content), &mc); err != nil {
-					// Fallback: treat as legacy plain text (backward compatibility)
-					msg.Content = &shareddomain.MessageContent{
-						Text:     lo.ToPtr(content),
-						IsBlocks: false,
-					}
-				} else {
-					msg.Content = &mc
-				}
-			}
-
-			// Add usage if token data exists
-			if mongoutil.Get[int](doc, mongoschema.SessionRecordInputTokensField) > 0 ||
-				mongoutil.Get[int](doc, mongoschema.SessionRecordOutputTokensField) > 0 ||
-				mongoutil.Get[int](doc, mongoschema.SessionRecordCacheReadTokensField) > 0 {
-				msg.Usage = &shareddomain.Usage{
-					InputTokens:          mongoutil.Get[int](doc, mongoschema.SessionRecordInputTokensField),
-					OutputTokens:         mongoutil.Get[int](doc, mongoschema.SessionRecordOutputTokensField),
-					CacheReadInputTokens: mongoutil.Get[int](doc, mongoschema.SessionRecordCacheReadTokensField),
-				}
-			}
-
-			record.Message = msg
+		// Unmarshal JSON into domain.Record (uses custom UnmarshalJSON)
+		var record shareddomain.Record
+		if err := sonic.Unmarshal(docBytes, &record); err != nil {
+			r.logger.Error("failed to unmarshal record",
+				slog.String("sessionID", sessionID),
+				slog.String("type", string(recordType)),
+				slog.Any("error", err))
+			continue
 		}
 
 		records = append(records, record)
@@ -498,24 +458,37 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, sessionID str
 
 	detail.Records = records
 
-	// Calculate aggregated usage and timestamps
+	// Calculate aggregated usage and timestamps from records
 	if len(records) > 0 {
-		detail.StartedAt = records[0].Timestamp
-		detail.EndedAt = records[len(records)-1].Timestamp
+		// Extract timestamps from first and last records
+		if firstUserRec, ok := records[0].Data.(*shareddomain.UserRecord); ok {
+			detail.StartedAt = firstUserRec.Timestamp
+		} else if firstAssistantRec, ok := records[0].Data.(*shareddomain.AssistantRecord); ok {
+			detail.StartedAt = firstAssistantRec.Timestamp
+		}
 
-		var inputTokens, outputTokens, cacheReadTokens int64
+		if lastUserRec, ok := records[len(records)-1].Data.(*shareddomain.UserRecord); ok {
+			detail.EndedAt = lastUserRec.Timestamp
+		} else if lastAssistantRec, ok := records[len(records)-1].Data.(*shareddomain.AssistantRecord); ok {
+			detail.EndedAt = lastAssistantRec.Timestamp
+		}
+
+		// Calculate token usage from assistant records
+		var inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens int64
 		for _, r := range records {
-			if r.Message != nil && r.Message.Usage != nil {
-				inputTokens += int64(r.Message.Usage.InputTokens)
-				outputTokens += int64(r.Message.Usage.OutputTokens)
-				cacheReadTokens += int64(r.Message.Usage.CacheReadInputTokens)
+			if assistantRec, ok := r.Data.(*shareddomain.AssistantRecord); ok {
+				inputTokens += int64(assistantRec.Message.Usage.InputTokens)
+				outputTokens += int64(assistantRec.Message.Usage.OutputTokens)
+				cacheCreationTokens += int64(assistantRec.Message.Usage.CacheCreationInputTokens)
+				cacheReadTokens += int64(assistantRec.Message.Usage.CacheReadInputTokens)
 			}
 		}
 
 		detail.Usage = repository.TokenUsageSummary{
-			TotalInputTokens:     inputTokens,
-			TotalOutputTokens:    outputTokens,
-			TotalCacheReadTokens: cacheReadTokens,
+			TotalInputTokens:         inputTokens,
+			TotalOutputTokens:        outputTokens,
+			TotalCacheCreationTokens: cacheCreationTokens,
+			TotalCacheReadTokens:     cacheReadTokens,
 		}
 	}
 
@@ -529,21 +502,21 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, limit 
 	pipeline := bson.A{
 		// Stage 1: Lookup session records
 		bson.M{"$lookup": bson.M{
-			"from":         mongoschema.SessionRecordCollectionName,
+			"from":         mongoschema.RecordCollectionName,
 			"localField":   "_id",
-			"foreignField": mongoschema.SessionRecordProjectIDField,
+			"foreignField": mongoschema.RecordProjectIDField,
 			"as":           "sessions",
 		}},
 
 		// Stage 2: Calculate all stats from sessions array
 		bson.M{"$addFields": bson.M{
-			"lastActivity": bson.M{"$max": "$sessions." + mongoschema.SessionRecordTimestampField},
+			"lastActivity": bson.M{"$max": "$sessions." + mongoschema.RecordTimestampField},
 			"sessionCount": bson.M{"$size": bson.M{
-				"$setUnion": bson.A{"$sessions." + mongoschema.SessionRecordSessionIDField, bson.A{}},
+				"$setUnion": bson.A{"$sessions." + mongoschema.RecordSessionIDField, bson.A{}},
 			}},
-			mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$sessions." + mongoschema.SessionRecordInputTokensField},
-			mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$sessions." + mongoschema.SessionRecordOutputTokensField},
-			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$sessions." + mongoschema.SessionRecordCacheReadTokensField},
+			mongoschema.MessageUsageInputTokensPath:     bson.M{"$sum": "$sessions." + mongoschema.MessageUsageInputTokensPath},
+			mongoschema.MessageUsageOutputTokensPath:    bson.M{"$sum": "$sessions." + mongoschema.MessageUsageOutputTokensPath},
+			mongoschema.MessageUsageCacheReadTokensPath: bson.M{"$sum": "$sessions." + mongoschema.MessageUsageCacheReadTokensPath},
 		}},
 
 		// Stage 3: Sort by last activity (descending)
@@ -582,9 +555,9 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, limit 
 				SessionCount: mongoutil.Get[int32](doc, "sessionCount"),
 				LastActivity: mongoutil.Get[time.Time](doc, "lastActivity"),
 				Usage: repository.TokenUsageSummary{
-					TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.SessionRecordInputTokensField),
-					TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.SessionRecordOutputTokensField),
-					TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.SessionRecordCacheReadTokensField),
+					TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.MessageUsageInputTokensPath),
+					TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.MessageUsageOutputTokensPath),
+					TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.MessageUsageCacheReadTokensPath),
 				},
 			},
 		}
@@ -598,15 +571,15 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, limit 
 func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, limit int) ([]repository.SessionSummary, error) {
 	pipeline := bson.A{
 		bson.M{"$group": bson.M{
-			"_id":                                   "$" + mongoschema.SessionRecordSessionIDField,
+			"_id":                                   "$" + mongoschema.RecordSessionIDField,
 			"messageCount":                          bson.M{"$sum": 1},
-			"startedAt":                             bson.M{"$min": "$" + mongoschema.SessionRecordTimestampField},
-			"endedAt":                               bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-			mongoschema.SessionRecordProjectIDField: bson.M{"$first": "$" + mongoschema.SessionRecordProjectIDField},
-			mongoschema.SessionRecordGitBranchField: bson.M{"$first": "$" + mongoschema.SessionRecordGitBranchField},
-			mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
-			mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
-			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
+			"startedAt":                             bson.M{"$min": "$" + mongoschema.RecordTimestampField},
+			"endedAt":                               bson.M{"$max": "$" + mongoschema.RecordTimestampField},
+			mongoschema.RecordProjectIDField: bson.M{"$first": "$" + mongoschema.RecordProjectIDField},
+			mongoschema.RecordGitBranchField: bson.M{"$first": "$" + mongoschema.RecordGitBranchField},
+			mongoschema.MessageUsageInputTokensPath:     bson.M{"$sum": "$" + mongoschema.MessageUsageInputTokensPath},
+			mongoschema.MessageUsageOutputTokensPath:    bson.M{"$sum": "$" + mongoschema.MessageUsageOutputTokensPath},
+			mongoschema.MessageUsageCacheReadTokensPath: bson.M{"$sum": "$" + mongoschema.MessageUsageCacheReadTokensPath},
 		}},
 		bson.M{"$sort": bson.M{"startedAt": -1}},
 		bson.M{"$limit": limit},
@@ -626,7 +599,7 @@ func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, limit 
 		}
 
 		projectID := ""
-		if oid, ok := doc[mongoschema.SessionRecordProjectIDField].(bson.ObjectID); ok {
+		if oid, ok := doc[mongoschema.RecordProjectIDField].(bson.ObjectID); ok {
 			projectID = oid.Hex()
 		}
 
@@ -634,15 +607,15 @@ func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, limit 
 			SessionBase: repository.SessionBase{
 				ID:        mongoutil.Get[string](doc, "_id"),
 				ProjectID: projectID,
-				GitBranch: mongoutil.Get[string](doc, mongoschema.SessionRecordGitBranchField),
+				GitBranch: mongoutil.Get[string](doc, mongoschema.RecordGitBranchField),
 				StartedAt: mongoutil.Get[time.Time](doc, "startedAt"),
 				EndedAt:   mongoutil.Get[time.Time](doc, "endedAt"),
 			},
 			MessageCount: mongoutil.Get[int32](doc, "messageCount"),
 			Usage: repository.TokenUsageSummary{
-				TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.SessionRecordInputTokensField),
-				TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.SessionRecordOutputTokensField),
-				TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.SessionRecordCacheReadTokensField),
+				TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.MessageUsageInputTokensPath),
+				TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.MessageUsageOutputTokensPath),
+				TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.MessageUsageCacheReadTokensPath),
 			},
 		}
 
@@ -659,21 +632,21 @@ func (r *MongoDashboardRepository) getProjectStats(ctx context.Context, projectI
 	}
 
 	pipeline := bson.A{
-		bson.M{"$match": bson.M{mongoschema.SessionRecordProjectIDField: projectOID}},
+		bson.M{"$match": bson.M{mongoschema.RecordProjectIDField: projectOID}},
 		bson.M{"$group": bson.M{
 			"_id":          nil,
-			"sessionCount": bson.M{"$addToSet": "$" + mongoschema.SessionRecordSessionIDField},
-			"lastActivity": bson.M{"$max": "$" + mongoschema.SessionRecordTimestampField},
-			mongoschema.SessionRecordInputTokensField:     bson.M{"$sum": "$" + mongoschema.SessionRecordInputTokensField},
-			mongoschema.SessionRecordOutputTokensField:    bson.M{"$sum": "$" + mongoschema.SessionRecordOutputTokensField},
-			mongoschema.SessionRecordCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.SessionRecordCacheReadTokensField},
+			"sessionCount": bson.M{"$addToSet": "$" + mongoschema.RecordSessionIDField},
+			"lastActivity": bson.M{"$max": "$" + mongoschema.RecordTimestampField},
+			mongoschema.MessageUsageInputTokensPath:     bson.M{"$sum": "$" + mongoschema.MessageUsageInputTokensPath},
+			mongoschema.MessageUsageOutputTokensPath:    bson.M{"$sum": "$" + mongoschema.MessageUsageOutputTokensPath},
+			mongoschema.MessageUsageCacheReadTokensPath: bson.M{"$sum": "$" + mongoschema.MessageUsageCacheReadTokensPath},
 		}},
 		bson.M{"$project": bson.M{
 			"sessionCount": bson.M{"$size": "$sessionCount"},
 			"lastActivity": 1,
-			mongoschema.SessionRecordInputTokensField:     1,
-			mongoschema.SessionRecordOutputTokensField:    1,
-			mongoschema.SessionRecordCacheReadTokensField: 1,
+			mongoschema.MessageUsageInputTokensPath:     1,
+			mongoschema.MessageUsageOutputTokensPath:    1,
+			mongoschema.MessageUsageCacheReadTokensPath: 1,
 		}},
 	}
 
@@ -697,9 +670,9 @@ func (r *MongoDashboardRepository) getProjectStats(ctx context.Context, projectI
 			SessionCount: mongoutil.Get[int32](doc, "sessionCount"),
 			LastActivity: mongoutil.Get[time.Time](doc, "lastActivity"),
 			Usage: repository.TokenUsageSummary{
-				TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.SessionRecordInputTokensField),
-				TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.SessionRecordOutputTokensField),
-				TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.SessionRecordCacheReadTokensField),
+				TotalInputTokens:     mongoutil.Get[int64](doc, mongoschema.MessageUsageInputTokensPath),
+				TotalOutputTokens:    mongoutil.Get[int64](doc, mongoschema.MessageUsageOutputTokensPath),
+				TotalCacheReadTokens: mongoutil.Get[int64](doc, mongoschema.MessageUsageCacheReadTokensPath),
 			},
 		},
 	}, nil

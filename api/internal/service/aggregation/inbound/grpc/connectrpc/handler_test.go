@@ -13,15 +13,15 @@ var _ = Describe("JSONL Parsing", func() {
 		Context("when all lines are valid JSON", func() {
 			It("parses all lines successfully", func() {
 				lines := []string{
-					`{"uuid":"1","type":"user","sessionId":"s1","timestamp":"2024-01-01T00:00:00Z"}`,
-					`{"uuid":"2","type":"assistant","sessionId":"s1","timestamp":"2024-01-01T00:00:01Z"}`,
+					`{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`,
+					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`,
 				}
 
-				var records []shareddomain.SessionRecord
+				var records []shareddomain.Record
 				var parseErrors []error
 
 				for _, line := range lines {
-					var record shareddomain.SessionRecord
+					var record shareddomain.Record
 					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 						parseErrors = append(parseErrors, err)
 						continue
@@ -31,8 +31,8 @@ var _ = Describe("JSONL Parsing", func() {
 
 				Expect(records).To(HaveLen(2))
 				Expect(parseErrors).To(BeEmpty())
-				Expect(records[0].UUID).To(Equal("1"))
-				Expect(records[0].Type).To(Equal(shareddomain.SessionTypeUser))
+				Expect(records[0].Type).To(Equal(shareddomain.RecordTypeUser))
+				Expect(records[1].Type).To(Equal(shareddomain.RecordTypeMessage))
 			})
 		})
 	})
@@ -41,16 +41,16 @@ var _ = Describe("JSONL Parsing", func() {
 		Context("when some lines contain invalid JSON", func() {
 			It("skips invalid lines and parses valid ones", func() {
 				lines := []string{
-					`{"uuid":"1","type":"user"}`,
+					`{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`,
 					`invalid json`,
-					`{"uuid":"2","type":"assistant"}`,
+					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`,
 				}
 
-				var records []shareddomain.SessionRecord
+				var records []shareddomain.Record
 				var parseErrors []error
 
 				for _, line := range lines {
-					var record shareddomain.SessionRecord
+					var record shareddomain.Record
 					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 						parseErrors = append(parseErrors, err)
 						continue
@@ -68,18 +68,18 @@ var _ = Describe("JSONL Parsing", func() {
 		Context("when lines contain empty strings", func() {
 			It("skips empty lines and parses valid ones", func() {
 				lines := []string{
-					`{"uuid":"1","type":"user"}`,
+					`{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`,
 					``,
-					`{"uuid":"2","type":"assistant"}`,
+					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`,
 				}
 
-				var records []shareddomain.SessionRecord
+				var records []shareddomain.Record
 
 				for _, line := range lines {
 					if line == "" {
 						continue
 					}
-					var record shareddomain.SessionRecord
+					var record shareddomain.Record
 					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 						continue
 					}
@@ -91,35 +91,43 @@ var _ = Describe("JSONL Parsing", func() {
 		})
 	})
 
-	Describe("parsing message content", func() {
-		Context("when content is a text string", func() {
-			It("parses text content correctly", func() {
-				textLine := `{"uuid":"1","type":"user","message":{"role":"user","content":"hello"}}`
+	Describe("parsing record types", func() {
+		Context("when parsing user record", func() {
+			It("returns Record with UserRecord data", func() {
+				userLine := `{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`
 
-				var record shareddomain.SessionRecord
-				err := sonic.Unmarshal([]byte(textLine), &record)
+				var record shareddomain.Record
+				err := sonic.Unmarshal([]byte(userLine), &record)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(record.Message).NotTo(BeNil())
-				Expect(record.Message.Content).NotTo(BeNil())
-				Expect(record.Message.Content.IsBlocks).To(BeFalse())
-				Expect(record.Message.Content.Text).NotTo(BeNil())
-				Expect(*record.Message.Content.Text).To(Equal("hello"))
+				Expect(record.Type).To(Equal(shareddomain.RecordTypeUser))
+				Expect(record.Data).To(BeAssignableToTypeOf(&shareddomain.UserRecord{}))
 			})
 		})
 
-		Context("when content is an array of blocks", func() {
-			It("parses content blocks correctly", func() {
-				blockLine := `{"uuid":"1","type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"hello"},{"type":"tool_use","id":"t1","name":"read","input":{}}]}}`
+		Context("when parsing assistant record", func() {
+			It("returns Record with AssistantRecord data", func() {
+				assistantLine := `{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`
 
-				var record shareddomain.SessionRecord
-				err := sonic.Unmarshal([]byte(blockLine), &record)
+				var record shareddomain.Record
+				err := sonic.Unmarshal([]byte(assistantLine), &record)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(record.Message).NotTo(BeNil())
-				Expect(record.Message.Content).NotTo(BeNil())
-				Expect(record.Message.Content.IsBlocks).To(BeTrue())
-				Expect(record.Message.Content.Blocks).To(HaveLen(2))
+				Expect(record.Type).To(Equal(shareddomain.RecordTypeMessage))
+				Expect(record.Data).To(BeAssignableToTypeOf(&shareddomain.AssistantRecord{}))
+			})
+		})
+
+		Context("when parsing file-history-snapshot record", func() {
+			It("returns Record with FileHistorySnapshotRecord data", func() {
+				snapshotLine := `{"type":"file-history-snapshot","messageId":"m1","snapshot":{"messageId":"m1","trackedFileBackups":{}},"isSnapshotUpdate":false}`
+
+				var record shareddomain.Record
+				err := sonic.Unmarshal([]byte(snapshotLine), &record)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(record.Type).To(Equal(shareddomain.RecordTypeFileHistorySnapshot))
+				Expect(record.Data).To(BeAssignableToTypeOf(&shareddomain.FileHistorySnapshotRecord{}))
 			})
 		})
 	})

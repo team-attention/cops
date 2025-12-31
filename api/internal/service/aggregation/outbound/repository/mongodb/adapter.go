@@ -24,11 +24,11 @@ type MongoSessionRecordRepository struct {
 func NewMongoSessionRecordRepository(l *slog.Logger, db *mongo.Database) *MongoSessionRecordRepository {
 	return &MongoSessionRecordRepository{
 		logger:     l.With(slog.String("name", "aggregation.repository.mongodb")),
-		collection: db.Collection(mongoschema.SessionRecordCollectionName),
+		collection: db.Collection(mongoschema.RecordCollectionName),
 	}
 }
 
-// SaveBatch saves a batch of session records to MongoDB.
+// SaveBatch saves a batch of records to MongoDB.
 func (r *MongoSessionRecordRepository) SaveBatch(ctx context.Context, batch *repository.LogBatch) error {
 	if len(batch.Records) == 0 {
 		return nil
@@ -47,15 +47,15 @@ func (r *MongoSessionRecordRepository) SaveBatch(ctx context.Context, batch *rep
 
 	result, err := r.collection.InsertMany(ctx, docs)
 	if err != nil {
-		r.logger.Error("failed to insert session records",
+		r.logger.Error("failed to insert records",
 			slog.String("projectId", batch.ProjectID),
 			slog.Int("count", len(batch.Records)),
 			slog.Any("error", err),
 		)
-		return fmt.Errorf("failed to insert session records: %w", err)
+		return fmt.Errorf("failed to insert records: %w", err)
 	}
 
-	r.logger.Debug("inserted session records",
+	r.logger.Debug("inserted records",
 		slog.String("projectId", batch.ProjectID),
 		slog.Int("count", len(result.InsertedIDs)),
 	)
@@ -63,64 +63,37 @@ func (r *MongoSessionRecordRepository) SaveBatch(ctx context.Context, batch *rep
 	return nil
 }
 
-func toDocument(record shareddomain.SessionRecord, projectObjID bson.ObjectID) bson.M {
-	doc := bson.M{
-		mongoschema.SessionRecordUUIDField:        record.UUID,
-		mongoschema.SessionRecordParentUUIDField:  record.ParentUUID,
-		mongoschema.SessionRecordSessionIDField:   record.SessionID,
-		mongoschema.SessionRecordProjectIDField:   projectObjID,
-		mongoschema.SessionRecordTypeField:        string(record.Type),
-		mongoschema.SessionRecordTimestampField:   record.Timestamp,
-		mongoschema.SessionRecordCWDField:         record.CWD,
-		mongoschema.SessionRecordGitBranchField:   record.GitBranch,
-		mongoschema.SessionRecordVersionField:     record.Version,
-		mongoschema.SessionRecordUserTypeField:    record.UserType,
-		mongoschema.SessionRecordIsSidechainField: record.IsSidechain,
-		mongoschema.SessionRecordIsMetaField:      record.IsMeta,
+func toDocument(record shareddomain.Record, projectObjID bson.ObjectID) bson.M {
+	// Marshal record to JSON using record.MarshalJSON() (produces flat JSON)
+	jsonBytes, err := record.MarshalJSON()
+	if err != nil {
+		// Log error and return minimal document
+		slog.Error("failed to marshal record to JSON",
+			slog.String("type", string(record.Type)),
+			slog.Any("error", err),
+		)
+		return bson.M{
+			mongoschema.RecordProjectIDField: projectObjID,
+			mongoschema.RecordTypeField:      string(record.Type),
+		}
 	}
 
-	if record.Slug != "" {
-		doc[mongoschema.SessionRecordSlugField] = record.Slug
-	}
-	if record.RequestID != "" {
-		doc[mongoschema.SessionRecordRequestIDField] = record.RequestID
+	// Unmarshal JSON into bson.M
+	var doc bson.M
+	if err := sonic.Unmarshal(jsonBytes, &doc); err != nil {
+		// Log error and return minimal document
+		slog.Error("failed to unmarshal JSON to bson.M",
+			slog.String("type", string(record.Type)),
+			slog.Any("error", err),
+		)
+		return bson.M{
+			mongoschema.RecordProjectIDField: projectObjID,
+			mongoschema.RecordTypeField:      string(record.Type),
+		}
 	}
 
-	if record.Message != nil {
-		msg := record.Message
-		if msg.ID != "" {
-			doc[mongoschema.SessionRecordMessageIDField] = msg.ID
-		}
-		if msg.Type != "" {
-			doc[mongoschema.SessionRecordMessageTypeField] = msg.Type
-		}
-		if msg.Role != "" {
-			doc[mongoschema.SessionRecordMessageRoleField] = msg.Role
-		}
-		if msg.Model != "" {
-			doc[mongoschema.SessionRecordMessageModelField] = msg.Model
-		}
-		if msg.StopReason != "" {
-			doc[mongoschema.SessionRecordStopReasonField] = msg.StopReason
-		}
-		if msg.Content != nil {
-			contentBytes, err := sonic.Marshal(msg.Content)
-			if err != nil {
-				// Log warning but continue - don't fail the batch for one message
-				slog.Warn("failed to serialize message content",
-					slog.String("messageId", msg.ID),
-					slog.Any("error", err),
-				)
-			} else {
-				doc[mongoschema.SessionRecordMessageContentField] = string(contentBytes)
-			}
-		}
-		if msg.Usage != nil {
-			doc[mongoschema.SessionRecordInputTokensField] = msg.Usage.InputTokens
-			doc[mongoschema.SessionRecordOutputTokensField] = msg.Usage.OutputTokens
-			doc[mongoschema.SessionRecordCacheReadTokensField] = msg.Usage.CacheReadInputTokens
-		}
-	}
+	// Add projectId field with projectObjID
+	doc[mongoschema.RecordProjectIDField] = projectObjID
 
 	return doc
 }

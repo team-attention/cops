@@ -71,10 +71,10 @@ func (h *AggregationGRPCHandler) SendLogs(
 	return connect.NewResponse(res), nil
 }
 
-// parseJSONLLines parses raw JSONL lines into SessionRecord domain objects.
+// parseJSONLLines parses raw JSONL lines into Record domain objects.
 // Returns the parsed batch and any parse errors encountered.
 func (h *AggregationGRPCHandler) parseJSONLLines(lines []string, projectID string) (*repository.LogBatch, []error) {
-	var records []shareddomain.SessionRecord
+	var records []shareddomain.Record
 	var parseErrors []error
 
 	for _, line := range lines {
@@ -82,7 +82,7 @@ func (h *AggregationGRPCHandler) parseJSONLLines(lines []string, projectID strin
 			continue
 		}
 
-		var record shareddomain.SessionRecord
+		var record shareddomain.Record
 		if err := sonic.Unmarshal([]byte(line), &record); err != nil {
 			parseErrors = append(parseErrors, fmt.Errorf("parse error: %s (line: %.100s...)", err.Error(), line))
 			continue

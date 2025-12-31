@@ -126,8 +126,9 @@ message SessionDetail {
   // Git branch during session
   string git_branch = 3;
 
-  // Working directory
-  string cwd = 4;
+  // Reserved field numbers for removed fields
+  reserved 4;
+  reserved "cwd";
 
   // Claude Code version
   string version = 5;
@@ -142,7 +143,7 @@ message SessionDetail {
   google.protobuf.Timestamp ended_at = 8;
 
   // All session records
-  repeated aggregation.v1.SessionRecord records = 9;
+  repeated aggregation.v1.Record records = 9;
 }
 
 // GetOverviewReq is the request for GetOverview RPC.

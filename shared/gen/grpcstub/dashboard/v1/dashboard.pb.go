@@ -524,8 +524,6 @@ type SessionDetail struct {
 	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Git branch during session
 	GitBranch string `protobuf:"bytes,3,opt,name=git_branch,json=gitBranch,proto3" json:"git_branch,omitempty"`
-	// Working directory
-	Cwd string `protobuf:"bytes,4,opt,name=cwd,proto3" json:"cwd,omitempty"`
 	// Claude Code version
 	Version string `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
 	// Session token usage
@@ -535,7 +533,7 @@ type SessionDetail struct {
 	// Session end timestamp
 	EndedAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
 	// All session records
-	Records       []*v1.SessionRecord `protobuf:"bytes,9,rep,name=records,proto3" json:"records,omitempty"`
+	Records       []*v1.Record `protobuf:"bytes,9,rep,name=records,proto3" json:"records,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -591,13 +589,6 @@ func (x *SessionDetail) GetGitBranch() string {
 	return ""
 }
 
-func (x *SessionDetail) GetCwd() string {
-	if x != nil {
-		return x.Cwd
-	}
-	return ""
-}
-
 func (x *SessionDetail) GetVersion() string {
 	if x != nil {
 		return x.Version
@@ -626,7 +617,7 @@ func (x *SessionDetail) GetEndedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *SessionDetail) GetRecords() []*v1.SessionRecord {
+func (x *SessionDetail) GetRecords() []*v1.Record {
 	if x != nil {
 		return x.Records
 	}
@@ -1211,20 +1202,19 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x05usage\x18\x05 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
 	"started_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xeb\x02\n" +
+	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xdd\x02\n" +
 	"\rSessionDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x1d\n" +
 	"\n" +
-	"git_branch\x18\x03 \x01(\tR\tgitBranch\x12\x10\n" +
-	"\x03cwd\x18\x04 \x01(\tR\x03cwd\x12\x18\n" +
+	"git_branch\x18\x03 \x01(\tR\tgitBranch\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\tR\aversion\x125\n" +
 	"\x05usage\x18\x06 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
 	"started_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x127\n" +
-	"\arecords\x18\t \x03(\v2\x1d.aggregation.v1.SessionRecordR\arecords\"\x10\n" +
+	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x120\n" +
+	"\arecords\x18\t \x03(\v2\x16.aggregation.v1.RecordR\arecordsJ\x04\b\x04\x10\x05R\x03cwd\"\x10\n" +
 	"\x0eGetOverviewReq\"\xaa\x02\n" +
 	"\x0eGetOverviewRes\x12@\n" +
 	"\vtotal_usage\x18\x01 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\n" +
@@ -1307,7 +1297,7 @@ var file_dashboard_v1_dashboard_proto_goTypes = []any{
 	(*GetSessionReq)(nil),         // 15: dashboard.v1.GetSessionReq
 	(*GetSessionRes)(nil),         // 16: dashboard.v1.GetSessionRes
 	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
-	(*v1.SessionRecord)(nil),      // 18: aggregation.v1.SessionRecord
+	(*v1.Record)(nil),             // 18: aggregation.v1.Record
 }
 var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 0: dashboard.v1.ProjectSummary.usage:type_name -> dashboard.v1.TokenUsageSummary
@@ -1321,7 +1311,7 @@ var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 8: dashboard.v1.SessionDetail.usage:type_name -> dashboard.v1.TokenUsageSummary
 	17, // 9: dashboard.v1.SessionDetail.started_at:type_name -> google.protobuf.Timestamp
 	17, // 10: dashboard.v1.SessionDetail.ended_at:type_name -> google.protobuf.Timestamp
-	18, // 11: dashboard.v1.SessionDetail.records:type_name -> aggregation.v1.SessionRecord
+	18, // 11: dashboard.v1.SessionDetail.records:type_name -> aggregation.v1.Record
 	0,  // 12: dashboard.v1.GetOverviewRes.total_usage:type_name -> dashboard.v1.TokenUsageSummary
 	3,  // 13: dashboard.v1.GetOverviewRes.recent_projects:type_name -> dashboard.v1.ProjectSummary
 	5,  // 14: dashboard.v1.GetOverviewRes.recent_sessions:type_name -> dashboard.v1.SessionSummary
