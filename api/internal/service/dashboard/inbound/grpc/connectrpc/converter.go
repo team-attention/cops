@@ -121,6 +121,7 @@ func toProtoRecord(r shareddomain.Record) *aggregationv1.Record {
 
 // toProtoUserRecordData converts UserRecord to proto UserRecordData.
 func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecordData {
+	// 1. Create base UserRecordData with metadata and other fields.
 	data := &aggregationv1.UserRecordData{
 		Metadata: &aggregationv1.MessageMetadata{
 			ParentUuid:  "",
@@ -133,16 +134,40 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 			Timestamp:   timestamppb.New(u.Timestamp),
 		},
 		Message: &aggregationv1.UserMessage{
-			Role:    string(u.Message.Role),
-			Content: u.Message.Content,
+			Role: string(u.Message.Role),
 		},
 		IsMeta: u.IsMeta,
 	}
 
+	// 2. Set ParentUuid if present.
 	if u.ParentUUID != nil {
 		data.Metadata.ParentUuid = *u.ParentUUID
 	}
 
+	// 3. Convert Content based on its type (string or []*UserMessageBlockContent).
+	if u.Message.Content != nil {
+		switch content := u.Message.Content.(type) {
+		case string:
+			// a. If string: Set Message.Content to UserMessage_Text.
+			data.Message.Content = &aggregationv1.UserMessage_Text{
+				Text: content,
+			}
+		case []*shareddomain.UserMessageBlockContent:
+			// b. If []*UserMessageBlockContent: Convert to protobuf blocks.
+			protoBlocks := make([]*aggregationv1.UserMessageBlockContent, len(content))
+			for i, block := range content {
+				protoBlocks[i] = toProtoUserMessageBlockContent(block)
+			}
+			// Set Message.Content to UserMessage_Blocks.
+			data.Message.Content = &aggregationv1.UserMessage_Blocks{
+				Blocks: &aggregationv1.UserMessageBlockContentList{
+					Blocks: protoBlocks,
+				},
+			}
+		}
+	}
+
+	// 4. Convert ThinkingMetadata if present.
 	if u.ThinkingMetadata != nil {
 		data.ThinkingMetadata = &aggregationv1.UserRecordThinkingMetadata{
 			Level:    u.ThinkingMetadata.Level,
@@ -160,6 +185,7 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 		}
 	}
 
+	// 5. Convert Todos if present.
 	if len(u.Todos) > 0 {
 		data.Todos = make([]*aggregationv1.UserRecordTodo, len(u.Todos))
 		for i, todo := range u.Todos {
@@ -171,7 +197,54 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 		}
 	}
 
+	// 6. Return the fully constructed data.
 	return data
+}
+
+// toProtoUserMessageBlockContent converts a single domain UserMessageBlockContent to protobuf.
+func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent) *aggregationv1.UserMessageBlockContent {
+	// 1. Create base protobuf block with type field.
+	protoBlock := &aggregationv1.UserMessageBlockContent{
+		Type: block.Type,
+	}
+
+	// 2. If Text is set, copy to proto.
+	if block.Text != nil {
+		protoBlock.Text = *block.Text
+	}
+
+	// 3. If Source is set (image block), convert to proto.
+	if block.Source != nil {
+		protoBlock.Source = &aggregationv1.UserMessageBlockContentSource{
+			Type:      block.Source.Type,
+			MediaType: block.Source.Media_type,
+			Data:      block.Source.Data,
+		}
+	}
+
+	// 4. If UserMessageBlockContentToolResult is set (tool_result block), convert to proto.
+	if block.UserMessageBlockContentToolResult != nil {
+		// Convert Content to string (may be string or other type).
+		contentStr := ""
+		if block.UserMessageBlockContentToolResult.Content != nil {
+			switch c := block.UserMessageBlockContentToolResult.Content.(type) {
+			case string:
+				contentStr = c
+			default:
+				// Marshal non-string content to JSON.
+				if jsonBytes, err := sonic.Marshal(c); err == nil {
+					contentStr = string(jsonBytes)
+				}
+			}
+		}
+		protoBlock.ToolResult = &aggregationv1.UserMessageBlockContentToolResult{
+			ToolUseId: block.UserMessageBlockContentToolResult.ToolUseID,
+			Content:   contentStr,
+		}
+	}
+
+	// 5. Return the converted block.
+	return protoBlock
 }
 
 // toProtoAssistantRecordData converts AssistantRecord to proto AssistantRecordData.

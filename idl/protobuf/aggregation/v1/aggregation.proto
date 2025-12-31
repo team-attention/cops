@@ -26,10 +26,39 @@ message MessageMetadata {
   google.protobuf.Timestamp timestamp = 8;
 }
 
+// UserMessageBlockContentSource contains image source information.
+message UserMessageBlockContentSource {
+  string type = 1;
+  string media_type = 2;
+  string data = 3;
+}
+
+// UserMessageBlockContentToolResult contains tool result information.
+message UserMessageBlockContentToolResult {
+  string tool_use_id = 1;
+  string content = 2;
+}
+
+// UserMessageBlockContent contains a single content block (text, image, or tool_result).
+message UserMessageBlockContent {
+  string type = 1;
+  string text = 2;
+  UserMessageBlockContentSource source = 3;
+  UserMessageBlockContentToolResult tool_result = 4;
+}
+
+// UserMessageBlockContentList wraps repeated UserMessageBlockContent for oneof usage.
+message UserMessageBlockContentList {
+  repeated UserMessageBlockContent blocks = 1;
+}
+
 // UserMessage contains user message content.
 message UserMessage {
   string role = 1;
-  string content = 2;
+  oneof content {
+    string text = 2;
+    UserMessageBlockContentList blocks = 3;
+  }
 }
 
 // UserRecordThinkingMetadataTrigger contains trigger information.

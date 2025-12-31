@@ -97,6 +97,42 @@ var _ = Describe("Record", func() {
 				Expect(assistantRecord.Message.Content).To(HaveLen(1))
 				Expect(assistantRecord.Message.Content[0].Type).To(Equal(domain.AssistantMessageContentTypeTool))
 			})
+
+			It("parses assistant record with tool_result content from JSONL file", func() {
+				// Read line 5 from record_assistant.jsonl (contains tool_result)
+				file, err := os.Open(assistantTestDataFile)
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				lineNum := 0
+				var line string
+				for scanner.Scan() {
+					lineNum++
+					if lineNum == 5 {
+						line = scanner.Text()
+						break
+					}
+				}
+				Expect(scanner.Err()).NotTo(HaveOccurred())
+				Expect(line).NotTo(BeEmpty())
+
+				// Unmarshal into domain.Record
+				var record domain.Record
+				err = json.Unmarshal([]byte(line), &record)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Assert Type equals RecordTypeMessage
+				Expect(record.Type).To(Equal(domain.RecordTypeMessage))
+
+				// Assert Data is *AssistantRecord
+				assistantRecord, ok := record.Data.(*domain.AssistantRecord)
+				Expect(ok).To(BeTrue())
+
+				// Assert Message.Content contains tool_result block
+				Expect(assistantRecord.Message.Content).To(HaveLen(1))
+				Expect(assistantRecord.Message.Content[0].Type).To(Equal(domain.AssistantMessageContentType("tool_result")))
+			})
 		})
 
 		Context("when unmarshaling user records", func() {
@@ -196,6 +232,245 @@ var _ = Describe("Record", func() {
 				Expect(userRecord.Todos[0].Content).To(Equal("테스트 할 일 항목 작성하기"))
 				Expect(userRecord.Todos[0].Status).To(Equal("in_progress"))
 			})
+			It("parses user record with array content from JSONL file", func() {
+				// Read line 9 from record_user.jsonl (array content with image)
+				file, err := os.Open(userTestDataFile)
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				lineNum := 0
+				var line string
+				for scanner.Scan() {
+					lineNum++
+					if lineNum == 9 {
+						line = scanner.Text()
+						break
+					}
+				}
+				Expect(scanner.Err()).NotTo(HaveOccurred())
+				Expect(line).NotTo(BeEmpty())
+
+				// Unmarshal into domain.Record
+				var record domain.Record
+				err = json.Unmarshal([]byte(line), &record)
+
+				// Assert successful unmarshaling
+				Expect(err).NotTo(HaveOccurred())
+				Expect(record.Type).To(Equal(domain.RecordTypeUser))
+
+				// Assert Data is *UserRecord
+				userRecord, ok := record.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+
+				// Assert Content is []*UserMessageBlockContent
+				blocks, ok := userRecord.Message.Content.([]*domain.UserMessageBlockContent)
+				Expect(ok).To(BeTrue())
+				Expect(blocks).To(HaveLen(2))
+
+				// Assert first block is text type
+				Expect(blocks[0].Type).To(Equal("text"))
+				Expect(blocks[0].Text).NotTo(BeNil())
+				Expect(*blocks[0].Text).To(Equal("이렇게 보내면 어떻게 되는거지"))
+
+				// Assert second block is image type
+				Expect(blocks[1].Type).To(Equal("image"))
+				Expect(blocks[1].Source).NotTo(BeNil())
+				Expect(blocks[1].Source.Type).To(Equal("base64"))
+				Expect(blocks[1].Source.Media_type).To(Equal("image/png"))
+			})
+
+			It("parses user record with string content from JSONL file", func() {
+				// Read line 4 from record_user.jsonl (string content "hellop")
+				file, err := os.Open(userTestDataFile)
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				lineNum := 0
+				var line string
+				for scanner.Scan() {
+					lineNum++
+					if lineNum == 4 {
+						line = scanner.Text()
+						break
+					}
+				}
+				Expect(scanner.Err()).NotTo(HaveOccurred())
+				Expect(line).NotTo(BeEmpty())
+
+				// Unmarshal into domain.Record
+				var record domain.Record
+				err = json.Unmarshal([]byte(line), &record)
+
+				// Assert no error occurred
+				Expect(err).NotTo(HaveOccurred())
+
+				// Assert record.Data is *domain.UserRecord
+				userRecord, ok := record.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+
+				// Assert userRecord.Message.Content is a string
+				content, ok := userRecord.Message.Content.(string)
+				Expect(ok).To(BeTrue())
+
+				// Assert the string value equals "hellop"
+				Expect(content).To(Equal("hellop"))
+			})
+
+			It("parses user record with tool_result content from JSONL file", func() {
+				// Read line 10 from record_user.jsonl (tool_result content)
+				file, err := os.Open(userTestDataFile)
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				lineNum := 0
+				var line string
+				for scanner.Scan() {
+					lineNum++
+					if lineNum == 10 {
+						line = scanner.Text()
+						break
+					}
+				}
+				Expect(scanner.Err()).NotTo(HaveOccurred())
+				Expect(line).NotTo(BeEmpty())
+
+				// Unmarshal into domain.Record
+				var record domain.Record
+				err = json.Unmarshal([]byte(line), &record)
+
+				// Assert no error occurred
+				Expect(err).NotTo(HaveOccurred())
+
+				// Assert record.Data is *domain.UserRecord
+				userRecord, ok := record.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+
+				// Assert userRecord.Message.Content is []*domain.UserMessageBlockContent
+				blocks, ok := userRecord.Message.Content.([]*domain.UserMessageBlockContent)
+				Expect(ok).To(BeTrue())
+
+				// Assert the slice has 1 element
+				Expect(blocks).To(HaveLen(1))
+
+				// Assert element Type is "tool_result"
+				Expect(blocks[0].Type).To(Equal("tool_result"))
+
+				// Assert element ToolUseID equals "toolu_01K1DDVNnv3oFCVTTQkGVtJm"
+				Expect(blocks[0].UserMessageBlockContentToolResult).NotTo(BeNil())
+				Expect(blocks[0].ToolUseID).To(Equal("toolu_01K1DDVNnv3oFCVTTQkGVtJm"))
+
+				// Assert element Content equals "tool-content"
+				Expect(blocks[0].UserMessageBlockContentToolResult.Content).To(Equal("tool-content"))
+			})
+
+			It("round-trips user record with array content", func() {
+				// Read line 9 from record_user.jsonl
+				file, err := os.Open(userTestDataFile)
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				lineNum := 0
+				var line string
+				for scanner.Scan() {
+					lineNum++
+					if lineNum == 9 {
+						line = scanner.Text()
+						break
+					}
+				}
+				Expect(scanner.Err()).NotTo(HaveOccurred())
+
+				// Unmarshal into domain.Record
+				var record domain.Record
+				err = json.Unmarshal([]byte(line), &record)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Marshal back to JSON
+				jsonData, err := json.Marshal(record)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Unmarshal again into new domain.Record
+				var record2 domain.Record
+				err = json.Unmarshal(jsonData, &record2)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Assert both records have equal Type
+				Expect(record2.Type).To(Equal(record.Type))
+
+				// Assert both UserRecord.Message.Content are []*UserMessageBlockContent
+				userRecord1, ok := record.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+				userRecord2, ok := record2.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+
+				blocks1, ok := userRecord1.Message.Content.([]*domain.UserMessageBlockContent)
+				Expect(ok).To(BeTrue())
+				blocks2, ok := userRecord2.Message.Content.([]*domain.UserMessageBlockContent)
+				Expect(ok).To(BeTrue())
+
+				// Assert both slices have same length
+				Expect(blocks2).To(HaveLen(len(blocks1)))
+
+				// Assert corresponding block types match
+				for i := range blocks1 {
+					Expect(blocks2[i].Type).To(Equal(blocks1[i].Type))
+				}
+			})
+
+			It("round-trips user record with string content", func() {
+				// Read line 4 from record_user.jsonl
+				file, err := os.Open(userTestDataFile)
+				Expect(err).NotTo(HaveOccurred())
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				lineNum := 0
+				var line string
+				for scanner.Scan() {
+					lineNum++
+					if lineNum == 4 {
+						line = scanner.Text()
+						break
+					}
+				}
+				Expect(scanner.Err()).NotTo(HaveOccurred())
+
+				// Unmarshal into domain.Record
+				var record domain.Record
+				err = json.Unmarshal([]byte(line), &record)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Marshal back to JSON
+				jsonData, err := json.Marshal(record)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Unmarshal again into new domain.Record
+				var record2 domain.Record
+				err = json.Unmarshal(jsonData, &record2)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Assert both records have equal Type
+				Expect(record2.Type).To(Equal(record.Type))
+
+				// Assert both UserRecord.Message.Content are strings
+				userRecord1, ok := record.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+				userRecord2, ok := record2.Data.(*domain.UserRecord)
+				Expect(ok).To(BeTrue())
+
+				content1, ok := userRecord1.Message.Content.(string)
+				Expect(ok).To(BeTrue())
+				content2, ok := userRecord2.Message.Content.(string)
+				Expect(ok).To(BeTrue())
+
+				// Assert both string values are equal
+				Expect(content2).To(Equal(content1))
+			})
+
 		})
 
 		Context("when unmarshaling file-history-snapshot records", func() {
@@ -725,7 +1000,7 @@ var _ = Describe("Record", func() {
 			Expect(scanner.Err()).NotTo(HaveOccurred())
 
 			// Assert correct number of records parsed (4 lines)
-			Expect(recordCount).To(Equal(4))
+			Expect(recordCount).To(Equal(5))
 		})
 
 		It("can parse entire user JSONL file", func() {
@@ -746,7 +1021,7 @@ var _ = Describe("Record", func() {
 			Expect(scanner.Err()).NotTo(HaveOccurred())
 
 			// Assert correct number of records (8 lines)
-			Expect(records).To(HaveLen(8))
+			Expect(records).To(HaveLen(10))
 
 			// Assert all have Type RecordTypeUser
 			for i, record := range records {

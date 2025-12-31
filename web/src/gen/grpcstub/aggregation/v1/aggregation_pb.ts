@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file aggregation/v1/aggregation.proto.
  */
 export const file_aggregation_v1_aggregation: GenFile = /*@__PURE__*/
-  fileDesc("CiBhZ2dyZWdhdGlvbi92MS9hZ2dyZWdhdGlvbi5wcm90bxIOYWdncmVnYXRpb24udjEixQEKD01lc3NhZ2VNZXRhZGF0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIUCgxpc19zaWRlY2hhaW4YAiABKAgSEQoJdXNlcl90eXBlGAMgASgJEhIKCnNlc3Npb25faWQYBCABKAkSDwoHdmVyc2lvbhgFIAEoCRISCgpnaXRfYnJhbmNoGAYgASgJEgwKBHV1aWQYByABKAkSLQoJdGltZXN0YW1wGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCIsCgtVc2VyTWVzc2FnZRIMCgRyb2xlGAEgASgJEg8KB2NvbnRlbnQYAiABKAkiTQohVXNlclJlY29yZFRoaW5raW5nTWV0YWRhdGFUcmlnZ2VyEg0KBXN0YXJ0GAEgASgFEgsKA2VuZBgCIAEoBRIMCgR0ZXh0GAMgASgJIoIBChpVc2VyUmVjb3JkVGhpbmtpbmdNZXRhZGF0YRINCgVsZXZlbBgBIAEoCRIQCghkaXNhYmxlZBgCIAEoCBJDCgh0cmlnZ2VycxgDIAMoCzIxLmFnZ3JlZ2F0aW9uLnYxLlVzZXJSZWNvcmRUaGlua2luZ01ldGFkYXRhVHJpZ2dlciJGCg5Vc2VyUmVjb3JkVG9kbxIPCgdjb250ZW50GAEgASgJEg4KBnN0YXR1cxgCIAEoCRITCgthY3RpdmVfZm9ybRgDIAEoCSL4AQoOVXNlclJlY29yZERhdGESMQoIbWV0YWRhdGEYASABKAsyHy5hZ2dyZWdhdGlvbi52MS5NZXNzYWdlTWV0YWRhdGESLAoHbWVzc2FnZRgCIAEoCzIbLmFnZ3JlZ2F0aW9uLnYxLlVzZXJNZXNzYWdlEg8KB2lzX21ldGEYAyABKAgSRQoRdGhpbmtpbmdfbWV0YWRhdGEYBCABKAsyKi5hZ2dyZWdhdGlvbi52MS5Vc2VyUmVjb3JkVGhpbmtpbmdNZXRhZGF0YRItCgV0b2RvcxgFIAMoCzIeLmFnZ3JlZ2F0aW9uLnYxLlVzZXJSZWNvcmRUb2RvIpABChdBc3Npc3RhbnRNZXNzYWdlQ29udGVudBIMCgR0eXBlGAEgASgJEgwKBHRleHQYAiABKAkSEAoIdGhpbmtpbmcYAyABKAkSEwoLdG9vbF91c2VfaWQYBCABKAkSFQoNdG9vbF91c2VfbmFtZRgFIAEoCRIbChN0b29sX3VzZV9pbnB1dF9qc29uGAYgASgJIqABChVBc3Npc3RhbnRNZXNzYWdlVXNhZ2USFAoMaW5wdXRfdG9rZW5zGAEgASgFEhUKDW91dHB1dF90b2tlbnMYAiABKAUSIwobY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zGAMgASgFEh8KF2NhY2hlX3JlYWRfaW5wdXRfdG9rZW5zGAQgASgFEhQKDHNlcnZpY2VfdGllchgFIAEoCSLlAQoQQXNzaXN0YW50TWVzc2FnZRINCgVtb2RlbBgBIAEoCRIKCgJpZBgCIAEoCRIMCgR0eXBlGAMgASgJEgwKBHJvbGUYBCABKAkSOAoHY29udGVudBgFIAMoCzInLmFnZ3JlZ2F0aW9uLnYxLkFzc2lzdGFudE1lc3NhZ2VDb250ZW50EhMKC3N0b3BfcmVhc29uGAYgASgJEhUKDXN0b3Bfc2VxdWVuY2UYByABKAUSNAoFdXNhZ2UYCCABKAsyJS5hZ2dyZWdhdGlvbi52MS5Bc3Npc3RhbnRNZXNzYWdlVXNhZ2UijwEKE0Fzc2lzdGFudFJlY29yZERhdGESMQoIbWV0YWRhdGEYASABKAsyHy5hZ2dyZWdhdGlvbi52MS5NZXNzYWdlTWV0YWRhdGESEgoKcmVxdWVzdF9pZBgCIAEoCRIxCgdtZXNzYWdlGAMgASgLMiAuYWdncmVnYXRpb24udjEuQXNzaXN0YW50TWVzc2FnZSJ+CiBGaWxlSGlzdG9yeVNuYXBzaG90VHJhY2tlZEJhY2t1cBIYChBiYWNrdXBfZmlsZV9uYW1lGAEgASgJEg8KB3ZlcnNpb24YAiABKAUSLwoLYmFja3VwX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIvEBChNGaWxlSGlzdG9yeVNuYXBzaG90EhIKCm1lc3NhZ2VfaWQYASABKAkSWQoUdHJhY2tlZF9maWxlX2JhY2t1cHMYAiADKAsyOy5hZ2dyZWdhdGlvbi52MS5GaWxlSGlzdG9yeVNuYXBzaG90LlRyYWNrZWRGaWxlQmFja3Vwc0VudHJ5GmsKF1RyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EgsKA2tleRgBIAEoCRI/CgV2YWx1ZRgCIAEoCzIwLmFnZ3JlZ2F0aW9uLnYxLkZpbGVIaXN0b3J5U25hcHNob3RUcmFja2VkQmFja3VwOgI4ASKGAQodRmlsZUhpc3RvcnlTbmFwc2hvdFJlY29yZERhdGESEgoKbWVzc2FnZV9pZBgBIAEoCRI1CghzbmFwc2hvdBgCIAEoCzIjLmFnZ3JlZ2F0aW9uLnYxLkZpbGVIaXN0b3J5U25hcHNob3QSGgoSaXNfc25hcHNob3RfdXBkYXRlGAMgASgIIoMCCgZSZWNvcmQSKAoEdHlwZRgBIAEoDjIaLmFnZ3JlZ2F0aW9uLnYxLlJlY29yZFR5cGUSMwoJdXNlcl9kYXRhGAIgASgLMh4uYWdncmVnYXRpb24udjEuVXNlclJlY29yZERhdGFIABI9Cg5hc3Npc3RhbnRfZGF0YRgDIAEoCzIjLmFnZ3JlZ2F0aW9uLnYxLkFzc2lzdGFudFJlY29yZERhdGFIABJTChpmaWxlX2hpc3Rvcnlfc25hcHNob3RfZGF0YRgEIAEoCzItLmFnZ3JlZ2F0aW9uLnYxLkZpbGVIaXN0b3J5U25hcHNob3RSZWNvcmREYXRhSABCBgoEZGF0YSItCghMb2dCYXRjaBINCgVqc29ubBgBIAMoCRISCgpwcm9qZWN0X2lkGAIgASgJIjYKC1NlbmRMb2dzUmVxEicKBWJhdGNoGAEgASgLMhguYWdncmVnYXRpb24udjEuTG9nQmF0Y2giTgoLU2VuZExvZ3NSZXMSDwoHc3VjY2VzcxgBIAEoCBIVCg1lcnJvcl9tZXNzYWdlGAIgASgJEhcKD3Byb2Nlc3NlZF9jb3VudBgDIAEoBSqBAQoKUmVjb3JkVHlwZRIbChdSRUNPUkRfVFlQRV9VTlNQRUNJRklFRBAAEhQKEFJFQ09SRF9UWVBFX1VTRVIQARIZChVSRUNPUkRfVFlQRV9BU1NJU1RBTlQQAhIlCiFSRUNPUkRfVFlQRV9GSUxFX0hJU1RPUllfU05BUFNIT1QQAzJaChJBZ2dyZWdhdGlvblNlcnZpY2USRAoIU2VuZExvZ3MSGy5hZ2dyZWdhdGlvbi52MS5TZW5kTG9nc1JlcRobLmFnZ3JlZ2F0aW9uLnYxLlNlbmRMb2dzUmVzQtABChJjb20uYWdncmVnYXRpb24udjFCEEFnZ3JlZ2F0aW9uUHJvdG9QAVpPZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvYWdncmVnYXRpb24vdjE7YWdncmVnYXRpb252MaICA0FYWKoCDkFnZ3JlZ2F0aW9uLlYxygIOQWdncmVnYXRpb25cVjHiAhpBZ2dyZWdhdGlvblxWMVxHUEJNZXRhZGF0YeoCD0FnZ3JlZ2F0aW9uOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("CiBhZ2dyZWdhdGlvbi92MS9hZ2dyZWdhdGlvbi5wcm90bxIOYWdncmVnYXRpb24udjEixQEKD01lc3NhZ2VNZXRhZGF0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIUCgxpc19zaWRlY2hhaW4YAiABKAgSEQoJdXNlcl90eXBlGAMgASgJEhIKCnNlc3Npb25faWQYBCABKAkSDwoHdmVyc2lvbhgFIAEoCRISCgpnaXRfYnJhbmNoGAYgASgJEgwKBHV1aWQYByABKAkSLQoJdGltZXN0YW1wGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJPCh1Vc2VyTWVzc2FnZUJsb2NrQ29udGVudFNvdXJjZRIMCgR0eXBlGAEgASgJEhIKCm1lZGlhX3R5cGUYAiABKAkSDAoEZGF0YRgDIAEoCSJJCiFVc2VyTWVzc2FnZUJsb2NrQ29udGVudFRvb2xSZXN1bHQSEwoLdG9vbF91c2VfaWQYASABKAkSDwoHY29udGVudBgCIAEoCSK8AQoXVXNlck1lc3NhZ2VCbG9ja0NvbnRlbnQSDAoEdHlwZRgBIAEoCRIMCgR0ZXh0GAIgASgJEj0KBnNvdXJjZRgDIAEoCzItLmFnZ3JlZ2F0aW9uLnYxLlVzZXJNZXNzYWdlQmxvY2tDb250ZW50U291cmNlEkYKC3Rvb2xfcmVzdWx0GAQgASgLMjEuYWdncmVnYXRpb24udjEuVXNlck1lc3NhZ2VCbG9ja0NvbnRlbnRUb29sUmVzdWx0IlYKG1VzZXJNZXNzYWdlQmxvY2tDb250ZW50TGlzdBI3CgZibG9ja3MYASADKAsyJy5hZ2dyZWdhdGlvbi52MS5Vc2VyTWVzc2FnZUJsb2NrQ29udGVudCJ1CgtVc2VyTWVzc2FnZRIMCgRyb2xlGAEgASgJEg4KBHRleHQYAiABKAlIABI9CgZibG9ja3MYAyABKAsyKy5hZ2dyZWdhdGlvbi52MS5Vc2VyTWVzc2FnZUJsb2NrQ29udGVudExpc3RIAEIJCgdjb250ZW50Ik0KIVVzZXJSZWNvcmRUaGlua2luZ01ldGFkYXRhVHJpZ2dlchINCgVzdGFydBgBIAEoBRILCgNlbmQYAiABKAUSDAoEdGV4dBgDIAEoCSKCAQoaVXNlclJlY29yZFRoaW5raW5nTWV0YWRhdGESDQoFbGV2ZWwYASABKAkSEAoIZGlzYWJsZWQYAiABKAgSQwoIdHJpZ2dlcnMYAyADKAsyMS5hZ2dyZWdhdGlvbi52MS5Vc2VyUmVjb3JkVGhpbmtpbmdNZXRhZGF0YVRyaWdnZXIiRgoOVXNlclJlY29yZFRvZG8SDwoHY29udGVudBgBIAEoCRIOCgZzdGF0dXMYAiABKAkSEwoLYWN0aXZlX2Zvcm0YAyABKAki+AEKDlVzZXJSZWNvcmREYXRhEjEKCG1ldGFkYXRhGAEgASgLMh8uYWdncmVnYXRpb24udjEuTWVzc2FnZU1ldGFkYXRhEiwKB21lc3NhZ2UYAiABKAsyGy5hZ2dyZWdhdGlvbi52MS5Vc2VyTWVzc2FnZRIPCgdpc19tZXRhGAMgASgIEkUKEXRoaW5raW5nX21ldGFkYXRhGAQgASgLMiouYWdncmVnYXRpb24udjEuVXNlclJlY29yZFRoaW5raW5nTWV0YWRhdGESLQoFdG9kb3MYBSADKAsyHi5hZ2dyZWdhdGlvbi52MS5Vc2VyUmVjb3JkVG9kbyKQAQoXQXNzaXN0YW50TWVzc2FnZUNvbnRlbnQSDAoEdHlwZRgBIAEoCRIMCgR0ZXh0GAIgASgJEhAKCHRoaW5raW5nGAMgASgJEhMKC3Rvb2xfdXNlX2lkGAQgASgJEhUKDXRvb2xfdXNlX25hbWUYBSABKAkSGwoTdG9vbF91c2VfaW5wdXRfanNvbhgGIAEoCSKgAQoVQXNzaXN0YW50TWVzc2FnZVVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAki5QEKEEFzc2lzdGFudE1lc3NhZ2USDQoFbW9kZWwYASABKAkSCgoCaWQYAiABKAkSDAoEdHlwZRgDIAEoCRIMCgRyb2xlGAQgASgJEjgKB2NvbnRlbnQYBSADKAsyJy5hZ2dyZWdhdGlvbi52MS5Bc3Npc3RhbnRNZXNzYWdlQ29udGVudBITCgtzdG9wX3JlYXNvbhgGIAEoCRIVCg1zdG9wX3NlcXVlbmNlGAcgASgFEjQKBXVzYWdlGAggASgLMiUuYWdncmVnYXRpb24udjEuQXNzaXN0YW50TWVzc2FnZVVzYWdlIo8BChNBc3Npc3RhbnRSZWNvcmREYXRhEjEKCG1ldGFkYXRhGAEgASgLMh8uYWdncmVnYXRpb24udjEuTWVzc2FnZU1ldGFkYXRhEhIKCnJlcXVlc3RfaWQYAiABKAkSMQoHbWVzc2FnZRgDIAEoCzIgLmFnZ3JlZ2F0aW9uLnYxLkFzc2lzdGFudE1lc3NhZ2UifgogRmlsZUhpc3RvcnlTbmFwc2hvdFRyYWNrZWRCYWNrdXASGAoQYmFja3VwX2ZpbGVfbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFEi8KC2JhY2t1cF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLxAQoTRmlsZUhpc3RvcnlTbmFwc2hvdBISCgptZXNzYWdlX2lkGAEgASgJElkKFHRyYWNrZWRfZmlsZV9iYWNrdXBzGAIgAygLMjsuYWdncmVnYXRpb24udjEuRmlsZUhpc3RvcnlTbmFwc2hvdC5UcmFja2VkRmlsZUJhY2t1cHNFbnRyeRprChdUcmFja2VkRmlsZUJhY2t1cHNFbnRyeRILCgNrZXkYASABKAkSPwoFdmFsdWUYAiABKAsyMC5hZ2dyZWdhdGlvbi52MS5GaWxlSGlzdG9yeVNuYXBzaG90VHJhY2tlZEJhY2t1cDoCOAEihgEKHUZpbGVIaXN0b3J5U25hcHNob3RSZWNvcmREYXRhEhIKCm1lc3NhZ2VfaWQYASABKAkSNQoIc25hcHNob3QYAiABKAsyIy5hZ2dyZWdhdGlvbi52MS5GaWxlSGlzdG9yeVNuYXBzaG90EhoKEmlzX3NuYXBzaG90X3VwZGF0ZRgDIAEoCCKDAgoGUmVjb3JkEigKBHR5cGUYASABKA4yGi5hZ2dyZWdhdGlvbi52MS5SZWNvcmRUeXBlEjMKCXVzZXJfZGF0YRgCIAEoCzIeLmFnZ3JlZ2F0aW9uLnYxLlVzZXJSZWNvcmREYXRhSAASPQoOYXNzaXN0YW50X2RhdGEYAyABKAsyIy5hZ2dyZWdhdGlvbi52MS5Bc3Npc3RhbnRSZWNvcmREYXRhSAASUwoaZmlsZV9oaXN0b3J5X3NuYXBzaG90X2RhdGEYBCABKAsyLS5hZ2dyZWdhdGlvbi52MS5GaWxlSGlzdG9yeVNuYXBzaG90UmVjb3JkRGF0YUgAQgYKBGRhdGEiLQoITG9nQmF0Y2gSDQoFanNvbmwYASADKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI2CgtTZW5kTG9nc1JlcRInCgViYXRjaBgBIAEoCzIYLmFnZ3JlZ2F0aW9uLnYxLkxvZ0JhdGNoIk4KC1NlbmRMb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSFQoNZXJyb3JfbWVzc2FnZRgCIAEoCRIXCg9wcm9jZXNzZWRfY291bnQYAyABKAUqgQEKClJlY29yZFR5cGUSGwoXUkVDT1JEX1RZUEVfVU5TUEVDSUZJRUQQABIUChBSRUNPUkRfVFlQRV9VU0VSEAESGQoVUkVDT1JEX1RZUEVfQVNTSVNUQU5UEAISJQohUkVDT1JEX1RZUEVfRklMRV9ISVNUT1JZX1NOQVBTSE9UEAMyWgoSQWdncmVnYXRpb25TZXJ2aWNlEkQKCFNlbmRMb2dzEhsuYWdncmVnYXRpb24udjEuU2VuZExvZ3NSZXEaGy5hZ2dyZWdhdGlvbi52MS5TZW5kTG9nc1Jlc0LQAQoSY29tLmFnZ3JlZ2F0aW9uLnYxQhBBZ2dyZWdhdGlvblByb3RvUAFaT2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2FnZ3JlZ2F0aW9uL3YxO2FnZ3JlZ2F0aW9udjGiAgNBWFiqAg5BZ2dyZWdhdGlvbi5WMcoCDkFnZ3JlZ2F0aW9uXFYx4gIaQWdncmVnYXRpb25cVjFcR1BCTWV0YWRhdGHqAg9BZ2dyZWdhdGlvbjo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * MessageMetadata contains common metadata fields for user and assistant records.
@@ -69,6 +69,112 @@ export const MessageMetadataSchema: GenMessage<MessageMetadata> = /*@__PURE__*/
   messageDesc(file_aggregation_v1_aggregation, 0);
 
 /**
+ * UserMessageBlockContentSource contains image source information.
+ *
+ * @generated from message aggregation.v1.UserMessageBlockContentSource
+ */
+export type UserMessageBlockContentSource = Message<"aggregation.v1.UserMessageBlockContentSource"> & {
+  /**
+   * @generated from field: string type = 1;
+   */
+  type: string;
+
+  /**
+   * @generated from field: string media_type = 2;
+   */
+  mediaType: string;
+
+  /**
+   * @generated from field: string data = 3;
+   */
+  data: string;
+};
+
+/**
+ * Describes the message aggregation.v1.UserMessageBlockContentSource.
+ * Use `create(UserMessageBlockContentSourceSchema)` to create a new message.
+ */
+export const UserMessageBlockContentSourceSchema: GenMessage<UserMessageBlockContentSource> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 1);
+
+/**
+ * UserMessageBlockContentToolResult contains tool result information.
+ *
+ * @generated from message aggregation.v1.UserMessageBlockContentToolResult
+ */
+export type UserMessageBlockContentToolResult = Message<"aggregation.v1.UserMessageBlockContentToolResult"> & {
+  /**
+   * @generated from field: string tool_use_id = 1;
+   */
+  toolUseId: string;
+
+  /**
+   * @generated from field: string content = 2;
+   */
+  content: string;
+};
+
+/**
+ * Describes the message aggregation.v1.UserMessageBlockContentToolResult.
+ * Use `create(UserMessageBlockContentToolResultSchema)` to create a new message.
+ */
+export const UserMessageBlockContentToolResultSchema: GenMessage<UserMessageBlockContentToolResult> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 2);
+
+/**
+ * UserMessageBlockContent contains a single content block (text, image, or tool_result).
+ *
+ * @generated from message aggregation.v1.UserMessageBlockContent
+ */
+export type UserMessageBlockContent = Message<"aggregation.v1.UserMessageBlockContent"> & {
+  /**
+   * @generated from field: string type = 1;
+   */
+  type: string;
+
+  /**
+   * @generated from field: string text = 2;
+   */
+  text: string;
+
+  /**
+   * @generated from field: aggregation.v1.UserMessageBlockContentSource source = 3;
+   */
+  source?: UserMessageBlockContentSource;
+
+  /**
+   * @generated from field: aggregation.v1.UserMessageBlockContentToolResult tool_result = 4;
+   */
+  toolResult?: UserMessageBlockContentToolResult;
+};
+
+/**
+ * Describes the message aggregation.v1.UserMessageBlockContent.
+ * Use `create(UserMessageBlockContentSchema)` to create a new message.
+ */
+export const UserMessageBlockContentSchema: GenMessage<UserMessageBlockContent> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 3);
+
+/**
+ * UserMessageBlockContentList wraps repeated UserMessageBlockContent for oneof usage.
+ *
+ * @generated from message aggregation.v1.UserMessageBlockContentList
+ */
+export type UserMessageBlockContentList = Message<"aggregation.v1.UserMessageBlockContentList"> & {
+  /**
+   * @generated from field: repeated aggregation.v1.UserMessageBlockContent blocks = 1;
+   */
+  blocks: UserMessageBlockContent[];
+};
+
+/**
+ * Describes the message aggregation.v1.UserMessageBlockContentList.
+ * Use `create(UserMessageBlockContentListSchema)` to create a new message.
+ */
+export const UserMessageBlockContentListSchema: GenMessage<UserMessageBlockContentList> = /*@__PURE__*/
+  messageDesc(file_aggregation_v1_aggregation, 4);
+
+/**
  * UserMessage contains user message content.
  *
  * @generated from message aggregation.v1.UserMessage
@@ -80,9 +186,21 @@ export type UserMessage = Message<"aggregation.v1.UserMessage"> & {
   role: string;
 
   /**
-   * @generated from field: string content = 2;
+   * @generated from oneof aggregation.v1.UserMessage.content
    */
-  content: string;
+  content: {
+    /**
+     * @generated from field: string text = 2;
+     */
+    value: string;
+    case: "text";
+  } | {
+    /**
+     * @generated from field: aggregation.v1.UserMessageBlockContentList blocks = 3;
+     */
+    value: UserMessageBlockContentList;
+    case: "blocks";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
@@ -90,7 +208,7 @@ export type UserMessage = Message<"aggregation.v1.UserMessage"> & {
  * Use `create(UserMessageSchema)` to create a new message.
  */
 export const UserMessageSchema: GenMessage<UserMessage> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 1);
+  messageDesc(file_aggregation_v1_aggregation, 5);
 
 /**
  * UserRecordThinkingMetadataTrigger contains trigger information.
@@ -119,7 +237,7 @@ export type UserRecordThinkingMetadataTrigger = Message<"aggregation.v1.UserReco
  * Use `create(UserRecordThinkingMetadataTriggerSchema)` to create a new message.
  */
 export const UserRecordThinkingMetadataTriggerSchema: GenMessage<UserRecordThinkingMetadataTrigger> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 2);
+  messageDesc(file_aggregation_v1_aggregation, 6);
 
 /**
  * UserRecordThinkingMetadata contains thinking metadata.
@@ -148,7 +266,7 @@ export type UserRecordThinkingMetadata = Message<"aggregation.v1.UserRecordThink
  * Use `create(UserRecordThinkingMetadataSchema)` to create a new message.
  */
 export const UserRecordThinkingMetadataSchema: GenMessage<UserRecordThinkingMetadata> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 3);
+  messageDesc(file_aggregation_v1_aggregation, 7);
 
 /**
  * UserRecordTodo contains todo item.
@@ -177,7 +295,7 @@ export type UserRecordTodo = Message<"aggregation.v1.UserRecordTodo"> & {
  * Use `create(UserRecordTodoSchema)` to create a new message.
  */
 export const UserRecordTodoSchema: GenMessage<UserRecordTodo> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 4);
+  messageDesc(file_aggregation_v1_aggregation, 8);
 
 /**
  * UserRecordData contains user-specific record data.
@@ -216,7 +334,7 @@ export type UserRecordData = Message<"aggregation.v1.UserRecordData"> & {
  * Use `create(UserRecordDataSchema)` to create a new message.
  */
 export const UserRecordDataSchema: GenMessage<UserRecordData> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 5);
+  messageDesc(file_aggregation_v1_aggregation, 9);
 
 /**
  * AssistantMessageContent contains assistant message content block.
@@ -260,7 +378,7 @@ export type AssistantMessageContent = Message<"aggregation.v1.AssistantMessageCo
  * Use `create(AssistantMessageContentSchema)` to create a new message.
  */
 export const AssistantMessageContentSchema: GenMessage<AssistantMessageContent> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 6);
+  messageDesc(file_aggregation_v1_aggregation, 10);
 
 /**
  * AssistantMessageUsage contains token usage information.
@@ -299,7 +417,7 @@ export type AssistantMessageUsage = Message<"aggregation.v1.AssistantMessageUsag
  * Use `create(AssistantMessageUsageSchema)` to create a new message.
  */
 export const AssistantMessageUsageSchema: GenMessage<AssistantMessageUsage> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 7);
+  messageDesc(file_aggregation_v1_aggregation, 11);
 
 /**
  * AssistantMessage contains assistant message.
@@ -353,7 +471,7 @@ export type AssistantMessage = Message<"aggregation.v1.AssistantMessage"> & {
  * Use `create(AssistantMessageSchema)` to create a new message.
  */
 export const AssistantMessageSchema: GenMessage<AssistantMessage> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 8);
+  messageDesc(file_aggregation_v1_aggregation, 12);
 
 /**
  * AssistantRecordData contains assistant-specific record data.
@@ -382,7 +500,7 @@ export type AssistantRecordData = Message<"aggregation.v1.AssistantRecordData"> 
  * Use `create(AssistantRecordDataSchema)` to create a new message.
  */
 export const AssistantRecordDataSchema: GenMessage<AssistantRecordData> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 9);
+  messageDesc(file_aggregation_v1_aggregation, 13);
 
 /**
  * FileHistorySnapshotTrackedBackup contains file backup information.
@@ -411,7 +529,7 @@ export type FileHistorySnapshotTrackedBackup = Message<"aggregation.v1.FileHisto
  * Use `create(FileHistorySnapshotTrackedBackupSchema)` to create a new message.
  */
 export const FileHistorySnapshotTrackedBackupSchema: GenMessage<FileHistorySnapshotTrackedBackup> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 10);
+  messageDesc(file_aggregation_v1_aggregation, 14);
 
 /**
  * FileHistorySnapshot contains snapshot data.
@@ -435,7 +553,7 @@ export type FileHistorySnapshot = Message<"aggregation.v1.FileHistorySnapshot"> 
  * Use `create(FileHistorySnapshotSchema)` to create a new message.
  */
 export const FileHistorySnapshotSchema: GenMessage<FileHistorySnapshot> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 11);
+  messageDesc(file_aggregation_v1_aggregation, 15);
 
 /**
  * FileHistorySnapshotRecordData contains file-history-snapshot-specific record data.
@@ -464,7 +582,7 @@ export type FileHistorySnapshotRecordData = Message<"aggregation.v1.FileHistoryS
  * Use `create(FileHistorySnapshotRecordDataSchema)` to create a new message.
  */
 export const FileHistorySnapshotRecordDataSchema: GenMessage<FileHistorySnapshotRecordData> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 12);
+  messageDesc(file_aggregation_v1_aggregation, 16);
 
 /**
  * Record represents a single Claude Code JSONL entry with type-specific data.
@@ -506,7 +624,7 @@ export type Record = Message<"aggregation.v1.Record"> & {
  * Use `create(RecordSchema)` to create a new message.
  */
 export const RecordSchema: GenMessage<Record> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 13);
+  messageDesc(file_aggregation_v1_aggregation, 17);
 
 /**
  * LogBatch contains raw JSONL lines for batch sending.
@@ -530,7 +648,7 @@ export type LogBatch = Message<"aggregation.v1.LogBatch"> & {
  * Use `create(LogBatchSchema)` to create a new message.
  */
 export const LogBatchSchema: GenMessage<LogBatch> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 14);
+  messageDesc(file_aggregation_v1_aggregation, 18);
 
 /**
  * SendLogsReq is the request for sending logs.
@@ -549,7 +667,7 @@ export type SendLogsReq = Message<"aggregation.v1.SendLogsReq"> & {
  * Use `create(SendLogsReqSchema)` to create a new message.
  */
 export const SendLogsReqSchema: GenMessage<SendLogsReq> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 15);
+  messageDesc(file_aggregation_v1_aggregation, 19);
 
 /**
  * SendLogsRes is the response for sending logs.
@@ -578,7 +696,7 @@ export type SendLogsRes = Message<"aggregation.v1.SendLogsRes"> & {
  * Use `create(SendLogsResSchema)` to create a new message.
  */
 export const SendLogsResSchema: GenMessage<SendLogsRes> = /*@__PURE__*/
-  messageDesc(file_aggregation_v1_aggregation, 16);
+  messageDesc(file_aggregation_v1_aggregation, 20);
 
 /**
  * RecordType represents the type discriminator for records.

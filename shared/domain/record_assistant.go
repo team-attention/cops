@@ -41,8 +41,8 @@ type AssistantMessageUsage struct {
 	CacheCreationInputTokens int `json:"cacheCreationInputTokens" bson:"cacheCreationInputTokens"`
 	CacheReadInputTokens     int `json:"cacheReadInputTokens" bson:"cacheReadInputTokens"`
 	CacheCreation            struct {
-		Ephemeral5mInputTokens int `json:"ephemeral_5m_input_tokens" bson:"ephemeral_5m_input_tokens"`
-		Ephemeral1hInputTokens int `json:"ephemeral_1h_input_tokens" bson:"ephemeral_1h_input_tokens"`
+		Ephemeral5mInputTokens int `json:"ephemeral_5m_input_tokens" bson:"ephemeral5MInputTokens"`
+		Ephemeral1hInputTokens int `json:"ephemeral_1h_input_tokens" bson:"ephemeral1HInputTokens"`
 	} `json:"cacheCreation" bson:"cacheCreation"`
 	ServiceTier string `json:"serviceTier" bson:"serviceTier"`
 }

@@ -176,18 +176,250 @@ func (x *MessageMetadata) GetTimestamp() *timestamppb.Timestamp {
 	return nil
 }
 
+// UserMessageBlockContentSource contains image source information.
+type UserMessageBlockContentSource struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	MediaType     string                 `protobuf:"bytes,2,opt,name=media_type,json=mediaType,proto3" json:"media_type,omitempty"`
+	Data          string                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserMessageBlockContentSource) Reset() {
+	*x = UserMessageBlockContentSource{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserMessageBlockContentSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserMessageBlockContentSource) ProtoMessage() {}
+
+func (x *UserMessageBlockContentSource) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserMessageBlockContentSource.ProtoReflect.Descriptor instead.
+func (*UserMessageBlockContentSource) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *UserMessageBlockContentSource) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *UserMessageBlockContentSource) GetMediaType() string {
+	if x != nil {
+		return x.MediaType
+	}
+	return ""
+}
+
+func (x *UserMessageBlockContentSource) GetData() string {
+	if x != nil {
+		return x.Data
+	}
+	return ""
+}
+
+// UserMessageBlockContentToolResult contains tool result information.
+type UserMessageBlockContentToolResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ToolUseId     string                 `protobuf:"bytes,1,opt,name=tool_use_id,json=toolUseId,proto3" json:"tool_use_id,omitempty"`
+	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserMessageBlockContentToolResult) Reset() {
+	*x = UserMessageBlockContentToolResult{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserMessageBlockContentToolResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserMessageBlockContentToolResult) ProtoMessage() {}
+
+func (x *UserMessageBlockContentToolResult) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserMessageBlockContentToolResult.ProtoReflect.Descriptor instead.
+func (*UserMessageBlockContentToolResult) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UserMessageBlockContentToolResult) GetToolUseId() string {
+	if x != nil {
+		return x.ToolUseId
+	}
+	return ""
+}
+
+func (x *UserMessageBlockContentToolResult) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+// UserMessageBlockContent contains a single content block (text, image, or tool_result).
+type UserMessageBlockContent struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Type          string                             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Text          string                             `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	Source        *UserMessageBlockContentSource     `protobuf:"bytes,3,opt,name=source,proto3" json:"source,omitempty"`
+	ToolResult    *UserMessageBlockContentToolResult `protobuf:"bytes,4,opt,name=tool_result,json=toolResult,proto3" json:"tool_result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserMessageBlockContent) Reset() {
+	*x = UserMessageBlockContent{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserMessageBlockContent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserMessageBlockContent) ProtoMessage() {}
+
+func (x *UserMessageBlockContent) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserMessageBlockContent.ProtoReflect.Descriptor instead.
+func (*UserMessageBlockContent) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UserMessageBlockContent) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *UserMessageBlockContent) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *UserMessageBlockContent) GetSource() *UserMessageBlockContentSource {
+	if x != nil {
+		return x.Source
+	}
+	return nil
+}
+
+func (x *UserMessageBlockContent) GetToolResult() *UserMessageBlockContentToolResult {
+	if x != nil {
+		return x.ToolResult
+	}
+	return nil
+}
+
+// UserMessageBlockContentList wraps repeated UserMessageBlockContent for oneof usage.
+type UserMessageBlockContentList struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Blocks        []*UserMessageBlockContent `protobuf:"bytes,1,rep,name=blocks,proto3" json:"blocks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserMessageBlockContentList) Reset() {
+	*x = UserMessageBlockContentList{}
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserMessageBlockContentList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserMessageBlockContentList) ProtoMessage() {}
+
+func (x *UserMessageBlockContentList) ProtoReflect() protoreflect.Message {
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserMessageBlockContentList.ProtoReflect.Descriptor instead.
+func (*UserMessageBlockContentList) Descriptor() ([]byte, []int) {
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UserMessageBlockContentList) GetBlocks() []*UserMessageBlockContent {
+	if x != nil {
+		return x.Blocks
+	}
+	return nil
+}
+
 // UserMessage contains user message content.
 type UserMessage struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Role          string                 `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Role  string                 `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
+	// Types that are valid to be assigned to Content:
+	//
+	//	*UserMessage_Text
+	//	*UserMessage_Blocks
+	Content       isUserMessage_Content `protobuf_oneof:"content"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UserMessage) Reset() {
 	*x = UserMessage{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -199,7 +431,7 @@ func (x *UserMessage) String() string {
 func (*UserMessage) ProtoMessage() {}
 
 func (x *UserMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[1]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -212,7 +444,7 @@ func (x *UserMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserMessage.ProtoReflect.Descriptor instead.
 func (*UserMessage) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{1}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UserMessage) GetRole() string {
@@ -222,12 +454,46 @@ func (x *UserMessage) GetRole() string {
 	return ""
 }
 
-func (x *UserMessage) GetContent() string {
+func (x *UserMessage) GetContent() isUserMessage_Content {
 	if x != nil {
 		return x.Content
 	}
+	return nil
+}
+
+func (x *UserMessage) GetText() string {
+	if x != nil {
+		if x, ok := x.Content.(*UserMessage_Text); ok {
+			return x.Text
+		}
+	}
 	return ""
 }
+
+func (x *UserMessage) GetBlocks() *UserMessageBlockContentList {
+	if x != nil {
+		if x, ok := x.Content.(*UserMessage_Blocks); ok {
+			return x.Blocks
+		}
+	}
+	return nil
+}
+
+type isUserMessage_Content interface {
+	isUserMessage_Content()
+}
+
+type UserMessage_Text struct {
+	Text string `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
+}
+
+type UserMessage_Blocks struct {
+	Blocks *UserMessageBlockContentList `protobuf:"bytes,3,opt,name=blocks,proto3,oneof"`
+}
+
+func (*UserMessage_Text) isUserMessage_Content() {}
+
+func (*UserMessage_Blocks) isUserMessage_Content() {}
 
 // UserRecordThinkingMetadataTrigger contains trigger information.
 type UserRecordThinkingMetadataTrigger struct {
@@ -241,7 +507,7 @@ type UserRecordThinkingMetadataTrigger struct {
 
 func (x *UserRecordThinkingMetadataTrigger) Reset() {
 	*x = UserRecordThinkingMetadataTrigger{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -253,7 +519,7 @@ func (x *UserRecordThinkingMetadataTrigger) String() string {
 func (*UserRecordThinkingMetadataTrigger) ProtoMessage() {}
 
 func (x *UserRecordThinkingMetadataTrigger) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[2]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -266,7 +532,7 @@ func (x *UserRecordThinkingMetadataTrigger) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use UserRecordThinkingMetadataTrigger.ProtoReflect.Descriptor instead.
 func (*UserRecordThinkingMetadataTrigger) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{2}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UserRecordThinkingMetadataTrigger) GetStart() int32 {
@@ -302,7 +568,7 @@ type UserRecordThinkingMetadata struct {
 
 func (x *UserRecordThinkingMetadata) Reset() {
 	*x = UserRecordThinkingMetadata{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -314,7 +580,7 @@ func (x *UserRecordThinkingMetadata) String() string {
 func (*UserRecordThinkingMetadata) ProtoMessage() {}
 
 func (x *UserRecordThinkingMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[3]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -327,7 +593,7 @@ func (x *UserRecordThinkingMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRecordThinkingMetadata.ProtoReflect.Descriptor instead.
 func (*UserRecordThinkingMetadata) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{3}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UserRecordThinkingMetadata) GetLevel() string {
@@ -363,7 +629,7 @@ type UserRecordTodo struct {
 
 func (x *UserRecordTodo) Reset() {
 	*x = UserRecordTodo{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -375,7 +641,7 @@ func (x *UserRecordTodo) String() string {
 func (*UserRecordTodo) ProtoMessage() {}
 
 func (x *UserRecordTodo) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[4]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -388,7 +654,7 @@ func (x *UserRecordTodo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRecordTodo.ProtoReflect.Descriptor instead.
 func (*UserRecordTodo) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{4}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserRecordTodo) GetContent() string {
@@ -426,7 +692,7 @@ type UserRecordData struct {
 
 func (x *UserRecordData) Reset() {
 	*x = UserRecordData{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -438,7 +704,7 @@ func (x *UserRecordData) String() string {
 func (*UserRecordData) ProtoMessage() {}
 
 func (x *UserRecordData) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[5]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -451,7 +717,7 @@ func (x *UserRecordData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRecordData.ProtoReflect.Descriptor instead.
 func (*UserRecordData) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{5}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UserRecordData) GetMetadata() *MessageMetadata {
@@ -504,7 +770,7 @@ type AssistantMessageContent struct {
 
 func (x *AssistantMessageContent) Reset() {
 	*x = AssistantMessageContent{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[6]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -516,7 +782,7 @@ func (x *AssistantMessageContent) String() string {
 func (*AssistantMessageContent) ProtoMessage() {}
 
 func (x *AssistantMessageContent) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[6]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -529,7 +795,7 @@ func (x *AssistantMessageContent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssistantMessageContent.ProtoReflect.Descriptor instead.
 func (*AssistantMessageContent) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{6}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *AssistantMessageContent) GetType() string {
@@ -588,7 +854,7 @@ type AssistantMessageUsage struct {
 
 func (x *AssistantMessageUsage) Reset() {
 	*x = AssistantMessageUsage{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[7]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -600,7 +866,7 @@ func (x *AssistantMessageUsage) String() string {
 func (*AssistantMessageUsage) ProtoMessage() {}
 
 func (x *AssistantMessageUsage) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[7]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -613,7 +879,7 @@ func (x *AssistantMessageUsage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssistantMessageUsage.ProtoReflect.Descriptor instead.
 func (*AssistantMessageUsage) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{7}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *AssistantMessageUsage) GetInputTokens() int32 {
@@ -668,7 +934,7 @@ type AssistantMessage struct {
 
 func (x *AssistantMessage) Reset() {
 	*x = AssistantMessage{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[8]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -680,7 +946,7 @@ func (x *AssistantMessage) String() string {
 func (*AssistantMessage) ProtoMessage() {}
 
 func (x *AssistantMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[8]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -693,7 +959,7 @@ func (x *AssistantMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssistantMessage.ProtoReflect.Descriptor instead.
 func (*AssistantMessage) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{8}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *AssistantMessage) GetModel() string {
@@ -764,7 +1030,7 @@ type AssistantRecordData struct {
 
 func (x *AssistantRecordData) Reset() {
 	*x = AssistantRecordData{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[9]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -776,7 +1042,7 @@ func (x *AssistantRecordData) String() string {
 func (*AssistantRecordData) ProtoMessage() {}
 
 func (x *AssistantRecordData) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[9]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -789,7 +1055,7 @@ func (x *AssistantRecordData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssistantRecordData.ProtoReflect.Descriptor instead.
 func (*AssistantRecordData) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{9}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *AssistantRecordData) GetMetadata() *MessageMetadata {
@@ -825,7 +1091,7 @@ type FileHistorySnapshotTrackedBackup struct {
 
 func (x *FileHistorySnapshotTrackedBackup) Reset() {
 	*x = FileHistorySnapshotTrackedBackup{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[10]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -837,7 +1103,7 @@ func (x *FileHistorySnapshotTrackedBackup) String() string {
 func (*FileHistorySnapshotTrackedBackup) ProtoMessage() {}
 
 func (x *FileHistorySnapshotTrackedBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[10]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -850,7 +1116,7 @@ func (x *FileHistorySnapshotTrackedBackup) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileHistorySnapshotTrackedBackup.ProtoReflect.Descriptor instead.
 func (*FileHistorySnapshotTrackedBackup) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{10}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *FileHistorySnapshotTrackedBackup) GetBackupFileName() string {
@@ -885,7 +1151,7 @@ type FileHistorySnapshot struct {
 
 func (x *FileHistorySnapshot) Reset() {
 	*x = FileHistorySnapshot{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[11]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -897,7 +1163,7 @@ func (x *FileHistorySnapshot) String() string {
 func (*FileHistorySnapshot) ProtoMessage() {}
 
 func (x *FileHistorySnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[11]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -910,7 +1176,7 @@ func (x *FileHistorySnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileHistorySnapshot.ProtoReflect.Descriptor instead.
 func (*FileHistorySnapshot) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{11}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *FileHistorySnapshot) GetMessageId() string {
@@ -939,7 +1205,7 @@ type FileHistorySnapshotRecordData struct {
 
 func (x *FileHistorySnapshotRecordData) Reset() {
 	*x = FileHistorySnapshotRecordData{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[12]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -951,7 +1217,7 @@ func (x *FileHistorySnapshotRecordData) String() string {
 func (*FileHistorySnapshotRecordData) ProtoMessage() {}
 
 func (x *FileHistorySnapshotRecordData) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[12]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -964,7 +1230,7 @@ func (x *FileHistorySnapshotRecordData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileHistorySnapshotRecordData.ProtoReflect.Descriptor instead.
 func (*FileHistorySnapshotRecordData) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{12}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *FileHistorySnapshotRecordData) GetMessageId() string {
@@ -1004,7 +1270,7 @@ type Record struct {
 
 func (x *Record) Reset() {
 	*x = Record{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[13]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1016,7 +1282,7 @@ func (x *Record) String() string {
 func (*Record) ProtoMessage() {}
 
 func (x *Record) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[13]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1029,7 +1295,7 @@ func (x *Record) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Record.ProtoReflect.Descriptor instead.
 func (*Record) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{13}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *Record) GetType() RecordType {
@@ -1106,7 +1372,7 @@ type LogBatch struct {
 
 func (x *LogBatch) Reset() {
 	*x = LogBatch{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[14]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1118,7 +1384,7 @@ func (x *LogBatch) String() string {
 func (*LogBatch) ProtoMessage() {}
 
 func (x *LogBatch) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[14]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1131,7 +1397,7 @@ func (x *LogBatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogBatch.ProtoReflect.Descriptor instead.
 func (*LogBatch) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{14}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *LogBatch) GetJsonl() []string {
@@ -1158,7 +1424,7 @@ type SendLogsReq struct {
 
 func (x *SendLogsReq) Reset() {
 	*x = SendLogsReq{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[15]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1170,7 +1436,7 @@ func (x *SendLogsReq) String() string {
 func (*SendLogsReq) ProtoMessage() {}
 
 func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[15]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1183,7 +1449,7 @@ func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendLogsReq.ProtoReflect.Descriptor instead.
 func (*SendLogsReq) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{15}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *SendLogsReq) GetBatch() *LogBatch {
@@ -1205,7 +1471,7 @@ type SendLogsRes struct {
 
 func (x *SendLogsRes) Reset() {
 	*x = SendLogsRes{}
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[16]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1217,7 +1483,7 @@ func (x *SendLogsRes) String() string {
 func (*SendLogsRes) ProtoMessage() {}
 
 func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
-	mi := &file_aggregation_v1_aggregation_proto_msgTypes[16]
+	mi := &file_aggregation_v1_aggregation_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1230,7 +1496,7 @@ func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendLogsRes.ProtoReflect.Descriptor instead.
 func (*SendLogsRes) Descriptor() ([]byte, []int) {
-	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{16}
+	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *SendLogsRes) GetSuccess() bool {
@@ -1270,10 +1536,28 @@ const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\n" +
 	"git_branch\x18\x06 \x01(\tR\tgitBranch\x12\x12\n" +
 	"\x04uuid\x18\a \x01(\tR\x04uuid\x128\n" +
-	"\ttimestamp\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\";\n" +
+	"\ttimestamp\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"f\n" +
+	"\x1dUserMessageBlockContentSource\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12\x1d\n" +
+	"\n" +
+	"media_type\x18\x02 \x01(\tR\tmediaType\x12\x12\n" +
+	"\x04data\x18\x03 \x01(\tR\x04data\"]\n" +
+	"!UserMessageBlockContentToolResult\x12\x1e\n" +
+	"\vtool_use_id\x18\x01 \x01(\tR\ttoolUseId\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\"\xdc\x01\n" +
+	"\x17UserMessageBlockContent\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
+	"\x04text\x18\x02 \x01(\tR\x04text\x12E\n" +
+	"\x06source\x18\x03 \x01(\v2-.aggregation.v1.UserMessageBlockContentSourceR\x06source\x12R\n" +
+	"\vtool_result\x18\x04 \x01(\v21.aggregation.v1.UserMessageBlockContentToolResultR\n" +
+	"toolResult\"^\n" +
+	"\x1bUserMessageBlockContentList\x12?\n" +
+	"\x06blocks\x18\x01 \x03(\v2'.aggregation.v1.UserMessageBlockContentR\x06blocks\"\x89\x01\n" +
 	"\vUserMessage\x12\x12\n" +
-	"\x04role\x18\x01 \x01(\tR\x04role\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"_\n" +
+	"\x04role\x18\x01 \x01(\tR\x04role\x12\x14\n" +
+	"\x04text\x18\x02 \x01(\tH\x00R\x04text\x12E\n" +
+	"\x06blocks\x18\x03 \x01(\v2+.aggregation.v1.UserMessageBlockContentListH\x00R\x06blocksB\t\n" +
+	"\acontent\"_\n" +
 	"!UserRecordThinkingMetadataTrigger\x12\x14\n" +
 	"\x05start\x18\x01 \x01(\x05R\x05start\x12\x10\n" +
 	"\x03end\x18\x02 \x01(\x05R\x03end\x12\x12\n" +
@@ -1377,56 +1661,64 @@ func file_aggregation_v1_aggregation_proto_rawDescGZIP() []byte {
 }
 
 var file_aggregation_v1_aggregation_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_aggregation_v1_aggregation_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_aggregation_v1_aggregation_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_aggregation_v1_aggregation_proto_goTypes = []any{
 	(RecordType)(0),                           // 0: aggregation.v1.RecordType
 	(*MessageMetadata)(nil),                   // 1: aggregation.v1.MessageMetadata
-	(*UserMessage)(nil),                       // 2: aggregation.v1.UserMessage
-	(*UserRecordThinkingMetadataTrigger)(nil), // 3: aggregation.v1.UserRecordThinkingMetadataTrigger
-	(*UserRecordThinkingMetadata)(nil),        // 4: aggregation.v1.UserRecordThinkingMetadata
-	(*UserRecordTodo)(nil),                    // 5: aggregation.v1.UserRecordTodo
-	(*UserRecordData)(nil),                    // 6: aggregation.v1.UserRecordData
-	(*AssistantMessageContent)(nil),           // 7: aggregation.v1.AssistantMessageContent
-	(*AssistantMessageUsage)(nil),             // 8: aggregation.v1.AssistantMessageUsage
-	(*AssistantMessage)(nil),                  // 9: aggregation.v1.AssistantMessage
-	(*AssistantRecordData)(nil),               // 10: aggregation.v1.AssistantRecordData
-	(*FileHistorySnapshotTrackedBackup)(nil),  // 11: aggregation.v1.FileHistorySnapshotTrackedBackup
-	(*FileHistorySnapshot)(nil),               // 12: aggregation.v1.FileHistorySnapshot
-	(*FileHistorySnapshotRecordData)(nil),     // 13: aggregation.v1.FileHistorySnapshotRecordData
-	(*Record)(nil),                            // 14: aggregation.v1.Record
-	(*LogBatch)(nil),                          // 15: aggregation.v1.LogBatch
-	(*SendLogsReq)(nil),                       // 16: aggregation.v1.SendLogsReq
-	(*SendLogsRes)(nil),                       // 17: aggregation.v1.SendLogsRes
-	nil,                                       // 18: aggregation.v1.FileHistorySnapshot.TrackedFileBackupsEntry
-	(*timestamppb.Timestamp)(nil),             // 19: google.protobuf.Timestamp
+	(*UserMessageBlockContentSource)(nil),     // 2: aggregation.v1.UserMessageBlockContentSource
+	(*UserMessageBlockContentToolResult)(nil), // 3: aggregation.v1.UserMessageBlockContentToolResult
+	(*UserMessageBlockContent)(nil),           // 4: aggregation.v1.UserMessageBlockContent
+	(*UserMessageBlockContentList)(nil),       // 5: aggregation.v1.UserMessageBlockContentList
+	(*UserMessage)(nil),                       // 6: aggregation.v1.UserMessage
+	(*UserRecordThinkingMetadataTrigger)(nil), // 7: aggregation.v1.UserRecordThinkingMetadataTrigger
+	(*UserRecordThinkingMetadata)(nil),        // 8: aggregation.v1.UserRecordThinkingMetadata
+	(*UserRecordTodo)(nil),                    // 9: aggregation.v1.UserRecordTodo
+	(*UserRecordData)(nil),                    // 10: aggregation.v1.UserRecordData
+	(*AssistantMessageContent)(nil),           // 11: aggregation.v1.AssistantMessageContent
+	(*AssistantMessageUsage)(nil),             // 12: aggregation.v1.AssistantMessageUsage
+	(*AssistantMessage)(nil),                  // 13: aggregation.v1.AssistantMessage
+	(*AssistantRecordData)(nil),               // 14: aggregation.v1.AssistantRecordData
+	(*FileHistorySnapshotTrackedBackup)(nil),  // 15: aggregation.v1.FileHistorySnapshotTrackedBackup
+	(*FileHistorySnapshot)(nil),               // 16: aggregation.v1.FileHistorySnapshot
+	(*FileHistorySnapshotRecordData)(nil),     // 17: aggregation.v1.FileHistorySnapshotRecordData
+	(*Record)(nil),                            // 18: aggregation.v1.Record
+	(*LogBatch)(nil),                          // 19: aggregation.v1.LogBatch
+	(*SendLogsReq)(nil),                       // 20: aggregation.v1.SendLogsReq
+	(*SendLogsRes)(nil),                       // 21: aggregation.v1.SendLogsRes
+	nil,                                       // 22: aggregation.v1.FileHistorySnapshot.TrackedFileBackupsEntry
+	(*timestamppb.Timestamp)(nil),             // 23: google.protobuf.Timestamp
 }
 var file_aggregation_v1_aggregation_proto_depIdxs = []int32{
-	19, // 0: aggregation.v1.MessageMetadata.timestamp:type_name -> google.protobuf.Timestamp
-	3,  // 1: aggregation.v1.UserRecordThinkingMetadata.triggers:type_name -> aggregation.v1.UserRecordThinkingMetadataTrigger
-	1,  // 2: aggregation.v1.UserRecordData.metadata:type_name -> aggregation.v1.MessageMetadata
-	2,  // 3: aggregation.v1.UserRecordData.message:type_name -> aggregation.v1.UserMessage
-	4,  // 4: aggregation.v1.UserRecordData.thinking_metadata:type_name -> aggregation.v1.UserRecordThinkingMetadata
-	5,  // 5: aggregation.v1.UserRecordData.todos:type_name -> aggregation.v1.UserRecordTodo
-	7,  // 6: aggregation.v1.AssistantMessage.content:type_name -> aggregation.v1.AssistantMessageContent
-	8,  // 7: aggregation.v1.AssistantMessage.usage:type_name -> aggregation.v1.AssistantMessageUsage
-	1,  // 8: aggregation.v1.AssistantRecordData.metadata:type_name -> aggregation.v1.MessageMetadata
-	9,  // 9: aggregation.v1.AssistantRecordData.message:type_name -> aggregation.v1.AssistantMessage
-	19, // 10: aggregation.v1.FileHistorySnapshotTrackedBackup.backup_time:type_name -> google.protobuf.Timestamp
-	18, // 11: aggregation.v1.FileHistorySnapshot.tracked_file_backups:type_name -> aggregation.v1.FileHistorySnapshot.TrackedFileBackupsEntry
-	12, // 12: aggregation.v1.FileHistorySnapshotRecordData.snapshot:type_name -> aggregation.v1.FileHistorySnapshot
-	0,  // 13: aggregation.v1.Record.type:type_name -> aggregation.v1.RecordType
-	6,  // 14: aggregation.v1.Record.user_data:type_name -> aggregation.v1.UserRecordData
-	10, // 15: aggregation.v1.Record.assistant_data:type_name -> aggregation.v1.AssistantRecordData
-	13, // 16: aggregation.v1.Record.file_history_snapshot_data:type_name -> aggregation.v1.FileHistorySnapshotRecordData
-	15, // 17: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
-	11, // 18: aggregation.v1.FileHistorySnapshot.TrackedFileBackupsEntry.value:type_name -> aggregation.v1.FileHistorySnapshotTrackedBackup
-	16, // 19: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
-	17, // 20: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
-	20, // [20:21] is the sub-list for method output_type
-	19, // [19:20] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	23, // 0: aggregation.v1.MessageMetadata.timestamp:type_name -> google.protobuf.Timestamp
+	2,  // 1: aggregation.v1.UserMessageBlockContent.source:type_name -> aggregation.v1.UserMessageBlockContentSource
+	3,  // 2: aggregation.v1.UserMessageBlockContent.tool_result:type_name -> aggregation.v1.UserMessageBlockContentToolResult
+	4,  // 3: aggregation.v1.UserMessageBlockContentList.blocks:type_name -> aggregation.v1.UserMessageBlockContent
+	5,  // 4: aggregation.v1.UserMessage.blocks:type_name -> aggregation.v1.UserMessageBlockContentList
+	7,  // 5: aggregation.v1.UserRecordThinkingMetadata.triggers:type_name -> aggregation.v1.UserRecordThinkingMetadataTrigger
+	1,  // 6: aggregation.v1.UserRecordData.metadata:type_name -> aggregation.v1.MessageMetadata
+	6,  // 7: aggregation.v1.UserRecordData.message:type_name -> aggregation.v1.UserMessage
+	8,  // 8: aggregation.v1.UserRecordData.thinking_metadata:type_name -> aggregation.v1.UserRecordThinkingMetadata
+	9,  // 9: aggregation.v1.UserRecordData.todos:type_name -> aggregation.v1.UserRecordTodo
+	11, // 10: aggregation.v1.AssistantMessage.content:type_name -> aggregation.v1.AssistantMessageContent
+	12, // 11: aggregation.v1.AssistantMessage.usage:type_name -> aggregation.v1.AssistantMessageUsage
+	1,  // 12: aggregation.v1.AssistantRecordData.metadata:type_name -> aggregation.v1.MessageMetadata
+	13, // 13: aggregation.v1.AssistantRecordData.message:type_name -> aggregation.v1.AssistantMessage
+	23, // 14: aggregation.v1.FileHistorySnapshotTrackedBackup.backup_time:type_name -> google.protobuf.Timestamp
+	22, // 15: aggregation.v1.FileHistorySnapshot.tracked_file_backups:type_name -> aggregation.v1.FileHistorySnapshot.TrackedFileBackupsEntry
+	16, // 16: aggregation.v1.FileHistorySnapshotRecordData.snapshot:type_name -> aggregation.v1.FileHistorySnapshot
+	0,  // 17: aggregation.v1.Record.type:type_name -> aggregation.v1.RecordType
+	10, // 18: aggregation.v1.Record.user_data:type_name -> aggregation.v1.UserRecordData
+	14, // 19: aggregation.v1.Record.assistant_data:type_name -> aggregation.v1.AssistantRecordData
+	17, // 20: aggregation.v1.Record.file_history_snapshot_data:type_name -> aggregation.v1.FileHistorySnapshotRecordData
+	19, // 21: aggregation.v1.SendLogsReq.batch:type_name -> aggregation.v1.LogBatch
+	15, // 22: aggregation.v1.FileHistorySnapshot.TrackedFileBackupsEntry.value:type_name -> aggregation.v1.FileHistorySnapshotTrackedBackup
+	20, // 23: aggregation.v1.AggregationService.SendLogs:input_type -> aggregation.v1.SendLogsReq
+	21, // 24: aggregation.v1.AggregationService.SendLogs:output_type -> aggregation.v1.SendLogsRes
+	24, // [24:25] is the sub-list for method output_type
+	23, // [23:24] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_aggregation_v1_aggregation_proto_init() }
@@ -1434,7 +1726,11 @@ func file_aggregation_v1_aggregation_proto_init() {
 	if File_aggregation_v1_aggregation_proto != nil {
 		return
 	}
-	file_aggregation_v1_aggregation_proto_msgTypes[13].OneofWrappers = []any{
+	file_aggregation_v1_aggregation_proto_msgTypes[5].OneofWrappers = []any{
+		(*UserMessage_Text)(nil),
+		(*UserMessage_Blocks)(nil),
+	}
+	file_aggregation_v1_aggregation_proto_msgTypes[17].OneofWrappers = []any{
 		(*Record_UserData)(nil),
 		(*Record_AssistantData)(nil),
 		(*Record_FileHistorySnapshotData)(nil),
@@ -1445,7 +1741,7 @@ func file_aggregation_v1_aggregation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_aggregation_v1_aggregation_proto_rawDesc), len(file_aggregation_v1_aggregation_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   18,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
