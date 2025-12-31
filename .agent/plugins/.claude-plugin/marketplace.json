@@ -1,0 +1,13 @@
+{
+    "name": "local",
+    "owner": {
+        "name": "Changhoi Kim"
+    },
+    "plugins": [
+        {
+            "name": "feature-dev",
+            "source": "./feature-dev",
+            "description": "Enables features development workflow"
+        }
+    ]
+}

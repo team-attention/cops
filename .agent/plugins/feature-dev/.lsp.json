@@ -1,0 +1,20 @@
+{
+    "go": {
+        "command": "gopls",
+        "args": [
+            "serve"
+        ],
+        "extensionToLanguage": {
+            ".go": "go"
+        }
+    },
+    "typescript": {
+        "command": "tsserver",
+        "args": [
+            "serve"
+        ],
+        "extensionToLanguage": {
+            ".ts": "typescript"
+        }
+    }
+}

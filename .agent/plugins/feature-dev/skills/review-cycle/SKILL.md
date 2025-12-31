@@ -240,3 +240,7 @@ Review cycle completed successfully.
 ```
 
 Exit the skill.
+
+## Notice
+
+**CRITICAL INSTRUCTION**: You must NOT perform the actual work (planning, coding, reviewing) yourself. Your role is to **ORCHESTRATE** by calling the specified sub-agents (`code-review`, `planning`, `implement`) using the `Task` tool. Do not attempt to modify code or write plans directly in this skill.
