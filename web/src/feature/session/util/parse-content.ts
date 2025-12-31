@@ -1,5 +1,9 @@
-import { SessionType } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
-import type { SessionRecord } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
+import { RecordType } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
+import type {
+  Record,
+  UserRecordData,
+  AssistantMessageContent,
+} from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 import type {
   ParsedMessage,
   ContentBlock,
@@ -8,115 +12,189 @@ import type {
   ToolResultContentBlock,
 } from '../type/content-block'
 
-// Safely parse JSON with fallback
-const tryParseJSON = (str: string): unknown => {
-  try {
-    return JSON.parse(str)
-  } catch {
-    return str
+// Helper to extract user message text content from UserRecordData
+const extractUserMessageText = (userData: UserRecordData): string => {
+  if (!userData.message) {
+    return ''
   }
+
+  const { content } = userData.message
+
+  if (content.case === 'text') {
+    return content.value
+  }
+
+  if (content.case === 'blocks') {
+    return content.value.blocks
+      .filter((block) => block.type === 'text')
+      .map((block) => block.text)
+      .join('')
+  }
+
+  return ''
 }
 
-// Type guard for content blocks
-const isValidContentBlock = (block: unknown): block is ContentBlock => {
-  if (typeof block !== 'object' || block === null) return false
-  const b = block as Record<string, unknown>
-  return b.type === 'text' || b.type === 'tool_use' || b.type === 'tool_result'
+// Helper to convert AssistantMessageContent[] to ContentBlock[]
+const convertAssistantContent = (content: AssistantMessageContent[]): ContentBlock[] => {
+  const blocks: ContentBlock[] = []
+
+  for (const item of content) {
+    if (item.type === 'text') {
+      blocks.push({
+        type: 'text',
+        text: item.text,
+      })
+    } else if (item.type === 'thinking') {
+      blocks.push({
+        type: 'text',
+        text: item.thinking,
+      })
+    } else if (item.type === 'tool_use') {
+      let input: globalThis.Record<string, unknown> = {}
+      try {
+        input = JSON.parse(item.toolUseInputJson)
+      } catch {
+        // Keep empty object if parsing fails
+      }
+
+      blocks.push({
+        type: 'tool_use',
+        id: item.toolUseId,
+        name: item.toolUseName,
+        input,
+      })
+    } else if (item.type === 'tool_result') {
+      blocks.push({
+        type: 'tool_result',
+        tool_use_id: item.toolUseId,
+        content: item.text,
+      })
+    }
+  }
+
+  return blocks
 }
 
-// Parse a single SessionRecord into a renderable ParsedMessage
-export const parseMessageContent = (record: SessionRecord): ParsedMessage => {
-  const contentStr = record.message?.content || ''
-  const content = tryParseJSON(contentStr)
+// Parse a single Record into a renderable ParsedMessage
+export const parseMessageContent = (record: Record): ParsedMessage => {
+  if (record.type === RecordType.USER && record.data.case === 'userData') {
+    const userData = record.data.value
+    const metadata = userData.metadata
 
-  if (record.type === SessionType.USER) {
-    const text = typeof content === 'string' ? content : contentStr
     return {
-      uuid: record.uuid,
+      uuid: metadata?.uuid || '',
       type: 'user',
-      timestamp: record.timestamp,
-      isMeta: record.isMeta,
-      isSidechain: record.isSidechain,
-      content: [{ type: 'text', text }],
+      timestamp: metadata?.timestamp,
+      isMeta: userData.isMeta,
+      isSidechain: metadata?.isSidechain || false,
+      content: [
+        {
+          type: 'text',
+          text: extractUserMessageText(userData),
+        },
+      ],
     }
   }
 
-  if (record.type === SessionType.ASSISTANT) {
-    const blocks = Array.isArray(content)
-      ? content.filter(isValidContentBlock)
-      : [{ type: 'text' as const, text: contentStr }]
+  if (record.type === RecordType.ASSISTANT && record.data.case === 'assistantData') {
+    const assistantData = record.data.value
+    const metadata = assistantData.metadata
+
     return {
-      uuid: record.uuid,
+      uuid: metadata?.uuid || '',
       type: 'assistant',
-      timestamp: record.timestamp,
-      isMeta: record.isMeta,
-      isSidechain: record.isSidechain,
-      usage: record.message?.usage,
-      content: blocks,
+      timestamp: metadata?.timestamp,
+      isMeta: false,
+      isSidechain: metadata?.isSidechain || false,
+      usage: assistantData.message?.usage,
+      content: assistantData.message?.content
+        ? convertAssistantContent(assistantData.message.content)
+        : [],
     }
   }
 
-  // Note: tool_result is not a separate SessionType in aggregation schema
-  // Tool results are embedded in assistant message content blocks
-  // This code path may not be reached with aggregation.v1.SessionRecord
+  if (record.type === RecordType.FILE_HISTORY_SNAPSHOT) {
+    return {
+      uuid: '',
+      type: 'system',
+      isMeta: false,
+      isSidechain: false,
+      content: [],
+    }
+  }
 
-  // Fallback for system/summary/other types
+  // Fallback for UNSPECIFIED or unknown types
   return {
-    uuid: record.uuid,
+    uuid: '',
     type: 'system',
-    timestamp: record.timestamp,
-    isMeta: record.isMeta,
-    isSidechain: record.isSidechain,
-    content: [{ type: 'text', text: contentStr }],
+    isMeta: false,
+    isSidechain: false,
+    content: [],
   }
 }
 
-// Extract and link tool calls from session records
-export const extractToolCalls = (records: SessionRecord[]): LinkedToolCall[] => {
-  const toolUseMap = new Map<string, {
-    block: ToolUseContentBlock
-    sourceUuid: string
-    timestamp?: SessionRecord['timestamp']
-  }>()
+// Extract and link tool calls from records
+export const extractToolCalls = (records: Record[]): LinkedToolCall[] => {
+  const toolUseMap = new Map<
+    string,
+    {
+      block: ToolUseContentBlock
+      sourceUuid: string
+      timestamp?: ParsedMessage['timestamp']
+    }
+  >()
   const toolResults = new Map<string, ToolResultContentBlock>()
 
-  // First pass: collect all tool_use blocks from assistant messages
+  // First pass - collect tool_use blocks from assistant records
   for (const record of records) {
-    if (record.type === SessionType.ASSISTANT) {
-      const contentStr = record.message?.content || ''
-      const content = tryParseJSON(contentStr)
-      if (Array.isArray(content)) {
-        for (const block of content) {
-          if (isValidContentBlock(block) && block.type === 'tool_use') {
-            toolUseMap.set(block.id, {
-              block: block as ToolUseContentBlock,
-              sourceUuid: record.uuid,
-              timestamp: record.timestamp,
-            })
+    if (record.type === RecordType.ASSISTANT && record.data.case === 'assistantData') {
+      const assistantData = record.data.value
+      const metadata = assistantData.metadata
+      const content = assistantData.message?.content || []
+
+      for (const item of content) {
+        if (item.type === 'tool_use') {
+          let input: globalThis.Record<string, unknown> = {}
+          try {
+            input = JSON.parse(item.toolUseInputJson)
+          } catch {
+            // Keep empty object if parsing fails
           }
+
+          toolUseMap.set(item.toolUseId, {
+            block: {
+              type: 'tool_use',
+              id: item.toolUseId,
+              name: item.toolUseName,
+              input,
+            },
+            sourceUuid: metadata?.uuid || '',
+            timestamp: metadata?.timestamp,
+          })
         }
       }
     }
   }
 
-  // Second pass: collect tool_result blocks from assistant messages
-  // In aggregation schema, tool_result is embedded in content, not a separate record type
+  // Second pass - collect tool_result blocks
   for (const record of records) {
-    if (record.type === SessionType.ASSISTANT) {
-      const contentStr = record.message?.content || ''
-      const content = tryParseJSON(contentStr)
-      if (Array.isArray(content)) {
-        for (const block of content) {
-          if (isValidContentBlock(block) && block.type === 'tool_result') {
-            const resultBlock = block as ToolResultContentBlock
-            toolResults.set(resultBlock.tool_use_id, resultBlock)
-          }
+    if (record.type === RecordType.ASSISTANT && record.data.case === 'assistantData') {
+      const assistantData = record.data.value
+      const content = assistantData.message?.content || []
+
+      for (const item of content) {
+        if (item.type === 'tool_result') {
+          toolResults.set(item.toolUseId, {
+            type: 'tool_result',
+            tool_use_id: item.toolUseId,
+            content: item.text,
+          })
         }
       }
     }
   }
 
-  // Link them together and return as array
+  // Link tool uses with results
   return Array.from(toolUseMap.entries()).map(([id, { block, sourceUuid, timestamp }]) => ({
     toolUse: block,
     toolResult: toolResults.get(id),
@@ -126,16 +204,6 @@ export const extractToolCalls = (records: SessionRecord[]): LinkedToolCall[] => 
 }
 
 // Filter records for chat view display
-export const filterRecordsForChat = (records: SessionRecord[]): SessionRecord[] => {
-  return records.filter((record) => {
-    // Exclude summary and file-history-snapshot types
-    if (record.type === SessionType.SUMMARY || record.type === SessionType.FILE_HISTORY_SNAPSHOT) {
-      return false
-    }
-    // Exclude queue-operation types
-    if (record.type === SessionType.QUEUE_OPERATION) {
-      return false
-    }
-    return true
-  })
+export const filterRecordsForChat = (records: Record[]): Record[] => {
+  return records.filter((record) => record.type !== RecordType.FILE_HISTORY_SNAPSHOT)
 }
