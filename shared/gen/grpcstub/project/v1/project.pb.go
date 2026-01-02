@@ -37,9 +37,11 @@ type RegisterProjectReq struct {
 	// If empty, the server will generate a default from the remote URL
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// is_git_project indicates whether this is a git repository
-	IsGitProject  bool `protobuf:"varint,5,opt,name=is_git_project,json=isGitProject,proto3" json:"is_git_project,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	IsGitProject bool `protobuf:"varint,5,opt,name=is_git_project,json=isGitProject,proto3" json:"is_git_project,omitempty"`
+	// organization_id is the organization this project belongs to
+	OrganizationId string `protobuf:"bytes,6,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RegisterProjectReq) Reset() {
@@ -107,6 +109,13 @@ func (x *RegisterProjectReq) GetIsGitProject() bool {
 	return false
 }
 
+func (x *RegisterProjectReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
 // RegisterProjectRes contains the result of project registration.
 type RegisterProjectRes struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -117,9 +126,11 @@ type RegisterProjectRes struct {
 	// name is the project name (either provided or generated)
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// is_git_project indicates whether this is a git repository
-	IsGitProject  bool `protobuf:"varint,4,opt,name=is_git_project,json=isGitProject,proto3" json:"is_git_project,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	IsGitProject bool `protobuf:"varint,4,opt,name=is_git_project,json=isGitProject,proto3" json:"is_git_project,omitempty"`
+	// organization_id is the organization this project belongs to
+	OrganizationId string `protobuf:"bytes,5,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RegisterProjectRes) Reset() {
@@ -180,24 +191,33 @@ func (x *RegisterProjectRes) GetIsGitProject() bool {
 	return false
 }
 
+func (x *RegisterProjectRes) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
 var File_project_v1_project_proto protoreflect.FileDescriptor
 
 const file_project_v1_project_proto_rawDesc = "" +
 	"\n" +
 	"\x18project/v1/project.proto\x12\n" +
-	"project.v1\"\xde\x01\n" +
+	"project.v1\"\x87\x02\n" +
 	"\x12RegisterProjectReq\x122\n" +
 	"\x15configured_remote_url\x18\x01 \x01(\tR\x13configuredRemoteUrl\x12*\n" +
 	"\x11actual_remote_url\x18\x02 \x01(\tR\x0factualRemoteUrl\x12.\n" +
 	"\x13existing_project_id\x18\x03 \x01(\tR\x11existingProjectId\x12\x12\n" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12$\n" +
-	"\x0eis_git_project\x18\x05 \x01(\bR\fisGitProject\"\x84\x01\n" +
+	"\x0eis_git_project\x18\x05 \x01(\bR\fisGitProject\x12'\n" +
+	"\x0forganization_id\x18\x06 \x01(\tR\x0eorganizationId\"\xad\x01\n" +
 	"\x12RegisterProjectRes\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x15\n" +
 	"\x06is_new\x18\x02 \x01(\bR\x05isNew\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12$\n" +
-	"\x0eis_git_project\x18\x04 \x01(\bR\fisGitProject2c\n" +
+	"\x0eis_git_project\x18\x04 \x01(\bR\fisGitProject\x12'\n" +
+	"\x0forganization_id\x18\x05 \x01(\tR\x0eorganizationId2c\n" +
 	"\x0eProjectService\x12Q\n" +
 	"\x0fRegisterProject\x12\x1e.project.v1.RegisterProjectReq\x1a\x1e.project.v1.RegisterProjectResB\xb0\x01\n" +
 	"\x0ecom.project.v1B\fProjectProtoP\x01ZGgithub.com/team-attention/cops/shared/gen/grpcstub/project/v1;projectv1\xa2\x02\x03PXX\xaa\x02\n" +

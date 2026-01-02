@@ -24,6 +24,9 @@ message RegisterProjectReq {
 
   // is_git_project indicates whether this is a git repository
   bool is_git_project = 5;
+
+  // organization_id is the organization this project belongs to
+  string organization_id = 6;
 }
 
 // RegisterProjectRes contains the result of project registration.
@@ -39,6 +42,9 @@ message RegisterProjectRes {
 
   // is_git_project indicates whether this is a git repository
   bool is_git_project = 4;
+
+  // organization_id is the organization this project belongs to
+  string organization_id = 5;
 }
 
 // ProjectService handles project registration and management.

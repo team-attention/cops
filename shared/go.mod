@@ -12,15 +12,10 @@ require (
 
 require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
-	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20251213031049-b05bdaca462f // indirect
-	github.com/ianlancetaylor/demangle v0.0.0-20250417193237-f615e6bd150b // indirect
-	github.com/kr/pretty v0.3.1 // indirect
-	github.com/kr/text v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.31.0 // indirect

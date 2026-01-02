@@ -90,7 +90,47 @@ const (
 - **Placement**: Second const block in the file
 - **All fields**: Include constants for ALL fields in the struct (both ID and domain fields)
 - **Ordering**: ID fields first, then domain fields
-- **Values**: Match the BSON tag names exactly
+- **Values**: Match the BSON tag names exactly (single field name, no dots)
+
+### Embedded Struct Types
+
+When a struct contains embedded structs (e.g., `User` contains `[]Account`), each struct type gets its OWN set of field constants with that type as prefix.
+
+**Example: User with embedded Accounts array**
+
+```go
+// User struct field constants
+const (
+    UserIDField              = "_id"
+    UserEmailField           = "email"
+    UserNameField            = "name"
+    UserProfileImageURLField = "profileImageUrl"
+    UserAccountsField        = "accounts"  // The array field on User struct
+)
+
+// Account struct field constants (separate type, separate constants)
+const (
+    AccountProviderField   = "provider"    // Account struct's Provider field
+    AccountProviderIDField = "providerId"  // Account struct's ProviderID field
+)
+```
+
+**IMPORTANT Rules:**
+- Each struct type has its own prefix (e.g., `User`, `Account`)
+- Field constant names and values should NOT contain dots (`.`)
+- Values match the exact BSON field name for that struct only
+- When querying nested fields in MongoDB, combine constants at query time:
+  ```go
+  // Query example: find user by account provider
+  filter := bson.M{
+      mongoschema.UserAccountsField: bson.M{
+          "$elemMatch": bson.M{
+              mongoschema.AccountProviderField:   provider,
+              mongoschema.AccountProviderIDField: providerID,
+          },
+      },
+  }
+  ```
 
 ## Struct Embedding Pattern
 

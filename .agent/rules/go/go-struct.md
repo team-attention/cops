@@ -27,6 +27,16 @@ Use pointer types (`*T`) when:
    Blocks []Block `json:"blocks,omitempty"` // Set when IsText=false
    ```
 
+4. **Struct array elements** - when structs are used as array elements, ALWAYS use pointers
+   ```go
+   // CORRECT: Use pointer elements for struct arrays
+   Accounts []*Account `json:"accounts" bson:"accounts"`
+   Items    []*Item    `json:"items" bson:"items"`
+
+   // WRONG: Do not use value types for struct arrays
+   Accounts []Account `json:"accounts" bson:"accounts"`  // Avoid this
+   ```
+
 ### When to Use Value Types
 
 Use value types when:
@@ -36,7 +46,7 @@ Use value types when:
    Status Status `json:"status"`
    ```
 
-2. **Slice/map fields** - nil is equivalent to empty
+2. **Slice/map of primitives** - nil is equivalent to empty
    ```go
    Tags  []string          `json:"tags"`
    Attrs map[string]string `json:"attrs"`
@@ -51,4 +61,6 @@ Use value types when:
 | Required struct | `T` | `json:"field"` |
 | Optional struct | `*T` | `json:"field,omitempty"` |
 | Discriminated union member | `*T` | `json:"field,omitempty"` |
-| Slice/map | `[]T`, `map[K]V` | `json:"field"` or `json:"field,omitempty"` |
+| Slice of primitives | `[]string`, `[]int` | `json:"field"` or `json:"field,omitempty"` |
+| **Slice of structs** | `[]*T` (pointer elements) | `json:"field"` or `json:"field,omitempty"` |
+| Map | `map[K]V` | `json:"field"` or `json:"field,omitempty"` |

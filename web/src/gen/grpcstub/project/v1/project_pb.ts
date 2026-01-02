@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file project/v1/project.proto.
  */
 export const file_project_v1_project: GenFile = /*@__PURE__*/
-  fileDesc("Chhwcm9qZWN0L3YxL3Byb2plY3QucHJvdG8SCnByb2plY3QudjEikQEKElJlZ2lzdGVyUHJvamVjdFJlcRIdChVjb25maWd1cmVkX3JlbW90ZV91cmwYASABKAkSGQoRYWN0dWFsX3JlbW90ZV91cmwYAiABKAkSGwoTZXhpc3RpbmdfcHJvamVjdF9pZBgDIAEoCRIMCgRuYW1lGAQgASgJEhYKDmlzX2dpdF9wcm9qZWN0GAUgASgIIl4KElJlZ2lzdGVyUHJvamVjdFJlcxISCgpwcm9qZWN0X2lkGAEgASgJEg4KBmlzX25ldxgCIAEoCBIMCgRuYW1lGAMgASgJEhYKDmlzX2dpdF9wcm9qZWN0GAQgASgIMmMKDlByb2plY3RTZXJ2aWNlElEKD1JlZ2lzdGVyUHJvamVjdBIeLnByb2plY3QudjEuUmVnaXN0ZXJQcm9qZWN0UmVxGh4ucHJvamVjdC52MS5SZWdpc3RlclByb2plY3RSZXNCsAEKDmNvbS5wcm9qZWN0LnYxQgxQcm9qZWN0UHJvdG9QAVpHZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvcHJvamVjdC92MTtwcm9qZWN0djGiAgNQWFiqAgpQcm9qZWN0LlYxygIKUHJvamVjdFxWMeICFlByb2plY3RcVjFcR1BCTWV0YWRhdGHqAgtQcm9qZWN0OjpWMWIGcHJvdG8z");
+  fileDesc("Chhwcm9qZWN0L3YxL3Byb2plY3QucHJvdG8SCnByb2plY3QudjEiqgEKElJlZ2lzdGVyUHJvamVjdFJlcRIdChVjb25maWd1cmVkX3JlbW90ZV91cmwYASABKAkSGQoRYWN0dWFsX3JlbW90ZV91cmwYAiABKAkSGwoTZXhpc3RpbmdfcHJvamVjdF9pZBgDIAEoCRIMCgRuYW1lGAQgASgJEhYKDmlzX2dpdF9wcm9qZWN0GAUgASgIEhcKD29yZ2FuaXphdGlvbl9pZBgGIAEoCSJ3ChJSZWdpc3RlclByb2plY3RSZXMSEgoKcHJvamVjdF9pZBgBIAEoCRIOCgZpc19uZXcYAiABKAgSDAoEbmFtZRgDIAEoCRIWCg5pc19naXRfcHJvamVjdBgEIAEoCBIXCg9vcmdhbml6YXRpb25faWQYBSABKAkyYwoOUHJvamVjdFNlcnZpY2USUQoPUmVnaXN0ZXJQcm9qZWN0Eh4ucHJvamVjdC52MS5SZWdpc3RlclByb2plY3RSZXEaHi5wcm9qZWN0LnYxLlJlZ2lzdGVyUHJvamVjdFJlc0KwAQoOY29tLnByb2plY3QudjFCDFByb2plY3RQcm90b1ABWkdnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9wcm9qZWN0L3YxO3Byb2plY3R2MaICA1BYWKoCClByb2plY3QuVjHKAgpQcm9qZWN0XFYx4gIWUHJvamVjdFxWMVxHUEJNZXRhZGF0YeoCC1Byb2plY3Q6OlYxYgZwcm90bzM");
 
 /**
  * RegisterProjectReq contains parameters for registering a project with the API server.
@@ -56,6 +56,13 @@ export type RegisterProjectReq = Message<"project.v1.RegisterProjectReq"> & {
    * @generated from field: bool is_git_project = 5;
    */
   isGitProject: boolean;
+
+  /**
+   * organization_id is the organization this project belongs to
+   *
+   * @generated from field: string organization_id = 6;
+   */
+  organizationId: string;
 };
 
 /**
@@ -98,6 +105,13 @@ export type RegisterProjectRes = Message<"project.v1.RegisterProjectRes"> & {
    * @generated from field: bool is_git_project = 4;
    */
   isGitProject: boolean;
+
+  /**
+   * organization_id is the organization this project belongs to
+   *
+   * @generated from field: string organization_id = 5;
+   */
+  organizationId: string;
 };
 
 /**

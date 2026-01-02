@@ -25,3 +25,8 @@ func InitAPIClient(cfg *Config) *APIClient {
 func (c *APIClient) StandardHTTPClient() *http.Client {
 	return c.Client.GetClient()
 }
+
+// WithAuth returns a cloned client with auth header set.
+func (c *APIClient) WithAuth(accessToken string) *req.Client {
+	return c.Client.Clone().SetCommonBearerAuthToken(accessToken)
+}

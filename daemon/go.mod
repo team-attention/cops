@@ -15,7 +15,6 @@ require (
 	github.com/onsi/gomega v1.38.3
 	github.com/team-attention/cops/shared v0.0.0-00010101000000-000000000000
 	go.uber.org/fx v1.24.0
-	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -36,6 +35,7 @@ require (
 	github.com/quic-go/quic-go v0.57.1 // indirect
 	github.com/refraction-networking/utls v1.8.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
+	go.mongodb.org/mongo-driver/v2 v2.4.1 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
@@ -48,4 +48,5 @@ require (
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 )

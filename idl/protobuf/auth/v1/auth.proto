@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/auth/v1;authv1";
+
+// TokenPair contains access and refresh tokens.
+message TokenPair {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 expires_at = 3;  // Unix timestamp when access token expires
+}
+
+// GoogleAuthReq contains Google OAuth authorization code.
+message GoogleAuthReq {
+  // authorization_code is the code received from Google OAuth callback
+  string authorization_code = 1;
+  // redirect_uri must match the URI used to obtain the code
+  string redirect_uri = 2;
+}
+
+// GoogleAuthRes contains authentication result (tokens only).
+message GoogleAuthRes {
+  TokenPair tokens = 1;
+}
+
+// DeviceCodeReq initiates device flow authentication.
+message DeviceCodeReq {}
+
+// DeviceCodeRes contains device code for CLI authentication.
+message DeviceCodeRes {
+  string device_code = 1;
+  string user_code = 2;
+  string verification_url = 3;
+  int32 expires_in = 4;
+  int32 interval = 5;
+}
+
+// DevicePollReq polls for device authentication completion.
+message DevicePollReq {
+  string device_code = 1;
+}
+
+// DevicePollRes contains poll result (tokens only when complete).
+message DevicePollRes {
+  bool pending = 1;
+  TokenPair tokens = 2;
+}
+
+// RefreshTokenReq contains refresh token for token renewal.
+message RefreshTokenReq {
+  string refresh_token = 1;
+}
+
+// RefreshTokenRes contains new token pair.
+message RefreshTokenRes {
+  TokenPair tokens = 1;
+}
+
+// AuthService handles authentication operations.
+service AuthService {
+  // GoogleAuth exchanges Google OAuth code for JWT tokens (web flow).
+  rpc GoogleAuth(GoogleAuthReq) returns (GoogleAuthRes);
+
+  // DeviceCode initiates device flow for CLI authentication.
+  rpc DeviceCode(DeviceCodeReq) returns (DeviceCodeRes);
+
+  // DevicePoll polls for device authentication completion.
+  rpc DevicePoll(DevicePollReq) returns (DevicePollRes);
+
+  // RefreshToken exchanges refresh token for new token pair.
+  rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes);
+}

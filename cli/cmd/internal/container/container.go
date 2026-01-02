@@ -10,6 +10,9 @@ func Run() error {
 	if err := newPlatformModule(c); err != nil {
 		return err
 	}
+	if err := newAuthModule(c); err != nil {
+		return err
+	}
 	if err := newTrackingModule(c); err != nil {
 		return err
 	}

@@ -12,6 +12,7 @@ func Run() {
 		// Modules
 		newPlatformModule(),
 		newHealthModule(),
+		newAuthModule(),
 		newAggregationModule(),
 		newDashboardModule(),
 		newProjectModule(),

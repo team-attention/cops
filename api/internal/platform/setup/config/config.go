@@ -13,6 +13,8 @@ type Config struct {
 	HTTP    HTTPConfig
 	Logging LoggingConfig
 	MongoDB MongoDBConfig
+	JWT     JWTConfig
+	OAuth   OAuthConfig
 }
 
 // AppConfig holds application-level settings.
@@ -45,6 +47,21 @@ type LoggingConfig struct {
 type MongoDBConfig struct {
 	URI      string `env:"MONGODB_URI,required"`
 	Database string `env:"MONGODB_DATABASE,required"`
+}
+
+// JWTConfig holds JWT token configuration.
+type JWTConfig struct {
+	SecretKey            string        `env:"JWT_SECRET_KEY,required"`
+	AccessTokenDuration  time.Duration `env:"JWT_ACCESS_TOKEN_DURATION" envDefault:"30m"`
+	RefreshTokenDuration time.Duration `env:"JWT_REFRESH_TOKEN_DURATION" envDefault:"720h"` // 30 days
+	Issuer               string        `env:"JWT_ISSUER" envDefault:"cops"`
+}
+
+// OAuthConfig holds OAuth provider configuration.
+type OAuthConfig struct {
+	GoogleClientID     string   `env:"GOOGLE_CLIENT_ID,required"`
+	GoogleClientSecret string   `env:"GOOGLE_CLIENT_SECRET,required"`
+	GoogleScopes       []string `env:"GOOGLE_SCOPES" envDefault:"email,profile"`
 }
 
 // InitConfig loads configuration from environment variables.

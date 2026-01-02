@@ -44,6 +44,7 @@ func (h *ProjectGRPCHandler) RegisterProject(
 		ExistingProjectID:   msg.GetExistingProjectId(),
 		Name:                msg.GetName(),
 		IsGitProject:        msg.GetIsGitProject(),
+		OrganizationID:      msg.GetOrganizationId(),
 	}
 
 	// Call service
@@ -54,10 +55,11 @@ func (h *ProjectGRPCHandler) RegisterProject(
 
 	// Build response
 	res := &projectv1.RegisterProjectRes{
-		ProjectId:    result.ProjectID,
-		IsNew:        result.IsNew,
-		Name:         result.Name,
-		IsGitProject: result.IsGitProject,
+		ProjectId:      result.ProjectID,
+		IsNew:          result.IsNew,
+		Name:           result.Name,
+		IsGitProject:   result.IsGitProject,
+		OrganizationId: result.OrganizationID,
 	}
 
 	return connect.NewResponse(res), nil

@@ -1,5 +1,68 @@
-- [ ] Project의 불필요한 필드 지우기
-  - ProjectClaudeDirField: 프로젝트 단위가 아니라 Sessions에나 의미가 있음(한 프로젝트가 여러 디렉토리에서 실행될 수 있기 때문에. ex. Sub Directory, Worktree 등의 모습으로)
-  - ProjectWorktreesField: 이걸 왜 서버에 저장해야 하는지 잘 모르겠음. 그냥 Local의 상태니까 Daemon에서만 Watch 잘 하면 될 것 같고, 여기서 관리하는 건 효율도 안좋고 의미도 없는듯.
-- [ ] Project의 필드 중 ProjectRegisteredAtField 값이 생성되지 않고 있는 것 같음. (웹 대시보드에서 이 값을 쓸 것으로 유추되는 필드가 1년 1월 1일(아마 기본값)로 표기됨)
-- [ ] Domain의 Session Record Data는 파싱이 잘 되고 있는 것으로 보이지만(테스트 코드를 통해), DB에 저장될 때 Block으로 파싱된 데이터가 저장되지 않고 있는 걸 봤을 때 mongoschema에서 도메인 모델을 제대로 반영하지 않고 있는 것 같음.
+# TODO: Database Index Migration
+
+This document tracks database index requirements that need to be implemented via migration scripts.
+
+**Note**: These indexes are NOT managed in Go codebase. They should be created via separate migration scripts.
+
+## User Authentication Indexes
+
+### Collection: `users`
+
+1. **Unique index on email**
+   - Field: `email`
+   - Unique: `true`
+   - Purpose: Prevent duplicate user accounts
+
+2. **Index on embedded accounts array**
+   - Fields: `accounts.provider`, `accounts.providerId`
+   - Purpose: Efficient lookup by OAuth provider account
+   - Query pattern: `{ "accounts": { "$elemMatch": { "provider": X, "providerId": Y } } }`
+
+### Collection: `organizations`
+
+1. **Unique index on slug**
+   - Field: `slug`
+   - Unique: `true`
+   - Purpose: URL-friendly unique organization identifier
+
+### Collection: `organization_members`
+
+1. **Unique compound index on organization + user**
+   - Fields: `organizationId`, `userId`
+   - Unique: `true`
+   - Purpose: Prevent duplicate memberships
+
+2. **Index on userId**
+   - Field: `userId`
+   - Purpose: Efficient lookup of user's organizations
+
+### Collection: `projects`
+
+1. **Index on organizationId**
+   - Field: `organizationId`
+   - Purpose: Efficient lookup of organization's projects
+
+## Migration Script Template
+
+```javascript
+// Example MongoDB migration script
+db.users.createIndex({ "email": 1 }, { unique: true });
+db.users.createIndex({ "accounts.provider": 1, "accounts.providerId": 1 });
+
+db.organizations.createIndex({ "slug": 1 }, { unique: true });
+
+db.organization_members.createIndex(
+  { "organizationId": 1, "userId": 1 },
+  { unique: true }
+);
+db.organization_members.createIndex({ "userId": 1 });
+
+db.projects.createIndex({ "organizationId": 1 });
+```
+
+## Status
+
+- [ ] Create migration scripts
+- [ ] Test migrations in development environment
+- [ ] Apply to staging
+- [ ] Apply to production

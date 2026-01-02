@@ -1,16 +1,154 @@
-# Implementation Plan: User and Organization Management with Authentication
+# Implementation Plan: User Authentication with Google OAuth
 
 ## Overview
 
-This plan implements User, Account, and Organization domain models with Google OAuth authentication for the C-Ops system. The implementation adds:
+This plan implements User and Account domain models with Google OAuth authentication for the C-Ops system. The implementation adds:
 
-1. **Domain Models**: User, Account, Organization, OrganizationMember in the shared module
+1. **Domain Models**: User (with embedded Accounts), Organization, OrganizationMember in the shared module
 2. **Authentication**: Google OAuth 2.0 with JWT token generation/validation
-3. **Authorization**: Role-based access control (Owner, Admin, Member) for organizations
-4. **CLI Authentication**: Device flow OAuth with token storage
-5. **Daemon Integration**: Shared authentication using CLI tokens
+3. **CLI Authentication**: Device flow OAuth with token storage
+4. **Daemon Integration**: Shared authentication using CLI tokens
 
 The implementation follows the existing hexagonal architecture patterns, ConnectRPC for gRPC, MongoDB for persistence, and fx/dig for dependency injection.
+
+**Note**: Organization service implementation is out of scope for this plan. Only domain models and MongoSchema are defined for future use.
+
+---
+
+## Authentication Flow Architecture
+
+### Flow Clarification
+
+The authentication flow is designed as follows:
+
+```
+CLI -> C-Ops API -> Google OAuth -> C-Ops API -> JWT Tokens -> CLI
+```
+
+**How it works:**
+1. CLI requests a device code from C-Ops API (not directly from Google)
+2. C-Ops API acts as an intermediary and requests the device code from Google
+3. User authenticates with Google in their browser
+4. CLI polls C-Ops API for completion
+5. When Google authentication completes, C-Ops API:
+   - Receives Google tokens
+   - Creates/updates user in C-Ops database
+   - Generates C-Ops JWT tokens (separate from Google tokens)
+6. CLI receives and stores C-Ops JWT tokens
+
+**Important**: The CLI never directly communicates with Google. All OAuth communication goes through C-Ops API, which:
+- Manages the Google OAuth client credentials
+- Creates user records in the database
+- Issues its own JWT tokens for API authentication
+
+### Why This Architecture?
+
+This design supports **multiple login providers** in the future:
+
+1. **Provider abstraction**: The C-Ops API abstracts away the OAuth provider. CLI only knows about C-Ops authentication endpoints.
+2. **Easy to extend**: Adding GitHub, Microsoft, or other OAuth providers only requires:
+   - Adding a new OAuth adapter in the API
+   - No CLI changes needed
+3. **Consistent token format**: Regardless of the OAuth provider used, CLI always receives the same C-Ops JWT token format.
+
+### Future: Web-Based Login Page
+
+When a web-based login page is implemented:
+
+```
+CLI -> C-Ops API -> C-Ops Web Login Page -> (Google/GitHub/etc.) -> C-Ops API -> JWT
+```
+
+The CLI would:
+1. Request a device code from C-Ops API
+2. Display: "Open https://cops.example.com/device and enter code: ABCD-EFGH"
+3. User logs in via C-Ops web page (which supports multiple OAuth providers)
+4. CLI polls and receives tokens
+
+**No CLI changes required** - the verification_url would simply point to C-Ops web instead of Google directly.
+
+---
+
+## Google OAuth Device Flow Explained
+
+The Device Flow (RFC 8628) is designed for devices with limited input capabilities (like CLI tools) where users cannot easily enter credentials directly.
+
+### How It Works
+
+```
++----------+                                +----------------+                 +--------+
+|          |  (1) Request Device Code       |                |                 |        |
+|   CLI    | -----------------------------> |   C-Ops API    |                 | Google |
+|          |                                |                |                 |        |
+|          |  (2) Device Code + User Code   |                |                 |        |
+|          | <----------------------------- |                |                 |        |
+|          |                                |                |                 |        |
+|          |  Display to user:              |                |                 |        |
+|          |  "Go to: google.com/device"    |                |                 |        |
+|          |  "Enter code: ABCD-EFGH"       |                |                 |        |
+|          |                                |                |                 |        |
++----------+                                +----------------+                 +--------+
+                                                   |
+     User opens browser, enters code,              |  (3) API requests device code
+     authenticates with Google                     |       from Google
+                                                   |
++----------+                                +----------------+                 +--------+
+|          |  (4) Poll for completion       |                |  (5) Poll      |        |
+|   CLI    | -----------------------------> |   C-Ops API    | -------------> | Google |
+|          |                                |                |                 |        |
+|          |  (6) Pending / Tokens          |                |  (7) Tokens    |        |
+|          | <----------------------------- |                | <------------- |        |
+|          |                                |                |                 |        |
+|          |  Save tokens to ~/.cops/auth.json              |                 |        |
+|          |                                |                |                 |        |
++----------+                                +----------------+                 +--------+
+```
+
+### Step-by-Step CLI Authentication Flow
+
+1. **User runs `cops auth login`**
+   - CLI calls C-Ops API `DeviceCode` endpoint
+   - API requests a device code from Google OAuth
+
+2. **API returns device code info**
+   - `device_code`: Internal code for polling (never shown to user)
+   - `user_code`: Human-readable code like "ABCD-EFGH" (shown to user)
+   - `verification_url`: URL where user enters the code
+   - `interval`: How often to poll (typically 5 seconds)
+   - `expires_in`: How long the code is valid (typically 30 minutes)
+
+3. **CLI displays instructions**
+   ```
+   To sign in, open this URL in your browser:
+     https://www.google.com/device
+
+   Then enter this code:
+     ABCD-EFGH
+
+   Waiting for authentication...
+   ```
+
+4. **User authenticates in browser**
+   - Opens the verification URL
+   - Enters the user code
+   - Signs in with Google account
+   - Grants permission to the app
+
+5. **CLI polls for completion**
+   - Calls `DevicePoll` endpoint every `interval` seconds
+   - If user hasn't completed: returns `pending: true`
+   - If user completed: returns JWT tokens
+
+6. **CLI saves tokens**
+   - Stores tokens in `~/.cops/auth.json` with 0600 permissions
+   - Displays success message with user info
+
+### Why Device Flow?
+
+- **No browser redirect needed**: Works in SSH sessions, containers, headless environments
+- **No localhost server**: Doesn't require opening ports or running a local server
+- **User-friendly**: Simple code entry is easier than pasting URLs
+- **Secure**: Device code and user code are separate; only user code is displayed
 
 ---
 
@@ -28,29 +166,13 @@ The implementation follows the existing hexagonal architecture patterns, Connect
 
 **Files to Read**:
 - `.agent/rules/go/go-platform-domain.md`: Domain model guidelines
+- `.agent/rules/go/go-struct.md`: Struct definition rules (pointer types for struct arrays)
 - `shared/domain/common.go`: Existing ID type definition
 - `shared/domain/project.go`: Example domain model pattern
 
-### `shared/domain/user.go`
-
-**Description**: Define User domain model representing authenticated users.
-
-```go
-package domain
-
-// User represents an authenticated user in the system.
-// A user can have multiple linked OAuth accounts.
-type User struct {
-    ID              ID     `json:"-" bson:"-"`
-    Email           string `json:"email" bson:"email"`
-    Name            string `json:"name" bson:"name"`
-    ProfileImageURL string `json:"profileImageUrl,omitempty" bson:"profileImageUrl,omitempty"`
-}
-```
-
 ### `shared/domain/account.go`
 
-**Description**: Define Account domain model for OAuth provider accounts.
+**Description**: Define Account domain model for OAuth provider accounts. Accounts are embedded in User.
 
 ```go
 package domain
@@ -63,18 +185,34 @@ const (
 )
 
 // Account represents an OAuth provider account linked to a user.
-// Separating accounts allows future multi-provider support.
+// Accounts are embedded within the User document, not stored separately.
 type Account struct {
-    ID         ID              `json:"-" bson:"-"`
     Provider   AccountProvider `json:"provider" bson:"provider"`
     ProviderID string          `json:"providerId" bson:"providerId"`
-    UserID     ID              `json:"-" bson:"-"`
+}
+```
+
+### `shared/domain/user.go`
+
+**Description**: Define User domain model representing authenticated users with embedded accounts.
+
+```go
+package domain
+
+// User represents an authenticated user in the system.
+// A user can have multiple linked OAuth accounts embedded in the Accounts array.
+type User struct {
+    ID              ID         `json:"-" bson:"-"`
+    Email           string     `json:"email" bson:"email"`
+    Name            string     `json:"name" bson:"name"`
+    ProfileImageURL string     `json:"profileImageUrl,omitempty" bson:"profileImageUrl,omitempty"`
+    Accounts        []*Account `json:"accounts" bson:"accounts"`
 }
 ```
 
 ### `shared/domain/organization.go`
 
-**Description**: Define Organization and OrganizationMember domain models.
+**Description**: Define Organization and OrganizationMember domain models. Note: Organization service is out of scope; only domain models are defined.
 
 ```go
 package domain
@@ -83,17 +221,15 @@ package domain
 type MemberRole string
 
 const (
-    MemberRoleOwner  MemberRole = "owner"
     MemberRoleAdmin  MemberRole = "admin"
     MemberRoleMember MemberRole = "member"
 )
 
 // Organization represents a group that owns projects.
 type Organization struct {
-    ID      ID     `json:"id" bson:"-"`
-    Name    string `json:"name" bson:"name"`
-    Slug    string `json:"slug" bson:"slug"`
-    OwnerID ID     `json:"-" bson:"-"`
+    ID   ID     `json:"id" bson:"-"`
+    Name string `json:"name" bson:"name"`
+    Slug string `json:"slug" bson:"slug"`
 }
 
 // OrganizationMember represents membership relationship between user and organization.
@@ -109,7 +245,8 @@ type OrganizationMember struct {
 
 | Scenario | Input | Expected Output | Branch Covered |
 | :------- | :---- | :-------------- | :------------- |
-| Valid MemberRole constants | `MemberRoleOwner` | `"owner"` | Enum values |
+| Valid MemberRole constants | `MemberRoleAdmin` | `"admin"` | Enum values |
+| Valid MemberRole constants | `MemberRoleMember` | `"member"` | Enum values |
 | Valid AccountProvider constants | `AccountProviderGoogle` | `"google"` | Enum values |
 
 ---
@@ -122,7 +259,7 @@ type OrganizationMember struct {
 
 ### `shared/domain/mongoschema/user.go`
 
-**Description**: MongoDB schema for User with ID conversion.
+**Description**: MongoDB schema for User with ID conversion. Accounts are embedded in the User document. Each struct type has its own field constants.
 
 ```go
 package mongoschema
@@ -136,11 +273,19 @@ const (
     UserCollectionName = "users"
 )
 
+// User struct field constants
 const (
     UserIDField              = "_id"
     UserEmailField           = "email"
     UserNameField            = "name"
     UserProfileImageURLField = "profileImageUrl"
+    UserAccountsField        = "accounts"
+)
+
+// Account struct field constants (embedded type gets its own constants)
+const (
+    AccountProviderField   = "provider"
+    AccountProviderIDField = "providerId"
 )
 
 type User struct {
@@ -163,55 +308,9 @@ func (s *User) ToDomain() *domain.User {
 }
 ```
 
-### `shared/domain/mongoschema/account.go`
-
-**Description**: MongoDB schema for Account with ID conversions.
-
-```go
-package mongoschema
-
-import (
-    "github.com/team-attention/cops/shared/domain"
-    "go.mongodb.org/mongo-driver/v2/bson"
-)
-
-const (
-    AccountCollectionName = "accounts"
-)
-
-const (
-    AccountIDField         = "_id"
-    AccountProviderField   = "provider"
-    AccountProviderIDField = "providerId"
-    AccountUserIDField     = "userId"
-)
-
-type Account struct {
-    domain.Account `bson:",inline"`
-    ID             bson.ObjectID `bson:"_id,omitempty"`
-    UserID         bson.ObjectID `bson:"userId"`
-}
-
-func (s *Account) FromDomain(d *domain.Account) {
-    // Implementation outline:
-    // 1. Return early if d is nil.
-    // 2. Copy the embedded Account struct from domain.
-    // 3. Convert d.ID to bson.ObjectID if not empty.
-    // 4. Convert d.UserID to bson.ObjectID if not empty.
-}
-
-func (s *Account) ToDomain() *domain.Account {
-    // Implementation outline:
-    // 1. Return nil if s is nil.
-    // 2. Set s.Account.ID from s.ID.Hex().
-    // 3. Set s.Account.UserID from s.UserID.Hex().
-    // 4. Return pointer to embedded Account.
-}
-```
-
 ### `shared/domain/mongoschema/organization.go`
 
-**Description**: MongoDB schema for Organization with ID conversion.
+**Description**: MongoDB schema for Organization with ID conversion. Note: Organization service is out of scope.
 
 ```go
 package mongoschema
@@ -226,16 +325,14 @@ const (
 )
 
 const (
-    OrganizationIDField      = "_id"
-    OrganizationNameField    = "name"
-    OrganizationSlugField    = "slug"
-    OrganizationOwnerIDField = "ownerId"
+    OrganizationIDField   = "_id"
+    OrganizationNameField = "name"
+    OrganizationSlugField = "slug"
 )
 
 type Organization struct {
     domain.Organization `bson:",inline"`
     ID                  bson.ObjectID `bson:"_id,omitempty"`
-    OwnerID             bson.ObjectID `bson:"ownerId"`
 }
 
 func (s *Organization) FromDomain(d *domain.Organization) {
@@ -243,21 +340,19 @@ func (s *Organization) FromDomain(d *domain.Organization) {
     // 1. Return early if d is nil.
     // 2. Copy the embedded Organization struct from domain.
     // 3. Convert d.ID to bson.ObjectID if not empty.
-    // 4. Convert d.OwnerID to bson.ObjectID if not empty.
 }
 
 func (s *Organization) ToDomain() *domain.Organization {
     // Implementation outline:
     // 1. Return nil if s is nil.
     // 2. Set s.Organization.ID from s.ID.Hex().
-    // 3. Set s.Organization.OwnerID from s.OwnerID.Hex().
-    // 4. Return pointer to embedded Organization.
+    // 3. Return pointer to embedded Organization.
 }
 ```
 
 ### `shared/domain/mongoschema/organization_member.go`
 
-**Description**: MongoDB schema for OrganizationMember relationship.
+**Description**: MongoDB schema for OrganizationMember relationship. Note: Organization service is out of scope.
 
 ```go
 package mongoschema
@@ -314,7 +409,7 @@ func (s *OrganizationMember) ToDomain() *domain.OrganizationMember {
 
 ### `idl/protobuf/auth/v1/auth.proto`
 
-**Description**: Authentication service protobuf definition.
+**Description**: Authentication service protobuf definition. Simplified to return only tokens.
 
 ```protobuf
 syntax = "proto3";
@@ -330,21 +425,6 @@ message TokenPair {
   int64 expires_at = 3;  // Unix timestamp when access token expires
 }
 
-// UserInfo contains basic user information.
-message UserInfo {
-  string id = 1;
-  string email = 2;
-  string name = 3;
-  string profile_image_url = 4;
-}
-
-// OrganizationInfo contains basic organization information.
-message OrganizationInfo {
-  string id = 1;
-  string name = 2;
-  string slug = 3;
-}
-
 // GoogleAuthReq contains Google OAuth authorization code.
 message GoogleAuthReq {
   // authorization_code is the code received from Google OAuth callback
@@ -353,12 +433,9 @@ message GoogleAuthReq {
   string redirect_uri = 2;
 }
 
-// GoogleAuthRes contains authentication result.
+// GoogleAuthRes contains authentication result (tokens only).
 message GoogleAuthRes {
   TokenPair tokens = 1;
-  UserInfo user = 2;
-  OrganizationInfo organization = 3;
-  bool is_new_user = 4;
 }
 
 // DeviceCodeReq initiates device flow authentication.
@@ -378,12 +455,10 @@ message DevicePollReq {
   string device_code = 1;
 }
 
-// DevicePollRes contains poll result.
+// DevicePollRes contains poll result (tokens only when complete).
 message DevicePollRes {
   bool pending = 1;
   TokenPair tokens = 2;
-  UserInfo user = 3;
-  OrganizationInfo organization = 4;
 }
 
 // RefreshTokenReq contains refresh token for token renewal.
@@ -396,18 +471,9 @@ message RefreshTokenRes {
   TokenPair tokens = 1;
 }
 
-// GetCurrentUserReq is empty request for getting current user.
-message GetCurrentUserReq {}
-
-// GetCurrentUserRes contains current authenticated user information.
-message GetCurrentUserRes {
-  UserInfo user = 1;
-  OrganizationInfo organization = 2;
-}
-
 // AuthService handles authentication operations.
 service AuthService {
-  // GoogleAuth exchanges Google OAuth code for JWT tokens.
+  // GoogleAuth exchanges Google OAuth code for JWT tokens (web flow).
   rpc GoogleAuth(GoogleAuthReq) returns (GoogleAuthRes);
 
   // DeviceCode initiates device flow for CLI authentication.
@@ -418,116 +484,6 @@ service AuthService {
 
   // RefreshToken exchanges refresh token for new token pair.
   rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes);
-
-  // GetCurrentUser returns current authenticated user info.
-  rpc GetCurrentUser(GetCurrentUserReq) returns (GetCurrentUserRes);
-}
-```
-
-### `idl/protobuf/organization/v1/organization.proto`
-
-**Description**: Organization management service protobuf definition.
-
-```protobuf
-syntax = "proto3";
-
-package organization.v1;
-
-option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/organization/v1;organizationv1";
-
-// MemberRole represents organization member roles.
-enum MemberRole {
-  MEMBER_ROLE_UNSPECIFIED = 0;
-  MEMBER_ROLE_OWNER = 1;
-  MEMBER_ROLE_ADMIN = 2;
-  MEMBER_ROLE_MEMBER = 3;
-}
-
-// Organization contains organization information.
-message Organization {
-  string id = 1;
-  string name = 2;
-  string slug = 3;
-  string owner_id = 4;
-}
-
-// OrganizationMember contains member information.
-message OrganizationMember {
-  string id = 1;
-  string user_id = 2;
-  string email = 3;
-  string name = 4;
-  MemberRole role = 5;
-}
-
-// CreateOrganizationReq contains new organization details.
-message CreateOrganizationReq {
-  string name = 1;
-  string slug = 2;
-}
-
-// CreateOrganizationRes contains created organization.
-message CreateOrganizationRes {
-  Organization organization = 1;
-}
-
-// ListOrganizationsReq is empty for listing user's organizations.
-message ListOrganizationsReq {}
-
-// ListOrganizationsRes contains user's organizations.
-message ListOrganizationsRes {
-  repeated Organization organizations = 1;
-}
-
-// GetOrganizationReq contains organization identifier.
-message GetOrganizationReq {
-  string organization_id = 1;
-}
-
-// GetOrganizationRes contains organization details.
-message GetOrganizationRes {
-  Organization organization = 1;
-  repeated OrganizationMember members = 2;
-}
-
-// AddMemberReq contains new member details.
-message AddMemberReq {
-  string organization_id = 1;
-  string email = 2;
-  MemberRole role = 3;
-}
-
-// AddMemberRes contains added member.
-message AddMemberRes {
-  OrganizationMember member = 1;
-}
-
-// SelectOrganizationReq sets current organization context.
-message SelectOrganizationReq {
-  string organization_id = 1;
-}
-
-// SelectOrganizationRes confirms organization selection.
-message SelectOrganizationRes {
-  Organization organization = 1;
-}
-
-// OrganizationService handles organization management.
-service OrganizationService {
-  // CreateOrganization creates a new organization.
-  rpc CreateOrganization(CreateOrganizationReq) returns (CreateOrganizationRes);
-
-  // ListOrganizations returns organizations the user belongs to.
-  rpc ListOrganizations(ListOrganizationsReq) returns (ListOrganizationsRes);
-
-  // GetOrganization returns organization details with members.
-  rpc GetOrganization(GetOrganizationReq) returns (GetOrganizationRes);
-
-  // AddMember adds a user to an organization.
-  rpc AddMember(AddMemberReq) returns (AddMemberRes);
-
-  // SelectOrganization sets the current organization context.
-  rpc SelectOrganization(SelectOrganizationReq) returns (SelectOrganizationRes);
 }
 ```
 
@@ -552,10 +508,11 @@ message RegisterProjectReq {
 **Files to Read**:
 - `.agent/rules/go/go-platform.md`: Platform package guidelines
 - `api/internal/platform/util/errutil/errutil.go`: Error utility pattern
+- `api/internal/platform/setup/config/config.go`: Config location for JWT settings
 
 ### `api/internal/platform/util/jwtutil/jwtutil.go`
 
-**Description**: JWT token generation and validation utilities.
+**Description**: JWT token generation and validation utilities. Uses only RegisteredClaims with UserID in the `sub` field.
 
 ```go
 package jwtutil
@@ -566,16 +523,8 @@ import (
     "github.com/golang-jwt/jwt/v5"
 )
 
-// Claims represents custom JWT claims for C-Ops.
-type Claims struct {
-    jwt.RegisteredClaims
-    UserID         string `json:"userId"`
-    Email          string `json:"email"`
-    OrganizationID string `json:"orgId"`
-    Role           string `json:"role"`
-}
-
 // Config holds JWT configuration.
+// This struct is populated from api/internal/platform/setup/config/config.go
 type Config struct {
     SecretKey            string
     AccessTokenDuration  time.Duration
@@ -591,35 +540,46 @@ type TokenPair struct {
 }
 
 // GenerateTokenPair creates new access and refresh tokens.
-func GenerateTokenPair(cfg *Config, userID, email, orgID, role string) (*TokenPair, error) {
+// Uses only jwt.RegisteredClaims with UserID stored in Subject field.
+func GenerateTokenPair(cfg *Config, userID string) (*TokenPair, error) {
     // Implementation outline:
-    // 1. Create access token claims with short expiry (AccessTokenDuration).
-    // 2. Set registered claims: Subject=userID, Issuer, IssuedAt, ExpiresAt.
-    // 3. Set custom claims: UserID, Email, OrganizationID, Role.
-    // 4. Sign access token with HS256 using SecretKey.
-    // 5. Create refresh token claims with longer expiry (RefreshTokenDuration).
-    // 6. Set registered claims for refresh token.
-    // 7. Sign refresh token with HS256 using SecretKey.
+    // 1. Calculate access token expiry time (now + AccessTokenDuration).
+    // 2. Create access token claims using jwt.RegisteredClaims:
+    //    - Subject: userID
+    //    - Issuer: cfg.Issuer
+    //    - IssuedAt: now
+    //    - ExpiresAt: access token expiry
+    // 3. Create JWT token with HS256 signing method.
+    // 4. Sign access token with SecretKey.
+    // 5. Calculate refresh token expiry time (now + RefreshTokenDuration).
+    // 6. Create refresh token claims using jwt.RegisteredClaims:
+    //    - Subject: userID
+    //    - Issuer: cfg.Issuer
+    //    - IssuedAt: now
+    //    - ExpiresAt: refresh token expiry
+    // 7. Sign refresh token with SecretKey.
     // 8. Return TokenPair with both tokens and access token expiry.
 }
 
 // ValidateAccessToken parses and validates an access token.
-func ValidateAccessToken(cfg *Config, tokenString string) (*Claims, error) {
+// Returns the userID from the Subject claim.
+func ValidateAccessToken(cfg *Config, tokenString string) (string, error) {
     // Implementation outline:
-    // 1. Create parser with HS256 validation method only.
-    // 2. Parse token string with claims into Claims struct.
-    // 3. Validate signing method is HMAC.
-    // 4. Return claims if token is valid.
-    // 5. Return appropriate error for expired, invalid, or malformed tokens.
+    // 1. Create parser with jwt.WithValidMethods([]string{"HS256"}).
+    // 2. Parse token string with jwt.RegisteredClaims.
+    // 3. Provide key function that validates signing method is HMAC.
+    // 4. If parsing fails, return appropriate error.
+    // 5. Extract claims and return Subject (userID).
 }
 
 // ValidateRefreshToken parses and validates a refresh token.
-func ValidateRefreshToken(cfg *Config, tokenString string) (*jwt.RegisteredClaims, error) {
+// Returns the userID from the Subject claim.
+func ValidateRefreshToken(cfg *Config, tokenString string) (string, error) {
     // Implementation outline:
-    // 1. Create parser with HS256 validation method only.
-    // 2. Parse token string with registered claims.
+    // 1. Create parser with jwt.WithValidMethods([]string{"HS256"}).
+    // 2. Parse token string with jwt.RegisteredClaims.
     // 3. Validate signing method is HMAC.
-    // 4. Return registered claims (Subject contains UserID) if valid.
+    // 4. Return Subject (userID) if valid.
     // 5. Return appropriate error for expired, invalid, or malformed tokens.
 }
 ```
@@ -628,15 +588,50 @@ func ValidateRefreshToken(cfg *Config, tokenString string) (*jwt.RegisteredClaim
 
 | Scenario | Input | Expected Output | Branch Covered |
 | :------- | :---- | :-------------- | :------------- |
-| Generate valid token pair | Valid userID, email, orgID, role | TokenPair with valid tokens | Happy path |
-| Validate valid access token | Valid token string | Claims struct | Happy path |
+| Generate valid token pair | Valid userID | TokenPair with valid tokens | Happy path |
+| Validate valid access token | Valid token string | userID string | Happy path |
 | Validate expired access token | Expired token | Error: token expired | Error handling |
 | Validate malformed token | Invalid string | Error: malformed token | Validation branch |
 | Validate wrong signing method | RS256 signed token | Error: invalid signing method | Security branch |
 
 ---
 
-## Step 5: Implement Auth Middleware in API Module
+## Step 5: Update API Configuration
+
+**Files to Read**:
+- `api/internal/platform/setup/config/config.go`: Existing config structure
+
+### Update `api/internal/platform/setup/config/config.go`
+
+**Description**: Add JWT and OAuth configuration to the main config file.
+
+```go
+// Add to Config struct:
+type Config struct {
+    // ... existing fields ...
+    JWT   JWTConfig
+    OAuth OAuthConfig
+}
+
+// JWTConfig holds JWT token configuration.
+type JWTConfig struct {
+    SecretKey            string        `env:"JWT_SECRET_KEY,required"`
+    AccessTokenDuration  time.Duration `env:"JWT_ACCESS_TOKEN_DURATION" envDefault:"30m"`
+    RefreshTokenDuration time.Duration `env:"JWT_REFRESH_TOKEN_DURATION" envDefault:"720h"` // 30 days
+    Issuer               string        `env:"JWT_ISSUER" envDefault:"cops"`
+}
+
+// OAuthConfig holds OAuth provider configuration.
+type OAuthConfig struct {
+    GoogleClientID     string   `env:"GOOGLE_CLIENT_ID,required"`
+    GoogleClientSecret string   `env:"GOOGLE_CLIENT_SECRET,required"`
+    GoogleScopes       []string `env:"GOOGLE_SCOPES" envDefault:"email,profile"`
+}
+```
+
+---
+
+## Step 6: Implement Auth Middleware in API Module
 
 **Files to Read**:
 - `.agent/rules/go/go-inbound-http-fiber.md`: Fiber middleware patterns
@@ -644,13 +639,12 @@ func ValidateRefreshToken(cfg *Config, tokenString string) (*jwt.RegisteredClaim
 
 ### `api/internal/platform/middleware/auth.go`
 
-**Description**: Authentication middleware for extracting and validating JWT from requests.
+**Description**: Authentication middleware for extracting and validating JWT from requests. Simplified to only extract UserID.
 
 ```go
 package middleware
 
 import (
-    "context"
     "log/slog"
     "strings"
 
@@ -663,17 +657,8 @@ import (
 type contextKey string
 
 const (
-    UserContextKey         contextKey = "user"
-    OrganizationContextKey contextKey = "organization"
+    UserIDContextKey contextKey = "userId"
 )
-
-// UserContext contains authenticated user information from JWT.
-type UserContext struct {
-    UserID         string
-    Email          string
-    OrganizationID string
-    Role           string
-}
 
 // AuthMiddleware creates a Fiber middleware for JWT authentication.
 func AuthMiddleware(l *slog.Logger, jwtCfg *jwtutil.Config) fiber.Handler {
@@ -684,29 +669,28 @@ func AuthMiddleware(l *slog.Logger, jwtCfg *jwtutil.Config) fiber.Handler {
     // 4. Extract token string after "Bearer " prefix.
     // 5. Call jwtutil.ValidateAccessToken with token.
     // 6. If validation fails, log error and return 401.
-    // 7. Create UserContext from validated claims.
-    // 8. Store UserContext in Fiber locals for handler access.
-    // 9. Call c.Next() to continue request processing.
+    // 7. Store userID in Fiber locals for handler access.
+    // 8. Call c.Next() to continue request processing.
 }
 
-// OptionalAuthMiddleware extracts user context if token is present, but doesn't require it.
+// OptionalAuthMiddleware extracts user ID if token is present, but doesn't require it.
 func OptionalAuthMiddleware(l *slog.Logger, jwtCfg *jwtutil.Config) fiber.Handler {
     // Implementation outline:
     // 1. Return fiber.Handler function.
     // 2. Extract Authorization header from request.
     // 3. If header is missing, call c.Next() without setting context.
     // 4. If header present, validate token.
-    // 5. If valid, store UserContext in Fiber locals.
+    // 5. If valid, store userID in Fiber locals.
     // 6. If invalid, log warning but continue without context.
     // 7. Call c.Next().
 }
 
-// GetUserContext extracts UserContext from Fiber context.
-func GetUserContext(c *fiber.Ctx) *UserContext {
+// GetUserID extracts userID from Fiber context.
+func GetUserID(c *fiber.Ctx) string {
     // Implementation outline:
-    // 1. Get value from Fiber locals using UserContextKey.
-    // 2. Type assert to *UserContext.
-    // 3. Return nil if not found or wrong type.
+    // 1. Get value from Fiber locals using UserIDContextKey.
+    // 2. Type assert to string.
+    // 3. Return empty string if not found or wrong type.
 }
 ```
 
@@ -714,16 +698,16 @@ func GetUserContext(c *fiber.Ctx) *UserContext {
 
 | Scenario | Input | Expected Output | Branch Covered |
 | :------- | :---- | :-------------- | :------------- |
-| Valid Bearer token | `Authorization: Bearer valid_token` | UserContext set, next called | Happy path |
+| Valid Bearer token | `Authorization: Bearer valid_token` | UserID set, next called | Happy path |
 | Missing header | No Authorization header | 401 Unauthorized | Missing auth |
 | Invalid token format | `Authorization: Basic token` | 401 Unauthorized | Format validation |
 | Expired token | Expired Bearer token | 401 Unauthorized | Token validation |
-| Optional with valid token | Valid Bearer token | UserContext set | Optional happy path |
+| Optional with valid token | Valid Bearer token | UserID set | Optional happy path |
 | Optional without token | No header | Next called, no context | Optional skip |
 
 ---
 
-## Step 6: Implement Auth Service in API Module
+## Step 7: Implement Auth Service in API Module
 
 **Files to Read**:
 - `.agent/rules/go/go-service.md`: Service implementation guidelines
@@ -731,7 +715,7 @@ func GetUserContext(c *fiber.Ctx) *UserContext {
 
 ### `api/internal/service/auth/auth_service.go`
 
-**Description**: Core authentication service handling OAuth and token operations.
+**Description**: Core authentication service handling OAuth and token operations. Simplified to handle only user authentication without organization logic.
 
 ```go
 package auth
@@ -752,14 +736,6 @@ type GoogleAuthParams struct {
     RedirectURI       string
 }
 
-// GoogleAuthResult contains the result of Google OAuth authentication.
-type GoogleAuthResult struct {
-    Tokens       *jwtutil.TokenPair
-    User         *domain.User
-    Organization *domain.Organization
-    IsNewUser    bool
-}
-
 // DeviceCodeResult contains device code for CLI flow.
 type DeviceCodeResult struct {
     DeviceCode      string
@@ -771,19 +747,16 @@ type DeviceCodeResult struct {
 
 // DevicePollResult contains result of device code polling.
 type DevicePollResult struct {
-    Pending      bool
-    Tokens       *jwtutil.TokenPair
-    User         *domain.User
-    Organization *domain.Organization
+    Pending bool
+    Tokens  *jwtutil.TokenPair
 }
 
 // Service implements authentication business logic.
 type Service struct {
-    logger     *slog.Logger
-    jwtCfg     *jwtutil.Config
-    oauthPort  oauth.GoogleOAuthPort
-    userRepo   repository.UserRepositoryPort
-    orgRepo    repository.OrganizationRepositoryPort
+    logger    *slog.Logger
+    jwtCfg    *jwtutil.Config
+    oauthPort oauth.GoogleOAuthPort
+    userRepo  repository.UserRepositoryPort
 }
 
 // NewService creates a new auth service.
@@ -792,36 +765,30 @@ func NewService(
     jwtCfg *jwtutil.Config,
     oauthPort oauth.GoogleOAuthPort,
     userRepo repository.UserRepositoryPort,
-    orgRepo repository.OrganizationRepositoryPort,
 ) *Service {
     return &Service{
         logger:    l.With(slog.String("name", "auth.service")),
         jwtCfg:    jwtCfg,
         oauthPort: oauthPort,
         userRepo:  userRepo,
-        orgRepo:   orgRepo,
     }
 }
 
 // GoogleAuth handles Google OAuth code exchange and user creation/lookup.
-func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*GoogleAuthResult, error) {
+func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*jwtutil.TokenPair, error) {
     // Implementation outline:
     // 1. Exchange authorization code for Google tokens via oauthPort.
     // 2. Fetch user info from Google using access token.
-    // 3. Look up existing account by provider="google" and providerID=googleUserID.
-    // 4. If account exists:
-    //    a. Fetch user by account.UserID.
-    //    b. Fetch user's default organization.
-    //    c. Get user's role in organization.
-    //    d. Generate JWT token pair.
-    //    e. Return result with IsNewUser=false.
-    // 5. If account doesn't exist:
+    // 3. Look up existing user by accounts.provider="google" and accounts.providerId=googleUserID.
+    // 4. If user exists:
+    //    a. Generate JWT token pair with userID.
+    //    b. Return tokens.
+    // 5. If user doesn't exist:
     //    a. Create new User with Google profile info.
-    //    b. Create new Account linking to User.
-    //    c. Create default Organization named "{User.Name}'s Organization".
-    //    d. Create OrganizationMember with role=owner.
-    //    e. Generate JWT token pair.
-    //    f. Return result with IsNewUser=true.
+    //    b. Add Account to user's Accounts array.
+    //    c. Save user to database.
+    //    d. Generate JWT token pair with new userID.
+    //    e. Return tokens.
 }
 
 // DeviceCode initiates device flow authentication.
@@ -835,31 +802,24 @@ func (s *Service) DeviceCode(ctx context.Context) (*DeviceCodeResult, error) {
 func (s *Service) DevicePoll(ctx context.Context, deviceCode string) (*DevicePollResult, error) {
     // Implementation outline:
     // 1. Call oauthPort.PollDeviceCode(deviceCode).
-    // 2. If still pending, return DevicePollResult{Pending: true}.
+    // 2. If still pending (authorization_pending error), return DevicePollResult{Pending: true}.
     // 3. If complete:
-    //    a. Fetch user info from Google.
-    //    b. Follow same user lookup/creation logic as GoogleAuth.
-    //    c. Generate JWT token pair.
-    //    d. Return DevicePollResult with tokens, user, organization.
+    //    a. Fetch user info from Google using returned access token.
+    //    b. Look up existing user by provider account.
+    //    c. If not found, create new user with account.
+    //    d. Generate JWT token pair.
+    //    e. Return DevicePollResult with tokens.
 }
 
 // RefreshToken exchanges refresh token for new token pair.
 func (s *Service) RefreshToken(ctx context.Context, refreshToken string) (*jwtutil.TokenPair, error) {
     // Implementation outline:
     // 1. Validate refresh token using jwtutil.ValidateRefreshToken.
-    // 2. Extract userID from claims.Subject.
+    // 2. Extract userID from Subject claim.
     // 3. Fetch user by ID to ensure still valid.
-    // 4. Fetch user's current organization membership.
-    // 5. Generate new token pair with current user/org info.
+    // 4. If user not found, return error.
+    // 5. Generate new token pair with userID.
     // 6. Return new TokenPair.
-}
-
-// GetCurrentUser returns current authenticated user info.
-func (s *Service) GetCurrentUser(ctx context.Context, userID, orgID string) (*GoogleAuthResult, error) {
-    // Implementation outline:
-    // 1. Fetch user by userID.
-    // 2. Fetch organization by orgID.
-    // 3. Return result with user and organization (no tokens).
 }
 ```
 
@@ -867,18 +827,19 @@ func (s *Service) GetCurrentUser(ctx context.Context, userID, orgID string) (*Go
 
 | Scenario | Input | Expected Output | Branch Covered |
 | :------- | :---- | :-------------- | :------------- |
-| New user Google auth | Valid auth code, new Google account | New user, org created, IsNewUser=true | New user path |
-| Existing user Google auth | Valid auth code, existing account | Existing user returned, IsNewUser=false | Existing user path |
+| New user Google auth | Valid auth code, new Google account | Tokens, user created | New user path |
+| Existing user Google auth | Valid auth code, existing account | Tokens | Existing user path |
 | Invalid auth code | Invalid authorization code | Error: invalid code | OAuth error |
 | Device code initiation | Empty request | Device code result | Happy path |
 | Device poll pending | Device code not yet authorized | Pending=true | Pending state |
-| Device poll complete | Authorized device code | Tokens and user | Complete state |
+| Device poll complete | Authorized device code | Tokens | Complete state |
 | Refresh valid token | Valid refresh token | New token pair | Happy path |
 | Refresh expired token | Expired refresh token | Error: token expired | Expired token |
+| Refresh with non-existent user | Valid token, deleted user | Error: user not found | User validation |
 
 ---
 
-## Step 7: Implement Auth Repository Ports and Adapters
+## Step 8: Implement Auth Repository Ports and Adapters
 
 **Files to Read**:
 - `.agent/rules/go/go-outbound.md`: Outbound adapter guidelines
@@ -887,7 +848,7 @@ func (s *Service) GetCurrentUser(ctx context.Context, userID, orgID string) (*Go
 
 ### `api/internal/service/auth/outbound/repository/user_repo_port.go`
 
-**Description**: User repository interface.
+**Description**: User repository interface. Accounts are managed as embedded documents within User.
 
 ```go
 package repository
@@ -900,61 +861,15 @@ import (
 
 // UserRepositoryPort defines interface for user data persistence.
 type UserRepositoryPort interface {
-    // Create creates a new user.
+    // Create creates a new user with embedded accounts.
     Create(ctx context.Context, user *domain.User) (*domain.User, error)
 
     // GetByID retrieves user by ID.
     GetByID(ctx context.Context, userID string) (*domain.User, error)
 
-    // GetByEmail retrieves user by email.
-    GetByEmail(ctx context.Context, email string) (*domain.User, error)
-
     // FindByAccountProvider finds user by OAuth provider account.
+    // Searches within the embedded accounts array.
     FindByAccountProvider(ctx context.Context, provider domain.AccountProvider, providerID string) (*domain.User, error)
-
-    // CreateAccount creates an OAuth account linked to a user.
-    CreateAccount(ctx context.Context, account *domain.Account) (*domain.Account, error)
-}
-```
-
-### `api/internal/service/auth/outbound/repository/organization_repo_port.go`
-
-**Description**: Organization repository interface.
-
-```go
-package repository
-
-import (
-    "context"
-
-    "github.com/team-attention/cops/shared/domain"
-)
-
-// OrganizationRepositoryPort defines interface for organization data persistence.
-type OrganizationRepositoryPort interface {
-    // Create creates a new organization.
-    Create(ctx context.Context, org *domain.Organization) (*domain.Organization, error)
-
-    // GetByID retrieves organization by ID.
-    GetByID(ctx context.Context, orgID string) (*domain.Organization, error)
-
-    // GetBySlug retrieves organization by slug.
-    GetBySlug(ctx context.Context, slug string) (*domain.Organization, error)
-
-    // ListByUserID returns all organizations a user belongs to.
-    ListByUserID(ctx context.Context, userID string) ([]*domain.Organization, error)
-
-    // CreateMember adds a user to an organization.
-    CreateMember(ctx context.Context, member *domain.OrganizationMember) (*domain.OrganizationMember, error)
-
-    // GetMember retrieves membership for a user in an organization.
-    GetMember(ctx context.Context, orgID, userID string) (*domain.OrganizationMember, error)
-
-    // ListMembers returns all members of an organization.
-    ListMembers(ctx context.Context, orgID string) ([]*domain.OrganizationMember, error)
-
-    // GetDefaultOrganization returns the first organization for a user.
-    GetDefaultOrganization(ctx context.Context, userID string) (*domain.Organization, error)
 }
 ```
 
@@ -994,7 +909,7 @@ type TokenResponse struct {
 
 // GoogleOAuthPort defines interface for Google OAuth operations.
 type GoogleOAuthPort interface {
-    // ExchangeCode exchanges authorization code for tokens.
+    // ExchangeCode exchanges authorization code for tokens (web flow).
     ExchangeCode(ctx context.Context, code, redirectURI string) (*TokenResponse, error)
 
     // GetUserInfo fetches user profile using access token.
@@ -1004,13 +919,14 @@ type GoogleOAuthPort interface {
     InitiateDeviceFlow(ctx context.Context) (*DeviceCodeResponse, error)
 
     // PollDeviceCode polls for device code authorization.
+    // Returns nil TokenResponse if authorization is still pending.
     PollDeviceCode(ctx context.Context, deviceCode string) (*TokenResponse, error)
 }
 ```
 
 ### `api/internal/service/auth/outbound/repository/mongodb/user_repo.go`
 
-**Description**: MongoDB implementation of user repository.
+**Description**: MongoDB implementation of user repository. Users are stored with embedded accounts.
 
 ```go
 package mongodb
@@ -1028,16 +944,14 @@ import (
 )
 
 type MongoUserRepository struct {
-    logger       *slog.Logger
-    usersColl    *mongo.Collection
-    accountsColl *mongo.Collection
+    logger    *slog.Logger
+    usersColl *mongo.Collection
 }
 
 func NewMongoUserRepository(l *slog.Logger, db *mongo.Database) *MongoUserRepository {
     return &MongoUserRepository{
-        logger:       l.With(slog.String("name", "auth.repository.mongodb.user")),
-        usersColl:    db.Collection(mongoschema.UserCollectionName),
-        accountsColl: db.Collection(mongoschema.AccountCollectionName),
+        logger:    l.With(slog.String("name", "auth.repository.mongodb.user")),
+        usersColl: db.Collection(mongoschema.UserCollectionName),
     }
 }
 
@@ -1053,140 +967,33 @@ func (r *MongoUserRepository) GetByID(ctx context.Context, userID string) (*doma
     // Implementation outline:
     // 1. Convert userID to ObjectID.
     // 2. Find document by _id.
-    // 3. Convert to domain.User.
+    // 3. Convert to domain.User using ToDomain().
     // 4. Return user or NotFoundError.
-}
-
-func (r *MongoUserRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
-    // Implementation outline:
-    // 1. Find document by email field.
-    // 2. Convert to domain.User.
-    // 3. Return user or NotFoundError.
 }
 
 func (r *MongoUserRepository) FindByAccountProvider(ctx context.Context, provider domain.AccountProvider, providerID string) (*domain.User, error) {
     // Implementation outline:
-    // 1. Find account by provider and providerID.
-    // 2. If not found, return nil (not error).
-    // 3. If found, fetch user by account.UserID.
-    // 4. Return user.
-}
-
-func (r *MongoUserRepository) CreateAccount(ctx context.Context, account *domain.Account) (*domain.Account, error) {
-    // Implementation outline:
-    // 1. Create mongoschema.Account from domain.Account.
-    // 2. Insert into accounts collection.
-    // 3. Set account.ID from inserted ObjectID.
-    // 4. Return account.
+    // 1. Build query to search embedded accounts array using field constants:
+    //    filter := bson.M{
+    //        mongoschema.UserAccountsField: bson.M{
+    //            "$elemMatch": bson.M{
+    //                mongoschema.AccountProviderField:   provider,
+    //                mongoschema.AccountProviderIDField: providerID,
+    //            },
+    //        },
+    //    }
+    // 2. Find document matching the filter.
+    // 3. If not found, return nil (not error).
+    // 4. Convert to domain.User using ToDomain().
+    // 5. Return user.
 }
 
 var _ repository.UserRepositoryPort = (*MongoUserRepository)(nil)
 ```
 
-### `api/internal/service/auth/outbound/repository/mongodb/organization_repo.go`
-
-**Description**: MongoDB implementation of organization repository.
-
-```go
-package mongodb
-
-import (
-    "context"
-    "log/slog"
-
-    "go.mongodb.org/mongo-driver/v2/bson"
-    "go.mongodb.org/mongo-driver/v2/mongo"
-
-    "github.com/team-attention/cops/api/internal/service/auth/outbound/repository"
-    "github.com/team-attention/cops/shared/domain"
-    "github.com/team-attention/cops/shared/domain/mongoschema"
-)
-
-type MongoOrganizationRepository struct {
-    logger      *slog.Logger
-    orgsColl    *mongo.Collection
-    membersColl *mongo.Collection
-}
-
-func NewMongoOrganizationRepository(l *slog.Logger, db *mongo.Database) *MongoOrganizationRepository {
-    return &MongoOrganizationRepository{
-        logger:      l.With(slog.String("name", "auth.repository.mongodb.organization")),
-        orgsColl:    db.Collection(mongoschema.OrganizationCollectionName),
-        membersColl: db.Collection(mongoschema.OrganizationMemberCollectionName),
-    }
-}
-
-func (r *MongoOrganizationRepository) Create(ctx context.Context, org *domain.Organization) (*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Create mongoschema.Organization from domain.
-    // 2. Insert into organizations collection.
-    // 3. Set org.ID from inserted ObjectID.
-    // 4. Return organization.
-}
-
-func (r *MongoOrganizationRepository) GetByID(ctx context.Context, orgID string) (*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Convert orgID to ObjectID.
-    // 2. Find document by _id.
-    // 3. Convert to domain.Organization.
-    // 4. Return org or NotFoundError.
-}
-
-func (r *MongoOrganizationRepository) GetBySlug(ctx context.Context, slug string) (*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Find document by slug field.
-    // 2. Convert to domain.Organization.
-    // 3. Return org or NotFoundError.
-}
-
-func (r *MongoOrganizationRepository) ListByUserID(ctx context.Context, userID string) ([]*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Convert userID to ObjectID.
-    // 2. Find all memberships for userID.
-    // 3. Collect organization IDs from memberships.
-    // 4. Find all organizations by IDs.
-    // 5. Convert to domain.Organization slice.
-    // 6. Return organizations.
-}
-
-func (r *MongoOrganizationRepository) CreateMember(ctx context.Context, member *domain.OrganizationMember) (*domain.OrganizationMember, error) {
-    // Implementation outline:
-    // 1. Create mongoschema.OrganizationMember from domain.
-    // 2. Insert into organization_members collection.
-    // 3. Set member.ID from inserted ObjectID.
-    // 4. Return member.
-}
-
-func (r *MongoOrganizationRepository) GetMember(ctx context.Context, orgID, userID string) (*domain.OrganizationMember, error) {
-    // Implementation outline:
-    // 1. Convert orgID and userID to ObjectIDs.
-    // 2. Find document by organizationId and userId.
-    // 3. Convert to domain.OrganizationMember.
-    // 4. Return member or NotFoundError.
-}
-
-func (r *MongoOrganizationRepository) ListMembers(ctx context.Context, orgID string) ([]*domain.OrganizationMember, error) {
-    // Implementation outline:
-    // 1. Convert orgID to ObjectID.
-    // 2. Find all documents by organizationId.
-    // 3. Convert each to domain.OrganizationMember.
-    // 4. Return members.
-}
-
-func (r *MongoOrganizationRepository) GetDefaultOrganization(ctx context.Context, userID string) (*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Convert userID to ObjectID.
-    // 2. Find first membership for userID (sorted by _id for consistency).
-    // 3. Fetch organization by membership.OrganizationID.
-    // 4. Return organization or nil if no membership.
-}
-
-var _ repository.OrganizationRepositoryPort = (*MongoOrganizationRepository)(nil)
-```
-
 ### `api/internal/service/auth/outbound/oauth/google/google_oauth.go`
 
-**Description**: Google OAuth implementation.
+**Description**: Google OAuth implementation. OAuth config is injected from main config.
 
 ```go
 package google
@@ -1196,42 +1003,42 @@ import (
     "encoding/json"
     "log/slog"
     "net/http"
+    "net/url"
+    "strings"
 
     "golang.org/x/oauth2"
     "golang.org/x/oauth2/google"
 
+    "github.com/team-attention/cops/api/internal/platform/setup/config"
     oauthport "github.com/team-attention/cops/api/internal/service/auth/outbound/oauth"
 )
 
-// Config holds Google OAuth configuration.
-type Config struct {
-    ClientID     string
-    ClientSecret string
-    Scopes       []string
-}
-
 type GoogleOAuthAdapter struct {
-    logger     *slog.Logger
-    config     *oauth2.Config
-    httpClient *http.Client
+    logger       *slog.Logger
+    config       *oauth2.Config
+    clientID     string
+    clientSecret string
+    httpClient   *http.Client
 }
 
-func NewGoogleOAuthAdapter(l *slog.Logger, cfg *Config) *GoogleOAuthAdapter {
+func NewGoogleOAuthAdapter(l *slog.Logger, cfg *config.Config) *GoogleOAuthAdapter {
     return &GoogleOAuthAdapter{
         logger: l.With(slog.String("name", "auth.oauth.google")),
         config: &oauth2.Config{
-            ClientID:     cfg.ClientID,
-            ClientSecret: cfg.ClientSecret,
-            Scopes:       cfg.Scopes,
+            ClientID:     cfg.OAuth.GoogleClientID,
+            ClientSecret: cfg.OAuth.GoogleClientSecret,
+            Scopes:       cfg.OAuth.GoogleScopes,
             Endpoint:     google.Endpoint,
         },
-        httpClient: http.DefaultClient,
+        clientID:     cfg.OAuth.GoogleClientID,
+        clientSecret: cfg.OAuth.GoogleClientSecret,
+        httpClient:   http.DefaultClient,
     }
 }
 
 func (a *GoogleOAuthAdapter) ExchangeCode(ctx context.Context, code, redirectURI string) (*oauthport.TokenResponse, error) {
     // Implementation outline:
-    // 1. Set redirect URI on config.
+    // 1. Create copy of config with provided redirect URI.
     // 2. Call config.Exchange(ctx, code).
     // 3. Convert oauth2.Token to TokenResponse.
     // 4. Return TokenResponse.
@@ -1248,23 +1055,30 @@ func (a *GoogleOAuthAdapter) GetUserInfo(ctx context.Context, accessToken string
 
 func (a *GoogleOAuthAdapter) InitiateDeviceFlow(ctx context.Context) (*oauthport.DeviceCodeResponse, error) {
     // Implementation outline:
-    // 1. POST to https://oauth2.googleapis.com/device/code with:
-    //    - client_id
-    //    - scope (space-separated)
-    // 2. Parse JSON response.
-    // 3. Return DeviceCodeResponse with device_code, user_code, verification_url.
+    // 1. Build form data with client_id and scope.
+    // 2. POST to https://oauth2.googleapis.com/device/code.
+    // 3. Parse JSON response containing:
+    //    - device_code
+    //    - user_code
+    //    - verification_url
+    //    - expires_in
+    //    - interval
+    // 4. Return DeviceCodeResponse.
 }
 
 func (a *GoogleOAuthAdapter) PollDeviceCode(ctx context.Context, deviceCode string) (*oauthport.TokenResponse, error) {
     // Implementation outline:
-    // 1. POST to https://oauth2.googleapis.com/token with:
+    // 1. Build form data with:
     //    - client_id
     //    - client_secret
     //    - device_code
     //    - grant_type=urn:ietf:params:oauth:grant-type:device_code
-    // 2. If response contains "authorization_pending" error, return nil (pending).
-    // 3. If success, return TokenResponse.
-    // 4. If other error, return error.
+    // 2. POST to https://oauth2.googleapis.com/token.
+    // 3. Parse response.
+    // 4. If error "authorization_pending", return nil (still pending).
+    // 5. If error "slow_down", return nil (still pending, caller should increase interval).
+    // 6. If error "access_denied" or "expired_token", return error.
+    // 7. If success, return TokenResponse with access_token.
 }
 
 var _ oauthport.GoogleOAuthPort = (*GoogleOAuthAdapter)(nil)
@@ -1272,7 +1086,7 @@ var _ oauthport.GoogleOAuthPort = (*GoogleOAuthAdapter)(nil)
 
 ---
 
-## Step 8: Implement Auth ConnectRPC Handler
+## Step 9: Implement Auth ConnectRPC Handler
 
 **Files to Read**:
 - `.agent/rules/go/go-inbound-grpc-connectrpc.md`: ConnectRPC handler guidelines
@@ -1280,7 +1094,7 @@ var _ oauthport.GoogleOAuthPort = (*GoogleOAuthAdapter)(nil)
 
 ### `api/internal/service/auth/inbound/grpc/connectrpc/handler.go`
 
-**Description**: ConnectRPC handler for auth service.
+**Description**: ConnectRPC handler for auth service. Simplified responses with tokens only.
 
 ```go
 package connectrpc
@@ -1321,8 +1135,8 @@ func (h *AuthGRPCHandler) GoogleAuth(
     // Implementation outline:
     // 1. Extract params from request message.
     // 2. Call h.svc.GoogleAuth(ctx, params).
-    // 3. Convert result to protobuf response.
-    // 4. Return connect.NewResponse(res).
+    // 3. Convert TokenPair to protobuf TokenPair.
+    // 4. Return connect.NewResponse with tokens only.
 }
 
 func (h *AuthGRPCHandler) DeviceCode(
@@ -1342,7 +1156,7 @@ func (h *AuthGRPCHandler) DevicePoll(
     // Implementation outline:
     // 1. Extract device code from request.
     // 2. Call h.svc.DevicePoll(ctx, deviceCode).
-    // 3. Convert result to protobuf response.
+    // 3. Build response with pending flag and tokens (if complete).
     // 4. Return connect.NewResponse(res).
 }
 
@@ -1357,197 +1171,12 @@ func (h *AuthGRPCHandler) RefreshToken(
     // 4. Return connect.NewResponse(res).
 }
 
-func (h *AuthGRPCHandler) GetCurrentUser(
-    ctx context.Context,
-    req *connect.Request[authv1.GetCurrentUserReq],
-) (*connect.Response[authv1.GetCurrentUserRes], error) {
-    // Implementation outline:
-    // 1. Extract user context from request (set by middleware).
-    // 2. Call h.svc.GetCurrentUser(ctx, userID, orgID).
-    // 3. Convert result to protobuf response.
-    // 4. Return connect.NewResponse(res).
-}
-
 var _ authv1connect.AuthServiceHandler = (*AuthGRPCHandler)(nil)
 ```
 
 ---
 
-## Step 9: Implement Organization Service
-
-**Files to Read**:
-- `.agent/rules/go/go-service.md`: Service implementation guidelines
-- `api/internal/service/auth/auth_service.go`: Auth service for reference
-
-### `api/internal/service/organization/organization_service.go`
-
-**Description**: Organization management service.
-
-```go
-package organization
-
-import (
-    "context"
-    "log/slog"
-    "regexp"
-    "strings"
-
-    "github.com/team-attention/cops/api/internal/service/organization/outbound/repository"
-    "github.com/team-attention/cops/shared/domain"
-)
-
-// CreateOrganizationParams contains parameters for creating an organization.
-type CreateOrganizationParams struct {
-    UserID string
-    Name   string
-    Slug   string
-}
-
-// AddMemberParams contains parameters for adding a member.
-type AddMemberParams struct {
-    OrganizationID string
-    ActorUserID    string
-    TargetEmail    string
-    Role           domain.MemberRole
-}
-
-// Service implements organization management business logic.
-type Service struct {
-    logger   *slog.Logger
-    orgRepo  repository.OrganizationRepositoryPort
-    userRepo repository.UserRepositoryPort
-}
-
-// NewService creates a new organization service.
-func NewService(
-    l *slog.Logger,
-    orgRepo repository.OrganizationRepositoryPort,
-    userRepo repository.UserRepositoryPort,
-) *Service {
-    return &Service{
-        logger:   l.With(slog.String("name", "organization.service")),
-        orgRepo:  orgRepo,
-        userRepo: userRepo,
-    }
-}
-
-// CreateOrganization creates a new organization with the user as owner.
-func (s *Service) CreateOrganization(ctx context.Context, params CreateOrganizationParams) (*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Validate name is not empty.
-    // 2. Generate slug from name if not provided (lowercase, hyphenated).
-    // 3. Validate slug format (alphanumeric and hyphens only).
-    // 4. Check slug uniqueness via orgRepo.GetBySlug.
-    // 5. Create Organization with OwnerID=params.UserID.
-    // 6. Call orgRepo.Create.
-    // 7. Create OrganizationMember with role=owner for the user.
-    // 8. Call orgRepo.CreateMember.
-    // 9. Return created organization.
-}
-
-// ListOrganizations returns all organizations a user belongs to.
-func (s *Service) ListOrganizations(ctx context.Context, userID string) ([]*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Call orgRepo.ListByUserID(ctx, userID).
-    // 2. Return organizations list.
-}
-
-// GetOrganization returns organization details with members.
-func (s *Service) GetOrganization(ctx context.Context, orgID, userID string) (*domain.Organization, []*domain.OrganizationMember, error) {
-    // Implementation outline:
-    // 1. Verify user is member of organization via orgRepo.GetMember.
-    // 2. If not member, return ForbiddenError.
-    // 3. Fetch organization via orgRepo.GetByID.
-    // 4. Fetch members via orgRepo.ListMembers.
-    // 5. Return organization and members.
-}
-
-// AddMember adds a user to an organization.
-func (s *Service) AddMember(ctx context.Context, params AddMemberParams) (*domain.OrganizationMember, error) {
-    // Implementation outline:
-    // 1. Verify actor is admin or owner of organization.
-    // 2. If not, return ForbiddenError.
-    // 3. Look up target user by email via userRepo.GetByEmail.
-    // 4. If user not found, return NotFoundError.
-    // 5. Check if target is already member via orgRepo.GetMember.
-    // 6. If already member, return BadRequestError.
-    // 7. Create OrganizationMember with specified role.
-    // 8. Call orgRepo.CreateMember.
-    // 9. Return created member.
-}
-
-// SelectOrganization validates and returns selected organization.
-func (s *Service) SelectOrganization(ctx context.Context, orgID, userID string) (*domain.Organization, error) {
-    // Implementation outline:
-    // 1. Verify user is member of organization.
-    // 2. If not member, return ForbiddenError.
-    // 3. Fetch organization by ID.
-    // 4. Return organization.
-}
-
-// generateSlug creates a URL-safe slug from organization name.
-func (s *Service) generateSlug(name string) string {
-    // Implementation outline:
-    // 1. Convert to lowercase.
-    // 2. Replace spaces with hyphens.
-    // 3. Remove non-alphanumeric characters except hyphens.
-    // 4. Trim leading/trailing hyphens.
-    // 5. Return slug.
-}
-```
-
-**Test Scenarios**:
-
-| Scenario | Input | Expected Output | Branch Covered |
-| :------- | :---- | :-------------- | :------------- |
-| Create organization | Valid name, userID | Organization created, user is owner | Happy path |
-| Create with duplicate slug | Existing slug | Error: slug taken | Slug validation |
-| List user's organizations | Valid userID | List of organizations | Happy path |
-| Get organization as member | Valid orgID, member userID | Organization and members | Member access |
-| Get organization as non-member | Valid orgID, non-member userID | ForbiddenError | Access denied |
-| Add member as owner | Owner adds member | Member created | Owner privilege |
-| Add member as regular member | Member tries to add | ForbiddenError | Insufficient permission |
-| Add already existing member | Email of existing member | BadRequestError | Duplicate check |
-| Add non-existent user | Unknown email | NotFoundError | User lookup |
-
----
-
-## Step 10: Update API Configuration
-
-**Files to Read**:
-- `api/internal/platform/setup/config/config.go`: Existing config structure
-- `.agent/rules/go/go-platform-setup.md`: Setup guidelines
-
-### Update `api/internal/platform/setup/config/config.go`
-
-**Description**: Add JWT and OAuth configuration.
-
-```go
-// Add to Config struct:
-type Config struct {
-    // ... existing fields ...
-    JWT    JWTConfig
-    OAuth  OAuthConfig
-}
-
-// JWTConfig holds JWT token configuration.
-type JWTConfig struct {
-    SecretKey            string        `env:"JWT_SECRET_KEY,required"`
-    AccessTokenDuration  time.Duration `env:"JWT_ACCESS_TOKEN_DURATION" envDefault:"30m"`
-    RefreshTokenDuration time.Duration `env:"JWT_REFRESH_TOKEN_DURATION" envDefault:"720h"` // 30 days
-    Issuer               string        `env:"JWT_ISSUER" envDefault:"cops"`
-}
-
-// OAuthConfig holds OAuth provider configuration.
-type OAuthConfig struct {
-    GoogleClientID     string `env:"GOOGLE_CLIENT_ID,required"`
-    GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET,required"`
-}
-```
-
----
-
-## Step 11: Register Auth Module in API Container
+## Step 10: Register Auth Module in API Container
 
 **Files to Read**:
 - `api/cmd/internal/container/module_project.go`: Example module registration
@@ -1567,7 +1196,9 @@ import (
     "github.com/team-attention/cops/api/internal/platform/util/jwtutil"
     "github.com/team-attention/cops/api/internal/service/auth"
     "github.com/team-attention/cops/api/internal/service/auth/inbound/grpc/connectrpc"
+    "github.com/team-attention/cops/api/internal/service/auth/outbound/oauth"
     "github.com/team-attention/cops/api/internal/service/auth/outbound/oauth/google"
+    "github.com/team-attention/cops/api/internal/service/auth/outbound/repository"
     "github.com/team-attention/cops/api/internal/service/auth/outbound/repository/mongodb"
 )
 
@@ -1583,16 +1214,7 @@ func newAuthModule() fx.Option {
             }
         }),
 
-        // Google OAuth config
-        fx.Provide(func(cfg *config.Config) *google.Config {
-            return &google.Config{
-                ClientID:     cfg.OAuth.GoogleClientID,
-                ClientSecret: cfg.OAuth.GoogleClientSecret,
-                Scopes:       []string{"email", "profile"},
-            }
-        }),
-
-        // OAuth adapter
+        // OAuth adapter (config injected via constructor)
         fx.Provide(
             fx.Annotate(
                 google.NewGoogleOAuthAdapter,
@@ -1600,17 +1222,11 @@ func newAuthModule() fx.Option {
             ),
         ),
 
-        // Repositories
+        // User repository
         fx.Provide(
             fx.Annotate(
                 mongodb.NewMongoUserRepository,
                 fx.As(new(repository.UserRepositoryPort)),
-            ),
-        ),
-        fx.Provide(
-            fx.Annotate(
-                mongodb.NewMongoOrganizationRepository,
-                fx.As(new(repository.OrganizationRepositoryPort)),
             ),
         ),
 
@@ -1638,14 +1254,13 @@ func newAuthModule() fx.Option {
 fx.New(
     // ... existing modules ...
     newAuthModule(),
-    newOrganizationModule(),
     // ...
 )
 ```
 
 ---
 
-## Step 12: Implement CLI Auth Commands
+## Step 11: Implement CLI Auth Commands
 
 **Files to Read**:
 - `.agent/rules/go/go-dig-container.md`: Dig container guidelines
@@ -1654,7 +1269,7 @@ fx.New(
 
 ### `cli/internal/service/auth/auth_service.go`
 
-**Description**: CLI auth service for managing local authentication state.
+**Description**: CLI auth service for managing local authentication state. Stores only tokens.
 
 ```go
 package auth
@@ -1665,36 +1280,22 @@ import (
     "log/slog"
     "os"
     "path/filepath"
+    "time"
 
     "github.com/team-attention/cops/cli/internal/service/auth/outbound/api"
 )
 
 // AuthState represents the local authentication state.
+// Stores only token information.
 type AuthState struct {
-    User         *UserInfo         `json:"user"`
-    Organization *OrganizationInfo `json:"organization"`
-    Tokens       *TokenInfo        `json:"tokens"`
-}
-
-// UserInfo contains user information.
-type UserInfo struct {
-    ID    string `json:"id"`
-    Email string `json:"email"`
-    Name  string `json:"name"`
-}
-
-// OrganizationInfo contains organization information.
-type OrganizationInfo struct {
-    ID   string `json:"id"`
-    Name string `json:"name"`
-    Slug string `json:"slug"`
+    Tokens *TokenInfo `json:"tokens"`
 }
 
 // TokenInfo contains token data.
 type TokenInfo struct {
     AccessToken  string `json:"accessToken"`
     RefreshToken string `json:"refreshToken"`
-    ExpiresAt    string `json:"expiresAt"`
+    ExpiresAt    int64  `json:"expiresAt"` // Unix timestamp
 }
 
 // Service implements CLI authentication logic.
@@ -1713,15 +1314,30 @@ func NewService(l *slog.Logger, apiClient api.AuthAPIPort, homeDir string) *Serv
     }
 }
 
-// Login initiates the device flow login process.
-func (s *Service) Login(ctx context.Context) (*AuthState, error) {
+// LoginResult contains the result of login flow for display.
+type LoginResult struct {
+    DeviceCode      string
+    UserCode        string
+    VerificationURL string
+    Interval        int
+}
+
+// InitiateLogin starts the device flow and returns display info.
+func (s *Service) InitiateLogin(ctx context.Context) (*LoginResult, error) {
     // Implementation outline:
     // 1. Call apiClient.DeviceCode(ctx) to get device code.
-    // 2. Return device code info for display to user.
-    // 3. Poll apiClient.DevicePoll(ctx, deviceCode) at interval.
-    // 4. On success, create AuthState from response.
-    // 5. Save AuthState to auth.json with 0600 permissions.
-    // 6. Return AuthState.
+    // 2. Return LoginResult with device code info for display.
+}
+
+// PollLogin polls for authentication completion.
+func (s *Service) PollLogin(ctx context.Context, deviceCode string) (bool, error) {
+    // Implementation outline:
+    // 1. Call apiClient.DevicePoll(ctx, deviceCode).
+    // 2. If pending, return false, nil.
+    // 3. If complete:
+    //    a. Create AuthState with tokens.
+    //    b. Save to auth.json with 0600 permissions.
+    //    c. Return true, nil.
 }
 
 // Logout removes the local authentication state.
@@ -1741,13 +1357,20 @@ func (s *Service) GetAuthState() (*AuthState, error) {
     // 4. Return AuthState.
 }
 
+// IsLoggedIn checks if user is currently logged in.
+func (s *Service) IsLoggedIn() bool {
+    // Implementation outline:
+    // 1. Try to get auth state.
+    // 2. Return true if state exists with valid tokens.
+}
+
 // GetAccessToken returns a valid access token, refreshing if needed.
 func (s *Service) GetAccessToken(ctx context.Context) (string, error) {
     // Implementation outline:
     // 1. Get current auth state.
     // 2. If not logged in, return error.
-    // 3. Parse expiresAt time.
-    // 4. If token expired or will expire in <5 minutes:
+    // 3. Check if token is expired or will expire in <5 minutes.
+    // 4. If near expiry:
     //    a. Call apiClient.RefreshToken with refresh token.
     //    b. Update auth.json with new tokens.
     // 5. Return access token.
@@ -1756,15 +1379,15 @@ func (s *Service) GetAccessToken(ctx context.Context) (string, error) {
 // saveAuthState writes auth state to file with secure permissions.
 func (s *Service) saveAuthState(state *AuthState) error {
     // Implementation outline:
-    // 1. Ensure ~/.cops directory exists.
-    // 2. Marshal state to JSON.
+    // 1. Ensure ~/.cops directory exists (0700 permissions).
+    // 2. Marshal state to JSON with indentation.
     // 3. Write to auth.json with os.WriteFile and 0600 permissions.
 }
 ```
 
 ### `cli/internal/service/auth/outbound/api/auth_port.go`
 
-**Description**: API client interface for auth operations.
+**Description**: API client interface for auth operations. Simplified responses.
 
 ```go
 package api
@@ -1785,30 +1408,14 @@ type PollResult struct {
     Pending      bool
     AccessToken  string
     RefreshToken string
-    ExpiresAt    string
-    User         *UserInfo
-    Organization *OrganizationInfo
-}
-
-// UserInfo contains user data.
-type UserInfo struct {
-    ID    string
-    Email string
-    Name  string
-}
-
-// OrganizationInfo contains organization data.
-type OrganizationInfo struct {
-    ID   string
-    Name string
-    Slug string
+    ExpiresAt    int64
 }
 
 // TokenResult contains new tokens.
 type TokenResult struct {
     AccessToken  string
     RefreshToken string
-    ExpiresAt    string
+    ExpiresAt    int64
 }
 
 // AuthAPIPort defines the interface for auth API operations.
@@ -1858,7 +1465,7 @@ func NewAuthAPIClient(l *slog.Logger, httpClient *http.Client, baseURL string) *
 func (c *AuthAPIClient) DeviceCode(ctx context.Context) (*api.DeviceCodeResult, error) {
     // Implementation outline:
     // 1. Create DeviceCodeReq.
-    // 2. Call client.DeviceCode(ctx, req).
+    // 2. Call client.DeviceCode(ctx, connect.NewRequest(req)).
     // 3. Convert response to DeviceCodeResult.
     // 4. Return result.
 }
@@ -1866,7 +1473,7 @@ func (c *AuthAPIClient) DeviceCode(ctx context.Context) (*api.DeviceCodeResult, 
 func (c *AuthAPIClient) DevicePoll(ctx context.Context, deviceCode string) (*api.PollResult, error) {
     // Implementation outline:
     // 1. Create DevicePollReq with device code.
-    // 2. Call client.DevicePoll(ctx, req).
+    // 2. Call client.DevicePoll(ctx, connect.NewRequest(req)).
     // 3. Convert response to PollResult.
     // 4. Return result.
 }
@@ -1874,7 +1481,7 @@ func (c *AuthAPIClient) DevicePoll(ctx context.Context, deviceCode string) (*api
 func (c *AuthAPIClient) RefreshToken(ctx context.Context, refreshToken string) (*api.TokenResult, error) {
     // Implementation outline:
     // 1. Create RefreshTokenReq with refresh token.
-    // 2. Call client.RefreshToken(ctx, req).
+    // 2. Call client.RefreshToken(ctx, connect.NewRequest(req)).
     // 3. Convert response to TokenResult.
     // 4. Return result.
 }
@@ -1950,13 +1557,20 @@ func (h *AuthCLIHandler) NewLoginCommand() *cobra.Command {
         Short: "Log in with Google OAuth",
         RunE: func(cmd *cobra.Command, args []string) error {
             // Implementation outline:
-            // 1. Get context with timeout.
-            // 2. Call svc to get device code.
-            // 3. Display: "Go to: {verification_url}"
-            // 4. Display: "Enter code: {user_code}"
-            // 5. Start polling loop with interval.
-            // 6. On success, display user info.
-            // 7. Display: "Logged in as {email}"
+            // 1. Create context with 10-minute timeout.
+            // 2. Call svc.InitiateLogin(ctx) to get device code.
+            // 3. Display instructions:
+            //    fmt.Println("To sign in, open this URL in your browser:")
+            //    fmt.Printf("  %s\n\n", result.VerificationURL)
+            //    fmt.Println("Then enter this code:")
+            //    fmt.Printf("  %s\n\n", result.UserCode)
+            //    fmt.Println("Waiting for authentication...")
+            // 4. Start polling loop:
+            //    - Call svc.PollLogin(ctx, deviceCode) every interval seconds
+            //    - If returns true, authentication complete
+            //    - If context timeout, show error
+            // 5. On success:
+            //    fmt.Println("\nAuthentication successful!")
         },
     }
 }
@@ -1978,8 +1592,9 @@ func (h *AuthCLIHandler) NewLogoutCommand() *cobra.Command {
         Short: "Log out and remove stored credentials",
         RunE: func(cmd *cobra.Command, args []string) error {
             // Implementation outline:
-            // 1. Call svc.Logout(ctx).
-            // 2. Display: "Logged out successfully"
+            // 1. Call svc.Logout(cmd.Context()).
+            // 2. If error, display error message.
+            // 3. Display: "Logged out successfully"
         },
     }
 }
@@ -1992,7 +1607,11 @@ func (h *AuthCLIHandler) NewLogoutCommand() *cobra.Command {
 ```go
 package cobra
 
-import "github.com/spf13/cobra"
+import (
+    "fmt"
+
+    "github.com/spf13/cobra"
+)
 
 // NewStatusCommand creates the status command.
 func (h *AuthCLIHandler) NewStatusCommand() *cobra.Command {
@@ -2001,11 +1620,13 @@ func (h *AuthCLIHandler) NewStatusCommand() *cobra.Command {
         Short: "Show current authentication status",
         RunE: func(cmd *cobra.Command, args []string) error {
             // Implementation outline:
-            // 1. Call svc.GetAuthState().
-            // 2. If not logged in, display: "Not logged in"
-            // 3. If logged in, display:
-            //    - User: {name} ({email})
-            //    - Organization: {org name} ({org slug})
+            // 1. Call svc.IsLoggedIn().
+            // 2. If not logged in:
+            //    fmt.Println("Not logged in")
+            //    fmt.Println("Run 'cops auth login' to authenticate")
+            // 3. If logged in:
+            //    fmt.Println("Logged in")
+            //    // Optionally show token expiry info
         },
     }
 }
@@ -2013,31 +1634,86 @@ func (h *AuthCLIHandler) NewStatusCommand() *cobra.Command {
 
 ---
 
-## Step 13: Update CLI to Include Auth Token in Requests
+## Step 12: Update CLI to Include Auth Token in Requests
 
 **Files to Read**:
 - `cli/internal/service/tracking/outbound/api/connectrpc/project_client.go`: Example API client
+- `cli/internal/platform/setup/httpclient/httpclient.go`: HTTP client setup (uses `imroc/req/v3`)
 
 ### Update CLI HTTP Client
 
-**Description**: Add auth interceptor to include Bearer token.
+**Description**: Use `imroc/req/v3` middleware to add auth token when making API calls. Auth token is passed at call time, not injected into client initialization.
 
 ```go
 // cli/internal/platform/setup/httpclient/httpclient.go
 
-// Add interceptor that reads auth token and adds to requests:
-// 1. Create custom http.RoundTripper.
-// 2. In RoundTrip, check for auth token from auth service.
-// 3. If token exists, add Authorization: Bearer {token} header.
-// 4. Call underlying transport.
+import (
+    "net/http"
+
+    "github.com/imroc/req/v3"
+
+    "github.com/team-attention/cops/cli/internal/platform/setup/config"
+)
+
+// APIHTTPClient is an HTTP client configured for the API server.
+type APIHTTPClient struct {
+    *req.Client
+}
+
+// InitAPIHTTPClient creates a new HTTP client for the API server.
+// Note: Auth token is NOT injected here - it's added per-request by services.
+func InitAPIHTTPClient(cfg *config.Config) *APIHTTPClient {
+    client := req.C().
+        SetBaseURL(cfg.API.URL).
+        SetTimeout(cfg.API.Timeout)
+
+    return &APIHTTPClient{Client: client}
+}
+
+// StandardHTTPClient returns an http.Client that can be used with libraries
+// expecting the standard http.Client interface.
+func (c *APIHTTPClient) StandardHTTPClient() *http.Client {
+    return c.Client.GetClient()
+}
+
+// WithAuth returns a cloned client with auth header set for authenticated requests.
+// This should be called by service logic that needs authentication.
+func (c *APIHTTPClient) WithAuth(accessToken string) *req.Client {
+    // Implementation outline:
+    // 1. Clone the underlying req.Client.
+    // 2. Set Authorization header: "Bearer " + accessToken
+    // 3. Return the cloned client.
+    return c.Client.Clone().SetCommonBearerAuthToken(accessToken)
+}
+```
+
+### Service Usage Pattern
+
+When a service needs to make an authenticated request:
+
+```go
+// In service that needs auth:
+func (s *SomeService) DoAuthenticatedCall(ctx context.Context) error {
+    // 1. Get access token from auth service
+    token, err := s.authSvc.GetAccessToken(ctx)
+    if err != nil {
+        return err
+    }
+
+    // 2. Create authenticated client for this request
+    authClient := s.httpClient.WithAuth(token)
+
+    // 3. Make the request
+    // ...
+}
 ```
 
 ---
 
-## Step 14: Update Daemon for Authentication
+## Step 13: Update Daemon for Authentication
 
 **Files to Read**:
-- `daemon/internal/platform/setup/copsapi.go`: Existing API client setup
+- `daemon/internal/platform/setup/copsapi.go`: Existing API client setup (uses `imroc/req/v3`)
 - `daemon/internal/service/logwatcher/outbound/api/connectrpc/api_client.go`: API client
 
 ### `daemon/internal/service/auth/auth_service.go`
@@ -2058,27 +1734,13 @@ import (
 
 // AuthState mirrors CLI auth state structure.
 type AuthState struct {
-    User         *UserInfo         `json:"user"`
-    Organization *OrganizationInfo `json:"organization"`
-    Tokens       *TokenInfo        `json:"tokens"`
-}
-
-type UserInfo struct {
-    ID    string `json:"id"`
-    Email string `json:"email"`
-    Name  string `json:"name"`
-}
-
-type OrganizationInfo struct {
-    ID   string `json:"id"`
-    Name string `json:"name"`
-    Slug string `json:"slug"`
+    Tokens *TokenInfo `json:"tokens"`
 }
 
 type TokenInfo struct {
     AccessToken  string `json:"accessToken"`
     RefreshToken string `json:"refreshToken"`
-    ExpiresAt    string `json:"expiresAt"`
+    ExpiresAt    int64  `json:"expiresAt"`
 }
 
 // Service manages daemon authentication state.
@@ -2105,7 +1767,7 @@ func (s *Service) GetAccessToken() (string, error) {
     // 2. If cache is older than 30 seconds, reload from file.
     // 3. If file doesn't exist, return error (not authenticated).
     // 4. Parse auth.json.
-    // 5. Check if token is expired.
+    // 5. Check if token is expired (compare ExpiresAt with now).
     // 6. If expired, log warning and return error.
     // 7. Return access token.
 }
@@ -2118,28 +1780,71 @@ func (s *Service) IsAuthenticated() bool {
 }
 ```
 
-### Update Daemon API Client
+### Daemon API Client
 
-**Description**: Add auth token to API requests.
+**Description**: API client initialization remains simple. Auth is handled per-request by services.
 
 ```go
 // daemon/internal/platform/setup/copsapi.go
 
-// Update InitAPIClient to accept auth service:
-func InitAPIClient(cfg *Config, authSvc *auth.Service) *APIClient {
-    // Implementation outline:
-    // 1. Create req client with base URL.
-    // 2. Add request middleware that:
-    //    a. Gets access token from authSvc.
-    //    b. If token available, sets Authorization header.
-    //    c. If not available, logs warning.
-    // 3. Return client.
+import (
+    "net/http"
+
+    "github.com/imroc/req/v3"
+)
+
+// APIClient is an HTTP client configured for the COps API server.
+type APIClient struct {
+    *req.Client
+}
+
+// InitAPIClient creates a new HTTP client for the COps API server.
+// Note: Auth token is NOT injected here - it's added per-request by services.
+func InitAPIClient(cfg *Config) *APIClient {
+    client := req.C().
+        SetBaseURL(cfg.API.URL).
+        SetTimeout(cfg.API.Timeout)
+
+    return &APIClient{Client: client}
+}
+
+// StandardHTTPClient returns an http.Client that can be used with libraries
+// expecting the standard http.Client interface.
+func (c *APIClient) StandardHTTPClient() *http.Client {
+    return c.Client.GetClient()
+}
+
+// WithAuth returns a cloned client with auth header set.
+func (c *APIClient) WithAuth(accessToken string) *req.Client {
+    return c.Client.Clone().SetCommonBearerAuthToken(accessToken)
 }
 ```
 
+### Service Usage in Daemon
+
+When daemon services need authenticated requests:
+
+```go
+// In daemon service that needs auth:
+func (s *LogWatcherService) SendRecords(ctx context.Context, records []Record) error {
+    // 1. Get access token - authentication is REQUIRED
+    token, err := s.authSvc.GetAccessToken()
+    if err != nil {
+        // Return error - do NOT continue without authentication
+        return fmt.Errorf("authentication required: %w", err)
+    }
+
+    // 2. Use authenticated client
+    authClient := s.apiClient.WithAuth(token)
+    return s.sendWithClient(ctx, authClient, records)
+}
+```
+
+**Important**: Authentication is mandatory for daemon operation. If the user is not logged in via CLI (`cops auth login`), the daemon will fail to send records. This is intentional - unauthenticated requests are not allowed.
+
 ---
 
-## Step 15: Update Project Registration to Require Organization
+## Step 14: Update Project Registration to Require Organization
 
 **Files to Read**:
 - `api/internal/service/project/project_service.go`: Existing project service
@@ -2174,51 +1879,33 @@ type FindOrCreateResult struct {
 
 ### Update Project Service
 
-**Description**: Validate organization membership before project operations.
+**Description**: Include organization ID in project operations.
 
 ```go
 // api/internal/service/project/project_service.go
 
-// Add org repository dependency and validation:
+// Update RegisterProjectParams:
+type RegisterProjectParams struct {
+    ConfiguredRemoteURL string
+    ActualRemoteURL     string
+    ExistingProjectID   string
+    Name                string
+    IsGitProject        bool
+    OrganizationID      string // Add organization ID
+}
+
+// Update RegisterProject to pass organization ID:
 func (s *Service) RegisterProject(ctx context.Context, params RegisterProjectParams) (*repository.FindOrCreateResult, error) {
     // Implementation outline:
-    // 1. Validate user is member of organization (from context).
-    // 2. If not member, return ForbiddenError.
-    // 3. Add organization ID to find/create params.
-    // 4. Call repository.
-    // 5. Return result.
+    // 1. Add organization ID to find/create params.
+    // 2. Call repository.
+    // 3. Return result.
 }
 ```
 
 ---
 
-## Step 16: Create Database Indexes
-
-**Files to Read**:
-- `api/internal/platform/setup/mongodb/mongodb.go`: MongoDB setup
-
-### Update MongoDB Setup
-
-**Description**: Create indexes for new collections.
-
-```go
-// api/internal/platform/setup/mongodb/mongodb.go
-
-func ensureIndexes(db *mongo.Database) error {
-    // Implementation outline:
-    // 1. Create unique index on accounts: (provider, providerId).
-    // 2. Create index on accounts: userId.
-    // 3. Create unique index on organizations: slug.
-    // 4. Create unique index on organization_members: (organizationId, userId).
-    // 5. Create index on organization_members: userId.
-    // 6. Create index on projects: organizationId.
-    // 7. Create unique index on users: email.
-}
-```
-
----
-
-## Step 17: Generate Protobuf Code
+## Step 15: Generate Protobuf Code
 
 **Description**: Generate Go code from new protobuf definitions.
 
@@ -2229,22 +1916,20 @@ cd idl/protobuf && buf generate
 This generates:
 - `shared/gen/grpcstub/auth/v1/auth.pb.go`
 - `shared/gen/grpcstub/auth/v1/authv1connect/auth.connect.go`
-- `shared/gen/grpcstub/organization/v1/organization.pb.go`
-- `shared/gen/grpcstub/organization/v1/organizationv1connect/organization.connect.go`
 
 ---
 
 ## Implementation Order
 
 1. **Step 1-2**: Domain models and MongoSchema (shared module)
-2. **Step 3**: Protobuf definitions and code generation (Step 17)
-3. **Step 4-5**: JWT utility and auth middleware (API module)
-4. **Step 6-8**: Auth service, repositories, and handlers (API module)
-5. **Step 9**: Organization service (API module)
-6. **Step 10-11**: API configuration and module registration
-7. **Step 15-16**: Project updates and database indexes
-8. **Step 12-13**: CLI auth commands and token integration
-9. **Step 14**: Daemon auth integration
+2. **Step 3**: Protobuf definitions and code generation (Step 15)
+3. **Step 4-5**: JWT utility and API configuration
+4. **Step 6**: Auth middleware (API module)
+5. **Step 7-9**: Auth service, repositories, OAuth adapter, and handlers (API module)
+6. **Step 10**: API module registration
+7. **Step 14**: Project updates
+8. **Step 11-12**: CLI auth commands and token integration
+9. **Step 13**: Daemon auth integration
 
 ---
 
@@ -2260,13 +1945,13 @@ This generates:
 ### Integration Tests
 
 1. **Auth Flow**: Full OAuth code exchange with mock Google API
-2. **Organization Management**: CRUD operations with real MongoDB
-3. **Project Registration**: Organization validation
+2. **User Repository**: CRUD operations with embedded accounts
+3. **Project Registration**: Organization ID inclusion
 
 ### E2E Tests
 
 1. **CLI Login Flow**: Device code display and polling
-2. **Daemon Authentication**: Token refresh on API calls
+2. **Daemon Authentication**: Token reading and header injection
 
 ---
 
@@ -2276,14 +1961,28 @@ This generates:
 
 2. **Error Messages**: Authentication errors should not expose internal details. Use generic messages like "Authentication failed".
 
-3. **Token Refresh**: CLI should proactively refresh tokens before expiry (5-minute buffer). Daemon should handle 401 responses by stopping until re-authenticated.
+3. **Token Refresh**: CLI should proactively refresh tokens before expiry (5-minute buffer). Daemon requires valid authentication - if token is expired or missing, operations will fail with an error.
 
-4. **Organization Context**: JWT tokens include organization ID and role. Middleware extracts this for authorization checks.
+4. **JWT Claims**: Use only `jwt.RegisteredClaims` with UserID in the `Subject` field. Do not include organization ID in tokens since users can belong to multiple organizations.
 
-5. **Database Indexes**: Unique indexes on (provider, providerId) for accounts and (organizationId, userId) for members prevent duplicates at database level.
+5. **Embedded Accounts**: Accounts are embedded within User documents, not stored separately. Use `$elemMatch` for querying by provider account.
 
-6. **Slug Generation**: Organization slugs must be URL-safe. Use regex validation: `^[a-z0-9-]+$`.
+6. **Database Indexes**: See `TODO.md` for index requirements. Indexes are managed via migration scripts, NOT in Go codebase.
 
-7. **Device Flow Polling**: Use exponential backoff if server returns slow_down error. Respect interval from device code response.
+7. **Device Flow Polling**: Use the interval returned by Google. Handle `slow_down` error by increasing interval. Respect `expires_in` timeout.
 
-8. **Backward Compatibility**: Existing projects without organization_id should be migrated or handled gracefully during transition period.
+8. **Organization Service**: Organization service implementation is out of scope. Only domain models and MongoSchema are defined for future use.
+
+9. **Struct Arrays**: When structs are used as array elements, ALWAYS use pointer types (e.g., `[]*Account` not `[]Account`).
+
+10. **Context Keys**: Use camelCase for context key names (e.g., `userId` not `user_id`).
+
+11. **Field Constants**: Each struct type gets its own set of field constants with that type as prefix. Field constant names and values should NOT contain dots. Example: `UserAccountsField = "accounts"` for User struct, `AccountProviderField = "provider"` for Account struct.
+
+12. **OAuth Config**: OAuth configuration (client ID, secret, scopes) is defined in `api/internal/platform/setup/config/config.go` and injected into adapters via constructors.
+
+13. **HTTP Client**: Use `imroc/req/v3` package for HTTP clients. Auth tokens should be added per-request by services using `WithAuth()`, NOT injected into client initialization.
+
+14. **API Client Initialization**: Do NOT inject auth service into API client setup. Keep initialization simple. Services that need authentication should get tokens from auth service and pass them when making requests.
+
+15. **Daemon Authentication**: Authentication is MANDATORY for daemon operation. If the user is not logged in via CLI (`cops auth login`), the daemon will fail to send records with an error. Do NOT fall back to unauthenticated requests.

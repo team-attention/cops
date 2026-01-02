@@ -10,16 +10,18 @@ require (
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gofiber/adaptor/v2 v2.2.1
 	github.com/gofiber/fiber/v2 v2.52.10
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/onsi/ginkgo/v2 v2.27.3
 	github.com/onsi/gomega v1.38.3
-	github.com/samber/lo v1.52.0
 	github.com/team-attention/cops/shared v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver/v2 v2.4.1
 	go.uber.org/fx v1.24.0
+	golang.org/x/oauth2 v0.34.0
 	google.golang.org/protobuf v1.36.11
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
