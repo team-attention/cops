@@ -9,7 +9,8 @@ import (
 // Run creates and runs the fx application.
 func Run() {
 	fx.New(
-		// Modules
+		// Modules (auth must come before platform to provide auth.Service for interceptor)
+		newAuthModule(),
 		newPlatformModule(),
 		newConfigModule(),
 		newLogModule(),

@@ -25,6 +25,7 @@ func NewAPIClient(l *slog.Logger, apiClient *setup.APIClient, cfg *setup.Config)
 	client := aggregationv1connect.NewAggregationServiceClient(
 		apiClient.StandardHTTPClient(),
 		cfg.API.URL,
+		apiClient.ConnectOptions()...,
 	)
 
 	return &APIClient{
@@ -37,8 +38,9 @@ func NewAPIClient(l *slog.Logger, apiClient *setup.APIClient, cfg *setup.Config)
 func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 	req := &aggregationv1.SendLogsReq{
 		Batch: &aggregationv1.LogBatch{
-			Jsonl:     batch.Lines,
-			ProjectId: batch.ProjectID.String(),
+			OrganizationId: batch.OrganizationID,
+			ProjectId:      batch.ProjectID.String(),
+			Jsonl:          batch.Lines,
 		},
 	}
 
