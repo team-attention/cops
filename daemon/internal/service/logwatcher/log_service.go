@@ -12,10 +12,16 @@ import (
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/errutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/filesystem"
 	shareddomain "github.com/team-attention/cops/shared/domain"
+)
+
+const (
+	// minBatchSize is the minimum number of lines to attempt sending.
+	minBatchSize = 1
 )
 
 // Service contains pure business logic for log file watching and processing.
@@ -24,6 +30,7 @@ type Service struct {
 	logger             *slog.Logger
 	fileWatcher        filesystem.FileWatchPort // Outbound: fsnotify Add/Remove
 	apiClient          api.APIClientPort        // Outbound: API transmission
+	maxBatchSize       int                      // Maximum lines per batch (from config)
 	watchedDirs        map[string]bool
 	claudeDirToProject map[string]shareddomain.ID
 	projectPathToID    map[string]shareddomain.ID // ProjectPath -> ProjectID mapping for hierarchical matching
@@ -42,6 +49,7 @@ func NewService(
 		logger:             l.With(slog.String("name", "log.service")),
 		fileWatcher:        fileWatcher,
 		apiClient:          apiClient,
+		maxBatchSize:       cfg.Cops.MaxBatchSize,
 		watchedDirs:        make(map[string]bool),
 		claudeDirToProject: make(map[string]shareddomain.ID),
 		projectPathToID:    make(map[string]shareddomain.ID),
@@ -156,60 +164,236 @@ func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
 	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], lines...)
 }
 
-// Flush sends buffered lines to the API server.
-// Sends separate batches for each project.
+// Flush sends buffered lines to the API server using adaptive batching.
+// Sends separate batches for each project with dynamic size adjustment.
 func (s *Service) Flush(ctx context.Context) error {
+	// 1. Lock mutex and check if buffer is empty
 	s.mu.Lock()
 	if len(s.bufferByProject) == 0 {
 		s.mu.Unlock()
 		return nil
 	}
 
-	// Take ownership of buffer
+	// 2. Take ownership of buffer (swap with new empty map) and unlock
 	bufferedLines := s.bufferByProject
 	s.bufferByProject = make(map[shareddomain.ID][]string)
 	s.mu.Unlock()
 
-	var totalCount int
+	// 3. Initialize lastErr variable for tracking errors
 	var lastErr error
 
+	// 4. For each projectID and lines in bufferedLines
 	for projectID, lines := range bufferedLines {
+		// a. Skip if lines is empty
 		if len(lines) == 0 {
 			continue
 		}
 
+		// b. Log start of flush
+		s.logger.Info("flushing log batch",
+			slog.String("projectID", projectID.String()),
+			slog.Int("totalLines", len(lines)),
+			slog.Int("maxBatchSize", s.maxBatchSize),
+		)
+
+		// c. Call s.flushProjectLines
+		if err := s.flushProjectLines(ctx, projectID, lines); err != nil {
+			// d. If error returned, set lastErr and continue to next project
+			lastErr = err
+			continue
+		}
+	}
+
+	// 5. Return lastErr (nil if all projects succeeded)
+	return lastErr
+}
+
+// flushProjectLines sends all lines for a single project using adaptive batching.
+// Returns any unsent lines to the buffer on failure.
+func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.ID, lines []string) error {
+	// 1. Initialize state
+	currentBatchSize := s.maxBatchSize
+	remainingLines := lines
+	batchNum := 0
+	totalSent := 0
+
+	// 2. While len(remainingLines) > 0
+	for len(remainingLines) > 0 {
+		// a. Increment batchNum
+		batchNum++
+
+		// b. Calculate batchSize = min(currentBatchSize, len(remainingLines))
+		batchSize := currentBatchSize
+		if batchSize > len(remainingLines) {
+			batchSize = len(remainingLines)
+		}
+
+		// c. Extract currentBatch (make a copy to avoid aliasing issues)
+		currentBatch := make([]string, batchSize)
+		copy(currentBatch, remainingLines[:batchSize])
+
+		// d. Create domain.LogBatch
 		batch := domain.LogBatch{
-			Lines:     lines,
+			Lines:     currentBatch,
 			ProjectID: projectID,
 		}
 
-		s.logger.Info("flushing log batch",
-			slog.Int("count", len(lines)),
+		s.logger.Debug("attempting batch",
 			slog.String("projectID", projectID.String()),
+			slog.Int("batchNum", batchNum),
+			slog.Int("batchSize", batchSize),
+			slog.Int("remaining", len(remainingLines)),
+			slog.Int("currentBatchSize", currentBatchSize),
 		)
 
-		if err := s.apiClient.SendLogs(ctx, batch); err != nil {
-			// Put lines back in buffer on failure
-			s.mu.Lock()
-			s.bufferByProject[projectID] = append(lines, s.bufferByProject[projectID]...)
-			s.mu.Unlock()
+		// e. Call s.sendBatchWithRetry
+		if err := s.sendBatchWithRetry(ctx, batch, projectID, batchNum, &currentBatchSize); err != nil {
+			// f. If error
+			if errutil.IsPayloadTooLarge(err) && currentBatchSize == minBatchSize {
+				// Single line too large, skip it
+				s.logger.Error("single line too large, skipping",
+					slog.String("projectID", projectID.String()),
+					slog.Int("batchNum", batchNum),
+				)
+				// Remove the first line from remainingLines
+				remainingLines = remainingLines[1:]
+				// Reset currentBatchSize to s.maxBatchSize
+				currentBatchSize = s.maxBatchSize
+				continue
+			}
+			// Other errors - return lines to buffer and return error
+			s.returnLinesToBuffer(projectID, remainingLines)
+			return err
+		}
 
-			lastErr = fmt.Errorf("failed to send logs for project %s: %w", projectID.String(), err)
-			s.logger.Error("failed to send logs",
+		// After sendBatchWithRetry, batch.Lines may have been reduced
+		// Use the actual length that was sent
+		actualSentSize := len(batch.Lines)
+
+		s.logger.Debug("batch sent successfully",
+			slog.String("projectID", projectID.String()),
+			slog.Int("batchNum", batchNum),
+			slog.Int("actualSentSize", actualSentSize),
+			slog.Int("remainingBefore", len(remainingLines)),
+		)
+
+		// g. On success
+		// Remove sent lines from remainingLines
+		remainingLines = remainingLines[actualSentSize:]
+		// totalSent += actualSentSize
+		totalSent += actualSentSize
+
+		s.logger.Debug("after removing sent lines",
+			slog.String("projectID", projectID.String()),
+			slog.Int("batchNum", batchNum),
+			slog.Int("remainingAfter", len(remainingLines)),
+			slog.Int("totalSent", totalSent),
+		)
+
+		// Double currentBatchSize (capped at s.maxBatchSize)
+		currentBatchSize = currentBatchSize * 2
+		if currentBatchSize > s.maxBatchSize {
+			currentBatchSize = s.maxBatchSize
+		}
+	}
+
+	// 3. Log completion
+	s.logger.Info("flush completed",
+		slog.String("projectID", projectID.String()),
+		slog.Int("totalBatches", batchNum),
+		slog.Int("totalLinesSent", totalSent),
+	)
+
+	// 4. Return nil
+	return nil
+}
+
+// sendBatchWithRetry attempts to send a batch, retrying with reduced size on 413 errors.
+// Updates currentBatchSize pointer on 413 errors.
+// Returns nil on success, error on failure.
+func (s *Service) sendBatchWithRetry(
+	ctx context.Context,
+	batch domain.LogBatch,
+	projectID shareddomain.ID,
+	batchNum int,
+	currentBatchSize *int,
+) error {
+	// 1. Loop (infinite loop, will break on success or non-413 error)
+	for {
+		// a. Call s.apiClient.SendLogs
+		err := s.apiClient.SendLogs(ctx, batch)
+
+		// b. If no error
+		if err == nil {
+			// Log success
+			s.logger.Debug("batch sent successfully",
 				slog.String("projectID", projectID.String()),
-				slog.Any("error", err),
+				slog.Int("batchNum", batchNum),
+				slog.Int("linesInBatch", len(batch.Lines)),
+				slog.Int("currentBatchSize", *currentBatchSize),
 			)
+			return nil
+		}
+
+		// c. If errutil.IsPayloadTooLarge(err)
+		if errutil.IsPayloadTooLarge(err) {
+			// Calculate newSize
+			newSize := *currentBatchSize / 2
+			if newSize < minBatchSize {
+				newSize = minBatchSize
+			}
+
+			// Log warning
+			s.logger.Warn("batch too large, reducing size",
+				slog.String("projectID", projectID.String()),
+				slog.Int("batchNum", batchNum),
+				slog.Int("previousSize", *currentBatchSize),
+				slog.Int("newSize", newSize),
+			)
+
+			// If newSize == *currentBatchSize (already at minimum)
+			if newSize == *currentBatchSize {
+				// We're already at minimum size (1 line), return error
+				return err
+			}
+
+			// Update *currentBatchSize
+			*currentBatchSize = newSize
+
+			// Resize batch.Lines to newSize (but not larger than current batch)
+			if newSize > len(batch.Lines) {
+				newSize = len(batch.Lines)
+			}
+			batch.Lines = batch.Lines[:newSize]
+
+			// Continue loop (retry with smaller batch)
 			continue
 		}
 
-		totalCount += len(lines)
+		// d. For other errors
+		s.logger.Error("failed to send batch",
+			slog.String("projectID", projectID.String()),
+			slog.Int("batchNum", batchNum),
+			slog.Any("error", err),
+		)
+		return err
 	}
+}
 
-	if lastErr != nil {
-		return lastErr
-	}
+// returnLinesToBuffer puts unsent lines back into the buffer for retry in next flush.
+func (s *Service) returnLinesToBuffer(projectID shareddomain.ID, lines []string) {
+	// 1. Lock mutex
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	return nil
+	// 2. Prepend lines to s.bufferByProject[projectID]
+	s.bufferByProject[projectID] = append(lines, s.bufferByProject[projectID]...)
+
+	// 3. Log info
+	s.logger.Info("returned lines to buffer",
+		slog.String("projectID", projectID.String()),
+		slog.Int("lineCount", len(lines)),
+	)
 }
 
 // GetProjectIDForClaudeDir returns the ProjectID for a given ClaudeDir.

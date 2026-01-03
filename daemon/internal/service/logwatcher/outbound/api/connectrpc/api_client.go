@@ -3,11 +3,13 @@ package connectrpc
 import (
 	"context"
 	"log/slog"
+	"strings"
 
 	"connectrpc.com/connect"
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/errutil"
 	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
 	"github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1/aggregationv1connect"
 )
@@ -42,6 +44,18 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 
 	resp, err := c.client.SendLogs(ctx, connect.NewRequest(req))
 	if err != nil {
+		// Check if error indicates payload too large
+		code := connect.CodeOf(err)
+		if code == connect.CodeUnknown {
+			// Check error message for "413" or "Request Entity Too Large"
+			errMsg := err.Error()
+			if strings.Contains(errMsg, "413") || strings.Contains(strings.ToLower(errMsg), "request entity too large") {
+				return errutil.Wrap(errutil.ErrorTypePayloadTooLarge, "batch rejected by server", err)
+			}
+		}
+		if code == connect.CodeResourceExhausted {
+			return errutil.Wrap(errutil.ErrorTypePayloadTooLarge, "batch rejected by server", err)
+		}
 		return err
 	}
 
@@ -50,7 +64,7 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 	}
 
 	c.logger.Debug("logs sent",
-		slog.Int("processed", int(resp.Msg.ProcessedCount)),
+		slog.Int("count", len(batch.Lines)),
 	)
 
 	return nil

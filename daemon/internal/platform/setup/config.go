@@ -43,6 +43,7 @@ type CopsConfig struct {
 	GlobalConfigPath string        `env:"COPS_GLOBAL_CONFIG_PATH" envDefault:"~/.cops/config.json"`
 	DaemonDataDir    string        `env:"COPS_DAEMON_DATA_DIR" envDefault:"~/.cops/daemon"`
 	FlushInterval    time.Duration `env:"COPS_FLUSH_INTERVAL" envDefault:"60s"`
+	MaxBatchSize     int           `env:"COPS_MAX_BATCH_SIZE" envDefault:"100"`
 }
 
 // LoadConfig loads configuration from environment variables.
@@ -95,6 +96,11 @@ func validateConfig(cfg *Config) error {
 	}
 	if !validFormats[cfg.Logging.Format] {
 		return fmt.Errorf("invalid log format: %s (must be text or json)", cfg.Logging.Format)
+	}
+
+	// Validate max batch size
+	if cfg.Cops.MaxBatchSize < 1 {
+		return fmt.Errorf("max batch size must be at least 1")
 	}
 
 	return nil

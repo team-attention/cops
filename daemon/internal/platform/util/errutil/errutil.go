@@ -9,11 +9,12 @@ import (
 type ErrorType string
 
 const (
-	ErrorTypeBadRequest   ErrorType = "bad_request"
-	ErrorTypeUnauthorized ErrorType = "unauthorized"
-	ErrorTypeForbidden    ErrorType = "forbidden"
-	ErrorTypeNotFound     ErrorType = "not_found"
-	ErrorTypeInternal     ErrorType = "internal"
+	ErrorTypeBadRequest      ErrorType = "bad_request"
+	ErrorTypeUnauthorized    ErrorType = "unauthorized"
+	ErrorTypeForbidden       ErrorType = "forbidden"
+	ErrorTypeNotFound        ErrorType = "not_found"
+	ErrorTypeInternal        ErrorType = "internal"
+	ErrorTypePayloadTooLarge ErrorType = "payload_too_large"
 )
 
 // AppError represents a structured application error.
@@ -123,4 +124,19 @@ func IsNotFound(err error) bool {
 // IsInternal checks if the error is an internal error.
 func IsInternal(err error) bool {
 	return Is(err, ErrorTypeInternal)
+}
+
+// PayloadTooLarge creates a payload too large error.
+func PayloadTooLarge(msg string) *AppError {
+	return &AppError{Type: ErrorTypePayloadTooLarge, Message: msg}
+}
+
+// PayloadTooLargef creates a payload too large error with formatted message.
+func PayloadTooLargef(format string, args ...any) *AppError {
+	return &AppError{Type: ErrorTypePayloadTooLarge, Message: fmt.Sprintf(format, args...)}
+}
+
+// IsPayloadTooLarge checks if the error is a payload too large error.
+func IsPayloadTooLarge(err error) bool {
+	return Is(err, ErrorTypePayloadTooLarge)
 }
