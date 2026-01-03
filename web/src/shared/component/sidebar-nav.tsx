@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Activity, FolderGit2, MessageSquare, type LucideIcon } from 'lucide-react'
+import { Activity, FolderGit2, MessageSquare, Settings, type LucideIcon } from 'lucide-react'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -34,6 +34,12 @@ const navItems: NavItem[] = [
     icon: MessageSquare,
     label: 'Sessions',
     description: 'Agent interactions',
+  },
+  {
+    to: '/settings',
+    icon: Settings,
+    label: 'Settings',
+    description: 'Account settings',
   },
 ]
 
