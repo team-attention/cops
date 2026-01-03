@@ -1,8 +1,14 @@
 import { useEffect } from 'react';
-import { createFileRoute, useSearch, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import { Shield } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/gen/shadcn/ui/card';
 import { Button } from '@/gen/shadcn/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/gen/shadcn/ui/card';
 import { useAuth } from '@/shared/hook/use-auth';
 
 // Constants
@@ -72,12 +78,14 @@ function AuthPage() {
       <div className="w-full max-w-md px-4">
         <Card className="border-zinc-800 bg-zinc-900">
           <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
+            <div className="mb-4 flex justify-center">
               <div className="rounded-lg border border-cyan-500/20 bg-zinc-900/80 p-3">
                 <Shield className="h-8 w-8 text-cyan-400" />
               </div>
             </div>
-            <CardTitle className="text-xl text-zinc-100">Sign in to C-Ops</CardTitle>
+            <CardTitle className="text-xl text-zinc-100">
+              Sign in to C-Ops
+            </CardTitle>
             <CardDescription className="text-zinc-500">
               Continue with your Google account
             </CardDescription>

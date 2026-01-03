@@ -1,4 +1,8 @@
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import {
+  Outlet,
+  createRootRouteWithContext,
+  useRouterState,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
@@ -17,8 +21,34 @@ interface MyRouterContext {
   queryClient: QueryClient
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
+// RootComponent handles layout based on current route
+function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isAuthRoute = pathname.startsWith('/auth')
+
+  // Auth routes render without sidebar/header layout
+  if (isAuthRoute) {
+    return (
+      <>
+        <Outlet />
+        <TanStackDevtools
+          config={{
+            position: 'bottom-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+          ]}
+        />
+      </>
+    )
+  }
+
+  // Other routes render with full sidebar/header layout
+  return (
     <SidebarProvider defaultOpen={true}>
       <AppSidebar />
       <SidebarInset>
@@ -68,5 +98,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         ]}
       />
     </SidebarProvider>
-  ),
+  )
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  component: RootComponent,
 })
