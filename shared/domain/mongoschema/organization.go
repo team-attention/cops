@@ -10,14 +10,51 @@ const (
 )
 
 const (
-	OrganizationIDField   = "_id"
-	OrganizationNameField = "name"
-	OrganizationSlugField = "slug"
+	OrganizationIDField      = "_id"
+	OrganizationNameField    = "name"
+	OrganizationSlugField    = "slug"
+	OrganizationMembersField = "members"
 )
 
+// OrganizationMember field constants for nested queries.
+const (
+	OrganizationMemberUserIDField = "userId"
+	OrganizationMemberRoleField   = "role"
+)
+
+// OrganizationMember represents a member entry within an organization document.
+type OrganizationMember struct {
+	UserID bson.ObjectID     `bson:"userId"`
+	Role   domain.MemberRole `bson:"role"`
+}
+
+// ToDomain converts schema OrganizationMember to domain OrganizationMember.
+func (s *OrganizationMember) ToDomain() *domain.OrganizationMember {
+	if s == nil {
+		return nil
+	}
+	return &domain.OrganizationMember{
+		UserID: domain.ID(s.UserID.Hex()),
+		Role:   s.Role,
+	}
+}
+
+// FromDomain converts domain OrganizationMember to schema OrganizationMember.
+func (s *OrganizationMember) FromDomain(d *domain.OrganizationMember) {
+	if d == nil {
+		return
+	}
+	if d.UserID != "" {
+		s.UserID, _ = bson.ObjectIDFromHex(string(d.UserID))
+	}
+	s.Role = d.Role
+}
+
 type Organization struct {
-	domain.Organization `bson:",inline"`
-	ID                  bson.ObjectID `bson:"_id,omitempty"`
+	ID      bson.ObjectID         `bson:"_id,omitempty"`
+	Name    string                `bson:"name"`
+	Slug    string                `bson:"slug"`
+	Members []*OrganizationMember `bson:"members"`
 }
 
 func (s *Organization) FromDomain(d *domain.Organization) {
@@ -25,10 +62,20 @@ func (s *Organization) FromDomain(d *domain.Organization) {
 		return
 	}
 
-	s.Organization = *d
+	s.Name = d.Name
+	s.Slug = d.Slug
 
 	if d.ID != "" {
 		s.ID, _ = bson.ObjectIDFromHex(string(d.ID))
+	}
+
+	// Convert organization members
+	if d.Members != nil {
+		s.Members = make([]*OrganizationMember, len(d.Members))
+		for i, m := range d.Members {
+			s.Members[i] = &OrganizationMember{}
+			s.Members[i].FromDomain(m)
+		}
 	}
 }
 
@@ -37,7 +84,19 @@ func (s *Organization) ToDomain() *domain.Organization {
 		return nil
 	}
 
-	s.Organization.ID = domain.ID(s.ID.Hex())
+	org := &domain.Organization{
+		ID:   domain.ID(s.ID.Hex()),
+		Name: s.Name,
+		Slug: s.Slug,
+	}
 
-	return &s.Organization
+	// Convert organization members
+	if s.Members != nil {
+		org.Members = make([]*domain.OrganizationMember, len(s.Members))
+		for i, m := range s.Members {
+			org.Members[i] = m.ToDomain()
+		}
+	}
+
+	return org
 }

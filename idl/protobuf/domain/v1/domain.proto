@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package domain.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/domain/v1;domainv1";
+
+// User represents an authenticated user in the system.
+message User {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string avatar_url = 4;
+}
+
+// OrganizationMember represents a user's membership within an organization.
+message OrganizationMember {
+  string user_id = 1;
+  string role = 2;  // "admin" or "member"
+}
+
+// Organization represents a group that owns projects.
+// Members are embedded within the organization document.
+message Organization {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  repeated OrganizationMember members = 4;
+}

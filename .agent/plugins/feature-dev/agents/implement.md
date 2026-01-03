@@ -4,7 +4,7 @@ description: |
   Implementation agent that executes plans exactly as specified.
   Receives a plan document and implements code strictly according to the plan.
   Never adds features beyond the plan or makes arbitrary decisions.
-model: sonnet
+model: opus
 permissionMode: acceptEdits
 ---
 

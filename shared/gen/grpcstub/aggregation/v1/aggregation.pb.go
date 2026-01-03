@@ -1362,10 +1362,15 @@ func (*Record_AssistantData) isRecord_Data() {}
 func (*Record_FileHistorySnapshotData) isRecord_Data() {}
 
 // LogBatch contains raw JSONL lines for batch sending.
+// Each batch represents logs for one Project that belongs to an Organization.
 type LogBatch struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Jsonl         []string               `protobuf:"bytes,1,rep,name=jsonl,proto3" json:"jsonl,omitempty"`
-	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required - project belongs to this org)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// Project identifier
+	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	// Raw JSONL lines
+	Jsonl         []string `protobuf:"bytes,3,rep,name=jsonl,proto3" json:"jsonl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1400,11 +1405,11 @@ func (*LogBatch) Descriptor() ([]byte, []int) {
 	return file_aggregation_v1_aggregation_proto_rawDescGZIP(), []int{18}
 }
 
-func (x *LogBatch) GetJsonl() []string {
+func (x *LogBatch) GetOrganizationId() string {
 	if x != nil {
-		return x.Jsonl
+		return x.OrganizationId
 	}
-	return nil
+	return ""
 }
 
 func (x *LogBatch) GetProjectId() string {
@@ -1412,6 +1417,13 @@ func (x *LogBatch) GetProjectId() string {
 		return x.ProjectId
 	}
 	return ""
+}
+
+func (x *LogBatch) GetJsonl() []string {
+	if x != nil {
+		return x.Jsonl
+	}
+	return nil
 }
 
 // SendLogsReq is the request for sending logs.
@@ -1627,11 +1639,12 @@ const file_aggregation_v1_aggregation_proto_rawDesc = "" +
 	"\tuser_data\x18\x02 \x01(\v2\x1e.aggregation.v1.UserRecordDataH\x00R\buserData\x12L\n" +
 	"\x0eassistant_data\x18\x03 \x01(\v2#.aggregation.v1.AssistantRecordDataH\x00R\rassistantData\x12l\n" +
 	"\x1afile_history_snapshot_data\x18\x04 \x01(\v2-.aggregation.v1.FileHistorySnapshotRecordDataH\x00R\x17fileHistorySnapshotDataB\x06\n" +
-	"\x04data\"?\n" +
-	"\bLogBatch\x12\x14\n" +
-	"\x05jsonl\x18\x01 \x03(\tR\x05jsonl\x12\x1d\n" +
+	"\x04data\"h\n" +
+	"\bLogBatch\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x02 \x01(\tR\tprojectId\"=\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x14\n" +
+	"\x05jsonl\x18\x03 \x03(\tR\x05jsonl\"=\n" +
 	"\vSendLogsReq\x12.\n" +
 	"\x05batch\x18\x01 \x01(\v2\x18.aggregation.v1.LogBatchR\x05batch\"u\n" +
 	"\vSendLogsRes\x12\x18\n" +

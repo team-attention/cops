@@ -147,7 +147,10 @@ message SessionDetail {
 }
 
 // GetOverviewReq is the request for GetOverview RPC.
-message GetOverviewReq {}
+message GetOverviewReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+}
 
 // GetOverviewRes is the response for GetOverview RPC.
 message GetOverviewRes {
@@ -169,8 +172,11 @@ message GetOverviewRes {
 
 // ListProjectsReq is the request for ListProjects RPC.
 message ListProjectsReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+
   // Pagination parameters
-  PaginationReq pagination = 1;
+  PaginationReq pagination = 2;
 }
 
 // ListProjectsRes is the response for ListProjects RPC.
@@ -184,8 +190,11 @@ message ListProjectsRes {
 
 // GetProjectReq is the request for GetProject RPC.
 message GetProjectReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+
   // Project identifier
-  string project_id = 1;
+  string project_id = 2;
 }
 
 // GetProjectRes is the response for GetProject RPC.
@@ -196,17 +205,20 @@ message GetProjectRes {
 
 // ListSessionsReq is the request for ListSessions RPC.
 message ListSessionsReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+
   // Project identifier
-  string project_id = 1;
+  string project_id = 2;
 
   // Pagination parameters
-  PaginationReq pagination = 2;
+  PaginationReq pagination = 3;
 
   // Sort field: "started_at", "message_count", "usage"
-  string sort_by = 3;
+  string sort_by = 4;
 
   // Sort in descending order
-  bool sort_desc = 4;
+  bool sort_desc = 5;
 }
 
 // ListSessionsRes is the response for ListSessions RPC.
@@ -220,8 +232,11 @@ message ListSessionsRes {
 
 // GetSessionReq is the request for GetSession RPC.
 message GetSessionReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+
   // Session identifier
-  string session_id = 1;
+  string session_id = 2;
 }
 
 // GetSessionRes is the response for GetSession RPC.

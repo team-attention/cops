@@ -11,7 +11,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 
+	"github.com/team-attention/cops/api/internal/platform/interceptor"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
+	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
 )
 
 // ConnectHandler interface for ConnectRPC handlers.
@@ -32,9 +34,23 @@ type connectRPCServerParams struct {
 func registerConnectRPCServer(params connectRPCServerParams) {
 	logger := params.Logger.With(slog.String("name", "server.connectrpc"))
 
-	// Register ConnectRPC handlers
+	// Create JWT config from params
+	jwtCfg := &jwtutil.Config{
+		SecretKey:            params.Config.JWT.SecretKey,
+		AccessTokenDuration:  params.Config.JWT.AccessTokenDuration,
+		RefreshTokenDuration: params.Config.JWT.RefreshTokenDuration,
+		Issuer:               params.Config.JWT.Issuer,
+	}
+
+	// Create auth interceptor
+	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg)
+
+	// Create handler options with the interceptor
+	opts := []connect.HandlerOption{connect.WithInterceptors(authInterceptor)}
+
+	// Register ConnectRPC handlers with the interceptor options
 	for _, handler := range params.ConnectHandlers {
-		path, h := handler.GetHandler()
+		path, h := handler.GetHandler(opts...)
 		params.App.All(path+"*", adaptor.HTTPHandler(h))
 	}
 

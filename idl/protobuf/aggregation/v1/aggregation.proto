@@ -160,9 +160,16 @@ message Record {
 }
 
 // LogBatch contains raw JSONL lines for batch sending.
+// Each batch represents logs for one Project that belongs to an Organization.
 message LogBatch {
-  repeated string jsonl = 1;
+  // Organization identifier (required - project belongs to this org)
+  string organization_id = 1;
+
+  // Project identifier
   string project_id = 2;
+
+  // Raw JSONL lines
+  repeated string jsonl = 3;
 }
 
 // SendLogsReq is the request for sending logs.

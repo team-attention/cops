@@ -8,17 +8,17 @@ const (
 	MemberRoleMember MemberRole = "member"
 )
 
-// Organization represents a group that owns projects.
-type Organization struct {
-	ID   ID     `json:"id" bson:"-"`
-	Name string `json:"name" bson:"name"`
-	Slug string `json:"slug" bson:"slug"`
+// OrganizationMember represents a member entry within an organization.
+type OrganizationMember struct {
+	UserID ID         `json:"userId" bson:"userId"`
+	Role   MemberRole `json:"role" bson:"role"`
 }
 
-// OrganizationMember represents membership relationship between user and organization.
-type OrganizationMember struct {
-	ID             ID         `json:"-" bson:"-"`
-	OrganizationID ID         `json:"-" bson:"-"`
-	UserID         ID         `json:"-" bson:"-"`
-	Role           MemberRole `json:"role" bson:"role"`
+// Organization represents a group that owns projects.
+// Members are embedded as an array within the organization document.
+type Organization struct {
+	ID      ID                    `json:"id" bson:"-"`
+	Name    string                `json:"name" bson:"name"`
+	Slug    string                `json:"slug" bson:"slug"`
+	Members []*OrganizationMember `json:"members" bson:"members"`
 }

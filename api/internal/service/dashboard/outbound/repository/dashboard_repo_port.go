@@ -76,13 +76,16 @@ type OverviewStats struct {
 }
 
 // ListProjectsQuery contains filter conditions for listing projects.
-type ListProjectsQuery struct{}
+type ListProjectsQuery struct {
+	OrganizationID string
+}
 
 // ListSessionsQuery contains filter conditions for listing sessions.
 type ListSessionsQuery struct {
-	ProjectID string
-	SortBy    string
-	SortDesc  bool
+	OrganizationID string
+	ProjectID      string
+	SortBy         string
+	SortDesc       bool
 }
 
 // ListProjectsParams is a type alias for paginated project queries.
@@ -99,18 +102,21 @@ type PaginatedSessions = structure.PaginatedResult[SessionSummary]
 
 // DashboardRepositoryPort defines the interface for dashboard data access.
 type DashboardRepositoryPort interface {
-	// GetOverviewStats retrieves dashboard overview statistics.
-	GetOverviewStats(ctx context.Context) (*OverviewStats, error)
+	// GetOverviewStats retrieves dashboard overview statistics for an organization.
+	GetOverviewStats(ctx context.Context, organizationID string) (*OverviewStats, error)
 
-	// ListProjects retrieves a paginated list of projects.
+	// ListProjects retrieves a paginated list of projects for an organization.
 	ListProjects(ctx context.Context, params ListProjectsParams) (*PaginatedProjects, error)
 
 	// GetProject retrieves detailed project information.
-	GetProject(ctx context.Context, projectID string) (*ProjectDetail, error)
+	// Returns nil, errutil.NotFound if project not found or does not belong to organization.
+	GetProject(ctx context.Context, organizationID, projectID string) (*ProjectDetail, error)
 
-	// ListSessions retrieves paginated sessions for a project.
+	// ListSessions retrieves paginated sessions for a project in an organization.
+	// Returns empty result if project does not belong to organization.
 	ListSessions(ctx context.Context, params ListSessionsParams) (*PaginatedSessions, error)
 
 	// GetSession retrieves detailed session information with all records.
-	GetSession(ctx context.Context, sessionID string) (*SessionDetail, error)
+	// Returns nil, errutil.NotFound if session not found or its project does not belong to organization.
+	GetSession(ctx context.Context, organizationID, sessionID string) (*SessionDetail, error)
 }

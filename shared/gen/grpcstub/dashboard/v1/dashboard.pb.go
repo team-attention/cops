@@ -626,9 +626,11 @@ func (x *SessionDetail) GetRecords() []*v1.Record {
 
 // GetOverviewReq is the request for GetOverview RPC.
 type GetOverviewReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *GetOverviewReq) Reset() {
@@ -659,6 +661,13 @@ func (x *GetOverviewReq) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetOverviewReq.ProtoReflect.Descriptor instead.
 func (*GetOverviewReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetOverviewReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
 }
 
 // GetOverviewRes is the response for GetOverview RPC.
@@ -746,8 +755,10 @@ func (x *GetOverviewRes) GetRecentSessions() []*SessionSummary {
 // ListProjectsReq is the request for ListProjects RPC.
 type ListProjectsReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
 	// Pagination parameters
-	Pagination    *PaginationReq `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination    *PaginationReq `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -780,6 +791,13 @@ func (x *ListProjectsReq) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListProjectsReq.ProtoReflect.Descriptor instead.
 func (*ListProjectsReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListProjectsReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
 }
 
 func (x *ListProjectsReq) GetPagination() *PaginationReq {
@@ -847,8 +865,10 @@ func (x *ListProjectsRes) GetPagination() *PaginationRes {
 // GetProjectReq is the request for GetProject RPC.
 type GetProjectReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
 	// Project identifier
-	ProjectId     string `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ProjectId     string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -881,6 +901,13 @@ func (x *GetProjectReq) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetProjectReq.ProtoReflect.Descriptor instead.
 func (*GetProjectReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetProjectReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
 }
 
 func (x *GetProjectReq) GetProjectId() string {
@@ -939,14 +966,16 @@ func (x *GetProjectRes) GetProject() *ProjectDetail {
 // ListSessionsReq is the request for ListSessions RPC.
 type ListSessionsReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
 	// Project identifier
-	ProjectId string `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Pagination parameters
-	Pagination *PaginationReq `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *PaginationReq `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	// Sort field: "started_at", "message_count", "usage"
-	SortBy string `protobuf:"bytes,3,opt,name=sort_by,json=sortBy,proto3" json:"sort_by,omitempty"`
+	SortBy string `protobuf:"bytes,4,opt,name=sort_by,json=sortBy,proto3" json:"sort_by,omitempty"`
 	// Sort in descending order
-	SortDesc      bool `protobuf:"varint,4,opt,name=sort_desc,json=sortDesc,proto3" json:"sort_desc,omitempty"`
+	SortDesc      bool `protobuf:"varint,5,opt,name=sort_desc,json=sortDesc,proto3" json:"sort_desc,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -979,6 +1008,13 @@ func (x *ListSessionsReq) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListSessionsReq.ProtoReflect.Descriptor instead.
 func (*ListSessionsReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ListSessionsReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
 }
 
 func (x *ListSessionsReq) GetProjectId() string {
@@ -1067,8 +1103,10 @@ func (x *ListSessionsRes) GetPagination() *PaginationRes {
 // GetSessionReq is the request for GetSession RPC.
 type GetSessionReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
 	// Session identifier
-	SessionId     string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SessionId     string `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1101,6 +1139,13 @@ func (x *GetSessionReq) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetSessionReq.ProtoReflect.Descriptor instead.
 func (*GetSessionReq) Descriptor() ([]byte, []int) {
 	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetSessionReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
 }
 
 func (x *GetSessionReq) GetSessionId() string {
@@ -1214,45 +1259,50 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
 	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x120\n" +
-	"\arecords\x18\t \x03(\v2\x16.aggregation.v1.RecordR\arecordsJ\x04\b\x04\x10\x05R\x03cwd\"\x10\n" +
-	"\x0eGetOverviewReq\"\xaa\x02\n" +
+	"\arecords\x18\t \x03(\v2\x16.aggregation.v1.RecordR\arecordsJ\x04\b\x04\x10\x05R\x03cwd\"9\n" +
+	"\x0eGetOverviewReq\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\"\xaa\x02\n" +
 	"\x0eGetOverviewRes\x12@\n" +
 	"\vtotal_usage\x18\x01 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\n" +
 	"totalUsage\x12#\n" +
 	"\rproject_count\x18\x02 \x01(\x05R\fprojectCount\x12#\n" +
 	"\rsession_count\x18\x03 \x01(\x05R\fsessionCount\x12E\n" +
 	"\x0frecent_projects\x18\x04 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\x0erecentProjects\x12E\n" +
-	"\x0frecent_sessions\x18\x05 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\x0erecentSessions\"N\n" +
-	"\x0fListProjectsReq\x12;\n" +
+	"\x0frecent_sessions\x18\x05 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\x0erecentSessions\"w\n" +
+	"\x0fListProjectsReq\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12;\n" +
 	"\n" +
-	"pagination\x18\x01 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
+	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
 	"pagination\"\x88\x01\n" +
 	"\x0fListProjectsRes\x128\n" +
 	"\bprojects\x18\x01 \x03(\v2\x1c.dashboard.v1.ProjectSummaryR\bprojects\x12;\n" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\n" +
-	"pagination\".\n" +
-	"\rGetProjectReq\x12\x1d\n" +
+	"pagination\"W\n" +
+	"\rGetProjectReq\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\"F\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\"F\n" +
 	"\rGetProjectRes\x125\n" +
-	"\aproject\x18\x01 \x01(\v2\x1b.dashboard.v1.ProjectDetailR\aproject\"\xa3\x01\n" +
-	"\x0fListSessionsReq\x12\x1d\n" +
+	"\aproject\x18\x01 \x01(\v2\x1b.dashboard.v1.ProjectDetailR\aproject\"\xcc\x01\n" +
+	"\x0fListSessionsReq\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\x12;\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x12;\n" +
 	"\n" +
-	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
+	"pagination\x18\x03 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
 	"pagination\x12\x17\n" +
-	"\asort_by\x18\x03 \x01(\tR\x06sortBy\x12\x1b\n" +
-	"\tsort_desc\x18\x04 \x01(\bR\bsortDesc\"\x88\x01\n" +
+	"\asort_by\x18\x04 \x01(\tR\x06sortBy\x12\x1b\n" +
+	"\tsort_desc\x18\x05 \x01(\bR\bsortDesc\"\x88\x01\n" +
 	"\x0fListSessionsRes\x128\n" +
 	"\bsessions\x18\x01 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\bsessions\x12;\n" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\n" +
-	"pagination\".\n" +
-	"\rGetSessionReq\x12\x1d\n" +
+	"pagination\"W\n" +
+	"\rGetSessionReq\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\"F\n" +
+	"session_id\x18\x02 \x01(\tR\tsessionId\"F\n" +
 	"\rGetSessionRes\x125\n" +
 	"\asession\x18\x01 \x01(\v2\x1b.dashboard.v1.SessionDetailR\asession2\x89\x03\n" +
 	"\x10DashboardService\x12I\n" +

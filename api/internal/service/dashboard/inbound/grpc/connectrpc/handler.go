@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/team-attention/cops/api/internal/platform/interceptor"
 	dashboardservice "github.com/team-attention/cops/api/internal/service/dashboard"
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
 	dashboardv1 "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1"
@@ -37,8 +38,10 @@ func (h *DashboardGRPCHandler) GetOverview(
 	ctx context.Context,
 	req *connect.Request[dashboardv1.GetOverviewReq],
 ) (*connect.Response[dashboardv1.GetOverviewRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+
 	// Call service
-	stats, err := h.svc.GetOverview(ctx)
+	stats, err := h.svc.GetOverview(ctx, userID, req.Msg.GetOrganizationId())
 	if err != nil {
 		return nil, err
 	}
@@ -72,16 +75,20 @@ func (h *DashboardGRPCHandler) ListProjects(
 	ctx context.Context,
 	req *connect.Request[dashboardv1.ListProjectsReq],
 ) (*connect.Response[dashboardv1.ListProjectsRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+
 	// Parse request
 	msg := req.Msg
 	params := repository.ListProjectsParams{
 		Page:     msg.GetPagination().GetPage(),
 		PageSize: msg.GetPagination().GetPageSize(),
-		Query:    repository.ListProjectsQuery{},
+		Query: repository.ListProjectsQuery{
+			OrganizationID: msg.GetOrganizationId(),
+		},
 	}
 
 	// Call service
-	result, err := h.svc.ListProjects(ctx, params)
+	result, err := h.svc.ListProjects(ctx, userID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +113,10 @@ func (h *DashboardGRPCHandler) GetProject(
 	ctx context.Context,
 	req *connect.Request[dashboardv1.GetProjectReq],
 ) (*connect.Response[dashboardv1.GetProjectRes], error) {
-	// Parse request
-	projectID := req.Msg.GetProjectId()
+	userID := interceptor.UserIDFromContext(ctx)
 
 	// Call service
-	project, err := h.svc.GetProject(ctx, projectID)
+	project, err := h.svc.GetProject(ctx, userID, req.Msg.GetOrganizationId(), req.Msg.GetProjectId())
 	if err != nil {
 		return nil, err
 	}
@@ -128,20 +134,23 @@ func (h *DashboardGRPCHandler) ListSessions(
 	ctx context.Context,
 	req *connect.Request[dashboardv1.ListSessionsReq],
 ) (*connect.Response[dashboardv1.ListSessionsRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+
 	// Parse request
 	msg := req.Msg
 	params := repository.ListSessionsParams{
 		Page:     msg.GetPagination().GetPage(),
 		PageSize: msg.GetPagination().GetPageSize(),
 		Query: repository.ListSessionsQuery{
-			ProjectID: msg.GetProjectId(),
-			SortBy:    msg.GetSortBy(),
-			SortDesc:  msg.GetSortDesc(),
+			OrganizationID: msg.GetOrganizationId(),
+			ProjectID:      msg.GetProjectId(),
+			SortBy:         msg.GetSortBy(),
+			SortDesc:       msg.GetSortDesc(),
 		},
 	}
 
 	// Call service
-	result, err := h.svc.ListSessions(ctx, params)
+	result, err := h.svc.ListSessions(ctx, userID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +175,10 @@ func (h *DashboardGRPCHandler) GetSession(
 	ctx context.Context,
 	req *connect.Request[dashboardv1.GetSessionReq],
 ) (*connect.Response[dashboardv1.GetSessionRes], error) {
-	// Parse request
-	sessionID := req.Msg.GetSessionId()
+	userID := interceptor.UserIDFromContext(ctx)
 
 	// Call service
-	session, err := h.svc.GetSession(ctx, sessionID)
+	session, err := h.svc.GetSession(ctx, userID, req.Msg.GetOrganizationId(), req.Msg.GetSessionId())
 	if err != nil {
 		return nil, err
 	}

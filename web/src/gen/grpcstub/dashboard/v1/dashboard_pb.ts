@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dashboard/v1/dashboard.proto.
  */
 export const file_dashboard_v1_dashboard: GenFile = /*@__PURE__*/
-  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKWAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJwoHcmVjb3JkcxgJIAMoCzIWLmFnZ3JlZ2F0aW9uLnYxLlJlY29yZEoECAQQBVIDY3dkIhAKDkdldE92ZXJ2aWV3UmVxIuIBCg5HZXRPdmVydmlld1JlcxI0Cgt0b3RhbF91c2FnZRgBIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIVCg1wcm9qZWN0X2NvdW50GAIgASgFEhUKDXNlc3Npb25fY291bnQYAyABKAUSNQoPcmVjZW50X3Byb2plY3RzGAQgAygLMhwuZGFzaGJvYXJkLnYxLlByb2plY3RTdW1tYXJ5EjUKD3JlY2VudF9zZXNzaW9ucxgFIAMoCzIcLmRhc2hib2FyZC52MS5TZXNzaW9uU3VtbWFyeSJCCg9MaXN0UHJvamVjdHNSZXESLwoKcGFnaW5hdGlvbhgBIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiIwoNR2V0UHJvamVjdFJlcRISCgpwcm9qZWN0X2lkGAEgASgJIj0KDUdldFByb2plY3RSZXMSLAoHcHJvamVjdBgBIAEoCzIbLmRhc2hib2FyZC52MS5Qcm9qZWN0RGV0YWlsInoKD0xpc3RTZXNzaW9uc1JlcRISCgpwcm9qZWN0X2lkGAEgASgJEi8KCnBhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAMgASgJEhEKCXNvcnRfZGVzYxgEIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIiMKDUdldFNlc3Npb25SZXESEgoKc2Vzc2lvbl9pZBgBIAEoCSI9Cg1HZXRTZXNzaW9uUmVzEiwKB3Nlc3Npb24YASABKAsyGy5kYXNoYm9hcmQudjEuU2Vzc2lvbkRldGFpbDKJAwoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_aggregation_v1_aggregation]);
+  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKWAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJwoHcmVjb3JkcxgJIAMoCzIWLmFnZ3JlZ2F0aW9uLnYxLlJlY29yZEoECAQQBVIDY3dkIikKDkdldE92ZXJ2aWV3UmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCSLiAQoOR2V0T3ZlcnZpZXdSZXMSNAoLdG90YWxfdXNhZ2UYASABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSFQoNcHJvamVjdF9jb3VudBgCIAEoBRIVCg1zZXNzaW9uX2NvdW50GAMgASgFEjUKD3JlY2VudF9wcm9qZWN0cxgEIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRI1Cg9yZWNlbnRfc2Vzc2lvbnMYBSADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkiWwoPTGlzdFByb2plY3RzUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXEicgoPTGlzdFByb2plY3RzUmVzEi4KCHByb2plY3RzGAEgAygLMhwuZGFzaGJvYXJkLnYxLlByb2plY3RTdW1tYXJ5Ei8KCnBhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcyI8Cg1HZXRQcm9qZWN0UmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJIj0KDUdldFByb2plY3RSZXMSLAoHcHJvamVjdBgBIAEoCzIbLmRhc2hib2FyZC52MS5Qcm9qZWN0RGV0YWlsIpMBCg9MaXN0U2Vzc2lvbnNSZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSLwoKcGFnaW5hdGlvbhgDIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxEg8KB3NvcnRfYnkYBCABKAkSEQoJc29ydF9kZXNjGAUgASgIInIKD0xpc3RTZXNzaW9uc1JlcxIuCghzZXNzaW9ucxgBIAMoCzIcLmRhc2hib2FyZC52MS5TZXNzaW9uU3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0U2Vzc2lvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCSI9Cg1HZXRTZXNzaW9uUmVzEiwKB3Nlc3Npb24YASABKAsyGy5kYXNoYm9hcmQudjEuU2Vzc2lvbkRldGFpbDKJAwoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_aggregation_v1_aggregation]);
 
 /**
  * TokenUsageSummary aggregates token usage statistics.
@@ -386,6 +386,12 @@ export const SessionDetailSchema: GenMessage<SessionDetail> = /*@__PURE__*/
  * @generated from message dashboard.v1.GetOverviewReq
  */
 export type GetOverviewReq = Message<"dashboard.v1.GetOverviewReq"> & {
+  /**
+   * Organization identifier (required)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
 };
 
 /**
@@ -451,9 +457,16 @@ export const GetOverviewResSchema: GenMessage<GetOverviewRes> = /*@__PURE__*/
  */
 export type ListProjectsReq = Message<"dashboard.v1.ListProjectsReq"> & {
   /**
+   * Organization identifier (required)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
    * Pagination parameters
    *
-   * @generated from field: dashboard.v1.PaginationReq pagination = 1;
+   * @generated from field: dashboard.v1.PaginationReq pagination = 2;
    */
   pagination?: PaginationReq;
 };
@@ -500,9 +513,16 @@ export const ListProjectsResSchema: GenMessage<ListProjectsRes> = /*@__PURE__*/
  */
 export type GetProjectReq = Message<"dashboard.v1.GetProjectReq"> & {
   /**
+   * Organization identifier (required)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
    * Project identifier
    *
-   * @generated from field: string project_id = 1;
+   * @generated from field: string project_id = 2;
    */
   projectId: string;
 };
@@ -542,30 +562,37 @@ export const GetProjectResSchema: GenMessage<GetProjectRes> = /*@__PURE__*/
  */
 export type ListSessionsReq = Message<"dashboard.v1.ListSessionsReq"> & {
   /**
+   * Organization identifier (required)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
    * Project identifier
    *
-   * @generated from field: string project_id = 1;
+   * @generated from field: string project_id = 2;
    */
   projectId: string;
 
   /**
    * Pagination parameters
    *
-   * @generated from field: dashboard.v1.PaginationReq pagination = 2;
+   * @generated from field: dashboard.v1.PaginationReq pagination = 3;
    */
   pagination?: PaginationReq;
 
   /**
    * Sort field: "started_at", "message_count", "usage"
    *
-   * @generated from field: string sort_by = 3;
+   * @generated from field: string sort_by = 4;
    */
   sortBy: string;
 
   /**
    * Sort in descending order
    *
-   * @generated from field: bool sort_desc = 4;
+   * @generated from field: bool sort_desc = 5;
    */
   sortDesc: boolean;
 };
@@ -612,9 +639,16 @@ export const ListSessionsResSchema: GenMessage<ListSessionsRes> = /*@__PURE__*/
  */
 export type GetSessionReq = Message<"dashboard.v1.GetSessionReq"> & {
   /**
+   * Organization identifier (required)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
    * Session identifier
    *
-   * @generated from field: string session_id = 1;
+   * @generated from field: string session_id = 2;
    */
   sessionId: string;
 };

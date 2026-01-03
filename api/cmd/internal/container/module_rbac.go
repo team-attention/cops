@@ -10,14 +10,6 @@ import (
 
 func newRBACModule() fx.Option {
 	return fx.Module("rbac",
-		// Project repository for RBAC
-		fx.Provide(
-			fx.Annotate(
-				mongodb.NewMongoProjectRepository,
-				fx.As(new(repository.ProjectRepositoryPort)),
-			),
-		),
-
 		// Organization member repository
 		fx.Provide(
 			fx.Annotate(
@@ -26,7 +18,7 @@ func newRBACModule() fx.Option {
 			),
 		),
 
-		// RBAC Service
+		// RBAC Service (now only requires memberRepo)
 		fx.Provide(rbac.NewService),
 	)
 }

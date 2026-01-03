@@ -9,6 +9,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/bytedance/sonic"
 
+	"github.com/team-attention/cops/api/internal/platform/interceptor"
 	aggregationservice "github.com/team-attention/cops/api/internal/service/aggregation"
 	"github.com/team-attention/cops/api/internal/service/aggregation/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
@@ -40,6 +41,8 @@ func (h *AggregationGRPCHandler) SendLogs(
 	ctx context.Context,
 	req *connect.Request[aggregationv1.SendLogsReq],
 ) (*connect.Response[aggregationv1.SendLogsRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+
 	pbBatch := req.Msg.GetBatch()
 	if pbBatch == nil {
 		return connect.NewResponse(&aggregationv1.SendLogsRes{
@@ -48,19 +51,23 @@ func (h *AggregationGRPCHandler) SendLogs(
 		}), nil
 	}
 
-	batch, parseErrors := h.parseJSONLLines(pbBatch.GetJsonl(), pbBatch.GetProjectId())
+	batch, parseErrors := h.parseJSONLLines(pbBatch.GetJsonl(), pbBatch.GetProjectId(), pbBatch.GetOrganizationId())
 
 	// Log parse errors at ERROR level (Fire & Forget)
 	if len(parseErrors) > 0 {
 		h.logger.Error("failed to parse some JSONL lines",
 			slog.String("projectId", pbBatch.GetProjectId()),
+			slog.String("organizationId", pbBatch.GetOrganizationId()),
 			slog.Int("failedCount", len(parseErrors)),
 			slog.Int("totalCount", len(pbBatch.GetJsonl())),
 			slog.String("sampleError", parseErrors[0].Error()),
 		)
 	}
 
-	result := h.svc.CollectLogs(ctx, batch)
+	result, err := h.svc.CollectLogs(ctx, userID, batch)
+	if err != nil {
+		return nil, err
+	}
 
 	res := &aggregationv1.SendLogsRes{
 		Success:        result.Success,
@@ -73,7 +80,7 @@ func (h *AggregationGRPCHandler) SendLogs(
 
 // parseJSONLLines parses raw JSONL lines into Record domain objects.
 // Returns the parsed batch and any parse errors encountered.
-func (h *AggregationGRPCHandler) parseJSONLLines(lines []string, projectID string) (*repository.LogBatch, []error) {
+func (h *AggregationGRPCHandler) parseJSONLLines(lines []string, projectID, organizationID string) (*repository.LogBatch, []error) {
 	var records []shareddomain.Record
 	var parseErrors []error
 
@@ -92,8 +99,9 @@ func (h *AggregationGRPCHandler) parseJSONLLines(lines []string, projectID strin
 	}
 
 	return &repository.LogBatch{
-		Records:   records,
-		ProjectID: projectID,
+		Records:        records,
+		ProjectID:      projectID,
+		OrganizationID: organizationID,
 	}, parseErrors
 }
 

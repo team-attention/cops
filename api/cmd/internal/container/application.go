@@ -17,6 +17,7 @@ func Run() {
 		newDashboardModule(),
 		newProjectModule(),
 		newRBACModule(),
+		newUserModule(),
 
 		// Registrations (invoked for side effects)
 		fx.Invoke(registerConnectRPCServer),
