@@ -14,8 +14,9 @@ type ProjectAbstract struct {
 // Embeds ProjectAbstract for basic identification.
 type Project struct {
 	ProjectAbstract
-	IsGitProject bool      `json:"gitProject"`   // true if git repo, false otherwise
-	RegisteredAt time.Time `json:"registeredAt"` // When the project was registered
+	OrganizationID ID        `json:"organizationId"` // Organization that owns this project (required)
+	IsGitProject   bool      `json:"gitProject"`     // true if git repo, false otherwise
+	RegisteredAt   time.Time `json:"registeredAt"`   // When the project was registered
 }
 
 // ProjectWithWorktrees represents a project with dynamically discovered worktrees.
