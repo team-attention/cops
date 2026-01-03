@@ -8,8 +8,11 @@ import {
 import { SidebarHeader } from './sidebar-header'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarUser } from './sidebar-user'
+import { useUser } from '@/shared/hook/use-user'
 
 export const AppSidebar = () => {
+  // This triggers the useGetMe query when authenticated
+  useUser()
   return (
     <Sidebar
       collapsible="icon"
