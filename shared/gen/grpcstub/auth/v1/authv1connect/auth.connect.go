@@ -42,6 +42,9 @@ const (
 	// AuthServiceRefreshTokenProcedure is the fully-qualified name of the AuthService's RefreshToken
 	// RPC.
 	AuthServiceRefreshTokenProcedure = "/auth.v1.AuthService/RefreshToken"
+	// AuthServiceDeviceCodeApproveProcedure is the fully-qualified name of the AuthService's
+	// DeviceCodeApprove RPC.
+	AuthServiceDeviceCodeApproveProcedure = "/auth.v1.AuthService/DeviceCodeApprove"
 )
 
 // AuthServiceClient is a client for the auth.v1.AuthService service.
@@ -54,6 +57,9 @@ type AuthServiceClient interface {
 	DevicePoll(context.Context, *connect.Request[v1.DevicePollReq]) (*connect.Response[v1.DevicePollRes], error)
 	// RefreshToken exchanges refresh token for new token pair.
 	RefreshToken(context.Context, *connect.Request[v1.RefreshTokenReq]) (*connect.Response[v1.RefreshTokenRes], error)
+	// DeviceCodeApprove approves a device code from the web application.
+	// Requires authenticated user (JWT in Authorization header).
+	DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error)
 }
 
 // NewAuthServiceClient constructs a client for the auth.v1.AuthService service. By default, it uses
@@ -91,15 +97,22 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("RefreshToken")),
 			connect.WithClientOptions(opts...),
 		),
+		deviceCodeApprove: connect.NewClient[v1.DeviceCodeApproveReq, v1.DeviceCodeApproveRes](
+			httpClient,
+			baseURL+AuthServiceDeviceCodeApproveProcedure,
+			connect.WithSchema(authServiceMethods.ByName("DeviceCodeApprove")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
-	googleAuth   *connect.Client[v1.GoogleAuthReq, v1.GoogleAuthRes]
-	deviceCode   *connect.Client[v1.DeviceCodeReq, v1.DeviceCodeRes]
-	devicePoll   *connect.Client[v1.DevicePollReq, v1.DevicePollRes]
-	refreshToken *connect.Client[v1.RefreshTokenReq, v1.RefreshTokenRes]
+	googleAuth        *connect.Client[v1.GoogleAuthReq, v1.GoogleAuthRes]
+	deviceCode        *connect.Client[v1.DeviceCodeReq, v1.DeviceCodeRes]
+	devicePoll        *connect.Client[v1.DevicePollReq, v1.DevicePollRes]
+	refreshToken      *connect.Client[v1.RefreshTokenReq, v1.RefreshTokenRes]
+	deviceCodeApprove *connect.Client[v1.DeviceCodeApproveReq, v1.DeviceCodeApproveRes]
 }
 
 // GoogleAuth calls auth.v1.AuthService.GoogleAuth.
@@ -122,6 +135,11 @@ func (c *authServiceClient) RefreshToken(ctx context.Context, req *connect.Reque
 	return c.refreshToken.CallUnary(ctx, req)
 }
 
+// DeviceCodeApprove calls auth.v1.AuthService.DeviceCodeApprove.
+func (c *authServiceClient) DeviceCodeApprove(ctx context.Context, req *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error) {
+	return c.deviceCodeApprove.CallUnary(ctx, req)
+}
+
 // AuthServiceHandler is an implementation of the auth.v1.AuthService service.
 type AuthServiceHandler interface {
 	// GoogleAuth exchanges Google OAuth code for JWT tokens (web flow).
@@ -132,6 +150,9 @@ type AuthServiceHandler interface {
 	DevicePoll(context.Context, *connect.Request[v1.DevicePollReq]) (*connect.Response[v1.DevicePollRes], error)
 	// RefreshToken exchanges refresh token for new token pair.
 	RefreshToken(context.Context, *connect.Request[v1.RefreshTokenReq]) (*connect.Response[v1.RefreshTokenRes], error)
+	// DeviceCodeApprove approves a device code from the web application.
+	// Requires authenticated user (JWT in Authorization header).
+	DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -165,6 +186,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("RefreshToken")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceDeviceCodeApproveHandler := connect.NewUnaryHandler(
+		AuthServiceDeviceCodeApproveProcedure,
+		svc.DeviceCodeApprove,
+		connect.WithSchema(authServiceMethods.ByName("DeviceCodeApprove")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/auth.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceGoogleAuthProcedure:
@@ -175,6 +202,8 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceDevicePollHandler.ServeHTTP(w, r)
 		case AuthServiceRefreshTokenProcedure:
 			authServiceRefreshTokenHandler.ServeHTTP(w, r)
+		case AuthServiceDeviceCodeApproveProcedure:
+			authServiceDeviceCodeApproveHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -198,4 +227,8 @@ func (UnimplementedAuthServiceHandler) DevicePoll(context.Context, *connect.Requ
 
 func (UnimplementedAuthServiceHandler) RefreshToken(context.Context, *connect.Request[v1.RefreshTokenReq]) (*connect.Response[v1.RefreshTokenRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.RefreshToken is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.DeviceCodeApprove is not implemented"))
 }

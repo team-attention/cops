@@ -484,6 +484,104 @@ func (x *RefreshTokenRes) GetTokens() *TokenPair {
 	return nil
 }
 
+// DeviceCodeApproveReq contains the device code to approve.
+type DeviceCodeApproveReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserCode      string                 `protobuf:"bytes,1,opt,name=user_code,json=userCode,proto3" json:"user_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceCodeApproveReq) Reset() {
+	*x = DeviceCodeApproveReq{}
+	mi := &file_auth_v1_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceCodeApproveReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceCodeApproveReq) ProtoMessage() {}
+
+func (x *DeviceCodeApproveReq) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_v1_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceCodeApproveReq.ProtoReflect.Descriptor instead.
+func (*DeviceCodeApproveReq) Descriptor() ([]byte, []int) {
+	return file_auth_v1_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *DeviceCodeApproveReq) GetUserCode() string {
+	if x != nil {
+		return x.UserCode
+	}
+	return ""
+}
+
+// DeviceCodeApproveRes contains the approval result.
+type DeviceCodeApproveRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceCodeApproveRes) Reset() {
+	*x = DeviceCodeApproveRes{}
+	mi := &file_auth_v1_auth_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceCodeApproveRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceCodeApproveRes) ProtoMessage() {}
+
+func (x *DeviceCodeApproveRes) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_v1_auth_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceCodeApproveRes.ProtoReflect.Descriptor instead.
+func (*DeviceCodeApproveRes) Descriptor() ([]byte, []int) {
+	return file_auth_v1_auth_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeviceCodeApproveRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeviceCodeApproveRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_auth_v1_auth_proto_rawDesc = "" +
@@ -517,7 +615,12 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"\x0fRefreshTokenReq\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"=\n" +
 	"\x0fRefreshTokenRes\x12*\n" +
-	"\x06tokens\x18\x01 \x01(\v2\x12.auth.v1.TokenPairR\x06tokens2\x8b\x02\n" +
+	"\x06tokens\x18\x01 \x01(\v2\x12.auth.v1.TokenPairR\x06tokens\"3\n" +
+	"\x14DeviceCodeApproveReq\x12\x1b\n" +
+	"\tuser_code\x18\x01 \x01(\tR\buserCode\"J\n" +
+	"\x14DeviceCodeApproveRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xde\x02\n" +
 	"\vAuthService\x12<\n" +
 	"\n" +
 	"GoogleAuth\x12\x16.auth.v1.GoogleAuthReq\x1a\x16.auth.v1.GoogleAuthRes\x12<\n" +
@@ -525,7 +628,8 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"DeviceCode\x12\x16.auth.v1.DeviceCodeReq\x1a\x16.auth.v1.DeviceCodeRes\x12<\n" +
 	"\n" +
 	"DevicePoll\x12\x16.auth.v1.DevicePollReq\x1a\x16.auth.v1.DevicePollRes\x12B\n" +
-	"\fRefreshToken\x12\x18.auth.v1.RefreshTokenReq\x1a\x18.auth.v1.RefreshTokenResB\x98\x01\n" +
+	"\fRefreshToken\x12\x18.auth.v1.RefreshTokenReq\x1a\x18.auth.v1.RefreshTokenRes\x12Q\n" +
+	"\x11DeviceCodeApprove\x12\x1d.auth.v1.DeviceCodeApproveReq\x1a\x1d.auth.v1.DeviceCodeApproveResB\x98\x01\n" +
 	"\vcom.auth.v1B\tAuthProtoP\x01ZAgithub.com/team-attention/cops/shared/gen/grpcstub/auth/v1;authv1\xa2\x02\x03AXX\xaa\x02\aAuth.V1\xca\x02\aAuth\\V1\xe2\x02\x13Auth\\V1\\GPBMetadata\xea\x02\bAuth::V1b\x06proto3"
 
 var (
@@ -540,35 +644,39 @@ func file_auth_v1_auth_proto_rawDescGZIP() []byte {
 	return file_auth_v1_auth_proto_rawDescData
 }
 
-var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_auth_v1_auth_proto_goTypes = []any{
-	(*TokenPair)(nil),       // 0: auth.v1.TokenPair
-	(*GoogleAuthReq)(nil),   // 1: auth.v1.GoogleAuthReq
-	(*GoogleAuthRes)(nil),   // 2: auth.v1.GoogleAuthRes
-	(*DeviceCodeReq)(nil),   // 3: auth.v1.DeviceCodeReq
-	(*DeviceCodeRes)(nil),   // 4: auth.v1.DeviceCodeRes
-	(*DevicePollReq)(nil),   // 5: auth.v1.DevicePollReq
-	(*DevicePollRes)(nil),   // 6: auth.v1.DevicePollRes
-	(*RefreshTokenReq)(nil), // 7: auth.v1.RefreshTokenReq
-	(*RefreshTokenRes)(nil), // 8: auth.v1.RefreshTokenRes
+	(*TokenPair)(nil),            // 0: auth.v1.TokenPair
+	(*GoogleAuthReq)(nil),        // 1: auth.v1.GoogleAuthReq
+	(*GoogleAuthRes)(nil),        // 2: auth.v1.GoogleAuthRes
+	(*DeviceCodeReq)(nil),        // 3: auth.v1.DeviceCodeReq
+	(*DeviceCodeRes)(nil),        // 4: auth.v1.DeviceCodeRes
+	(*DevicePollReq)(nil),        // 5: auth.v1.DevicePollReq
+	(*DevicePollRes)(nil),        // 6: auth.v1.DevicePollRes
+	(*RefreshTokenReq)(nil),      // 7: auth.v1.RefreshTokenReq
+	(*RefreshTokenRes)(nil),      // 8: auth.v1.RefreshTokenRes
+	(*DeviceCodeApproveReq)(nil), // 9: auth.v1.DeviceCodeApproveReq
+	(*DeviceCodeApproveRes)(nil), // 10: auth.v1.DeviceCodeApproveRes
 }
 var file_auth_v1_auth_proto_depIdxs = []int32{
-	0, // 0: auth.v1.GoogleAuthRes.tokens:type_name -> auth.v1.TokenPair
-	0, // 1: auth.v1.DevicePollRes.tokens:type_name -> auth.v1.TokenPair
-	0, // 2: auth.v1.RefreshTokenRes.tokens:type_name -> auth.v1.TokenPair
-	1, // 3: auth.v1.AuthService.GoogleAuth:input_type -> auth.v1.GoogleAuthReq
-	3, // 4: auth.v1.AuthService.DeviceCode:input_type -> auth.v1.DeviceCodeReq
-	5, // 5: auth.v1.AuthService.DevicePoll:input_type -> auth.v1.DevicePollReq
-	7, // 6: auth.v1.AuthService.RefreshToken:input_type -> auth.v1.RefreshTokenReq
-	2, // 7: auth.v1.AuthService.GoogleAuth:output_type -> auth.v1.GoogleAuthRes
-	4, // 8: auth.v1.AuthService.DeviceCode:output_type -> auth.v1.DeviceCodeRes
-	6, // 9: auth.v1.AuthService.DevicePoll:output_type -> auth.v1.DevicePollRes
-	8, // 10: auth.v1.AuthService.RefreshToken:output_type -> auth.v1.RefreshTokenRes
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0,  // 0: auth.v1.GoogleAuthRes.tokens:type_name -> auth.v1.TokenPair
+	0,  // 1: auth.v1.DevicePollRes.tokens:type_name -> auth.v1.TokenPair
+	0,  // 2: auth.v1.RefreshTokenRes.tokens:type_name -> auth.v1.TokenPair
+	1,  // 3: auth.v1.AuthService.GoogleAuth:input_type -> auth.v1.GoogleAuthReq
+	3,  // 4: auth.v1.AuthService.DeviceCode:input_type -> auth.v1.DeviceCodeReq
+	5,  // 5: auth.v1.AuthService.DevicePoll:input_type -> auth.v1.DevicePollReq
+	7,  // 6: auth.v1.AuthService.RefreshToken:input_type -> auth.v1.RefreshTokenReq
+	9,  // 7: auth.v1.AuthService.DeviceCodeApprove:input_type -> auth.v1.DeviceCodeApproveReq
+	2,  // 8: auth.v1.AuthService.GoogleAuth:output_type -> auth.v1.GoogleAuthRes
+	4,  // 9: auth.v1.AuthService.DeviceCode:output_type -> auth.v1.DeviceCodeRes
+	6,  // 10: auth.v1.AuthService.DevicePoll:output_type -> auth.v1.DevicePollRes
+	8,  // 11: auth.v1.AuthService.RefreshToken:output_type -> auth.v1.RefreshTokenRes
+	10, // 12: auth.v1.AuthService.DeviceCodeApprove:output_type -> auth.v1.DeviceCodeApproveRes
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_auth_v1_auth_proto_init() }
@@ -582,7 +690,7 @@ func file_auth_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_v1_auth_proto_rawDesc), len(file_auth_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

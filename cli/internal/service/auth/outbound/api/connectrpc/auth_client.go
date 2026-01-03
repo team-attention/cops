@@ -3,10 +3,11 @@ package connectrpc
 import (
 	"context"
 	"log/slog"
-	"net/http"
 
 	"connectrpc.com/connect"
 
+	"github.com/team-attention/cops/cli/internal/platform/setup/config"
+	"github.com/team-attention/cops/cli/internal/platform/setup/httpclient"
 	"github.com/team-attention/cops/cli/internal/service/auth/outbound/api"
 	authv1 "github.com/team-attention/cops/shared/gen/grpcstub/auth/v1"
 	"github.com/team-attention/cops/shared/gen/grpcstub/auth/v1/authv1connect"
@@ -17,10 +18,26 @@ type AuthAPIClient struct {
 	client authv1connect.AuthServiceClient
 }
 
-func NewAuthAPIClient(l *slog.Logger, httpClient *http.Client, baseURL string) *AuthAPIClient {
+// NewAuthAPIClient creates a new ConnectRPC auth client.
+//
+// Dependencies:
+// - l: Logger for structured logging
+// - cfg: Configuration containing API server URL
+// - httpClient: Typed HTTP client wrapper providing standard http.Client
+//
+// Returns:
+// - *AuthAPIClient: Initialized auth API client ready for use
+func NewAuthAPIClient(l *slog.Logger, cfg *config.Config, httpClient *httpclient.APIHTTPClient) *AuthAPIClient {
+	logger := l.With(slog.String("name", "auth.api.connectrpc"))
+
+	client := authv1connect.NewAuthServiceClient(
+		httpClient.StandardHTTPClient(),
+		cfg.API.URL,
+	)
+
 	return &AuthAPIClient{
-		logger: l.With(slog.String("name", "auth.api.connectrpc")),
-		client: authv1connect.NewAuthServiceClient(httpClient, baseURL),
+		logger: logger,
+		client: client,
 	}
 }
 

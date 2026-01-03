@@ -2,9 +2,14 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"log/slog"
+	"strings"
+	"time"
 
+	"github.com/team-attention/cops/api/internal/platform/setup/config"
 	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
 	"github.com/team-attention/cops/api/internal/service/auth/outbound/oauth"
 	"github.com/team-attention/cops/api/internal/service/auth/outbound/repository"
@@ -34,24 +39,27 @@ type DevicePollResult struct {
 
 // Service implements authentication business logic.
 type Service struct {
-	logger    *slog.Logger
-	jwtCfg    *jwtutil.Config
-	oauthPort oauth.GoogleOAuthPort
-	userRepo  repository.UserRepositoryPort
+	logger         *slog.Logger
+	cfg            *config.Config
+	oauthPort      oauth.GoogleOAuthPort
+	userRepo       repository.UserRepositoryPort
+	deviceCodeRepo repository.DeviceCodeRepositoryPort
 }
 
 // NewService creates a new auth service.
 func NewService(
 	l *slog.Logger,
-	jwtCfg *jwtutil.Config,
+	cfg *config.Config,
 	oauthPort oauth.GoogleOAuthPort,
 	userRepo repository.UserRepositoryPort,
+	deviceCodeRepo repository.DeviceCodeRepositoryPort,
 ) *Service {
 	return &Service{
-		logger:    l.With(slog.String("name", "auth.service")),
-		jwtCfg:    jwtCfg,
-		oauthPort: oauthPort,
-		userRepo:  userRepo,
+		logger:         l.With(slog.String("name", "auth.service")),
+		cfg:            cfg,
+		oauthPort:      oauthPort,
+		userRepo:       userRepo,
+		deviceCodeRepo: deviceCodeRepo,
 	}
 }
 
@@ -82,7 +90,14 @@ func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*jwt
 	}
 
 	if user != nil {
-		tokens, err := jwtutil.GenerateTokenPair(s.jwtCfg, string(user.ID))
+		jwtCfg := &jwtutil.Config{
+			SecretKey:            s.cfg.JWT.SecretKey,
+			AccessTokenDuration:  s.cfg.JWT.AccessTokenDuration,
+			RefreshTokenDuration: s.cfg.JWT.RefreshTokenDuration,
+			Issuer:               s.cfg.JWT.Issuer,
+		}
+
+		tokens, err := jwtutil.GenerateTokenPair(jwtCfg, string(user.ID))
 		if err != nil {
 			s.logger.Error("failed to generate tokens for existing user",
 				slog.String("userID", string(user.ID)),
@@ -120,7 +135,14 @@ func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*jwt
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	tokens, err := jwtutil.GenerateTokenPair(s.jwtCfg, string(createdUser.ID))
+	jwtCfg := &jwtutil.Config{
+		SecretKey:            s.cfg.JWT.SecretKey,
+		AccessTokenDuration:  s.cfg.JWT.AccessTokenDuration,
+		RefreshTokenDuration: s.cfg.JWT.RefreshTokenDuration,
+		Issuer:               s.cfg.JWT.Issuer,
+	}
+
+	tokens, err := jwtutil.GenerateTokenPair(jwtCfg, string(createdUser.ID))
 	if err != nil {
 		s.logger.Error("failed to generate tokens for new user",
 			slog.String("userID", string(createdUser.ID)),
@@ -139,82 +161,95 @@ func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*jwt
 
 // DeviceCode initiates device flow authentication.
 func (s *Service) DeviceCode(ctx context.Context) (*DeviceCodeResult, error) {
-	resp, err := s.oauthPort.InitiateDeviceFlow(ctx)
+	userCode, err := generateUserCode()
 	if err != nil {
-		s.logger.Error("failed to initiate device flow",
+		s.logger.Error("failed to generate user code",
 			slog.Any("error", err),
 		)
-		return nil, fmt.Errorf("failed to initiate device flow: %w", err)
+		return nil, fmt.Errorf("failed to generate user code: %w", err)
 	}
 
+	expiresAt := time.Now().Add(s.cfg.DeviceCode.Expiration)
+
+	deviceCodeData := &domain.DeviceCode{
+		UserCode:  normalizeUserCode(userCode),
+		Approved:  false,
+		ExpiresAt: expiresAt,
+	}
+
+	createdCode, err := s.deviceCodeRepo.Create(ctx, deviceCodeData)
+	if err != nil {
+		s.logger.Error("failed to create device code",
+			slog.Any("error", err),
+		)
+		return nil, fmt.Errorf("failed to create device code: %w", err)
+	}
+
+	verificationURL := fmt.Sprintf("%s/auth/device?code=%s", s.cfg.DeviceCode.WebBaseURL, userCode)
+
 	return &DeviceCodeResult{
-		DeviceCode:      resp.DeviceCode,
-		UserCode:        resp.UserCode,
-		VerificationURL: resp.VerificationURL,
-		ExpiresIn:       resp.ExpiresIn,
-		Interval:        resp.Interval,
+		DeviceCode:      string(createdCode.ID),
+		UserCode:        userCode,
+		VerificationURL: verificationURL,
+		ExpiresIn:       int(s.cfg.DeviceCode.Expiration.Seconds()),
+		Interval:        s.cfg.DeviceCode.Interval,
 	}, nil
 }
 
 // DevicePoll checks if device authentication is complete.
 func (s *Service) DevicePoll(ctx context.Context, deviceCode string) (*DevicePollResult, error) {
-	tokenResp, err := s.oauthPort.PollDeviceCode(ctx, deviceCode)
+	code, err := s.deviceCodeRepo.GetByID(ctx, deviceCode)
 	if err != nil {
-		s.logger.Error("failed to poll device code",
+		s.logger.Error("failed to get device code",
+			slog.String("deviceCode", deviceCode),
 			slog.Any("error", err),
 		)
-		return nil, fmt.Errorf("failed to poll device code: %w", err)
+		return nil, fmt.Errorf("failed to get device code: %w", err)
 	}
 
-	if tokenResp == nil {
+	if code == nil {
+		return nil, fmt.Errorf("device code not found")
+	}
+
+	if code.ExpiresAt.Before(time.Now()) {
+		return nil, fmt.Errorf("device code expired")
+	}
+
+	if !code.Approved {
 		return &DevicePollResult{Pending: true}, nil
 	}
 
-	userInfo, err := s.oauthPort.GetUserInfo(ctx, tokenResp.AccessToken)
-	if err != nil {
-		s.logger.Error("failed to get user info from device flow",
-			slog.Any("error", err),
+	if code.UserID == nil {
+		s.logger.Error("device code approved but no user ID",
+			slog.String("deviceCode", deviceCode),
 		)
-		return nil, fmt.Errorf("failed to get user info: %w", err)
+		return nil, fmt.Errorf("device code approved but no user ID")
 	}
 
-	user, err := s.userRepo.FindByAccountProvider(ctx, domain.AccountProviderGoogle, userInfo.ID)
+	user, err := s.userRepo.GetByID(ctx, string(*code.UserID))
 	if err != nil {
-		s.logger.Error("failed to find user by account provider",
+		s.logger.Error("failed to get user",
+			slog.String("userID", string(*code.UserID)),
 			slog.Any("error", err),
 		)
-		return nil, fmt.Errorf("failed to find user: %w", err)
+		return nil, fmt.Errorf("user not found: %w", err)
 	}
 
 	if user == nil {
-		newUser := &domain.User{
-			Email:           userInfo.Email,
-			Name:            userInfo.Name,
-			ProfileImageURL: userInfo.Picture,
-			Accounts: []*domain.Account{
-				{
-					Provider:   domain.AccountProviderGoogle,
-					ProviderID: userInfo.ID,
-				},
-			},
-		}
-
-		user, err = s.userRepo.Create(ctx, newUser)
-		if err != nil {
-			s.logger.Error("failed to create user from device flow",
-				slog.String("email", newUser.Email),
-				slog.Any("error", err),
-			)
-			return nil, fmt.Errorf("failed to create user: %w", err)
-		}
-
-		s.logger.Info("new user created via device flow",
-			slog.String("userID", string(user.ID)),
-			slog.String("email", user.Email),
+		s.logger.Error("user not found for device code",
+			slog.String("userID", string(*code.UserID)),
 		)
+		return nil, fmt.Errorf("user not found")
 	}
 
-	tokens, err := jwtutil.GenerateTokenPair(s.jwtCfg, string(user.ID))
+	jwtCfg := &jwtutil.Config{
+		SecretKey:            s.cfg.JWT.SecretKey,
+		AccessTokenDuration:  s.cfg.JWT.AccessTokenDuration,
+		RefreshTokenDuration: s.cfg.JWT.RefreshTokenDuration,
+		Issuer:               s.cfg.JWT.Issuer,
+	}
+
+	tokens, err := jwtutil.GenerateTokenPair(jwtCfg, string(user.ID))
 	if err != nil {
 		s.logger.Error("failed to generate tokens from device flow",
 			slog.String("userID", string(user.ID)),
@@ -231,7 +266,14 @@ func (s *Service) DevicePoll(ctx context.Context, deviceCode string) (*DevicePol
 
 // RefreshToken exchanges refresh token for new token pair.
 func (s *Service) RefreshToken(ctx context.Context, refreshToken string) (*jwtutil.TokenPair, error) {
-	userID, err := jwtutil.ValidateRefreshToken(s.jwtCfg, refreshToken)
+	jwtCfg := &jwtutil.Config{
+		SecretKey:            s.cfg.JWT.SecretKey,
+		AccessTokenDuration:  s.cfg.JWT.AccessTokenDuration,
+		RefreshTokenDuration: s.cfg.JWT.RefreshTokenDuration,
+		Issuer:               s.cfg.JWT.Issuer,
+	}
+
+	userID, err := jwtutil.ValidateRefreshToken(jwtCfg, refreshToken)
 	if err != nil {
 		s.logger.Warn("invalid refresh token",
 			slog.Any("error", err),
@@ -255,7 +297,7 @@ func (s *Service) RefreshToken(ctx context.Context, refreshToken string) (*jwtut
 		return nil, fmt.Errorf("user not found")
 	}
 
-	tokens, err := jwtutil.GenerateTokenPair(s.jwtCfg, string(user.ID))
+	tokens, err := jwtutil.GenerateTokenPair(jwtCfg, string(user.ID))
 	if err != nil {
 		s.logger.Error("failed to generate new tokens",
 			slog.String("userID", userID),
@@ -269,4 +311,90 @@ func (s *Service) RefreshToken(ctx context.Context, refreshToken string) (*jwtut
 	)
 
 	return tokens, nil
+}
+
+// DeviceCodeApproveParams contains parameters for device code approval.
+type DeviceCodeApproveParams struct {
+	UserCode string
+	UserID   domain.ID
+}
+
+// DeviceCodeApprove approves a device code and links it to the authenticated user.
+func (s *Service) DeviceCodeApprove(ctx context.Context, params DeviceCodeApproveParams) error {
+	normalizedCode := normalizeUserCode(params.UserCode)
+
+	user, err := s.userRepo.GetByID(ctx, string(params.UserID))
+	if err != nil {
+		s.logger.Error("failed to get user",
+			slog.String("userID", string(params.UserID)),
+			slog.Any("error", err),
+		)
+		return fmt.Errorf("user not found: %w", err)
+	}
+
+	if user == nil {
+		s.logger.Warn("user not found for device code approval",
+			slog.String("userID", string(params.UserID)),
+		)
+		return fmt.Errorf("user not found")
+	}
+
+	err = s.deviceCodeRepo.Approve(ctx, normalizedCode, params.UserID)
+	if err != nil {
+		s.logger.Error("failed to approve device code",
+			slog.String("userCode", params.UserCode),
+			slog.String("userID", string(params.UserID)),
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	s.logger.Info("device code approved",
+		slog.String("userCode", params.UserCode),
+		slog.String("userID", string(params.UserID)),
+	)
+
+	return nil
+}
+
+// userCodeChars contains characters for human-friendly codes.
+// Excludes ambiguous characters: 0, O, I, 1, L
+const userCodeChars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+
+// generateDeviceCodeID generates a cryptographically secure device code ID.
+// Returns a 32-character hex string (16 bytes of randomness).
+func generateDeviceCodeID() (string, error) {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
+// generateUserCode generates a human-friendly 8-character code with hyphen.
+// Format: XXXX-XXXX (e.g., "ABCD-EFGH")
+func generateUserCode() (string, error) {
+	bytes := make([]byte, 8)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+
+	var code strings.Builder
+	code.Grow(9) // 8 chars + 1 hyphen
+
+	for i, b := range bytes {
+		if i == 4 {
+			code.WriteByte('-')
+		}
+		code.WriteByte(userCodeChars[int(b)%len(userCodeChars)])
+	}
+
+	return code.String(), nil
+}
+
+// normalizeUserCode normalizes user code input by removing hyphens and converting to uppercase.
+func normalizeUserCode(code string) string {
+	code = strings.ToUpper(code)
+	code = strings.ReplaceAll(code, "-", "")
+	return code
 }

@@ -36,7 +36,6 @@
       "Read(**/secret*.{yaml,yml})"
     ]
   },
-  "model": "opusplan",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7",

@@ -9,12 +9,13 @@ import (
 
 // Config holds all API application configuration.
 type Config struct {
-	App     AppConfig
-	HTTP    HTTPConfig
-	Logging LoggingConfig
-	MongoDB MongoDBConfig
-	JWT     JWTConfig
-	OAuth   OAuthConfig
+	App        AppConfig
+	HTTP       HTTPConfig
+	Logging    LoggingConfig
+	MongoDB    MongoDBConfig
+	JWT        JWTConfig
+	OAuth      OAuthConfig
+	DeviceCode DeviceCodeConfig
 }
 
 // AppConfig holds application-level settings.
@@ -34,7 +35,7 @@ type HTTPConfig struct {
 	// CORS settings
 	CORSAllowOrigins string `env:"CORS_ALLOW_ORIGINS" envDefault:"*"`
 	CORSAllowMethods string `env:"CORS_ALLOW_METHODS" envDefault:"GET,POST,PUT,DELETE,OPTIONS,PATCH"`
-	CORSAllowHeaders string `env:"CORS_ALLOW_HEADERS" envDefault:"Origin,Content-Type,Accept,Connect-Protocol-Version"`
+	CORSAllowHeaders string `env:"CORS_ALLOW_HEADERS" envDefault:"Origin,Content-Type,Accept,Authorization,Connect-Protocol-Version"`
 }
 
 // LoggingConfig holds logging settings.
@@ -62,6 +63,13 @@ type OAuthConfig struct {
 	GoogleClientID     string   `env:"GOOGLE_CLIENT_ID,required"`
 	GoogleClientSecret string   `env:"GOOGLE_CLIENT_SECRET,required"`
 	GoogleScopes       []string `env:"GOOGLE_SCOPES" envDefault:"email,profile"`
+}
+
+// DeviceCodeConfig holds device code flow configuration.
+type DeviceCodeConfig struct {
+	WebBaseURL string        `env:"COPS_WEB_BASE_URL,required"`
+	Expiration time.Duration `env:"COPS_DEVICE_CODE_EXPIRATION" envDefault:"15m"`
+	Interval   int           `env:"COPS_DEVICE_CODE_INTERVAL" envDefault:"5"`
 }
 
 // InitConfig loads configuration from environment variables.

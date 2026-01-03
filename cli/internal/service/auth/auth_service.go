@@ -33,7 +33,11 @@ type Service struct {
 }
 
 // NewService creates a new CLI auth service.
-func NewService(l *slog.Logger, apiClient api.AuthAPIPort, homeDir string) *Service {
+func NewService(l *slog.Logger, apiClient api.AuthAPIPort) *Service {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		homeDir = "."
+	}
 	return &Service{
 		logger:    l.With(slog.String("name", "auth.service")),
 		apiClient: apiClient,

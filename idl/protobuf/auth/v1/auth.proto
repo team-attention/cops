@@ -57,6 +57,17 @@ message RefreshTokenRes {
   TokenPair tokens = 1;
 }
 
+// DeviceCodeApproveReq contains the device code to approve.
+message DeviceCodeApproveReq {
+  string user_code = 1;
+}
+
+// DeviceCodeApproveRes contains the approval result.
+message DeviceCodeApproveRes {
+  bool success = 1;
+  string message = 2;
+}
+
 // AuthService handles authentication operations.
 service AuthService {
   // GoogleAuth exchanges Google OAuth code for JWT tokens (web flow).
@@ -70,4 +81,8 @@ service AuthService {
 
   // RefreshToken exchanges refresh token for new token pair.
   rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes);
+
+  // DeviceCodeApprove approves a device code from the web application.
+  // Requires authenticated user (JWT in Authorization header).
+  rpc DeviceCodeApprove(DeviceCodeApproveReq) returns (DeviceCodeApproveRes);
 }

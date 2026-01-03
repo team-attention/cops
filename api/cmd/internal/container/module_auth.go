@@ -3,8 +3,6 @@ package container
 import (
 	"go.uber.org/fx"
 
-	"github.com/team-attention/cops/api/internal/platform/setup/config"
-	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
 	"github.com/team-attention/cops/api/internal/service/auth"
 	"github.com/team-attention/cops/api/internal/service/auth/inbound/grpc/connectrpc"
 	"github.com/team-attention/cops/api/internal/service/auth/outbound/oauth"
@@ -15,17 +13,7 @@ import (
 
 func newAuthModule() fx.Option {
 	return fx.Module("auth",
-		// JWT config from main config
-		fx.Provide(func(cfg *config.Config) *jwtutil.Config {
-			return &jwtutil.Config{
-				SecretKey:            cfg.JWT.SecretKey,
-				AccessTokenDuration:  cfg.JWT.AccessTokenDuration,
-				RefreshTokenDuration: cfg.JWT.RefreshTokenDuration,
-				Issuer:               cfg.JWT.Issuer,
-			}
-		}),
-
-		// OAuth adapter (config injected via constructor)
+		// OAuth adapter
 		fx.Provide(
 			fx.Annotate(
 				google.NewGoogleOAuthAdapter,
@@ -41,10 +29,18 @@ func newAuthModule() fx.Option {
 			),
 		),
 
-		// Service
+		// Device code repository
+		fx.Provide(
+			fx.Annotate(
+				mongodb.NewMongoDeviceCodeRepository,
+				fx.As(new(repository.DeviceCodeRepositoryPort)),
+			),
+		),
+
+		// Service - receives *config.Config directly
 		fx.Provide(auth.NewService),
 
-		// ConnectRPC handler
+		// ConnectRPC handler - receives *config.Config directly
 		fx.Provide(
 			fx.Annotate(
 				connectrpc.NewAuthGRPCHandler,

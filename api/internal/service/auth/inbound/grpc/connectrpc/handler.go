@@ -2,25 +2,32 @@ package connectrpc
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"connectrpc.com/connect"
 
+	"github.com/team-attention/cops/api/internal/platform/setup/config"
+	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
+	"github.com/team-attention/cops/api/internal/service/auth"
+	"github.com/team-attention/cops/shared/domain"
 	authv1 "github.com/team-attention/cops/shared/gen/grpcstub/auth/v1"
 	"github.com/team-attention/cops/shared/gen/grpcstub/auth/v1/authv1connect"
-	"github.com/team-attention/cops/api/internal/service/auth"
 )
 
 type AuthGRPCHandler struct {
 	svc    *auth.Service
 	logger *slog.Logger
+	cfg    *config.Config
 }
 
-func NewAuthGRPCHandler(l *slog.Logger, svc *auth.Service) *AuthGRPCHandler {
+func NewAuthGRPCHandler(l *slog.Logger, svc *auth.Service, cfg *config.Config) *AuthGRPCHandler {
 	return &AuthGRPCHandler{
 		svc:    svc,
 		logger: l.With(slog.String("name", "auth.grpc.connectrpc")),
+		cfg:    cfg,
 	}
 }
 
@@ -125,6 +132,67 @@ func (h *AuthGRPCHandler) RefreshToken(
 			RefreshToken: tokens.RefreshToken,
 			ExpiresAt:    tokens.ExpiresAt.Unix(),
 		},
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+func (h *AuthGRPCHandler) DeviceCodeApprove(
+	ctx context.Context,
+	req *connect.Request[authv1.DeviceCodeApproveReq],
+) (*connect.Response[authv1.DeviceCodeApproveRes], error) {
+	authHeader := req.Header().Get("Authorization")
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		h.logger.Warn("DeviceCodeApprove: missing or invalid authorization header")
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("missing or invalid authorization header"))
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	jwtCfg := &jwtutil.Config{
+		SecretKey:            h.cfg.JWT.SecretKey,
+		AccessTokenDuration:  h.cfg.JWT.AccessTokenDuration,
+		RefreshTokenDuration: h.cfg.JWT.RefreshTokenDuration,
+		Issuer:               h.cfg.JWT.Issuer,
+	}
+
+	userID, err := jwtutil.ValidateAccessToken(jwtCfg, tokenString)
+	if err != nil {
+		h.logger.Warn("DeviceCodeApprove: invalid access token",
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid access token"))
+	}
+
+	params := auth.DeviceCodeApproveParams{
+		UserCode: req.Msg.UserCode,
+		UserID:   domain.ID(userID),
+	}
+
+	err = h.svc.DeviceCodeApprove(ctx, params)
+	if err != nil {
+		h.logger.Error("DeviceCodeApprove failed",
+			slog.String("userCode", req.Msg.UserCode),
+			slog.Any("error", err),
+		)
+
+		errMsg := err.Error()
+		code := connect.CodeInternal
+
+		if strings.Contains(errMsg, "not found") {
+			code = connect.CodeNotFound
+		} else if strings.Contains(errMsg, "expired") {
+			code = connect.CodeDeadlineExceeded
+		} else if strings.Contains(errMsg, "already approved") {
+			code = connect.CodeAlreadyExists
+		}
+
+		return nil, connect.NewError(code, err)
+	}
+
+	res := &authv1.DeviceCodeApproveRes{
+		Success: true,
+		Message: "Device approved successfully",
 	}
 
 	return connect.NewResponse(res), nil

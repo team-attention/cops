@@ -12,7 +12,7 @@ import (
 func (h *AuthCLIHandler) NewLoginCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "login",
-		Short: "Log in with Google OAuth",
+		Short: "Log in to C-Ops",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 			defer cancel()
@@ -23,9 +23,8 @@ func (h *AuthCLIHandler) NewLoginCommand() *cobra.Command {
 			}
 
 			fmt.Println("To sign in, open this URL in your browser:")
-			fmt.Printf("  %s\n\n", result.VerificationURL)
-			fmt.Println("Then enter this code:")
-			fmt.Printf("  %s\n\n", result.UserCode)
+			fmt.Printf("\n  %s\n\n", result.VerificationURL)
+			fmt.Printf("Device code: %s\n\n", result.UserCode)
 			fmt.Println("Waiting for authentication...")
 
 			ticker := time.NewTicker(time.Duration(result.Interval) * time.Second)

@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file auth/v1/auth.proto.
  */
 export const file_auth_v1_auth: GenFile = /*@__PURE__*/
-  fileDesc("ChJhdXRoL3YxL2F1dGgucHJvdG8SB2F1dGgudjEiTAoJVG9rZW5QYWlyEhQKDGFjY2Vzc190b2tlbhgBIAEoCRIVCg1yZWZyZXNoX3Rva2VuGAIgASgJEhIKCmV4cGlyZXNfYXQYAyABKAMiQQoNR29vZ2xlQXV0aFJlcRIaChJhdXRob3JpemF0aW9uX2NvZGUYASABKAkSFAoMcmVkaXJlY3RfdXJpGAIgASgJIjMKDUdvb2dsZUF1dGhSZXMSIgoGdG9rZW5zGAEgASgLMhIuYXV0aC52MS5Ub2tlblBhaXIiDwoNRGV2aWNlQ29kZVJlcSJ3Cg1EZXZpY2VDb2RlUmVzEhMKC2RldmljZV9jb2RlGAEgASgJEhEKCXVzZXJfY29kZRgCIAEoCRIYChB2ZXJpZmljYXRpb25fdXJsGAMgASgJEhIKCmV4cGlyZXNfaW4YBCABKAUSEAoIaW50ZXJ2YWwYBSABKAUiJAoNRGV2aWNlUG9sbFJlcRITCgtkZXZpY2VfY29kZRgBIAEoCSJECg1EZXZpY2VQb2xsUmVzEg8KB3BlbmRpbmcYASABKAgSIgoGdG9rZW5zGAIgASgLMhIuYXV0aC52MS5Ub2tlblBhaXIiKAoPUmVmcmVzaFRva2VuUmVxEhUKDXJlZnJlc2hfdG9rZW4YASABKAkiNQoPUmVmcmVzaFRva2VuUmVzEiIKBnRva2VucxgBIAEoCzISLmF1dGgudjEuVG9rZW5QYWlyMosCCgtBdXRoU2VydmljZRI8CgpHb29nbGVBdXRoEhYuYXV0aC52MS5Hb29nbGVBdXRoUmVxGhYuYXV0aC52MS5Hb29nbGVBdXRoUmVzEjwKCkRldmljZUNvZGUSFi5hdXRoLnYxLkRldmljZUNvZGVSZXEaFi5hdXRoLnYxLkRldmljZUNvZGVSZXMSPAoKRGV2aWNlUG9sbBIWLmF1dGgudjEuRGV2aWNlUG9sbFJlcRoWLmF1dGgudjEuRGV2aWNlUG9sbFJlcxJCCgxSZWZyZXNoVG9rZW4SGC5hdXRoLnYxLlJlZnJlc2hUb2tlblJlcRoYLmF1dGgudjEuUmVmcmVzaFRva2VuUmVzQpgBCgtjb20uYXV0aC52MUIJQXV0aFByb3RvUAFaQWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2F1dGgvdjE7YXV0aHYxogIDQVhYqgIHQXV0aC5WMcoCB0F1dGhcVjHiAhNBdXRoXFYxXEdQQk1ldGFkYXRh6gIIQXV0aDo6VjFiBnByb3RvMw");
+  fileDesc("ChJhdXRoL3YxL2F1dGgucHJvdG8SB2F1dGgudjEiTAoJVG9rZW5QYWlyEhQKDGFjY2Vzc190b2tlbhgBIAEoCRIVCg1yZWZyZXNoX3Rva2VuGAIgASgJEhIKCmV4cGlyZXNfYXQYAyABKAMiQQoNR29vZ2xlQXV0aFJlcRIaChJhdXRob3JpemF0aW9uX2NvZGUYASABKAkSFAoMcmVkaXJlY3RfdXJpGAIgASgJIjMKDUdvb2dsZUF1dGhSZXMSIgoGdG9rZW5zGAEgASgLMhIuYXV0aC52MS5Ub2tlblBhaXIiDwoNRGV2aWNlQ29kZVJlcSJ3Cg1EZXZpY2VDb2RlUmVzEhMKC2RldmljZV9jb2RlGAEgASgJEhEKCXVzZXJfY29kZRgCIAEoCRIYChB2ZXJpZmljYXRpb25fdXJsGAMgASgJEhIKCmV4cGlyZXNfaW4YBCABKAUSEAoIaW50ZXJ2YWwYBSABKAUiJAoNRGV2aWNlUG9sbFJlcRITCgtkZXZpY2VfY29kZRgBIAEoCSJECg1EZXZpY2VQb2xsUmVzEg8KB3BlbmRpbmcYASABKAgSIgoGdG9rZW5zGAIgASgLMhIuYXV0aC52MS5Ub2tlblBhaXIiKAoPUmVmcmVzaFRva2VuUmVxEhUKDXJlZnJlc2hfdG9rZW4YASABKAkiNQoPUmVmcmVzaFRva2VuUmVzEiIKBnRva2VucxgBIAEoCzISLmF1dGgudjEuVG9rZW5QYWlyIikKFERldmljZUNvZGVBcHByb3ZlUmVxEhEKCXVzZXJfY29kZRgBIAEoCSI4ChREZXZpY2VDb2RlQXBwcm92ZVJlcxIPCgdzdWNjZXNzGAEgASgIEg8KB21lc3NhZ2UYAiABKAky3gIKC0F1dGhTZXJ2aWNlEjwKCkdvb2dsZUF1dGgSFi5hdXRoLnYxLkdvb2dsZUF1dGhSZXEaFi5hdXRoLnYxLkdvb2dsZUF1dGhSZXMSPAoKRGV2aWNlQ29kZRIWLmF1dGgudjEuRGV2aWNlQ29kZVJlcRoWLmF1dGgudjEuRGV2aWNlQ29kZVJlcxI8CgpEZXZpY2VQb2xsEhYuYXV0aC52MS5EZXZpY2VQb2xsUmVxGhYuYXV0aC52MS5EZXZpY2VQb2xsUmVzEkIKDFJlZnJlc2hUb2tlbhIYLmF1dGgudjEuUmVmcmVzaFRva2VuUmVxGhguYXV0aC52MS5SZWZyZXNoVG9rZW5SZXMSUQoRRGV2aWNlQ29kZUFwcHJvdmUSHS5hdXRoLnYxLkRldmljZUNvZGVBcHByb3ZlUmVxGh0uYXV0aC52MS5EZXZpY2VDb2RlQXBwcm92ZVJlc0KYAQoLY29tLmF1dGgudjFCCUF1dGhQcm90b1ABWkFnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9hdXRoL3YxO2F1dGh2MaICA0FYWKoCB0F1dGguVjHKAgdBdXRoXFYx4gITQXV0aFxWMVxHUEJNZXRhZGF0YeoCCEF1dGg6OlYxYgZwcm90bzM");
 
 /**
  * TokenPair contains access and refresh tokens.
@@ -226,6 +226,49 @@ export const RefreshTokenResSchema: GenMessage<RefreshTokenRes> = /*@__PURE__*/
   messageDesc(file_auth_v1_auth, 8);
 
 /**
+ * DeviceCodeApproveReq contains the device code to approve.
+ *
+ * @generated from message auth.v1.DeviceCodeApproveReq
+ */
+export type DeviceCodeApproveReq = Message<"auth.v1.DeviceCodeApproveReq"> & {
+  /**
+   * @generated from field: string user_code = 1;
+   */
+  userCode: string;
+};
+
+/**
+ * Describes the message auth.v1.DeviceCodeApproveReq.
+ * Use `create(DeviceCodeApproveReqSchema)` to create a new message.
+ */
+export const DeviceCodeApproveReqSchema: GenMessage<DeviceCodeApproveReq> = /*@__PURE__*/
+  messageDesc(file_auth_v1_auth, 9);
+
+/**
+ * DeviceCodeApproveRes contains the approval result.
+ *
+ * @generated from message auth.v1.DeviceCodeApproveRes
+ */
+export type DeviceCodeApproveRes = Message<"auth.v1.DeviceCodeApproveRes"> & {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message auth.v1.DeviceCodeApproveRes.
+ * Use `create(DeviceCodeApproveResSchema)` to create a new message.
+ */
+export const DeviceCodeApproveResSchema: GenMessage<DeviceCodeApproveRes> = /*@__PURE__*/
+  messageDesc(file_auth_v1_auth, 10);
+
+/**
  * AuthService handles authentication operations.
  *
  * @generated from service auth.v1.AuthService
@@ -270,6 +313,17 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof RefreshTokenReqSchema;
     output: typeof RefreshTokenResSchema;
+  },
+  /**
+   * DeviceCodeApprove approves a device code from the web application.
+   * Requires authenticated user (JWT in Authorization header).
+   *
+   * @generated from rpc auth.v1.AuthService.DeviceCodeApprove
+   */
+  deviceCodeApprove: {
+    methodKind: "unary";
+    input: typeof DeviceCodeApproveReqSchema;
+    output: typeof DeviceCodeApproveResSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_auth_v1_auth, 0);
