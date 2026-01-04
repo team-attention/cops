@@ -1,25 +1,26 @@
-import { useEffect } from 'react';
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
-import { Shield } from 'lucide-react';
-import { Button } from '@/gen/shadcn/ui/button';
+import { useEffect } from 'react'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { Shield } from 'lucide-react'
+import { Button } from '@/gen/shadcn/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/gen/shadcn/ui/card';
-import { useAuth } from '@/shared/hook/use-auth';
+} from '@/gen/shadcn/ui/card'
+import { useAuth } from '@/shared/hook/use-auth'
 
 // Constants
-const GOOGLE_OAUTH_CLIENT_ID = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
-const GOOGLE_OAUTH_REDIRECT_URI = import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT_URI;
-const GOOGLE_OAUTH_SCOPES = 'openid email profile';
-const GOOGLE_OAUTH_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_OAUTH_CLIENT_ID = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID
+const GOOGLE_OAUTH_REDIRECT_URI = import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT_URI
+const GOOGLE_OAUTH_SCOPES = 'openid email profile'
+const GOOGLE_OAUTH_AUTHORIZE_URL =
+  'https://accounts.google.com/o/oauth2/v2/auth'
 
 // AuthSearchParams defines search params for auth route
 interface AuthSearchParams {
-  redirect?: string;
+  redirect?: string
 }
 
 // Route configuration
@@ -27,34 +28,49 @@ export const Route = createFileRoute('/auth/')({
   component: AuthPage,
   validateSearch: (search: Record<string, unknown>): AuthSearchParams => {
     return {
-      redirect: typeof search.redirect === 'string' ? search.redirect : undefined,
-    };
+      redirect:
+        typeof search.redirect === 'string' ? search.redirect : undefined,
+    }
   },
-});
+})
 
 // AuthPage displays the auth landing page with Google sign-in button
 function AuthPage() {
-  const search = useSearch({ from: '/auth/' });
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const search = useSearch({ from: '/auth/' })
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
-    // If user is already authenticated, redirect to appropriate page
-    if (isAuthenticated) {
-      // If redirect param exists, navigate to redirect URL
-      if (search.redirect) {
-        navigate({ to: search.redirect });
-        return;
-      }
-      // Otherwise, navigate to dashboard
-      navigate({ to: '/dashboard' });
+    // Implementation outline:
+    // 1. If isAuthenticated is false:
+    //    a. Return early (user needs to login, show the page)
+    if (!isAuthenticated) {
+      return
     }
-  }, [isAuthenticated, search.redirect, navigate]);
+
+    // 2. If isAuthenticated is true:
+    //    a. If search.redirect exists and is not empty:
+    if (search.redirect) {
+      //       i. Try-catch block:
+      try {
+        //          - Try: Call navigate({ to: search.redirect })
+        navigate({ to: search.redirect })
+      } catch {
+        //          - Catch: If navigation fails, call navigate({ to: '/dashboard' }) as fallback
+        navigate({ to: '/dashboard' })
+      }
+      //       ii. Return after navigation
+      return
+    }
+    //    b. Otherwise (no redirect param):
+    //       i. Call navigate({ to: '/dashboard' })
+    navigate({ to: '/dashboard' })
+  }, [isAuthenticated, search.redirect, navigate])
 
   const handleGoogleSignIn = () => {
     // Store redirect URL in sessionStorage if it exists
     if (search.redirect) {
-      sessionStorage.setItem('cops_oauth_redirect', search.redirect);
+      sessionStorage.setItem('cops_oauth_redirect', search.redirect)
     }
 
     // Build Google OAuth URL
@@ -65,13 +81,13 @@ function AuthPage() {
       scope: GOOGLE_OAUTH_SCOPES,
       access_type: 'offline',
       prompt: 'consent',
-    });
+    })
 
-    const oauthUrl = `${GOOGLE_OAUTH_AUTHORIZE_URL}?${params.toString()}`;
+    const oauthUrl = `${GOOGLE_OAUTH_AUTHORIZE_URL}?${params.toString()}`
 
     // Redirect browser to Google OAuth URL
-    window.location.href = oauthUrl;
-  };
+    window.location.href = oauthUrl
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -101,5 +117,5 @@ function AuthPage() {
         </Card>
       </div>
     </div>
-  );
+  )
 }
