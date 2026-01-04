@@ -4,6 +4,7 @@ import { useListProjects } from '@/feature/project/hook/use-list-projects'
 import { ProjectsTable } from '@/feature/project/component/projects-table'
 import { PaginationControls } from '@/shared/component/pagination-controls'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
+import { useUserStore } from '@/shared/store/user-store'
 
 export const Route = createFileRoute('/projects/')({
   component: ProjectsListPage,
@@ -27,8 +28,10 @@ const LoadingSkeleton = () => (
 function ProjectsListPage() {
   const navigate = useNavigate({ from: '/projects' })
   const { page, pageSize, sortBy, sortDesc } = Route.useSearch()
+  const { selectedOrganizationId } = useUserStore()
 
   const { data, isLoading, isError, refetch, isFetching } = useListProjects({
+    organizationId: selectedOrganizationId,
     page,
     pageSize,
   })

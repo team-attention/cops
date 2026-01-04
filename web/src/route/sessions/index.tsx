@@ -6,6 +6,7 @@ import { SessionsTable } from '@/feature/session/component/sessions-table'
 import { ProjectFilter } from '@/feature/session/component/project-filter'
 import { PaginationControls } from '@/shared/component/pagination-controls'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
+import { useUserStore } from '@/shared/store/user-store'
 
 export const Route = createFileRoute('/sessions/')({
   component: SessionsListPage,
@@ -30,15 +31,18 @@ const LoadingSkeleton = () => (
 function SessionsListPage() {
   const navigate = useNavigate({ from: '/sessions' })
   const { page, pageSize, sortBy, sortDesc, projectId } = Route.useSearch()
+  const { selectedOrganizationId } = useUserStore()
 
   // Fetch projects for filter dropdown
   const { data: projectsData, isLoading: isProjectsLoading } = useListProjects({
+    organizationId: selectedOrganizationId,
     page: 1,
     pageSize: 100,
   })
 
   // Fetch sessions with optional project filter
   const { data, isLoading, isError, refetch, isFetching } = useListSessions({
+    organizationId: selectedOrganizationId,
     projectId: projectId ?? undefined,
     page,
     pageSize,

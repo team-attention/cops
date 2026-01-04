@@ -36,7 +36,10 @@ const LoadingSkeleton = () => (
 )
 
 function DashboardPage() {
-  const { data, isLoading, isError, refetch, isFetching } = useGetOverview()
+  const { selectedOrganizationId } = useUserStore()
+  const { data, isLoading, isError, refetch, isFetching } = useGetOverview({
+    organizationId: selectedOrganizationId,
+  })
 
   return (
     <div className="relative">

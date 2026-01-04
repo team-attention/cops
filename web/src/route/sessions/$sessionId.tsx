@@ -7,6 +7,7 @@ import { ChatView } from '@/feature/session/component/chat-view'
 import { ToolCallPanel } from '@/feature/session/component/tool-call-panel'
 import { extractToolCalls } from '@/feature/session/util/parse-content'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
+import { useUserStore } from '@/shared/store/user-store'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   component: SessionDetailPage,
@@ -34,10 +35,13 @@ const LoadingSkeleton = () => (
 
 function SessionDetailPage() {
   const { sessionId } = Route.useParams()
+  const { selectedOrganizationId } = useUserStore()
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
 
-  const { data, isLoading, isError, refetch, isFetching } =
-    useGetSession(sessionId)
+  const { data, isLoading, isError, refetch, isFetching } = useGetSession({
+    organizationId: selectedOrganizationId,
+    sessionId,
+  })
 
   const session = data?.session
 

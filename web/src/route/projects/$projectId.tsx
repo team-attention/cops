@@ -6,6 +6,7 @@ import { ProjectHeader } from '@/feature/project/component/project-header'
 import { TokenBreakdown } from '@/feature/project/component/token-breakdown'
 import { SessionList } from '@/feature/project/component/session-list'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
+import { useUserStore } from '@/shared/store/user-store'
 
 export const Route = createFileRoute('/projects/$projectId')({
   component: ProjectDetailPage,
@@ -33,6 +34,7 @@ const LoadingSkeleton = () => (
 
 function ProjectDetailPage() {
   const { projectId } = Route.useParams()
+  const { selectedOrganizationId } = useUserStore()
 
   const {
     data: projectData,
@@ -40,14 +42,14 @@ function ProjectDetailPage() {
     isError: isProjectError,
     refetch: refetchProject,
     isFetching: isProjectFetching,
-  } = useGetProject(projectId)
+  } = useGetProject({ organizationId: selectedOrganizationId, projectId })
 
   const {
     data: sessionsData,
     isLoading: isSessionsLoading,
     refetch: refetchSessions,
     isFetching: isSessionsFetching,
-  } = useListSessions({ projectId })
+  } = useListSessions({ organizationId: selectedOrganizationId, projectId })
 
   const isLoading = isProjectLoading || isSessionsLoading
   const isFetching = isProjectFetching || isSessionsFetching
