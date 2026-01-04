@@ -22,6 +22,11 @@ type OrganizationWithMemberCount struct {
 
 // OrganizationRepositoryPort defines interface for organization queries.
 type OrganizationRepositoryPort interface {
+	// Create creates a new organization.
+	// Participates in transaction if ctx contains mongo.SessionContext.
+	// Returns created organization with generated ID.
+	Create(ctx context.Context, org *domain.Organization) (*domain.Organization, error)
+
 	// GetUserOrganizations retrieves all organizations a user belongs to with their roles.
 	// Queries organizations collection filtering by embedded members.userId.
 	// Returns empty slice if user has no organizations.

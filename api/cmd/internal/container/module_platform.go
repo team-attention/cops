@@ -1,8 +1,13 @@
 package container
 
 import (
+	"log/slog"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.uber.org/fx"
 
+	"github.com/team-attention/cops/api/internal/platform/outbound/txmanager"
+	mongotx "github.com/team-attention/cops/api/internal/platform/outbound/txmanager/mongodb"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
 	"github.com/team-attention/cops/api/internal/platform/setup/logger"
 	"github.com/team-attention/cops/api/internal/platform/setup/mongodb"
@@ -19,6 +24,16 @@ func newPlatformModule() fx.Option {
 
 		// MongoDB (depends on config, logger)
 		fx.Provide(mongodb.InitMongoDB),
+
+		// Transaction Manager (depends on logger, mongodb)
+		fx.Provide(
+			fx.Annotate(
+				func(l *slog.Logger, db *mongo.Database) *mongotx.MongoTransactionManager {
+					return mongotx.NewMongoTransactionManager(l, db.Client())
+				},
+				fx.As(new(txmanager.TransactionManagerPort)),
+			),
+		),
 
 		// Fiber app (depends on config, logger)
 		fx.Provide(server.InitFiber),

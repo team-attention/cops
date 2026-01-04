@@ -9,10 +9,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/team-attention/cops/api/internal/platform/outbound/txmanager"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
 	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
+	"github.com/team-attention/cops/api/internal/platform/util/slugutil"
 	"github.com/team-attention/cops/api/internal/service/auth/outbound/oauth"
 	"github.com/team-attention/cops/api/internal/service/auth/outbound/repository"
+	userrepo "github.com/team-attention/cops/api/internal/service/user/outbound/repository"
 	"github.com/team-attention/cops/shared/domain"
 )
 
@@ -37,6 +40,12 @@ type DevicePollResult struct {
 	Tokens  *jwtutil.TokenPair
 }
 
+// signupResult contains the result of user signup transaction.
+type signupResult struct {
+	User         *domain.User
+	Organization *domain.Organization
+}
+
 // Service implements authentication business logic.
 type Service struct {
 	logger         *slog.Logger
@@ -44,6 +53,8 @@ type Service struct {
 	oauthPort      oauth.GoogleOAuthPort
 	userRepo       repository.UserRepositoryPort
 	deviceCodeRepo repository.DeviceCodeRepositoryPort
+	orgRepo        userrepo.OrganizationRepositoryPort
+	txManager      txmanager.TransactionManagerPort
 }
 
 // NewService creates a new auth service.
@@ -53,6 +64,8 @@ func NewService(
 	oauthPort oauth.GoogleOAuthPort,
 	userRepo repository.UserRepositoryPort,
 	deviceCodeRepo repository.DeviceCodeRepositoryPort,
+	orgRepo userrepo.OrganizationRepositoryPort,
+	txManager txmanager.TransactionManagerPort,
 ) *Service {
 	return &Service{
 		logger:         l.With(slog.String("name", "auth.service")),
@@ -60,6 +73,8 @@ func NewService(
 		oauthPort:      oauthPort,
 		userRepo:       userRepo,
 		deviceCodeRepo: deviceCodeRepo,
+		orgRepo:        orgRepo,
+		txManager:      txManager,
 	}
 }
 
@@ -126,14 +141,67 @@ func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*jwt
 		},
 	}
 
-	createdUser, err := s.userRepo.Create(ctx, newUser)
+	result, err := s.txManager.WithTransaction(ctx, func(txCtx context.Context) (interface{}, error) {
+		createdUser, err := s.userRepo.Create(txCtx, newUser)
+		if err != nil {
+			s.logger.Error("failed to create user in transaction",
+				slog.String("email", newUser.Email),
+				slog.Any("error", err),
+			)
+			return nil, err
+		}
+
+		orgSlug, err := slugutil.GenerateSlug(createdUser.Name)
+		if err != nil {
+			s.logger.Error("failed to generate organization slug",
+				slog.String("userID", string(createdUser.ID)),
+				slog.Any("error", err),
+			)
+			return nil, fmt.Errorf("failed to generate organization slug: %w", err)
+		}
+
+		newOrg := &domain.Organization{
+			Name: fmt.Sprintf("%s's Organization", createdUser.Name),
+			Slug: orgSlug,
+			Members: []*domain.OrganizationMember{
+				{
+					UserID: createdUser.ID,
+					Role:   domain.MemberRoleAdmin,
+				},
+			},
+		}
+
+		createdOrg, err := s.orgRepo.Create(txCtx, newOrg)
+		if err != nil {
+			s.logger.Error("failed to create personal organization in transaction",
+				slog.String("userID", string(createdUser.ID)),
+				slog.String("orgSlug", orgSlug),
+				slog.Any("error", err),
+			)
+			return nil, err
+		}
+
+		return &signupResult{
+			User:         createdUser,
+			Organization: createdOrg,
+		}, nil
+	})
 	if err != nil {
-		s.logger.Error("failed to create user",
-			slog.String("email", newUser.Email),
+		s.logger.Error("user signup transaction failed",
+			slog.String("email", userInfo.Email),
 			slog.Any("error", err),
 		)
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		return nil, fmt.Errorf("failed to create user account: %w", err)
 	}
+
+	signup := result.(*signupResult)
+
+	s.logger.Info("new user created with personal organization",
+		slog.String("userID", string(signup.User.ID)),
+		slog.String("email", signup.User.Email),
+		slog.String("organizationID", string(signup.Organization.ID)),
+		slog.String("organizationSlug", signup.Organization.Slug),
+	)
 
 	jwtCfg := &jwtutil.Config{
 		SecretKey:            s.cfg.JWT.SecretKey,
@@ -142,19 +210,14 @@ func (s *Service) GoogleAuth(ctx context.Context, params GoogleAuthParams) (*jwt
 		Issuer:               s.cfg.JWT.Issuer,
 	}
 
-	tokens, err := jwtutil.GenerateTokenPair(jwtCfg, string(createdUser.ID))
+	tokens, err := jwtutil.GenerateTokenPair(jwtCfg, string(signup.User.ID))
 	if err != nil {
 		s.logger.Error("failed to generate tokens for new user",
-			slog.String("userID", string(createdUser.ID)),
+			slog.String("userID", string(signup.User.ID)),
 			slog.Any("error", err),
 		)
 		return nil, fmt.Errorf("failed to generate tokens: %w", err)
 	}
-
-	s.logger.Info("new user created and logged in",
-		slog.String("userID", string(createdUser.ID)),
-		slog.String("email", createdUser.Email),
-	)
 
 	return tokens, nil
 }

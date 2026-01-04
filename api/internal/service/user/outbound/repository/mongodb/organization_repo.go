@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -24,6 +25,29 @@ func NewMongoOrganizationRepository(l *slog.Logger, db *mongo.Database) *MongoOr
 		logger:  l.With(slog.String("name", "user.repository.mongodb.organization")),
 		orgColl: db.Collection(mongoschema.OrganizationCollectionName),
 	}
+}
+
+// Create creates a new organization in MongoDB.
+func (r *MongoOrganizationRepository) Create(ctx context.Context, org *domain.Organization) (*domain.Organization, error) {
+	var schema mongoschema.Organization
+	schema.FromDomain(org)
+
+	result, err := r.orgColl.InsertOne(ctx, schema)
+	if err != nil {
+		r.logger.Error("failed to create organization",
+			slog.String("slug", org.Slug),
+			slog.Any("error", err),
+		)
+		return nil, err
+	}
+
+	insertedID, ok := result.InsertedID.(bson.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("failed to get inserted organization ID")
+	}
+
+	schema.ID = insertedID
+	return schema.ToDomain(), nil
 }
 
 // GetUserOrganizations retrieves all organizations a user belongs to with their roles.
