@@ -3,6 +3,8 @@ package container
 import (
 	"go.uber.org/dig"
 
+	"github.com/team-attention/cops/cli/internal/platform/outbound/authstate"
+	"github.com/team-attention/cops/cli/internal/platform/outbound/authstate/filesystem"
 	setup_cobra "github.com/team-attention/cops/cli/internal/platform/setup/cobra"
 	"github.com/team-attention/cops/cli/internal/platform/setup/config"
 	"github.com/team-attention/cops/cli/internal/platform/setup/httpclient"
@@ -29,6 +31,14 @@ func newPlatformModule(c *dig.Container) error {
 		if err := c.Provide(p); err != nil {
 			return err
 		}
+	}
+
+	// Platform outbound adapters
+	if err := c.Provide(
+		filesystem.NewFilesystemAuthState,
+		dig.As(new(authstate.AuthStatePort)),
+	); err != nil {
+		return err
 	}
 
 	return nil

@@ -41,5 +41,6 @@ type RegisterProjectResult struct {
 type ProjectPort interface {
 	// RegisterProject registers a project or returns existing project ID if already registered.
 	// Performs duplicate detection using remote URLs and optional existing project ID.
-	RegisterProject(ctx context.Context, params RegisterProjectParams) (*RegisterProjectResult, error)
+	// Requires valid access token for authentication.
+	RegisterProject(ctx context.Context, accessToken string, params RegisterProjectParams) (*RegisterProjectResult, error)
 }

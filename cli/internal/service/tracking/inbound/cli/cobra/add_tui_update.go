@@ -27,24 +27,20 @@ func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case orgFetchMsg:
+		// 1. Handle error from organization fetch
 		if msg.err != nil {
 			m.err = msg.err
 			return m, tea.Quit
 		}
+		// 2. Store fetched organizations in model
 		m.organizations = msg.organizations
+		// 3. Handle edge case: no organizations found
 		if len(msg.organizations) == 0 {
 			m.err = fmt.Errorf("no organizations found. Please create an organization first")
 			return m, tea.Quit
 		}
-		if len(msg.organizations) == 1 {
-			// Auto-select single organization
-			m.selectedOrgID = string(msg.organizations[0].ID)
-			m.selectedOrgName = msg.organizations[0].Name
-			m.result.OrganizationID = m.selectedOrgID
-			m.step = stepGitSelection
-			return m, m.detectGitRepos
-		}
-		// Multiple orgs, stay on stepOrgSelection for user selection
+		// 4. Always show organization selection UI (removed auto-skip for single org)
+		//    User must explicitly select/confirm their organization
 		return m, nil
 
 	case gitDetectionMsg:

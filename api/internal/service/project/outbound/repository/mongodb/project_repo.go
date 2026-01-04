@@ -116,6 +116,13 @@ func (r *MongoProjectRepository) createProject(ctx context.Context, params repos
 		mongoschema.ProjectRegisteredAtField: time.Now(),
 	}
 
+	// Add organizationId field if provided
+	if params.OrganizationID != "" {
+		if orgID, err := bson.ObjectIDFromHex(params.OrganizationID); err == nil {
+			newDoc[mongoschema.ProjectOrganizationIDField] = orgID
+		}
+	}
+
 	result, err := r.projectsColl.InsertOne(ctx, newDoc)
 	if err != nil {
 		r.logger.Error("failed to create project", slog.Any("error", err))
@@ -128,21 +135,29 @@ func (r *MongoProjectRepository) createProject(ctx context.Context, params repos
 		slog.String("name", params.Name))
 
 	return &repository.FindOrCreateResult{
-		ProjectID:    newID,
-		IsNew:        true,
-		Name:         params.Name,
-		IsGitProject: params.IsGitProject,
+		ProjectID:      newID,
+		IsNew:          true,
+		Name:           params.Name,
+		IsGitProject:   params.IsGitProject,
+		OrganizationID: params.OrganizationID,
 	}, nil
 }
 
 // docToResult converts a MongoDB document to FindOrCreateResult.
 func (r *MongoProjectRepository) docToResult(doc bson.M) *repository.FindOrCreateResult {
-	return &repository.FindOrCreateResult{
+	result := &repository.FindOrCreateResult{
 		ProjectID:    doc[mongoschema.ProjectIDField].(bson.ObjectID).Hex(),
 		IsNew:        false,
 		Name:         doc[mongoschema.ProjectNameField].(string),
 		IsGitProject: doc[mongoschema.ProjectIsGitProjectField].(bool),
 	}
+
+	// Extract OrganizationID if present
+	if orgID, ok := doc[mongoschema.ProjectOrganizationIDField].(bson.ObjectID); ok {
+		result.OrganizationID = orgID.Hex()
+	}
+
+	return result
 }
 
 var _ repository.ProjectRepositoryPort = (*MongoProjectRepository)(nil)

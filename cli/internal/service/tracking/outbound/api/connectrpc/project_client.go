@@ -36,7 +36,7 @@ func NewProjectClient(l *slog.Logger, cfg *config.Config, httpClient *httpclient
 }
 
 // RegisterProject registers a project or returns existing project ID if already registered.
-func (c *ProjectClient) RegisterProject(ctx context.Context, params api.RegisterProjectParams) (*api.RegisterProjectResult, error) {
+func (c *ProjectClient) RegisterProject(ctx context.Context, accessToken string, params api.RegisterProjectParams) (*api.RegisterProjectResult, error) {
 	req := connect.NewRequest(&projectv1.RegisterProjectReq{
 		ConfiguredRemoteUrl: params.ConfiguredRemoteURL,
 		ActualRemoteUrl:     params.ActualRemoteURL,
@@ -45,6 +45,7 @@ func (c *ProjectClient) RegisterProject(ctx context.Context, params api.Register
 		IsGitProject:        params.IsGitProject,
 		OrganizationId:      params.OrganizationID,
 	})
+	req.Header().Set("Authorization", "Bearer "+accessToken)
 
 	resp, err := c.client.RegisterProject(ctx, req)
 	if err != nil {

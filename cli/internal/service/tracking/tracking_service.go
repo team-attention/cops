@@ -8,6 +8,7 @@ import (
 
 	"github.com/samber/lo"
 
+	"github.com/team-attention/cops/cli/internal/platform/outbound/authstate"
 	"github.com/team-attention/cops/cli/internal/platform/util/errutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/pathutil"
@@ -37,6 +38,7 @@ type ParentProjectInfo struct {
 type Service struct {
 	logger *slog.Logger
 
+	authState  authstate.AuthStatePort
 	configRepo config.ConfigPort
 	parser     parser.ParserPort
 	project    api.ProjectPort
@@ -45,12 +47,14 @@ type Service struct {
 // NewService creates a new tracking service.
 func NewService(
 	l *slog.Logger,
+	authState authstate.AuthStatePort,
 	configRepo config.ConfigPort,
 	parser parser.ParserPort,
 	project api.ProjectPort,
 ) *Service {
 	return &Service{
 		logger:     l.With(slog.String("name", "tracking.service")),
+		authState:  authState,
 		configRepo: configRepo,
 		parser:     parser,
 		project:    project,
@@ -113,8 +117,15 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		actualURL = gitutil.GetActualRemoteURL(projectPath)
 	}
 
+	// Get access token for API authentication
+	accessToken, err := s.authState.GetAccessToken(ctx)
+	if err != nil {
+		s.logger.Error("failed to get access token", slog.Any("error", err))
+		return nil, errutil.Internalf("authentication failed: %v", err)
+	}
+
 	// Always call API to register project
-	result, err := s.project.RegisterProject(ctx, api.RegisterProjectParams{
+	result, err := s.project.RegisterProject(ctx, accessToken, api.RegisterProjectParams{
 		ConfiguredRemoteURL: configuredURL,
 		ActualRemoteURL:     actualURL,
 		ExistingProjectID:   existingProjectID,

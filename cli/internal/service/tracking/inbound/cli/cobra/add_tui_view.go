@@ -34,15 +34,26 @@ func (m addModel) View() string {
 func (m addModel) viewOrgSelection() string {
 	var b strings.Builder
 
+	// 1. Show loading state when organizations not yet fetched
 	if len(m.organizations) == 0 {
 		b.WriteString("Fetching organizations...\n")
 		return b.String()
 	}
 
+	// 2. Render title
 	b.WriteString(m.titleStyle.Render("Select Organization"))
 	b.WriteString("\n\n")
-	b.WriteString("Choose which organization to add this project to:\n\n")
 
+	// 3. Show contextual instruction based on organization count
+	if len(m.organizations) == 1 {
+		// Single org: user confirms rather than chooses
+		b.WriteString("Confirm organization for this project:\n\n")
+	} else {
+		// Multiple orgs: user chooses from list
+		b.WriteString("Choose which organization to add this project to:\n\n")
+	}
+
+	// 4. Render organization list with cursor
 	for i, org := range m.organizations {
 		cursor := "  "
 		if m.orgCursor == i {
@@ -51,6 +62,7 @@ func (m addModel) viewOrgSelection() string {
 		b.WriteString(fmt.Sprintf("%s%s\n", cursor, org.Name))
 	}
 
+	// 5. Render help text
 	b.WriteString("\n")
 	b.WriteString(m.helpStyle.Render("up/down: navigate | enter: select | ctrl+c: cancel"))
 	b.WriteString("\n")

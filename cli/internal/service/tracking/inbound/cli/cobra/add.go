@@ -55,6 +55,14 @@ Examples:
 				return nil
 			}
 
+			// Validate organization was selected
+			// 1. OrganizationID is required for all projects
+			// 2. If empty, the TUI flow was interrupted or has a bug
+			// 3. Return user-friendly error message
+			if result.OrganizationID == "" {
+				return fmt.Errorf("organization selection is required. Please try again")
+			}
+
 			// Create params from TUI result
 			params := tracking.AddProjectParams{
 				Path:           result.ProjectPath,
