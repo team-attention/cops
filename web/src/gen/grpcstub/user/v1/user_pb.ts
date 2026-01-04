@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file user/v1/user.proto.
  */
 export const file_user_v1_user: GenFile = /*@__PURE__*/
-  fileDesc("ChJ1c2VyL3YxL3VzZXIucHJvdG8SB3VzZXIudjEiCgoIR2V0TWVSZXEiWQoIR2V0TWVSZXMSHQoEdXNlchgBIAEoCzIPLmRvbWFpbi52MS5Vc2VyEi4KDW9yZ2FuaXphdGlvbnMYAiADKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uMjwKC1VzZXJTZXJ2aWNlEi0KBUdldE1lEhEudXNlci52MS5HZXRNZVJlcRoRLnVzZXIudjEuR2V0TWVSZXNCmAEKC2NvbS51c2VyLnYxQglVc2VyUHJvdG9QAVpBZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvdXNlci92MTt1c2VydjGiAgNVWFiqAgdVc2VyLlYxygIHVXNlclxWMeICE1VzZXJcVjFcR1BCTWV0YWRhdGHqAghVc2VyOjpWMWIGcHJvdG8z", [file_domain_v1_domain]);
+  fileDesc("ChJ1c2VyL3YxL3VzZXIucHJvdG8SB3VzZXIudjEiCgoIR2V0TWVSZXEiWQoIR2V0TWVSZXMSHQoEdXNlchgBIAEoCzIPLmRvbWFpbi52MS5Vc2VyEi4KDW9yZ2FuaXphdGlvbnMYAiADKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uIi8KEERlbGV0ZUFjY291bnRSZXESGwoTY29uZmlybWF0aW9uX3BocmFzZRgBIAEoCSI0ChBEZWxldGVBY2NvdW50UmVzEg8KB3N1Y2Nlc3MYASABKAgSDwoHbWVzc2FnZRgCIAEoCTKDAQoLVXNlclNlcnZpY2USLQoFR2V0TWUSES51c2VyLnYxLkdldE1lUmVxGhEudXNlci52MS5HZXRNZVJlcxJFCg1EZWxldGVBY2NvdW50EhkudXNlci52MS5EZWxldGVBY2NvdW50UmVxGhkudXNlci52MS5EZWxldGVBY2NvdW50UmVzQpgBCgtjb20udXNlci52MUIJVXNlclByb3RvUAFaQWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL3VzZXIvdjE7dXNlcnYxogIDVVhYqgIHVXNlci5WMcoCB1VzZXJcVjHiAhNVc2VyXFYxXEdQQk1ldGFkYXRh6gIIVXNlcjo6VjFiBnByb3RvMw", [file_domain_v1_domain]);
 
 /**
  * GetMeReq is empty - user ID is extracted from JWT token.
@@ -54,6 +54,56 @@ export const GetMeResSchema: GenMessage<GetMeRes> = /*@__PURE__*/
   messageDesc(file_user_v1_user, 1);
 
 /**
+ * DeleteAccountReq contains the confirmation phrase for account deletion.
+ * User must type 'DELETE' exactly to confirm the deletion.
+ *
+ * @generated from message user.v1.DeleteAccountReq
+ */
+export type DeleteAccountReq = Message<"user.v1.DeleteAccountReq"> & {
+  /**
+   * confirmation_phrase must be exactly 'DELETE' (case-sensitive)
+   *
+   * @generated from field: string confirmation_phrase = 1;
+   */
+  confirmationPhrase: string;
+};
+
+/**
+ * Describes the message user.v1.DeleteAccountReq.
+ * Use `create(DeleteAccountReqSchema)` to create a new message.
+ */
+export const DeleteAccountReqSchema: GenMessage<DeleteAccountReq> = /*@__PURE__*/
+  messageDesc(file_user_v1_user, 2);
+
+/**
+ * DeleteAccountRes contains the result of account deletion.
+ *
+ * @generated from message user.v1.DeleteAccountRes
+ */
+export type DeleteAccountRes = Message<"user.v1.DeleteAccountRes"> & {
+  /**
+   * success indicates whether the account was deleted
+   *
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+
+  /**
+   * message provides additional context about the deletion result
+   *
+   * @generated from field: string message = 2;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message user.v1.DeleteAccountRes.
+ * Use `create(DeleteAccountResSchema)` to create a new message.
+ */
+export const DeleteAccountResSchema: GenMessage<DeleteAccountRes> = /*@__PURE__*/
+  messageDesc(file_user_v1_user, 3);
+
+/**
  * UserService handles user-related operations.
  *
  * @generated from service user.v1.UserService
@@ -69,6 +119,18 @@ export const UserService: GenService<{
     methodKind: "unary";
     input: typeof GetMeReqSchema;
     output: typeof GetMeResSchema;
+  },
+  /**
+   * DeleteAccount permanently deletes the authenticated user's account.
+   * Requires valid JWT token in Authorization header.
+   * Performs cascade deletion for organizations where user is sole member.
+   *
+   * @generated from rpc user.v1.UserService.DeleteAccount
+   */
+  deleteAccount: {
+    methodKind: "unary";
+    input: typeof DeleteAccountReqSchema;
+    output: typeof DeleteAccountResSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_user_v1_user, 0);

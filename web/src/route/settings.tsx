@@ -1,11 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Settings } from 'lucide-react'
+import { Settings, Trash2 } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/gen/shadcn/ui/card'
+import { Button } from '@/gen/shadcn/ui/button'
+import { DeleteAccountDialog } from '@/feature/user/component/delete-account-dialog'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
 })
 
-// SettingsPage displays a placeholder for future account settings.
+// SettingsPage displays account settings including the danger zone.
 function SettingsPage() {
   return (
     <div className="relative">
@@ -23,21 +32,46 @@ function SettingsPage() {
               Account Settings
             </h1>
             <p className="mt-0.5 font-mono text-xs text-zinc-600">
-              Manage your preferences
+              Manage your account
             </p>
           </div>
         </div>
 
-        {/* Coming soon card */}
-        <div className="rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-16 text-center backdrop-blur-sm">
-          <Settings className="mx-auto mb-6 h-16 w-16 text-zinc-700" />
-          <h2 className="mb-2 text-xl font-semibold text-zinc-300">
-            Coming soon
-          </h2>
-          <p className="mx-auto max-w-md text-sm text-zinc-500">
-            Account settings and preferences will be available in a future update. Stay tuned!
-          </p>
-        </div>
+        {/* Danger Zone */}
+        <Card className="border-red-900/50 bg-red-950/10">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Trash2 className="h-6 w-6 text-red-400" />
+              <div>
+                <CardTitle className="text-red-100">Danger Zone</CardTitle>
+                <CardDescription className="text-red-200/60">
+                  Irreversible and destructive actions
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Delete Account Section */}
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold text-red-100">
+                  Delete Account
+                </h3>
+                <p className="mt-1 text-sm text-red-200/70">
+                  Permanently delete your account and all associated data. This
+                  action cannot be undone.
+                </p>
+              </div>
+              <DeleteAccountDialog
+                trigger={
+                  <Button variant="destructive" size="sm">
+                    Delete Account
+                  </Button>
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-2 text-zinc-700">

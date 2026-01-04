@@ -35,6 +35,9 @@ const (
 const (
 	// UserServiceGetMeProcedure is the fully-qualified name of the UserService's GetMe RPC.
 	UserServiceGetMeProcedure = "/user.v1.UserService/GetMe"
+	// UserServiceDeleteAccountProcedure is the fully-qualified name of the UserService's DeleteAccount
+	// RPC.
+	UserServiceDeleteAccountProcedure = "/user.v1.UserService/DeleteAccount"
 )
 
 // UserServiceClient is a client for the user.v1.UserService service.
@@ -42,6 +45,10 @@ type UserServiceClient interface {
 	// GetMe returns the authenticated user's information and organizations.
 	// Requires valid JWT token in Authorization header.
 	GetMe(context.Context, *connect.Request[v1.GetMeReq]) (*connect.Response[v1.GetMeRes], error)
+	// DeleteAccount permanently deletes the authenticated user's account.
+	// Requires valid JWT token in Authorization header.
+	// Performs cascade deletion for organizations where user is sole member.
+	DeleteAccount(context.Context, *connect.Request[v1.DeleteAccountReq]) (*connect.Response[v1.DeleteAccountRes], error)
 }
 
 // NewUserServiceClient constructs a client for the user.v1.UserService service. By default, it uses
@@ -61,12 +68,19 @@ func NewUserServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(userServiceMethods.ByName("GetMe")),
 			connect.WithClientOptions(opts...),
 		),
+		deleteAccount: connect.NewClient[v1.DeleteAccountReq, v1.DeleteAccountRes](
+			httpClient,
+			baseURL+UserServiceDeleteAccountProcedure,
+			connect.WithSchema(userServiceMethods.ByName("DeleteAccount")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // userServiceClient implements UserServiceClient.
 type userServiceClient struct {
-	getMe *connect.Client[v1.GetMeReq, v1.GetMeRes]
+	getMe         *connect.Client[v1.GetMeReq, v1.GetMeRes]
+	deleteAccount *connect.Client[v1.DeleteAccountReq, v1.DeleteAccountRes]
 }
 
 // GetMe calls user.v1.UserService.GetMe.
@@ -74,11 +88,20 @@ func (c *userServiceClient) GetMe(ctx context.Context, req *connect.Request[v1.G
 	return c.getMe.CallUnary(ctx, req)
 }
 
+// DeleteAccount calls user.v1.UserService.DeleteAccount.
+func (c *userServiceClient) DeleteAccount(ctx context.Context, req *connect.Request[v1.DeleteAccountReq]) (*connect.Response[v1.DeleteAccountRes], error) {
+	return c.deleteAccount.CallUnary(ctx, req)
+}
+
 // UserServiceHandler is an implementation of the user.v1.UserService service.
 type UserServiceHandler interface {
 	// GetMe returns the authenticated user's information and organizations.
 	// Requires valid JWT token in Authorization header.
 	GetMe(context.Context, *connect.Request[v1.GetMeReq]) (*connect.Response[v1.GetMeRes], error)
+	// DeleteAccount permanently deletes the authenticated user's account.
+	// Requires valid JWT token in Authorization header.
+	// Performs cascade deletion for organizations where user is sole member.
+	DeleteAccount(context.Context, *connect.Request[v1.DeleteAccountReq]) (*connect.Response[v1.DeleteAccountRes], error)
 }
 
 // NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -94,10 +117,18 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(userServiceMethods.ByName("GetMe")),
 		connect.WithHandlerOptions(opts...),
 	)
+	userServiceDeleteAccountHandler := connect.NewUnaryHandler(
+		UserServiceDeleteAccountProcedure,
+		svc.DeleteAccount,
+		connect.WithSchema(userServiceMethods.ByName("DeleteAccount")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/user.v1.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UserServiceGetMeProcedure:
 			userServiceGetMeHandler.ServeHTTP(w, r)
+		case UserServiceDeleteAccountProcedure:
+			userServiceDeleteAccountHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -109,4 +140,8 @@ type UnimplementedUserServiceHandler struct{}
 
 func (UnimplementedUserServiceHandler) GetMe(context.Context, *connect.Request[v1.GetMeReq]) (*connect.Response[v1.GetMeRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("user.v1.UserService.GetMe is not implemented"))
+}
+
+func (UnimplementedUserServiceHandler) DeleteAccount(context.Context, *connect.Request[v1.DeleteAccountReq]) (*connect.Response[v1.DeleteAccountRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("user.v1.UserService.DeleteAccount is not implemented"))
 }

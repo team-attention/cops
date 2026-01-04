@@ -59,5 +59,32 @@ func (r *MongoUserRepository) GetByID(ctx context.Context, userID string) (*doma
 	return schema.ToDomain(), nil
 }
 
+// Delete permanently removes a user by their ID.
+func (r *MongoUserRepository) Delete(ctx context.Context, userID string) error {
+	// 1. Convert userID string to bson.ObjectID using bson.ObjectIDFromHex.
+	objectID, err := bson.ObjectIDFromHex(userID)
+	// 2. If conversion fails, return error.
+	if err != nil {
+		return err
+	}
+
+	// 3. Create filter with _id field.
+	filter := bson.M{mongoschema.UserIDField: objectID}
+
+	// 4. Execute DeleteOne on users collection.
+	_, err = r.usersColl.DeleteOne(ctx, filter)
+	// 5. If error occurs, log error and return error.
+	if err != nil {
+		r.logger.Error("failed to delete user",
+			slog.String("userID", userID),
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	// 6. Return nil (success - idempotent operation, no check for deleted count).
+	return nil
+}
+
 // Interface verification
 var _ repository.UserRepositoryPort = (*MongoUserRepository)(nil)

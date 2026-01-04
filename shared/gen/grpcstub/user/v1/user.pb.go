@@ -112,6 +112,108 @@ func (x *GetMeRes) GetOrganizations() []*v1.Organization {
 	return nil
 }
 
+// DeleteAccountReq contains the confirmation phrase for account deletion.
+// User must type 'DELETE' exactly to confirm the deletion.
+type DeleteAccountReq struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// confirmation_phrase must be exactly 'DELETE' (case-sensitive)
+	ConfirmationPhrase string `protobuf:"bytes,1,opt,name=confirmation_phrase,json=confirmationPhrase,proto3" json:"confirmation_phrase,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *DeleteAccountReq) Reset() {
+	*x = DeleteAccountReq{}
+	mi := &file_user_v1_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAccountReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAccountReq) ProtoMessage() {}
+
+func (x *DeleteAccountReq) ProtoReflect() protoreflect.Message {
+	mi := &file_user_v1_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAccountReq.ProtoReflect.Descriptor instead.
+func (*DeleteAccountReq) Descriptor() ([]byte, []int) {
+	return file_user_v1_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DeleteAccountReq) GetConfirmationPhrase() string {
+	if x != nil {
+		return x.ConfirmationPhrase
+	}
+	return ""
+}
+
+// DeleteAccountRes contains the result of account deletion.
+type DeleteAccountRes struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// success indicates whether the account was deleted
+	Success bool `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	// message provides additional context about the deletion result
+	Message       string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAccountRes) Reset() {
+	*x = DeleteAccountRes{}
+	mi := &file_user_v1_user_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAccountRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAccountRes) ProtoMessage() {}
+
+func (x *DeleteAccountRes) ProtoReflect() protoreflect.Message {
+	mi := &file_user_v1_user_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAccountRes.ProtoReflect.Descriptor instead.
+func (*DeleteAccountRes) Descriptor() ([]byte, []int) {
+	return file_user_v1_user_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *DeleteAccountRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeleteAccountRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_user_v1_user_proto_rawDesc = "" +
@@ -121,9 +223,15 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\bGetMeReq\"n\n" +
 	"\bGetMeRes\x12#\n" +
 	"\x04user\x18\x01 \x01(\v2\x0f.domain.v1.UserR\x04user\x12=\n" +
-	"\rorganizations\x18\x02 \x03(\v2\x17.domain.v1.OrganizationR\rorganizations2<\n" +
+	"\rorganizations\x18\x02 \x03(\v2\x17.domain.v1.OrganizationR\rorganizations\"C\n" +
+	"\x10DeleteAccountReq\x12/\n" +
+	"\x13confirmation_phrase\x18\x01 \x01(\tR\x12confirmationPhrase\"F\n" +
+	"\x10DeleteAccountRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x83\x01\n" +
 	"\vUserService\x12-\n" +
-	"\x05GetMe\x12\x11.user.v1.GetMeReq\x1a\x11.user.v1.GetMeResB\x98\x01\n" +
+	"\x05GetMe\x12\x11.user.v1.GetMeReq\x1a\x11.user.v1.GetMeRes\x12E\n" +
+	"\rDeleteAccount\x12\x19.user.v1.DeleteAccountReq\x1a\x19.user.v1.DeleteAccountResB\x98\x01\n" +
 	"\vcom.user.v1B\tUserProtoP\x01ZAgithub.com/team-attention/cops/shared/gen/grpcstub/user/v1;userv1\xa2\x02\x03UXX\xaa\x02\aUser.V1\xca\x02\aUser\\V1\xe2\x02\x13User\\V1\\GPBMetadata\xea\x02\bUser::V1b\x06proto3"
 
 var (
@@ -138,20 +246,24 @@ func file_user_v1_user_proto_rawDescGZIP() []byte {
 	return file_user_v1_user_proto_rawDescData
 }
 
-var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_user_v1_user_proto_goTypes = []any{
-	(*GetMeReq)(nil),        // 0: user.v1.GetMeReq
-	(*GetMeRes)(nil),        // 1: user.v1.GetMeRes
-	(*v1.User)(nil),         // 2: domain.v1.User
-	(*v1.Organization)(nil), // 3: domain.v1.Organization
+	(*GetMeReq)(nil),         // 0: user.v1.GetMeReq
+	(*GetMeRes)(nil),         // 1: user.v1.GetMeRes
+	(*DeleteAccountReq)(nil), // 2: user.v1.DeleteAccountReq
+	(*DeleteAccountRes)(nil), // 3: user.v1.DeleteAccountRes
+	(*v1.User)(nil),          // 4: domain.v1.User
+	(*v1.Organization)(nil),  // 5: domain.v1.Organization
 }
 var file_user_v1_user_proto_depIdxs = []int32{
-	2, // 0: user.v1.GetMeRes.user:type_name -> domain.v1.User
-	3, // 1: user.v1.GetMeRes.organizations:type_name -> domain.v1.Organization
+	4, // 0: user.v1.GetMeRes.user:type_name -> domain.v1.User
+	5, // 1: user.v1.GetMeRes.organizations:type_name -> domain.v1.Organization
 	0, // 2: user.v1.UserService.GetMe:input_type -> user.v1.GetMeReq
-	1, // 3: user.v1.UserService.GetMe:output_type -> user.v1.GetMeRes
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
+	2, // 3: user.v1.UserService.DeleteAccount:input_type -> user.v1.DeleteAccountReq
+	1, // 4: user.v1.UserService.GetMe:output_type -> user.v1.GetMeRes
+	3, // 5: user.v1.UserService.DeleteAccount:output_type -> user.v1.DeleteAccountRes
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
@@ -168,7 +280,7 @@ func file_user_v1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_v1_user_proto_rawDesc), len(file_user_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

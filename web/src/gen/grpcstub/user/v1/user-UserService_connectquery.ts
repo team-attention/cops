@@ -11,3 +11,12 @@ import { UserService } from "./user_pb";
  * @generated from rpc user.v1.UserService.GetMe
  */
 export const getMe = UserService.method.getMe;
+
+/**
+ * DeleteAccount permanently deletes the authenticated user's account.
+ * Requires valid JWT token in Authorization header.
+ * Performs cascade deletion for organizations where user is sole member.
+ *
+ * @generated from rpc user.v1.UserService.DeleteAccount
+ */
+export const deleteAccount = UserService.method.deleteAccount;

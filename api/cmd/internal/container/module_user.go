@@ -27,6 +27,14 @@ func newUserModule() fx.Option {
 			),
 		),
 
+		// Cascade delete repository
+		fx.Provide(
+			fx.Annotate(
+				mongodb.NewMongoCascadeDeleteRepository,
+				fx.As(new(repository.CascadeDeleteRepositoryPort)),
+			),
+		),
+
 		// Service
 		fx.Provide(user.NewService),
 
