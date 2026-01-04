@@ -68,3 +68,6 @@ Temporary Items
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,go
+
+# Node.js dependencies in ops directory
+ops/**/node_modules/
