@@ -22,12 +22,12 @@ func newDashboardModule() fx.Option {
 		// Service
 		fx.Provide(dashboard.NewService),
 
-		// gRPC Handler
+		// gRPC Handler (private - requires auth)
 		fx.Provide(
 			fx.Annotate(
 				connectrpc.NewDashboardGRPCHandler,
-				fx.As(new(ConnectHandler)),
-				fx.ResultTags(`group:"connect_handlers"`),
+				fx.As(new(PrivateConnectHandler)),
+				fx.ResultTags(`group:"private_connect_handlers"`),
 			),
 		),
 	)

@@ -16,8 +16,13 @@ import (
 	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
 )
 
-// ConnectHandler interface for ConnectRPC handlers.
-type ConnectHandler interface {
+// PublicConnectHandler interface for ConnectRPC handlers that do not require authentication.
+type PublicConnectHandler interface {
+	GetHandler(opts ...connect.HandlerOption) (string, http.Handler)
+}
+
+// PrivateConnectHandler interface for ConnectRPC handlers that require authentication.
+type PrivateConnectHandler interface {
 	GetHandler(opts ...connect.HandlerOption) (string, http.Handler)
 }
 
@@ -28,7 +33,8 @@ type connectRPCServerParams struct {
 	Logger          *slog.Logger
 	Config          *config.Config
 	App             *fiber.App
-	ConnectHandlers []ConnectHandler `group:"connect_handlers"`
+	PublicHandlers  []PublicConnectHandler  `group:"public_connect_handlers"`
+	PrivateHandlers []PrivateConnectHandler `group:"private_connect_handlers"`
 }
 
 func registerConnectRPCServer(params connectRPCServerParams) {
@@ -45,12 +51,18 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 	// Create auth interceptor
 	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg)
 
-	// Create handler options with the interceptor
-	opts := []connect.HandlerOption{connect.WithInterceptors(authInterceptor)}
+	// Create handler options with interceptor for private handlers
+	privateOpts := []connect.HandlerOption{connect.WithInterceptors(authInterceptor)}
 
-	// Register ConnectRPC handlers with the interceptor options
-	for _, handler := range params.ConnectHandlers {
-		path, h := handler.GetHandler(opts...)
+	// Register public handlers WITHOUT any interceptor options
+	for _, handler := range params.PublicHandlers {
+		path, h := handler.GetHandler()
+		params.App.All(path+"*", adaptor.HTTPHandler(h))
+	}
+
+	// Register private handlers WITH auth interceptor options
+	for _, handler := range params.PrivateHandlers {
+		path, h := handler.GetHandler(privateOpts...)
 		params.App.All(path+"*", adaptor.HTTPHandler(h))
 	}
 

@@ -9,34 +9,37 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/team-attention/cops/api/internal/platform/interceptor"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
-	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
 	"github.com/team-attention/cops/api/internal/service/auth"
 	"github.com/team-attention/cops/shared/domain"
 	authv1 "github.com/team-attention/cops/shared/gen/grpcstub/auth/v1"
 	"github.com/team-attention/cops/shared/gen/grpcstub/auth/v1/authv1connect"
 )
 
-type AuthGRPCHandler struct {
+// AuthPublicGRPCHandler handles public auth gRPC endpoints (no authentication required).
+type AuthPublicGRPCHandler struct {
 	svc    *auth.Service
 	logger *slog.Logger
 	cfg    *config.Config
 }
 
-func NewAuthGRPCHandler(l *slog.Logger, svc *auth.Service, cfg *config.Config) *AuthGRPCHandler {
-	return &AuthGRPCHandler{
+// NewAuthPublicGRPCHandler creates a new public auth gRPC handler.
+func NewAuthPublicGRPCHandler(l *slog.Logger, svc *auth.Service, cfg *config.Config) *AuthPublicGRPCHandler {
+	return &AuthPublicGRPCHandler{
 		svc:    svc,
-		logger: l.With(slog.String("name", "auth.grpc.connectrpc")),
+		logger: l.With(slog.String("name", "auth.grpc.connectrpc.public")),
 		cfg:    cfg,
 	}
 }
 
-// GetHandler implements ConnectHandler interface.
-func (h *AuthGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string, http.Handler) {
+// GetHandler implements PublicConnectHandler interface.
+func (h *AuthPublicGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string, http.Handler) {
 	return authv1connect.NewAuthServiceHandler(h, opts...)
 }
 
-func (h *AuthGRPCHandler) GoogleAuth(
+// GoogleAuth handles Google OAuth authentication.
+func (h *AuthPublicGRPCHandler) GoogleAuth(
 	ctx context.Context,
 	req *connect.Request[authv1.GoogleAuthReq],
 ) (*connect.Response[authv1.GoogleAuthRes], error) {
@@ -64,7 +67,32 @@ func (h *AuthGRPCHandler) GoogleAuth(
 	return connect.NewResponse(res), nil
 }
 
-func (h *AuthGRPCHandler) DeviceCode(
+// RefreshToken handles token refresh.
+func (h *AuthPublicGRPCHandler) RefreshToken(
+	ctx context.Context,
+	req *connect.Request[authv1.RefreshTokenReq],
+) (*connect.Response[authv1.RefreshTokenRes], error) {
+	tokens, err := h.svc.RefreshToken(ctx, req.Msg.RefreshToken)
+	if err != nil {
+		h.logger.Error("RefreshToken failed",
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeUnauthenticated, err)
+	}
+
+	res := &authv1.RefreshTokenRes{
+		Tokens: &authv1.TokenPair{
+			AccessToken:  tokens.AccessToken,
+			RefreshToken: tokens.RefreshToken,
+			ExpiresAt:    tokens.ExpiresAt.Unix(),
+		},
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+// DeviceCode initiates device code flow.
+func (h *AuthPublicGRPCHandler) DeviceCode(
 	ctx context.Context,
 	req *connect.Request[authv1.DeviceCodeReq],
 ) (*connect.Response[authv1.DeviceCodeRes], error) {
@@ -87,7 +115,8 @@ func (h *AuthGRPCHandler) DeviceCode(
 	return connect.NewResponse(res), nil
 }
 
-func (h *AuthGRPCHandler) DevicePoll(
+// DevicePoll polls for device code approval status.
+func (h *AuthPublicGRPCHandler) DevicePoll(
 	ctx context.Context,
 	req *connect.Request[authv1.DevicePollReq],
 ) (*connect.Response[authv1.DevicePollRes], error) {
@@ -114,54 +143,75 @@ func (h *AuthGRPCHandler) DevicePoll(
 	return connect.NewResponse(res), nil
 }
 
-func (h *AuthGRPCHandler) RefreshToken(
-	ctx context.Context,
-	req *connect.Request[authv1.RefreshTokenReq],
-) (*connect.Response[authv1.RefreshTokenRes], error) {
-	tokens, err := h.svc.RefreshToken(ctx, req.Msg.RefreshToken)
-	if err != nil {
-		h.logger.Error("RefreshToken failed",
-			slog.Any("error", err),
-		)
-		return nil, connect.NewError(connect.CodeUnauthenticated, err)
-	}
-
-	res := &authv1.RefreshTokenRes{
-		Tokens: &authv1.TokenPair{
-			AccessToken:  tokens.AccessToken,
-			RefreshToken: tokens.RefreshToken,
-			ExpiresAt:    tokens.ExpiresAt.Unix(),
-		},
-	}
-
-	return connect.NewResponse(res), nil
-}
-
-func (h *AuthGRPCHandler) DeviceCodeApprove(
+// DeviceCodeApprove returns unimplemented for public handler.
+// This method is handled by AuthPrivateGRPCHandler.
+func (h *AuthPublicGRPCHandler) DeviceCodeApprove(
 	ctx context.Context,
 	req *connect.Request[authv1.DeviceCodeApproveReq],
 ) (*connect.Response[authv1.DeviceCodeApproveRes], error) {
-	authHeader := req.Header().Get("Authorization")
-	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-		h.logger.Warn("DeviceCodeApprove: missing or invalid authorization header")
-		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("missing or invalid authorization header"))
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use authenticated endpoint"))
+}
+
+// AuthPrivateGRPCHandler handles private auth gRPC endpoints (authentication required).
+type AuthPrivateGRPCHandler struct {
+	svc    *auth.Service
+	logger *slog.Logger
+}
+
+// NewAuthPrivateGRPCHandler creates a new private auth gRPC handler.
+func NewAuthPrivateGRPCHandler(l *slog.Logger, svc *auth.Service) *AuthPrivateGRPCHandler {
+	return &AuthPrivateGRPCHandler{
+		svc:    svc,
+		logger: l.With(slog.String("name", "auth.grpc.connectrpc.private")),
 	}
+}
 
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+// GetHandler implements PrivateConnectHandler interface.
+func (h *AuthPrivateGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string, http.Handler) {
+	return authv1connect.NewAuthServiceHandler(h, opts...)
+}
 
-	jwtCfg := &jwtutil.Config{
-		SecretKey:            h.cfg.JWT.SecretKey,
-		AccessTokenDuration:  h.cfg.JWT.AccessTokenDuration,
-		RefreshTokenDuration: h.cfg.JWT.RefreshTokenDuration,
-		Issuer:               h.cfg.JWT.Issuer,
-	}
+// GoogleAuth returns unimplemented for private handler.
+// This method is handled by AuthPublicGRPCHandler.
+func (h *AuthPrivateGRPCHandler) GoogleAuth(
+	ctx context.Context,
+	req *connect.Request[authv1.GoogleAuthReq],
+) (*connect.Response[authv1.GoogleAuthRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
+}
 
-	userID, err := jwtutil.ValidateAccessToken(jwtCfg, tokenString)
-	if err != nil {
-		h.logger.Warn("DeviceCodeApprove: invalid access token",
-			slog.Any("error", err),
-		)
-		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid access token"))
+// RefreshToken returns unimplemented for private handler.
+func (h *AuthPrivateGRPCHandler) RefreshToken(
+	ctx context.Context,
+	req *connect.Request[authv1.RefreshTokenReq],
+) (*connect.Response[authv1.RefreshTokenRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
+}
+
+// DeviceCode returns unimplemented for private handler.
+func (h *AuthPrivateGRPCHandler) DeviceCode(
+	ctx context.Context,
+	req *connect.Request[authv1.DeviceCodeReq],
+) (*connect.Response[authv1.DeviceCodeRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
+}
+
+// DevicePoll returns unimplemented for private handler.
+func (h *AuthPrivateGRPCHandler) DevicePoll(
+	ctx context.Context,
+	req *connect.Request[authv1.DevicePollReq],
+) (*connect.Response[authv1.DevicePollRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
+}
+
+// DeviceCodeApprove approves a device code (requires authentication).
+func (h *AuthPrivateGRPCHandler) DeviceCodeApprove(
+	ctx context.Context,
+	req *connect.Request[authv1.DeviceCodeApproveReq],
+) (*connect.Response[authv1.DeviceCodeApproveRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+	if userID == "" {
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
 	}
 
 	params := auth.DeviceCodeApproveParams{
@@ -169,7 +219,7 @@ func (h *AuthGRPCHandler) DeviceCodeApprove(
 		UserID:   domain.ID(userID),
 	}
 
-	err = h.svc.DeviceCodeApprove(ctx, params)
+	err := h.svc.DeviceCodeApprove(ctx, params)
 	if err != nil {
 		h.logger.Error("DeviceCodeApprove failed",
 			slog.String("userCode", req.Msg.UserCode),
@@ -198,4 +248,6 @@ func (h *AuthGRPCHandler) DeviceCodeApprove(
 	return connect.NewResponse(res), nil
 }
 
-var _ authv1connect.AuthServiceHandler = (*AuthGRPCHandler)(nil)
+// Compile-time interface verification.
+var _ authv1connect.AuthServiceHandler = (*AuthPublicGRPCHandler)(nil)
+var _ authv1connect.AuthServiceHandler = (*AuthPrivateGRPCHandler)(nil)

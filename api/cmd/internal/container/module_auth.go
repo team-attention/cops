@@ -37,15 +37,24 @@ func newAuthModule() fx.Option {
 			),
 		),
 
-		// Service - receives *config.Config directly
+		// Service
 		fx.Provide(auth.NewService),
 
-		// ConnectRPC handler - receives *config.Config directly
+		// Public ConnectRPC handler (no auth required)
 		fx.Provide(
 			fx.Annotate(
-				connectrpc.NewAuthGRPCHandler,
-				fx.As(new(ConnectHandler)),
-				fx.ResultTags(`group:"connect_handlers"`),
+				connectrpc.NewAuthPublicGRPCHandler,
+				fx.As(new(PublicConnectHandler)),
+				fx.ResultTags(`group:"public_connect_handlers"`),
+			),
+		),
+
+		// Private ConnectRPC handler (auth required)
+		fx.Provide(
+			fx.Annotate(
+				connectrpc.NewAuthPrivateGRPCHandler,
+				fx.As(new(PrivateConnectHandler)),
+				fx.ResultTags(`group:"private_connect_handlers"`),
 			),
 		),
 	)

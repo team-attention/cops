@@ -12,12 +12,12 @@ func newHealthModule() fx.Option {
 		// Service
 		fx.Provide(health.NewService),
 
-		// gRPC Handler
+		// gRPC Handler (public - no auth required for health checks)
 		fx.Provide(
 			fx.Annotate(
 				connectrpc.NewHealthGRPCHandler,
-				fx.As(new(ConnectHandler)),
-				fx.ResultTags(`group:"connect_handlers"`),
+				fx.As(new(PublicConnectHandler)),
+				fx.ResultTags(`group:"public_connect_handlers"`),
 			),
 		),
 	)

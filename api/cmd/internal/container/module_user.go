@@ -30,12 +30,12 @@ func newUserModule() fx.Option {
 		// Service
 		fx.Provide(user.NewService),
 
-		// ConnectRPC handler
+		// ConnectRPC handler (private - requires auth)
 		fx.Provide(
 			fx.Annotate(
 				connectrpc.NewUserGRPCHandler,
-				fx.As(new(ConnectHandler)),
-				fx.ResultTags(`group:"connect_handlers"`),
+				fx.As(new(PrivateConnectHandler)),
+				fx.ResultTags(`group:"private_connect_handlers"`),
 			),
 		),
 	)
