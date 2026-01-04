@@ -31,11 +31,3 @@ export const devicePoll = AuthService.method.devicePoll;
  * @generated from rpc auth.v1.AuthService.RefreshToken
  */
 export const refreshToken = AuthService.method.refreshToken;
-
-/**
- * DeviceCodeApprove approves a device code from the web application.
- * Requires authenticated user (JWT in Authorization header).
- *
- * @generated from rpc auth.v1.AuthService.DeviceCodeApprove
- */
-export const deviceCodeApprove = AuthService.method.deviceCodeApprove;

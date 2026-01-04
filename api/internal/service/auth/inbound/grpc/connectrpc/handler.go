@@ -143,15 +143,6 @@ func (h *AuthPublicGRPCHandler) DevicePoll(
 	return connect.NewResponse(res), nil
 }
 
-// DeviceCodeApprove returns unimplemented for public handler.
-// This method is handled by AuthPrivateGRPCHandler.
-func (h *AuthPublicGRPCHandler) DeviceCodeApprove(
-	ctx context.Context,
-	req *connect.Request[authv1.DeviceCodeApproveReq],
-) (*connect.Response[authv1.DeviceCodeApproveRes], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use authenticated endpoint"))
-}
-
 // AuthPrivateGRPCHandler handles private auth gRPC endpoints (authentication required).
 type AuthPrivateGRPCHandler struct {
 	svc    *auth.Service
@@ -168,40 +159,7 @@ func NewAuthPrivateGRPCHandler(l *slog.Logger, svc *auth.Service) *AuthPrivateGR
 
 // GetHandler implements PrivateConnectHandler interface.
 func (h *AuthPrivateGRPCHandler) GetHandler(opts ...connect.HandlerOption) (string, http.Handler) {
-	return authv1connect.NewAuthServiceHandler(h, opts...)
-}
-
-// GoogleAuth returns unimplemented for private handler.
-// This method is handled by AuthPublicGRPCHandler.
-func (h *AuthPrivateGRPCHandler) GoogleAuth(
-	ctx context.Context,
-	req *connect.Request[authv1.GoogleAuthReq],
-) (*connect.Response[authv1.GoogleAuthRes], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
-}
-
-// RefreshToken returns unimplemented for private handler.
-func (h *AuthPrivateGRPCHandler) RefreshToken(
-	ctx context.Context,
-	req *connect.Request[authv1.RefreshTokenReq],
-) (*connect.Response[authv1.RefreshTokenRes], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
-}
-
-// DeviceCode returns unimplemented for private handler.
-func (h *AuthPrivateGRPCHandler) DeviceCode(
-	ctx context.Context,
-	req *connect.Request[authv1.DeviceCodeReq],
-) (*connect.Response[authv1.DeviceCodeRes], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
-}
-
-// DevicePoll returns unimplemented for private handler.
-func (h *AuthPrivateGRPCHandler) DevicePoll(
-	ctx context.Context,
-	req *connect.Request[authv1.DevicePollReq],
-) (*connect.Response[authv1.DevicePollRes], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("use public endpoint"))
+	return authv1connect.NewAuthPrivateServiceHandler(h, opts...)
 }
 
 // DeviceCodeApprove approves a device code (requires authentication).
@@ -250,4 +208,4 @@ func (h *AuthPrivateGRPCHandler) DeviceCodeApprove(
 
 // Compile-time interface verification.
 var _ authv1connect.AuthServiceHandler = (*AuthPublicGRPCHandler)(nil)
-var _ authv1connect.AuthServiceHandler = (*AuthPrivateGRPCHandler)(nil)
+var _ authv1connect.AuthPrivateServiceHandler = (*AuthPrivateGRPCHandler)(nil)

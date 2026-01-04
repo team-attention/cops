@@ -68,7 +68,7 @@ message DeviceCodeApproveRes {
   string message = 2;
 }
 
-// AuthService handles authentication operations.
+// AuthService handles public authentication operations (no auth required).
 service AuthService {
   // GoogleAuth exchanges Google OAuth code for JWT tokens (web flow).
   rpc GoogleAuth(GoogleAuthReq) returns (GoogleAuthRes);
@@ -81,7 +81,10 @@ service AuthService {
 
   // RefreshToken exchanges refresh token for new token pair.
   rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenRes);
+}
 
+// AuthPrivateService handles authenticated operations (JWT required).
+service AuthPrivateService {
   // DeviceCodeApprove approves a device code from the web application.
   // Requires authenticated user (JWT in Authorization header).
   rpc DeviceCodeApprove(DeviceCodeApproveReq) returns (DeviceCodeApproveRes);

@@ -620,7 +620,7 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"\tuser_code\x18\x01 \x01(\tR\buserCode\"J\n" +
 	"\x14DeviceCodeApproveRes\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xde\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x8b\x02\n" +
 	"\vAuthService\x12<\n" +
 	"\n" +
 	"GoogleAuth\x12\x16.auth.v1.GoogleAuthReq\x1a\x16.auth.v1.GoogleAuthRes\x12<\n" +
@@ -628,7 +628,8 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"DeviceCode\x12\x16.auth.v1.DeviceCodeReq\x1a\x16.auth.v1.DeviceCodeRes\x12<\n" +
 	"\n" +
 	"DevicePoll\x12\x16.auth.v1.DevicePollReq\x1a\x16.auth.v1.DevicePollRes\x12B\n" +
-	"\fRefreshToken\x12\x18.auth.v1.RefreshTokenReq\x1a\x18.auth.v1.RefreshTokenRes\x12Q\n" +
+	"\fRefreshToken\x12\x18.auth.v1.RefreshTokenReq\x1a\x18.auth.v1.RefreshTokenRes2g\n" +
+	"\x12AuthPrivateService\x12Q\n" +
 	"\x11DeviceCodeApprove\x12\x1d.auth.v1.DeviceCodeApproveReq\x1a\x1d.auth.v1.DeviceCodeApproveResB\x98\x01\n" +
 	"\vcom.auth.v1B\tAuthProtoP\x01ZAgithub.com/team-attention/cops/shared/gen/grpcstub/auth/v1;authv1\xa2\x02\x03AXX\xaa\x02\aAuth.V1\xca\x02\aAuth\\V1\xe2\x02\x13Auth\\V1\\GPBMetadata\xea\x02\bAuth::V1b\x06proto3"
 
@@ -666,12 +667,12 @@ var file_auth_v1_auth_proto_depIdxs = []int32{
 	3,  // 4: auth.v1.AuthService.DeviceCode:input_type -> auth.v1.DeviceCodeReq
 	5,  // 5: auth.v1.AuthService.DevicePoll:input_type -> auth.v1.DevicePollReq
 	7,  // 6: auth.v1.AuthService.RefreshToken:input_type -> auth.v1.RefreshTokenReq
-	9,  // 7: auth.v1.AuthService.DeviceCodeApprove:input_type -> auth.v1.DeviceCodeApproveReq
+	9,  // 7: auth.v1.AuthPrivateService.DeviceCodeApprove:input_type -> auth.v1.DeviceCodeApproveReq
 	2,  // 8: auth.v1.AuthService.GoogleAuth:output_type -> auth.v1.GoogleAuthRes
 	4,  // 9: auth.v1.AuthService.DeviceCode:output_type -> auth.v1.DeviceCodeRes
 	6,  // 10: auth.v1.AuthService.DevicePoll:output_type -> auth.v1.DevicePollRes
 	8,  // 11: auth.v1.AuthService.RefreshToken:output_type -> auth.v1.RefreshTokenRes
-	10, // 12: auth.v1.AuthService.DeviceCodeApprove:output_type -> auth.v1.DeviceCodeApproveRes
+	10, // 12: auth.v1.AuthPrivateService.DeviceCodeApprove:output_type -> auth.v1.DeviceCodeApproveRes
 	8,  // [8:13] is the sub-list for method output_type
 	3,  // [3:8] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
@@ -692,7 +693,7 @@ func file_auth_v1_auth_proto_init() {
 			NumEnums:      0,
 			NumMessages:   11,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_auth_v1_auth_proto_goTypes,
 		DependencyIndexes: file_auth_v1_auth_proto_depIdxs,

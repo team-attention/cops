@@ -23,6 +23,8 @@ const _ = connect.IsAtLeastVersion1_13_0
 const (
 	// AuthServiceName is the fully-qualified name of the AuthService service.
 	AuthServiceName = "auth.v1.AuthService"
+	// AuthPrivateServiceName is the fully-qualified name of the AuthPrivateService service.
+	AuthPrivateServiceName = "auth.v1.AuthPrivateService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -42,9 +44,9 @@ const (
 	// AuthServiceRefreshTokenProcedure is the fully-qualified name of the AuthService's RefreshToken
 	// RPC.
 	AuthServiceRefreshTokenProcedure = "/auth.v1.AuthService/RefreshToken"
-	// AuthServiceDeviceCodeApproveProcedure is the fully-qualified name of the AuthService's
-	// DeviceCodeApprove RPC.
-	AuthServiceDeviceCodeApproveProcedure = "/auth.v1.AuthService/DeviceCodeApprove"
+	// AuthPrivateServiceDeviceCodeApproveProcedure is the fully-qualified name of the
+	// AuthPrivateService's DeviceCodeApprove RPC.
+	AuthPrivateServiceDeviceCodeApproveProcedure = "/auth.v1.AuthPrivateService/DeviceCodeApprove"
 )
 
 // AuthServiceClient is a client for the auth.v1.AuthService service.
@@ -57,9 +59,6 @@ type AuthServiceClient interface {
 	DevicePoll(context.Context, *connect.Request[v1.DevicePollReq]) (*connect.Response[v1.DevicePollRes], error)
 	// RefreshToken exchanges refresh token for new token pair.
 	RefreshToken(context.Context, *connect.Request[v1.RefreshTokenReq]) (*connect.Response[v1.RefreshTokenRes], error)
-	// DeviceCodeApprove approves a device code from the web application.
-	// Requires authenticated user (JWT in Authorization header).
-	DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error)
 }
 
 // NewAuthServiceClient constructs a client for the auth.v1.AuthService service. By default, it uses
@@ -97,22 +96,15 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("RefreshToken")),
 			connect.WithClientOptions(opts...),
 		),
-		deviceCodeApprove: connect.NewClient[v1.DeviceCodeApproveReq, v1.DeviceCodeApproveRes](
-			httpClient,
-			baseURL+AuthServiceDeviceCodeApproveProcedure,
-			connect.WithSchema(authServiceMethods.ByName("DeviceCodeApprove")),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
-	googleAuth        *connect.Client[v1.GoogleAuthReq, v1.GoogleAuthRes]
-	deviceCode        *connect.Client[v1.DeviceCodeReq, v1.DeviceCodeRes]
-	devicePoll        *connect.Client[v1.DevicePollReq, v1.DevicePollRes]
-	refreshToken      *connect.Client[v1.RefreshTokenReq, v1.RefreshTokenRes]
-	deviceCodeApprove *connect.Client[v1.DeviceCodeApproveReq, v1.DeviceCodeApproveRes]
+	googleAuth   *connect.Client[v1.GoogleAuthReq, v1.GoogleAuthRes]
+	deviceCode   *connect.Client[v1.DeviceCodeReq, v1.DeviceCodeRes]
+	devicePoll   *connect.Client[v1.DevicePollReq, v1.DevicePollRes]
+	refreshToken *connect.Client[v1.RefreshTokenReq, v1.RefreshTokenRes]
 }
 
 // GoogleAuth calls auth.v1.AuthService.GoogleAuth.
@@ -135,11 +127,6 @@ func (c *authServiceClient) RefreshToken(ctx context.Context, req *connect.Reque
 	return c.refreshToken.CallUnary(ctx, req)
 }
 
-// DeviceCodeApprove calls auth.v1.AuthService.DeviceCodeApprove.
-func (c *authServiceClient) DeviceCodeApprove(ctx context.Context, req *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error) {
-	return c.deviceCodeApprove.CallUnary(ctx, req)
-}
-
 // AuthServiceHandler is an implementation of the auth.v1.AuthService service.
 type AuthServiceHandler interface {
 	// GoogleAuth exchanges Google OAuth code for JWT tokens (web flow).
@@ -150,9 +137,6 @@ type AuthServiceHandler interface {
 	DevicePoll(context.Context, *connect.Request[v1.DevicePollReq]) (*connect.Response[v1.DevicePollRes], error)
 	// RefreshToken exchanges refresh token for new token pair.
 	RefreshToken(context.Context, *connect.Request[v1.RefreshTokenReq]) (*connect.Response[v1.RefreshTokenRes], error)
-	// DeviceCodeApprove approves a device code from the web application.
-	// Requires authenticated user (JWT in Authorization header).
-	DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -186,12 +170,6 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("RefreshToken")),
 		connect.WithHandlerOptions(opts...),
 	)
-	authServiceDeviceCodeApproveHandler := connect.NewUnaryHandler(
-		AuthServiceDeviceCodeApproveProcedure,
-		svc.DeviceCodeApprove,
-		connect.WithSchema(authServiceMethods.ByName("DeviceCodeApprove")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/auth.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceGoogleAuthProcedure:
@@ -202,8 +180,6 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceDevicePollHandler.ServeHTTP(w, r)
 		case AuthServiceRefreshTokenProcedure:
 			authServiceRefreshTokenHandler.ServeHTTP(w, r)
-		case AuthServiceDeviceCodeApproveProcedure:
-			authServiceDeviceCodeApproveHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -229,6 +205,76 @@ func (UnimplementedAuthServiceHandler) RefreshToken(context.Context, *connect.Re
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.RefreshToken is not implemented"))
 }
 
-func (UnimplementedAuthServiceHandler) DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.DeviceCodeApprove is not implemented"))
+// AuthPrivateServiceClient is a client for the auth.v1.AuthPrivateService service.
+type AuthPrivateServiceClient interface {
+	// DeviceCodeApprove approves a device code from the web application.
+	// Requires authenticated user (JWT in Authorization header).
+	DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error)
+}
+
+// NewAuthPrivateServiceClient constructs a client for the auth.v1.AuthPrivateService service. By
+// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
+// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewAuthPrivateServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AuthPrivateServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	authPrivateServiceMethods := v1.File_auth_v1_auth_proto.Services().ByName("AuthPrivateService").Methods()
+	return &authPrivateServiceClient{
+		deviceCodeApprove: connect.NewClient[v1.DeviceCodeApproveReq, v1.DeviceCodeApproveRes](
+			httpClient,
+			baseURL+AuthPrivateServiceDeviceCodeApproveProcedure,
+			connect.WithSchema(authPrivateServiceMethods.ByName("DeviceCodeApprove")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// authPrivateServiceClient implements AuthPrivateServiceClient.
+type authPrivateServiceClient struct {
+	deviceCodeApprove *connect.Client[v1.DeviceCodeApproveReq, v1.DeviceCodeApproveRes]
+}
+
+// DeviceCodeApprove calls auth.v1.AuthPrivateService.DeviceCodeApprove.
+func (c *authPrivateServiceClient) DeviceCodeApprove(ctx context.Context, req *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error) {
+	return c.deviceCodeApprove.CallUnary(ctx, req)
+}
+
+// AuthPrivateServiceHandler is an implementation of the auth.v1.AuthPrivateService service.
+type AuthPrivateServiceHandler interface {
+	// DeviceCodeApprove approves a device code from the web application.
+	// Requires authenticated user (JWT in Authorization header).
+	DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error)
+}
+
+// NewAuthPrivateServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewAuthPrivateServiceHandler(svc AuthPrivateServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	authPrivateServiceMethods := v1.File_auth_v1_auth_proto.Services().ByName("AuthPrivateService").Methods()
+	authPrivateServiceDeviceCodeApproveHandler := connect.NewUnaryHandler(
+		AuthPrivateServiceDeviceCodeApproveProcedure,
+		svc.DeviceCodeApprove,
+		connect.WithSchema(authPrivateServiceMethods.ByName("DeviceCodeApprove")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/auth.v1.AuthPrivateService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case AuthPrivateServiceDeviceCodeApproveProcedure:
+			authPrivateServiceDeviceCodeApproveHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedAuthPrivateServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedAuthPrivateServiceHandler struct{}
+
+func (UnimplementedAuthPrivateServiceHandler) DeviceCodeApprove(context.Context, *connect.Request[v1.DeviceCodeApproveReq]) (*connect.Response[v1.DeviceCodeApproveRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthPrivateService.DeviceCodeApprove is not implemented"))
 }
