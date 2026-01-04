@@ -1,17 +1,16 @@
 import { Link } from '@tanstack/react-router'
 import {
-  MessageSquare,
-  GitBranch,
-  Clock,
-  ChevronRight,
-  Terminal,
   ArrowDownRight,
-  Zap,
+  ChevronRight,
+  Clock,
+  GitBranch,
+  MessageSquare,
   Timer,
+  Zap,
 } from 'lucide-react'
-import { Badge } from '@/gen/shadcn/ui/badge'
 import type { SessionDetail } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { Badge } from '@/gen/shadcn/ui/badge'
 
 interface SessionHeaderProps {
   session: SessionDetail
@@ -25,7 +24,10 @@ const formatTokenCount = (value: bigint | number | undefined): string => {
   return num.toLocaleString()
 }
 
-const formatDuration = (startedAt: Timestamp | undefined, endedAt: Timestamp | undefined): string => {
+const formatDuration = (
+  startedAt: Timestamp | undefined,
+  endedAt: Timestamp | undefined,
+): string => {
   if (!startedAt) return '-'
   const start = new Date(Number(startedAt.seconds) * 1000)
   const end = endedAt ? new Date(Number(endedAt.seconds) * 1000) : new Date()
@@ -65,7 +67,11 @@ export const SessionHeader = ({ session }: SessionHeaderProps) => {
           Dashboard
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <Link to="/projects" search={{} as never} className="transition-colors hover:text-cyan-400">
+        <Link
+          to="/projects"
+          search={{} as never}
+          className="transition-colors hover:text-cyan-400"
+        >
           Projects
         </Link>
         <ChevronRight className="h-3 w-3" />
@@ -114,13 +120,6 @@ export const SessionHeader = ({ session }: SessionHeaderProps) => {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 font-mono text-xs text-zinc-500">
-                <Terminal className="h-3 w-3" />
-                <span className="max-w-xs truncate lg:max-w-md" title={session.cwd}>
-                  {session.cwd || '/'}
-                </span>
-              </div>
-
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 {/* Git Branch Badge */}
                 <Badge
@@ -154,36 +153,52 @@ export const SessionHeader = ({ session }: SessionHeaderProps) => {
             <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-zinc-500">
                 <MessageSquare className="h-3 w-3" />
-                <span className="font-mono text-[10px] uppercase tracking-wider">Messages</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider">
+                  Messages
+                </span>
               </div>
-              <p className="mt-1 font-mono text-xl font-bold text-zinc-100">{messageCount}</p>
+              <p className="mt-1 font-mono text-xl font-bold text-zinc-100">
+                {messageCount}
+              </p>
             </div>
 
             {/* Input Tokens */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-zinc-500">
                 <ArrowDownRight className="h-3 w-3" />
-                <span className="font-mono text-[10px] uppercase tracking-wider">Input</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider">
+                  Input
+                </span>
               </div>
-              <p className="mt-1 font-mono text-xl font-bold text-cyan-400">{inputTokens}</p>
+              <p className="mt-1 font-mono text-xl font-bold text-cyan-400">
+                {inputTokens}
+              </p>
             </div>
 
             {/* Output Tokens */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-zinc-500">
                 <Zap className="h-3 w-3" />
-                <span className="font-mono text-[10px] uppercase tracking-wider">Output</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider">
+                  Output
+                </span>
               </div>
-              <p className="mt-1 font-mono text-xl font-bold text-violet-400">{outputTokens}</p>
+              <p className="mt-1 font-mono text-xl font-bold text-violet-400">
+                {outputTokens}
+              </p>
             </div>
 
             {/* Duration */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-center">
               <div className="flex items-center justify-center gap-1.5 text-zinc-500">
                 <Timer className="h-3 w-3" />
-                <span className="font-mono text-[10px] uppercase tracking-wider">Duration</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider">
+                  Duration
+                </span>
               </div>
-              <p className="mt-1 font-mono text-xl font-bold text-emerald-400">{duration}</p>
+              <p className="mt-1 font-mono text-xl font-bold text-emerald-400">
+                {duration}
+              </p>
             </div>
           </div>
         </div>

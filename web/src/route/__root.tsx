@@ -6,16 +6,14 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
+import TanStackQueryDevtools from '../integration/tanstack-query/devtools'
+import type { QueryClient } from '@tanstack/react-query'
 import {
+  SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-  SidebarInset,
 } from '@/gen/shadcn/ui/sidebar'
 import { AppSidebar } from '@/shared/component/app-sidebar'
-
-import TanStackQueryDevtools from '../integration/tanstack-query/devtools'
-
-import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -25,9 +23,10 @@ interface MyRouterContext {
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isAuthRoute = pathname.startsWith('/auth')
+  const isOrganizationNewRoute = pathname === '/organizations/new'
 
-  // Auth routes render without sidebar/header layout
-  if (isAuthRoute) {
+  // Auth routes and organization creation render without sidebar/header layout
+  if (isAuthRoute || isOrganizationNewRoute) {
     return (
       <>
         <Outlet />

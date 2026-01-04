@@ -56,18 +56,24 @@ export const useUser = () => {
       }
 
       // Map protobuf Organizations to OrganizationData[]
-      const orgs = data.organizations.map((org) => ({
-        id: org.id,
-        name: org.name,
-        role: org.role as 'admin' | 'member',
-      }))
+      const userId = data.user?.id
+      const orgs = data.organizations.map((org) => {
+        // Find the current user's membership in this organization
+        const membership = org.members.find((m) => m.userId === userId)
+        return {
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+          role: (membership?.role || 'member') as 'admin' | 'member',
+        }
+      })
       setOrganizations(orgs)
     }
   }, [data, setUser, setOrganizations])
 
   // Get selected organization object
   const selectedOrganization = organizations.find(
-    (org) => org.id === selectedOrganizationId
+    (org) => org.id === selectedOrganizationId,
   )
 
   return {

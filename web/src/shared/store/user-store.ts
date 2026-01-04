@@ -13,13 +13,14 @@ interface UserData {
 interface OrganizationData {
   id: string
   name: string
+  slug: string
   role: 'admin' | 'member'
 }
 
 // UserStoreState defines the state shape.
 interface UserStoreState {
   user: UserData | null
-  organizations: OrganizationData[]
+  organizations: Array<OrganizationData>
   selectedOrganizationId: string | null
   isLoading: boolean
   error: string | null
@@ -28,10 +29,13 @@ interface UserStoreState {
 // UserStoreActions defines the available actions.
 interface UserStoreActions {
   setUser: (user: UserData | null) => void
-  setOrganizations: (organizations: OrganizationData[]) => void
+  setOrganizations: (organizations: Array<OrganizationData>) => void
   setSelectedOrganizationId: (id: string | null) => void
   setLoading: (isLoading: boolean) => void
   setError: (error: string | null) => void
+  addOrganization: (organization: OrganizationData) => void
+  updateOrganization: (organizationId: string, updates: Partial<OrganizationData>) => void
+  removeOrganization: (organizationId: string) => void
   reset: () => void
 }
 
@@ -72,6 +76,37 @@ export const useUserStore = create<UserStore>()(
 
       setError: (error) => set({ error }),
 
+      addOrganization: (organization) =>
+        set((state) => ({
+          organizations: [...state.organizations, organization],
+          // Set newly created organization as selected
+          selectedOrganizationId: organization.id,
+        })),
+
+      updateOrganization: (organizationId, updates) =>
+        set((state) => ({
+          organizations: state.organizations.map((org) =>
+            org.id === organizationId ? { ...org, ...updates } : org
+          ),
+        })),
+
+      removeOrganization: (organizationId) =>
+        set((state) => {
+          const newOrganizations = state.organizations.filter(
+            (org) => org.id !== organizationId
+          )
+          return {
+            organizations: newOrganizations,
+            // Auto-select first remaining organization if current was removed
+            selectedOrganizationId:
+              state.selectedOrganizationId === organizationId
+                ? newOrganizations.length > 0
+                  ? newOrganizations[0].id
+                  : null
+                : state.selectedOrganizationId,
+          }
+        }),
+
       reset: () => set(initialState),
     }),
     {
@@ -79,6 +114,6 @@ export const useUserStore = create<UserStore>()(
       partialize: (state) => ({
         selectedOrganizationId: state.selectedOrganizationId,
       }),
-    }
-  )
+    },
+  ),
 )

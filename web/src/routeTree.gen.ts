@@ -17,6 +17,7 @@ import { Route as ProjectsIndexRouteImport } from './route/projects/index'
 import { Route as AuthIndexRouteImport } from './route/auth/index'
 import { Route as SessionsSessionIdRouteImport } from './route/sessions/$sessionId'
 import { Route as ProjectsProjectIdRouteImport } from './route/projects/$projectId'
+import { Route as OrganizationsNewRouteImport } from './route/organizations/new'
 import { Route as AuthDeviceRouteImport } from './route/auth/device'
 import { Route as AuthCallbackRouteImport } from './route/auth/callback'
 
@@ -60,6 +61,11 @@ const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
   path: '/projects/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationsNewRoute = OrganizationsNewRouteImport.update({
+  id: '/organizations/new',
+  path: '/organizations/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthDeviceRoute = AuthDeviceRouteImport.update({
   id: '/auth/device',
   path: '/auth/device',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/auth': typeof AuthIndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/auth': typeof AuthIndexRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/auth/': typeof AuthIndexRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/organizations/new'
     | '/projects/$projectId'
     | '/sessions/$sessionId'
     | '/auth'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/organizations/new'
     | '/projects/$projectId'
     | '/sessions/$sessionId'
     | '/auth'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/organizations/new'
     | '/projects/$projectId'
     | '/sessions/$sessionId'
     | '/auth/'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthDeviceRoute: typeof AuthDeviceRoute
+  OrganizationsNewRoute: typeof OrganizationsNewRoute
   ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
   AuthIndexRoute: typeof AuthIndexRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organizations/new': {
+      id: '/organizations/new'
+      path: '/organizations/new'
+      fullPath: '/organizations/new'
+      preLoaderRoute: typeof OrganizationsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/device': {
       id: '/auth/device'
       path: '/auth/device'
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthDeviceRoute: AuthDeviceRoute,
+  OrganizationsNewRoute: OrganizationsNewRoute,
   ProjectsProjectIdRoute: ProjectsProjectIdRoute,
   SessionsSessionIdRoute: SessionsSessionIdRoute,
   AuthIndexRoute: AuthIndexRoute,

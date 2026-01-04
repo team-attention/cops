@@ -1,12 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Activity, RefreshCw } from 'lucide-react'
 import { useGetOverview } from '@/feature/dashboard/hook/use-get-overview'
 import { OverviewStats } from '@/feature/dashboard/component/overview-stats'
 import { ProjectList } from '@/feature/dashboard/component/project-list'
 import { RecentSessions } from '@/feature/dashboard/component/recent-sessions'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
+import { useUserStore } from '@/shared/store/user-store'
 
 export const Route = createFileRoute('/dashboard')({
+  beforeLoad: async () => {
+    // Get organizations array from useUserStore.getState().organizations
+    const { organizations } = useUserStore.getState()
+    // If organizations.length === 0, redirect to organization creation page
+    if (organizations.length === 0) {
+      throw redirect({ to: '/organizations/new' })
+    }
+  },
   component: DashboardPage,
 })
 

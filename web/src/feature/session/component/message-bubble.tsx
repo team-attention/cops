@@ -1,7 +1,7 @@
-import { User, Bot, Wrench, AlertCircle, Zap } from 'lucide-react'
-import { Badge } from '@/gen/shadcn/ui/badge'
-import type { ParsedMessage, ToolUseContentBlock } from '../type/content-block'
+import { AlertCircle, Bot, User, Wrench, Zap } from 'lucide-react'
+import type { ParsedMessage } from '../type/content-block'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { Badge } from '@/gen/shadcn/ui/badge'
 
 interface MessageBubbleProps {
   message: ParsedMessage
@@ -60,9 +60,7 @@ export const MessageBubble = ({
     .map((block) => (block as { type: 'text'; text: string }).text)
     .join('\n')
 
-  const toolUses = message.content.filter(
-    (block) => block.type === 'tool_use'
-  ) as ToolUseContentBlock[]
+  const toolUses = message.content.filter((block) => block.type === 'tool_use')
 
   // Calculate total tokens for assistant messages
   const totalTokens = message.usage
@@ -131,7 +129,13 @@ export const MessageBubble = ({
                     : 'text-violet-400'
             }`}
           >
-            {isSystem ? 'System' : isUser ? 'Human' : isToolResult ? message.toolName || 'Tool Result' : 'Assistant'}
+            {isSystem
+              ? 'System'
+              : isUser
+                ? 'Human'
+                : isToolResult
+                  ? message.toolName || 'Tool Result'
+                  : 'Assistant'}
           </span>
 
           {/* Token usage for assistant */}
@@ -197,8 +201,12 @@ export const MessageBubble = ({
         {isToolResult && message.content[0]?.type === 'tool_result' && (
           <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
             <pre className="max-h-40 overflow-auto font-mono text-xs text-zinc-400">
-              {(message.content[0] as { content: string }).content.slice(0, 500)}
-              {(message.content[0] as { content: string }).content.length > 500 && (
+              {(message.content[0] as { content: string }).content.slice(
+                0,
+                500,
+              )}
+              {(message.content[0] as { content: string }).content.length >
+                500 && (
                 <span className="text-zinc-600">... (see tool panel)</span>
               )}
             </pre>
