@@ -1,25 +1,25 @@
 import { useState } from 'react'
 import {
+  AlertCircle,
+  Bot,
+  Check,
   ChevronDown,
   ChevronRight,
   Copy,
-  Check,
   FileText,
-  Pencil,
-  Terminal,
-  Search,
   Globe,
-  Bot,
-  AlertCircle,
+  Pencil,
+  Search,
+  Terminal,
 } from 'lucide-react'
+import type { LinkedToolCall } from '../type/content-block'
+import type { Timestamp } from '@bufbuild/protobuf/wkt'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/gen/shadcn/ui/collapsible'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import type { LinkedToolCall } from '../type/content-block'
-import type { Timestamp } from '@bufbuild/protobuf/wkt'
 
 interface ToolCallItemProps {
   toolCall: LinkedToolCall
@@ -29,7 +29,11 @@ interface ToolCallItemProps {
 const formatTime = (timestamp: Timestamp | undefined): string => {
   if (!timestamp) return ''
   const date = new Date(Number(timestamp.seconds) * 1000)
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 }
 
 // Get icon for tool type
@@ -47,7 +51,8 @@ const getToolIcon = (toolName: string) => {
 // Get accent color for tool type
 const getToolColor = (toolName: string): string => {
   const name = toolName.toLowerCase()
-  if (name.includes('read') || name.includes('glob') || name.includes('grep')) return 'cyan'
+  if (name.includes('read') || name.includes('glob') || name.includes('grep'))
+    return 'cyan'
   if (name.includes('write') || name.includes('edit')) return 'amber'
   if (name.includes('bash') || name.includes('shell')) return 'emerald'
   if (name.includes('web') || name.includes('fetch')) return 'blue'
@@ -55,7 +60,10 @@ const getToolColor = (toolName: string): string => {
   return 'zinc'
 }
 
-export const ToolCallItem = ({ toolCall, isHighlighted = false }: ToolCallItemProps) => {
+export const ToolCallItem = ({
+  toolCall,
+  isHighlighted = false,
+}: ToolCallItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [showFullOutput, setShowFullOutput] = useState(false)
@@ -72,7 +80,9 @@ export const ToolCallItem = ({ toolCall, isHighlighted = false }: ToolCallItemPr
   const outputContent = toolResult?.content || ''
   const outputLines = outputContent.split('\n')
   const isLongOutput = outputLines.length > 20
-  const displayOutput = showFullOutput ? outputContent : outputLines.slice(0, 20).join('\n')
+  const displayOutput = showFullOutput
+    ? outputContent
+    : outputLines.slice(0, 20).join('\n')
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation()

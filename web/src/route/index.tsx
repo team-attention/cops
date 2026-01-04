@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Terminal, ArrowRight } from 'lucide-react'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { ArrowRight, Terminal } from 'lucide-react'
 import { Button } from '@/gen/shadcn/ui/button'
 import { LandingHeader } from '@/shared/component/landing-header'
 import { useAuth } from '@/shared/hook/use-auth'
@@ -60,8 +60,9 @@ function LandingPage() {
 
           {/* Description */}
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-zinc-400 mb-8">
-            Monitor and analyze your AI coding sessions across all your projects. Get insights into
-            token usage, session history, and agent interactions in one unified dashboard.
+            Monitor and analyze your AI coding sessions across all your
+            projects. Get insights into token usage, session history, and agent
+            interactions in one unified dashboard.
           </p>
 
           {/* CTA Button */}
@@ -79,7 +80,9 @@ function LandingPage() {
         {/* Footer */}
         <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-2 text-zinc-700">
           <div className="h-px flex-1 max-w-[100px] bg-gradient-to-r from-transparent to-zinc-800" />
-          <span className="font-mono text-[10px] uppercase tracking-widest">C-Ops v0.1.0</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest">
+            C-Ops v0.1.0
+          </span>
           <div className="h-px flex-1 max-w-[100px] bg-gradient-to-l from-transparent to-zinc-800" />
         </div>
       </main>

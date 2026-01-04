@@ -1,16 +1,16 @@
-import { RecordType } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 import type {
+  AssistantMessageContent,
   Record,
   UserRecordData,
-  AssistantMessageContent,
 } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 import type {
-  ParsedMessage,
   ContentBlock,
   LinkedToolCall,
-  ToolUseContentBlock,
+  ParsedMessage,
   ToolResultContentBlock,
+  ToolUseContentBlock,
 } from '../type/content-block'
+import { RecordType } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 
 // Helper to extract user message text content from UserRecordData
 const extractUserMessageText = (userData: UserRecordData): string => {
@@ -35,8 +35,10 @@ const extractUserMessageText = (userData: UserRecordData): string => {
 }
 
 // Helper to convert AssistantMessageContent[] to ContentBlock[]
-const convertAssistantContent = (content: AssistantMessageContent[]): ContentBlock[] => {
-  const blocks: ContentBlock[] = []
+const convertAssistantContent = (
+  content: Array<AssistantMessageContent>,
+): Array<ContentBlock> => {
+  const blocks: Array<ContentBlock> = []
 
   for (const item of content) {
     if (item.type === 'text') {
@@ -96,7 +98,10 @@ export const parseMessageContent = (record: Record): ParsedMessage => {
     }
   }
 
-  if (record.type === RecordType.ASSISTANT && record.data.case === 'assistantData') {
+  if (
+    record.type === RecordType.ASSISTANT &&
+    record.data.case === 'assistantData'
+  ) {
     const assistantData = record.data.value
     const metadata = assistantData.metadata
 
@@ -134,7 +139,9 @@ export const parseMessageContent = (record: Record): ParsedMessage => {
 }
 
 // Extract and link tool calls from records
-export const extractToolCalls = (records: Record[]): LinkedToolCall[] => {
+export const extractToolCalls = (
+  records: Array<Record>,
+): Array<LinkedToolCall> => {
   const toolUseMap = new Map<
     string,
     {
@@ -147,7 +154,10 @@ export const extractToolCalls = (records: Record[]): LinkedToolCall[] => {
 
   // First pass - collect tool_use blocks from assistant records
   for (const record of records) {
-    if (record.type === RecordType.ASSISTANT && record.data.case === 'assistantData') {
+    if (
+      record.type === RecordType.ASSISTANT &&
+      record.data.case === 'assistantData'
+    ) {
       const assistantData = record.data.value
       const metadata = assistantData.metadata
       const content = assistantData.message?.content || []
@@ -178,7 +188,10 @@ export const extractToolCalls = (records: Record[]): LinkedToolCall[] => {
 
   // Second pass - collect tool_result blocks
   for (const record of records) {
-    if (record.type === RecordType.ASSISTANT && record.data.case === 'assistantData') {
+    if (
+      record.type === RecordType.ASSISTANT &&
+      record.data.case === 'assistantData'
+    ) {
       const assistantData = record.data.value
       const content = assistantData.message?.content || []
 
@@ -195,15 +208,19 @@ export const extractToolCalls = (records: Record[]): LinkedToolCall[] => {
   }
 
   // Link tool uses with results
-  return Array.from(toolUseMap.entries()).map(([id, { block, sourceUuid, timestamp }]) => ({
-    toolUse: block,
-    toolResult: toolResults.get(id),
-    sourceMessageUuid: sourceUuid,
-    timestamp,
-  }))
+  return Array.from(toolUseMap.entries()).map(
+    ([id, { block, sourceUuid, timestamp }]) => ({
+      toolUse: block,
+      toolResult: toolResults.get(id),
+      sourceMessageUuid: sourceUuid,
+      timestamp,
+    }),
+  )
 }
 
 // Filter records for chat view display
-export const filterRecordsForChat = (records: Record[]): Record[] => {
-  return records.filter((record) => record.type !== RecordType.FILE_HISTORY_SNAPSHOT)
+export const filterRecordsForChat = (records: Array<Record>): Array<Record> => {
+  return records.filter(
+    (record) => record.type !== RecordType.FILE_HISTORY_SNAPSHOT,
+  )
 }

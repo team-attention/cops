@@ -2,283 +2,300 @@
 // @generated from file collector/v1/collector.proto (package collector.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file collector/v1/collector.proto.
  */
-export const file_collector_v1_collector: GenFile = /*@__PURE__*/
-  fileDesc("Chxjb2xsZWN0b3IvdjEvY29sbGVjdG9yLnByb3RvEgxjb2xsZWN0b3IudjEi3AIKDVNlc3Npb25SZWNvcmQSDAoEdXVpZBgBIAEoCRITCgtwYXJlbnRfdXVpZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEgwKBHR5cGUYBCABKAkSDAoEcm9sZRgFIAEoCRIPCgdjb250ZW50GAYgASgJEi0KCXRpbWVzdGFtcBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASCwoDY3dkGAggASgJEhIKCmdpdF9icmFuY2gYCSABKAkSDwoHdmVyc2lvbhgKIAEoCRIqCgV1c2FnZRgLIAEoCzIbLmNvbGxlY3Rvci52MS5Vc2FnZU1ldGFkYXRhEhEKCXVzZXJfdHlwZRgMIAEoCRIUCgxpc19zaWRlY2hhaW4YDSABKAgSDwoHaXNfbWV0YRgOIAEoCBIMCgRzbHVnGA8gASgJEhIKCnJlcXVlc3RfaWQYECABKAkizQEKDVVzYWdlTWV0YWRhdGESFAoMaW5wdXRfdG9rZW5zGAEgASgFEhUKDW91dHB1dF90b2tlbnMYAiABKAUSIwobY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zGAMgASgFEh8KF2NhY2hlX3JlYWRfaW5wdXRfdG9rZW5zGAQgASgFEjMKDmNhY2hlX2NyZWF0aW9uGAUgASgLMhsuY29sbGVjdG9yLnYxLkNhY2hlQ3JlYXRpb24SFAoMc2VydmljZV90aWVyGAYgASgJIlUKDUNhY2hlQ3JlYXRpb24SIQoZZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucxgBIAEoBRIhChllcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zGAIgASgFIlIKDlNlbmRSZWNvcmRzUmVxEhIKCnByb2plY3RfaWQYASABKAkSLAoHcmVjb3JkcxgCIAMoCzIbLmNvbGxlY3Rvci52MS5TZXNzaW9uUmVjb3JkIjsKDlNlbmRSZWNvcmRzUmVzEhgKEHJlY29yZHNfcmVjZWl2ZWQYASABKAUSDwoHc3VjY2VzcxgCIAEoCDJdChBDb2xsZWN0b3JTZXJ2aWNlEkkKC1NlbmRSZWNvcmRzEhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVxGhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVzQsABChBjb20uY29sbGVjdG9yLnYxQg5Db2xsZWN0b3JQcm90b1ABWktnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9jb2xsZWN0b3IvdjE7Y29sbGVjdG9ydjGiAgNDWFiqAgxDb2xsZWN0b3IuVjHKAgxDb2xsZWN0b3JcVjHiAhhDb2xsZWN0b3JcVjFcR1BCTWV0YWRhdGHqAg1Db2xsZWN0b3I6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+export const file_collector_v1_collector: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'Chxjb2xsZWN0b3IvdjEvY29sbGVjdG9yLnByb3RvEgxjb2xsZWN0b3IudjEi3AIKDVNlc3Npb25SZWNvcmQSDAoEdXVpZBgBIAEoCRITCgtwYXJlbnRfdXVpZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEgwKBHR5cGUYBCABKAkSDAoEcm9sZRgFIAEoCRIPCgdjb250ZW50GAYgASgJEi0KCXRpbWVzdGFtcBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASCwoDY3dkGAggASgJEhIKCmdpdF9icmFuY2gYCSABKAkSDwoHdmVyc2lvbhgKIAEoCRIqCgV1c2FnZRgLIAEoCzIbLmNvbGxlY3Rvci52MS5Vc2FnZU1ldGFkYXRhEhEKCXVzZXJfdHlwZRgMIAEoCRIUCgxpc19zaWRlY2hhaW4YDSABKAgSDwoHaXNfbWV0YRgOIAEoCBIMCgRzbHVnGA8gASgJEhIKCnJlcXVlc3RfaWQYECABKAkizQEKDVVzYWdlTWV0YWRhdGESFAoMaW5wdXRfdG9rZW5zGAEgASgFEhUKDW91dHB1dF90b2tlbnMYAiABKAUSIwobY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zGAMgASgFEh8KF2NhY2hlX3JlYWRfaW5wdXRfdG9rZW5zGAQgASgFEjMKDmNhY2hlX2NyZWF0aW9uGAUgASgLMhsuY29sbGVjdG9yLnYxLkNhY2hlQ3JlYXRpb24SFAoMc2VydmljZV90aWVyGAYgASgJIlUKDUNhY2hlQ3JlYXRpb24SIQoZZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucxgBIAEoBRIhChllcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zGAIgASgFIlIKDlNlbmRSZWNvcmRzUmVxEhIKCnByb2plY3RfaWQYASABKAkSLAoHcmVjb3JkcxgCIAMoCzIbLmNvbGxlY3Rvci52MS5TZXNzaW9uUmVjb3JkIjsKDlNlbmRSZWNvcmRzUmVzEhgKEHJlY29yZHNfcmVjZWl2ZWQYASABKAUSDwoHc3VjY2VzcxgCIAEoCDJdChBDb2xsZWN0b3JTZXJ2aWNlEkkKC1NlbmRSZWNvcmRzEhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVxGhwuY29sbGVjdG9yLnYxLlNlbmRSZWNvcmRzUmVzQsABChBjb20uY29sbGVjdG9yLnYxQg5Db2xsZWN0b3JQcm90b1ABWktnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9jb2xsZWN0b3IvdjE7Y29sbGVjdG9ydjGiAgNDWFiqAgxDb2xsZWN0b3IuVjHKAgxDb2xsZWN0b3JcVjHiAhhDb2xsZWN0b3JcVjFcR1BCTWV0YWRhdGHqAg1Db2xsZWN0b3I6OlYxYgZwcm90bzM',
+    [file_google_protobuf_timestamp],
+  )
 
 /**
  * SessionRecord represents a single Claude Code session entry.
  *
  * @generated from message collector.v1.SessionRecord
  */
-export type SessionRecord = Message<"collector.v1.SessionRecord"> & {
+export type SessionRecord = Message<'collector.v1.SessionRecord'> & {
   /**
    * Unique identifier for this record
    *
    * @generated from field: string uuid = 1;
    */
-  uuid: string;
+  uuid: string
 
   /**
    * Parent record UUID (for message threading)
    *
    * @generated from field: string parent_uuid = 2;
    */
-  parentUuid: string;
+  parentUuid: string
 
   /**
    * Session identifier
    *
    * @generated from field: string session_id = 3;
    */
-  sessionId: string;
+  sessionId: string
 
   /**
    * Message type: user, assistant, system, summary, file-history-snapshot, queue-operation
    *
    * @generated from field: string type = 4;
    */
-  type: string;
+  type: string
 
   /**
    * Message role
    *
    * @generated from field: string role = 5;
    */
-  role: string;
+  role: string
 
   /**
    * Message content (may be JSON for complex content)
    *
    * @generated from field: string content = 6;
    */
-  content: string;
+  content: string
 
   /**
    * Record timestamp
    *
    * @generated from field: google.protobuf.Timestamp timestamp = 7;
    */
-  timestamp?: Timestamp;
+  timestamp?: Timestamp
 
   /**
    * Current working directory when message was created
    *
    * @generated from field: string cwd = 8;
    */
-  cwd: string;
+  cwd: string
 
   /**
    * Git branch name
    *
    * @generated from field: string git_branch = 9;
    */
-  gitBranch: string;
+  gitBranch: string
 
   /**
    * Claude Code version
    *
    * @generated from field: string version = 10;
    */
-  version: string;
+  version: string
 
   /**
    * Usage metadata (for assistant messages)
    *
    * @generated from field: collector.v1.UsageMetadata usage = 11;
    */
-  usage?: UsageMetadata;
+  usage?: UsageMetadata
 
   /**
    * User type (e.g., "external")
    *
    * @generated from field: string user_type = 12;
    */
-  userType: string;
+  userType: string
 
   /**
    * Whether this entry is part of a sidechain
    *
    * @generated from field: bool is_sidechain = 13;
    */
-  isSidechain: boolean;
+  isSidechain: boolean
 
   /**
    * True for meta messages (e.g., system reminders)
    *
    * @generated from field: bool is_meta = 14;
    */
-  isMeta: boolean;
+  isMeta: boolean
 
   /**
    * Human-readable name (present in tool_result and assistant entries)
    *
    * @generated from field: string slug = 15;
    */
-  slug: string;
+  slug: string
 
   /**
    * API Request ID (for assistant entries)
    *
    * @generated from field: string request_id = 16;
    */
-  requestId: string;
-};
+  requestId: string
+}
 
 /**
  * Describes the message collector.v1.SessionRecord.
  * Use `create(SessionRecordSchema)` to create a new message.
  */
-export const SessionRecordSchema: GenMessage<SessionRecord> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 0);
+export const SessionRecordSchema: GenMessage<SessionRecord> =
+  /*@__PURE__*/
+  messageDesc(file_collector_v1_collector, 0)
 
 /**
  * UsageMetadata contains token usage information from Claude API.
  *
  * @generated from message collector.v1.UsageMetadata
  */
-export type UsageMetadata = Message<"collector.v1.UsageMetadata"> & {
+export type UsageMetadata = Message<'collector.v1.UsageMetadata'> & {
   /**
    * Number of input tokens
    *
    * @generated from field: int32 input_tokens = 1;
    */
-  inputTokens: number;
+  inputTokens: number
 
   /**
    * Number of output tokens
    *
    * @generated from field: int32 output_tokens = 2;
    */
-  outputTokens: number;
+  outputTokens: number
 
   /**
    * Number of cache creation input tokens
    *
    * @generated from field: int32 cache_creation_input_tokens = 3;
    */
-  cacheCreationInputTokens: number;
+  cacheCreationInputTokens: number
 
   /**
    * Number of cache read input tokens
    *
    * @generated from field: int32 cache_read_input_tokens = 4;
    */
-  cacheReadInputTokens: number;
+  cacheReadInputTokens: number
 
   /**
    * Ephemeral cache token counts
    *
    * @generated from field: collector.v1.CacheCreation cache_creation = 5;
    */
-  cacheCreation?: CacheCreation;
+  cacheCreation?: CacheCreation
 
   /**
    * Service tier (e.g., "standard")
    *
    * @generated from field: string service_tier = 6;
    */
-  serviceTier: string;
-};
+  serviceTier: string
+}
 
 /**
  * Describes the message collector.v1.UsageMetadata.
  * Use `create(UsageMetadataSchema)` to create a new message.
  */
-export const UsageMetadataSchema: GenMessage<UsageMetadata> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 1);
+export const UsageMetadataSchema: GenMessage<UsageMetadata> =
+  /*@__PURE__*/
+  messageDesc(file_collector_v1_collector, 1)
 
 /**
  * CacheCreation contains ephemeral cache token counts.
  *
  * @generated from message collector.v1.CacheCreation
  */
-export type CacheCreation = Message<"collector.v1.CacheCreation"> & {
+export type CacheCreation = Message<'collector.v1.CacheCreation'> & {
   /**
    * Ephemeral 5-minute input tokens
    *
    * @generated from field: int32 ephemeral_5m_input_tokens = 1;
    */
-  ephemeral5mInputTokens: number;
+  ephemeral5mInputTokens: number
 
   /**
    * Ephemeral 1-hour input tokens
    *
    * @generated from field: int32 ephemeral_1h_input_tokens = 2;
    */
-  ephemeral1hInputTokens: number;
-};
+  ephemeral1hInputTokens: number
+}
 
 /**
  * Describes the message collector.v1.CacheCreation.
  * Use `create(CacheCreationSchema)` to create a new message.
  */
-export const CacheCreationSchema: GenMessage<CacheCreation> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 2);
+export const CacheCreationSchema: GenMessage<CacheCreation> =
+  /*@__PURE__*/
+  messageDesc(file_collector_v1_collector, 2)
 
 /**
  * SendRecordsReq is the request message for SendRecords RPC.
  *
  * @generated from message collector.v1.SendRecordsReq
  */
-export type SendRecordsReq = Message<"collector.v1.SendRecordsReq"> & {
+export type SendRecordsReq = Message<'collector.v1.SendRecordsReq'> & {
   /**
    * Project MongoDB ObjectID as hex string
    *
    * @generated from field: string project_id = 1;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * Session records to send
    *
    * @generated from field: repeated collector.v1.SessionRecord records = 2;
    */
-  records: SessionRecord[];
-};
+  records: SessionRecord[]
+}
 
 /**
  * Describes the message collector.v1.SendRecordsReq.
  * Use `create(SendRecordsReqSchema)` to create a new message.
  */
-export const SendRecordsReqSchema: GenMessage<SendRecordsReq> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 3);
+export const SendRecordsReqSchema: GenMessage<SendRecordsReq> =
+  /*@__PURE__*/
+  messageDesc(file_collector_v1_collector, 3)
 
 /**
  * SendRecordsRes is the response message for SendRecords RPC.
  *
  * @generated from message collector.v1.SendRecordsRes
  */
-export type SendRecordsRes = Message<"collector.v1.SendRecordsRes"> & {
+export type SendRecordsRes = Message<'collector.v1.SendRecordsRes'> & {
   /**
    * Number of records received
    *
    * @generated from field: int32 records_received = 1;
    */
-  recordsReceived: number;
+  recordsReceived: number
 
   /**
    * Whether the operation was successful
    *
    * @generated from field: bool success = 2;
    */
-  success: boolean;
-};
+  success: boolean
+}
 
 /**
  * Describes the message collector.v1.SendRecordsRes.
  * Use `create(SendRecordsResSchema)` to create a new message.
  */
-export const SendRecordsResSchema: GenMessage<SendRecordsRes> = /*@__PURE__*/
-  messageDesc(file_collector_v1_collector, 4);
+export const SendRecordsResSchema: GenMessage<SendRecordsRes> =
+  /*@__PURE__*/
+  messageDesc(file_collector_v1_collector, 4)
 
 /**
  * CollectorService handles session record collection.
@@ -292,10 +309,8 @@ export const CollectorService: GenService<{
    * @generated from rpc collector.v1.CollectorService.SendRecords
    */
   sendRecords: {
-    methodKind: "unary";
-    input: typeof SendRecordsReqSchema;
-    output: typeof SendRecordsResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_collector_v1_collector, 0);
-
+    methodKind: 'unary'
+    input: typeof SendRecordsReqSchema
+    output: typeof SendRecordsResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_collector_v1_collector, 0)

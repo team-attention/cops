@@ -1,6 +1,12 @@
-import { ArrowDownRight, ArrowUpRight, MessageSquare, Zap, Archive } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
+import {
+  Archive,
+  ArrowDownRight,
+  ArrowUpRight,
+  MessageSquare,
+  Zap,
+} from 'lucide-react'
 import type { TokenUsageSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
+import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 
 interface OverviewStatsProps {
   totalUsage?: TokenUsageSummary
@@ -25,12 +31,21 @@ interface StatCardProps {
   accentColor: string
 }
 
-const StatCard = ({ title, value, subtitle, icon, trend, accentColor }: StatCardProps) => (
+const StatCard = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  trend,
+  accentColor,
+}: StatCardProps) => (
   <Card className="group relative overflow-hidden border-zinc-800/50 bg-zinc-900/80 backdrop-blur-sm transition-all duration-300 hover:border-zinc-700/80 hover:bg-zinc-900/90">
     {/* Glow effect on hover */}
     <div
       className="absolute inset-0 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-20"
-      style={{ background: `radial-gradient(circle at 50% 50%, ${accentColor}, transparent 70%)` }}
+      style={{
+        background: `radial-gradient(circle at 50% 50%, ${accentColor}, transparent 70%)`,
+      }}
     />
 
     {/* Scanline effect */}
@@ -56,8 +71,14 @@ const StatCard = ({ title, value, subtitle, icon, trend, accentColor }: StatCard
           {value}
         </span>
         {trend && trend !== 'neutral' && (
-          <span className={`flex items-center text-xs ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {trend === 'up' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+          <span
+            className={`flex items-center text-xs ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}
+          >
+            {trend === 'up' ? (
+              <ArrowUpRight className="h-3 w-3" />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" />
+            )}
           </span>
         )}
       </div>
@@ -74,13 +95,18 @@ const StatCard = ({ title, value, subtitle, icon, trend, accentColor }: StatCard
   </Card>
 )
 
-export const OverviewStats = ({ totalUsage, projectCount, sessionCount }: OverviewStatsProps) => {
+export const OverviewStats = ({
+  totalUsage,
+  projectCount,
+  sessionCount,
+}: OverviewStatsProps) => {
   const inputTokens = formatTokenCount(totalUsage?.totalInputTokens)
   const outputTokens = formatTokenCount(totalUsage?.totalOutputTokens)
   const cacheTokens = formatTokenCount(
     totalUsage
-      ? (totalUsage.totalCacheCreationTokens ?? 0n) + (totalUsage.totalCacheReadTokens ?? 0n)
-      : undefined
+      ? (totalUsage.totalCacheCreationTokens ?? 0n) +
+          (totalUsage.totalCacheReadTokens ?? 0n)
+      : undefined,
   )
 
   return (

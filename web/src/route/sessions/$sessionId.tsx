@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { MessageSquare, RefreshCw } from 'lucide-react'
 import { useGetSession } from '@/feature/session/hook/use-get-session'
@@ -36,13 +36,8 @@ function SessionDetailPage() {
   const { sessionId } = Route.useParams()
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
 
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    isFetching,
-  } = useGetSession(sessionId)
+  const { data, isLoading, isError, refetch, isFetching } =
+    useGetSession(sessionId)
 
   const session = data?.session
 

@@ -22,7 +22,7 @@ interface PaginationControlsProps {
   totalCount: number
   onPageChange: (page: number) => void
   onPageSizeChange: (size: number) => void
-  pageSizeOptions?: number[]
+  pageSizeOptions?: Array<number>
 }
 
 export const PaginationControls = ({
@@ -38,7 +38,7 @@ export const PaginationControls = ({
   const endItem = Math.min(currentPage * pageSize, totalCount)
 
   // Generate visible page numbers with ellipsis
-  const getVisiblePages = (): (number | 'ellipsis')[] => {
+  const getVisiblePages = (): Array<number | 'ellipsis'> => {
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1)
     }
@@ -48,10 +48,26 @@ export const PaginationControls = ({
     }
 
     if (currentPage >= totalPages - 2) {
-      return [1, 'ellipsis', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
+      return [
+        1,
+        'ellipsis',
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ]
     }
 
-    return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages]
+    return [
+      1,
+      'ellipsis',
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      'ellipsis',
+      totalPages,
+    ]
   }
 
   return (
@@ -68,7 +84,11 @@ export const PaginationControls = ({
           </SelectTrigger>
           <SelectContent className="border-zinc-700 bg-zinc-900">
             {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={String(size)} className="font-mono text-xs">
+              <SelectItem
+                key={size}
+                value={String(size)}
+                className="font-mono text-xs"
+              >
                 {size}
               </SelectItem>
             ))}
@@ -88,7 +108,11 @@ export const PaginationControls = ({
           <PaginationItem>
             <PaginationPrevious
               onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-              className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              className={
+                currentPage <= 1
+                  ? 'pointer-events-none opacity-50'
+                  : 'cursor-pointer'
+              }
             />
           </PaginationItem>
 
@@ -110,8 +134,14 @@ export const PaginationControls = ({
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
-              className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              onClick={() =>
+                currentPage < totalPages && onPageChange(currentPage + 1)
+              }
+              className={
+                currentPage >= totalPages
+                  ? 'pointer-events-none opacity-50'
+                  : 'cursor-pointer'
+              }
             />
           </PaginationItem>
         </PaginationContent>

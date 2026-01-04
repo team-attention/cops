@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { FolderGit2, Clock, ChevronRight, Terminal } from 'lucide-react'
-import type { ProjectDetail, TokenUsageSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
+import { ChevronRight, Clock, FolderGit2, Terminal } from 'lucide-react'
+import type {
+  ProjectDetail,
+  TokenUsageSummary,
+} from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 
 interface ProjectHeaderProps {
@@ -48,10 +51,7 @@ export const ProjectHeader = ({ project }: ProjectHeaderProps) => {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 font-mono text-xs text-zinc-500">
-        <Link
-          to="/dashboard"
-          className="transition-colors hover:text-cyan-400"
-        >
+        <Link to="/dashboard" className="transition-colors hover:text-cyan-400">
           Dashboard
         </Link>
         <ChevronRight className="h-3 w-3" />
@@ -92,7 +92,10 @@ export const ProjectHeader = ({ project }: ProjectHeaderProps) => {
 
               <div className="flex items-center gap-2 font-mono text-xs text-zinc-500">
                 <Terminal className="h-3 w-3" />
-                <span className="max-w-xs truncate lg:max-w-md" title={project.path}>
+                <span
+                  className="max-w-xs truncate lg:max-w-md"
+                  title={project.path}
+                >
                   {project.path}
                 </span>
               </div>
@@ -112,12 +115,16 @@ export const ProjectHeader = ({ project }: ProjectHeaderProps) => {
             <div className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-2">
               <div className="text-right">
                 <p className="font-mono text-xs text-zinc-500">Total Tokens</p>
-                <p className="font-mono text-lg font-bold text-cyan-400">{totalTokens}</p>
+                <p className="font-mono text-lg font-bold text-cyan-400">
+                  {totalTokens}
+                </p>
               </div>
               <div className="h-8 w-px bg-zinc-800" />
               <div className="text-right">
                 <p className="font-mono text-xs text-zinc-500">Sessions</p>
-                <p className="font-mono text-lg font-bold text-emerald-400">{project.sessionCount}</p>
+                <p className="font-mono text-lg font-bold text-emerald-400">
+                  {project.sessionCount}
+                </p>
               </div>
             </div>
 

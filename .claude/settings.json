@@ -5,6 +5,7 @@
       "Bash(find:*)",
       "Bash(test:*)",
       "Bash(grep:*)",
+      "Bash(wc:*)",
       "Bash(git log:*)",
       "Bash(tree:*)",
       "Bash(xargs:*)",
@@ -44,6 +45,7 @@
   ],
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
-    "feature-dev@local": true
+    "feature-dev@local": false,
+    "feature-dev-v2@local": false
   }
 }

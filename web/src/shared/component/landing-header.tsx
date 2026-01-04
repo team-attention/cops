@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Terminal, UserCircle, Settings, LogOut } from 'lucide-react'
+import { LogOut, Settings, Terminal, UserCircle } from 'lucide-react'
 import { Button } from '@/gen/shadcn/ui/button'
 import {
   DropdownMenu,
@@ -62,7 +62,9 @@ export const LandingHeader = () => {
                   align="end"
                   className="w-48 border-zinc-800 bg-zinc-900"
                 >
-                  <DropdownMenuItem onClick={() => navigate({ to: '/settings' })}>
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: '/settings' })}
+                  >
                     <Settings className="h-4 w-4 mr-2" />
                     Account Settings
                   </DropdownMenuItem>

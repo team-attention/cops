@@ -1,5 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { FolderGit2, Clock, ChevronUp, ChevronDown, Zap } from 'lucide-react'
+import { ChevronDown, ChevronUp, Clock, FolderGit2, Zap } from 'lucide-react'
+import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import {
   Table,
   TableBody,
@@ -8,14 +9,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/gen/shadcn/ui/table'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/gen/shadcn/ui/tooltip'
-import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
-import { formatRelativeTime, formatTokenCount, truncatePath } from '@/shared/util/format'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/gen/shadcn/ui/tooltip'
+import {
+  formatRelativeTime,
+  formatTokenCount,
+  truncatePath,
+} from '@/shared/util/format'
 
 type SortField = 'name' | 'session_count' | 'last_activity' | 'usage'
 
 interface ProjectsTableProps {
-  projects: ProjectSummary[]
+  projects: Array<ProjectSummary>
   sortBy: SortField
   sortDesc: boolean
   onSortChange: (field: SortField) => void
@@ -42,15 +50,27 @@ const SortableHeader = ({
       className={`cursor-pointer font-mono text-[10px] uppercase tracking-widest text-zinc-600 hover:text-zinc-400 ${align === 'right' ? 'text-right' : ''}`}
       onClick={() => onSort(field)}
     >
-      <div className={`flex items-center gap-1 ${align === 'right' ? 'justify-end' : ''}`}>
+      <div
+        className={`flex items-center gap-1 ${align === 'right' ? 'justify-end' : ''}`}
+      >
         {children}
-        {isActive && (sortDesc ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />)}
+        {isActive &&
+          (sortDesc ? (
+            <ChevronDown className="h-3 w-3" />
+          ) : (
+            <ChevronUp className="h-3 w-3" />
+          ))}
       </div>
     </TableHead>
   )
 }
 
-export const ProjectsTable = ({ projects, sortBy, sortDesc, onSortChange }: ProjectsTableProps) => {
+export const ProjectsTable = ({
+  projects,
+  sortBy,
+  sortDesc,
+  onSortChange,
+}: ProjectsTableProps) => {
   const navigate = useNavigate()
 
   if (projects.length === 0) {
@@ -66,19 +86,42 @@ export const ProjectsTable = ({ projects, sortBy, sortDesc, onSortChange }: Proj
     <Table>
       <TableHeader>
         <TableRow className="border-zinc-800/50 hover:bg-transparent">
-          <SortableHeader field="name" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange}>
+          <SortableHeader
+            field="name"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+          >
             Project
           </SortableHeader>
           <TableHead className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
             Path
           </TableHead>
-          <SortableHeader field="session_count" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange} align="right">
+          <SortableHeader
+            field="session_count"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+            align="right"
+          >
             Sessions
           </SortableHeader>
-          <SortableHeader field="usage" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange} align="right">
+          <SortableHeader
+            field="usage"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+            align="right"
+          >
             Tokens
           </SortableHeader>
-          <SortableHeader field="last_activity" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange} align="right">
+          <SortableHeader
+            field="last_activity"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+            align="right"
+          >
             Activity
           </SortableHeader>
         </TableRow>
@@ -93,7 +136,12 @@ export const ProjectsTable = ({ projects, sortBy, sortDesc, onSortChange }: Proj
             <TableRow
               key={project.id}
               className="group cursor-pointer border-zinc-800/30 transition-colors hover:bg-zinc-800/30"
-              onClick={() => navigate({ to: '/projects/$projectId', params: { projectId: project.id } })}
+              onClick={() =>
+                navigate({
+                  to: '/projects/$projectId',
+                  params: { projectId: project.id },
+                })
+              }
             >
               <TableCell>
                 <Link
@@ -130,15 +178,23 @@ export const ProjectsTable = ({ projects, sortBy, sortDesc, onSortChange }: Proj
                     <div className="space-y-1 font-mono text-xs">
                       <div className="flex justify-between gap-4">
                         <span className="text-zinc-500">Input:</span>
-                        <span className="text-zinc-300">{formatTokenCount(inputTokens)}</span>
+                        <span className="text-zinc-300">
+                          {formatTokenCount(inputTokens)}
+                        </span>
                       </div>
                       <div className="flex justify-between gap-4">
                         <span className="text-zinc-500">Output:</span>
-                        <span className="text-zinc-300">{formatTokenCount(outputTokens)}</span>
+                        <span className="text-zinc-300">
+                          {formatTokenCount(outputTokens)}
+                        </span>
                       </div>
                       <div className="flex justify-between gap-4">
                         <span className="text-zinc-500">Cache Read:</span>
-                        <span className="text-zinc-300">{formatTokenCount(project.usage?.totalCacheReadTokens)}</span>
+                        <span className="text-zinc-300">
+                          {formatTokenCount(
+                            project.usage?.totalCacheReadTokens,
+                          )}
+                        </span>
                       </div>
                     </div>
                   </TooltipContent>

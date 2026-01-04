@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { Wrench } from 'lucide-react'
+import { ToolCallItem } from './tool-call-item'
+import type { LinkedToolCall } from '../type/content-block'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import type { LinkedToolCall } from '../type/content-block'
-import { ToolCallItem } from './tool-call-item'
 
 interface ToolCallPanelProps {
-  toolCalls: LinkedToolCall[]
+  toolCalls: Array<LinkedToolCall>
   highlightedMessageId?: string
 }
 
@@ -21,12 +21,14 @@ export const ToolCallPanel = ({
     return new Set(
       toolCalls
         .filter((tc) => tc.sourceMessageUuid === highlightedMessageId)
-        .map((tc) => tc.toolUse.id)
+        .map((tc) => tc.toolUse.id),
     )
   }, [toolCalls, highlightedMessageId])
 
   // Count successful vs error tools
-  const successCount = toolCalls.filter((tc) => tc.toolResult && !tc.toolResult.is_error).length
+  const successCount = toolCalls.filter(
+    (tc) => tc.toolResult && !tc.toolResult.is_error,
+  ).length
   const errorCount = toolCalls.filter((tc) => tc.toolResult?.is_error).length
 
   return (

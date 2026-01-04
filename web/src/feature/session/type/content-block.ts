@@ -22,7 +22,10 @@ export interface ToolResultContentBlock {
 }
 
 export type AssistantContentBlock = TextContentBlock | ToolUseContentBlock
-export type ContentBlock = TextContentBlock | ToolUseContentBlock | ToolResultContentBlock
+export type ContentBlock =
+  | TextContentBlock
+  | ToolUseContentBlock
+  | ToolResultContentBlock
 
 // Parsed message structure for rendering
 export interface ParsedMessage {
@@ -32,7 +35,7 @@ export interface ParsedMessage {
   isMeta: boolean
   isSidechain: boolean
   usage?: AssistantMessageUsage
-  content: ContentBlock[]
+  content: Array<ContentBlock>
   // For tool_result messages
   toolName?: string
   parentToolUseId?: string

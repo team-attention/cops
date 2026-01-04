@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { FolderGit2, ChevronRight, Clock } from 'lucide-react'
+import { ChevronRight, Clock, FolderGit2 } from 'lucide-react'
+import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import {
   Table,
@@ -9,11 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/gen/shadcn/ui/table'
-import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import { formatRelativeTime, truncatePath } from '@/shared/util/format'
 
 interface ProjectListProps {
-  projects: ProjectSummary[]
+  projects: Array<ProjectSummary>
 }
 
 export const ProjectList = ({ projects }: ProjectListProps) => {

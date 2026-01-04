@@ -1,12 +1,13 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Activity, FolderGit2, MessageSquare, Settings, type LucideIcon } from 'lucide-react'
+import { Activity, FolderGit2, MessageSquare, Settings } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
 } from '@/gen/shadcn/ui/sidebar'
 
 interface NavItem {
@@ -16,7 +17,7 @@ interface NavItem {
   description: string
 }
 
-const navItems: NavItem[] = [
+const navItems: Array<NavItem> = [
   {
     to: '/dashboard',
     icon: Activity,
@@ -82,7 +83,9 @@ export const SidebarNav = () => {
                     <div className="relative">
                       <Icon
                         className={`h-4 w-4 transition-all duration-200 ${
-                          isActive ? 'text-cyan-400' : 'text-zinc-500 group-hover/nav:text-zinc-300'
+                          isActive
+                            ? 'text-cyan-400'
+                            : 'text-zinc-500 group-hover/nav:text-zinc-300'
                         }`}
                       />
                       {isActive && (

@@ -2,271 +2,291 @@
 // @generated from file daemon/v1/daemon.proto (package daemon.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message as Message$1 } from "@bufbuild/protobuf";
+import type {
+  GenEnum,
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  enumDesc,
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt'
+import type { Message as Message$1 } from '@bufbuild/protobuf'
 
 /**
  * Describes the file daemon/v1/daemon.proto.
  */
-export const file_daemon_v1_daemon: GenFile = /*@__PURE__*/
-  fileDesc("ChZkYWVtb24vdjEvZGFlbW9uLnByb3RvEglkYWVtb24udjEikAEKBVVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAkingEKB01lc3NhZ2USCgoCaWQYASABKAkSDAoEdHlwZRgCIAEoCRIMCgRyb2xlGAMgASgJEg0KBW1vZGVsGAQgASgJEg8KB2NvbnRlbnQYBSABKAkSEwoLc3RvcF9yZWFzb24YBiABKAkSFQoNc3RvcF9zZXF1ZW5jZRgHIAEoCRIfCgV1c2FnZRgIIAEoCzIQLmRhZW1vbi52MS5Vc2FnZSLOAgoNU2Vzc2lvblJlY29yZBIMCgR1dWlkGAEgASgJEhMKC3BhcmVudF91dWlkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSJAoEdHlwZRgEIAEoDjIWLmRhZW1vbi52MS5TZXNzaW9uVHlwZRItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgsKA2N3ZBgGIAEoCRISCgpnaXRfYnJhbmNoGAcgASgJEg8KB3ZlcnNpb24YCCABKAkSEQoJdXNlcl90eXBlGAkgASgJEhQKDGlzX3NpZGVjaGFpbhgKIAEoCBIPCgdpc19tZXRhGAsgASgIEgwKBHNsdWcYDCABKAkSEgoKcmVxdWVzdF9pZBgNIAEoCRIjCgdtZXNzYWdlGA4gASgLMhIuZGFlbW9uLnYxLk1lc3NhZ2UieAoITG9nQmF0Y2gSKQoHcmVjb3JkcxgBIAMoCzIYLmRhZW1vbi52MS5TZXNzaW9uUmVjb3JkEhEKCWRhZW1vbl9pZBgCIAEoCRIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCIxCgtTZW5kTG9nc1JlcRIiCgViYXRjaBgBIAEoCzITLmRhZW1vbi52MS5Mb2dCYXRjaCJOCgtTZW5kTG9nc1JlcxIPCgdzdWNjZXNzGAEgASgIEhUKDWVycm9yX21lc3NhZ2UYAiABKAkSFwoPcHJvY2Vzc2VkX2NvdW50GAMgASgFKtsBCgtTZXNzaW9uVHlwZRIcChhTRVNTSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIVChFTRVNTSU9OX1RZUEVfVVNFUhABEhoKFlNFU1NJT05fVFlQRV9BU1NJU1RBTlQQAhIXChNTRVNTSU9OX1RZUEVfU1lTVEVNEAMSGAoUU0VTU0lPTl9UWVBFX1NVTU1BUlkQBBImCiJTRVNTSU9OX1RZUEVfRklMRV9ISVNUT1JZX1NOQVBTSE9UEAUSIAocU0VTU0lPTl9UWVBFX1FVRVVFX09QRVJBVElPThAGMksKDURhZW1vblNlcnZpY2USOgoIU2VuZExvZ3MSFi5kYWVtb24udjEuU2VuZExvZ3NSZXEaFi5kYWVtb24udjEuU2VuZExvZ3NSZXNCqAEKDWNvbS5kYWVtb24udjFCC0RhZW1vblByb3RvUAFaRWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2RhZW1vbi92MTtkYWVtb252MaICA0RYWKoCCURhZW1vbi5WMcoCCURhZW1vblxWMeICFURhZW1vblxWMVxHUEJNZXRhZGF0YeoCCkRhZW1vbjo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+export const file_daemon_v1_daemon: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChZkYWVtb24vdjEvZGFlbW9uLnByb3RvEglkYWVtb24udjEikAEKBVVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAkingEKB01lc3NhZ2USCgoCaWQYASABKAkSDAoEdHlwZRgCIAEoCRIMCgRyb2xlGAMgASgJEg0KBW1vZGVsGAQgASgJEg8KB2NvbnRlbnQYBSABKAkSEwoLc3RvcF9yZWFzb24YBiABKAkSFQoNc3RvcF9zZXF1ZW5jZRgHIAEoCRIfCgV1c2FnZRgIIAEoCzIQLmRhZW1vbi52MS5Vc2FnZSLOAgoNU2Vzc2lvblJlY29yZBIMCgR1dWlkGAEgASgJEhMKC3BhcmVudF91dWlkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSJAoEdHlwZRgEIAEoDjIWLmRhZW1vbi52MS5TZXNzaW9uVHlwZRItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgsKA2N3ZBgGIAEoCRISCgpnaXRfYnJhbmNoGAcgASgJEg8KB3ZlcnNpb24YCCABKAkSEQoJdXNlcl90eXBlGAkgASgJEhQKDGlzX3NpZGVjaGFpbhgKIAEoCBIPCgdpc19tZXRhGAsgASgIEgwKBHNsdWcYDCABKAkSEgoKcmVxdWVzdF9pZBgNIAEoCRIjCgdtZXNzYWdlGA4gASgLMhIuZGFlbW9uLnYxLk1lc3NhZ2UieAoITG9nQmF0Y2gSKQoHcmVjb3JkcxgBIAMoCzIYLmRhZW1vbi52MS5TZXNzaW9uUmVjb3JkEhEKCWRhZW1vbl9pZBgCIAEoCRIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCIxCgtTZW5kTG9nc1JlcRIiCgViYXRjaBgBIAEoCzITLmRhZW1vbi52MS5Mb2dCYXRjaCJOCgtTZW5kTG9nc1JlcxIPCgdzdWNjZXNzGAEgASgIEhUKDWVycm9yX21lc3NhZ2UYAiABKAkSFwoPcHJvY2Vzc2VkX2NvdW50GAMgASgFKtsBCgtTZXNzaW9uVHlwZRIcChhTRVNTSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIVChFTRVNTSU9OX1RZUEVfVVNFUhABEhoKFlNFU1NJT05fVFlQRV9BU1NJU1RBTlQQAhIXChNTRVNTSU9OX1RZUEVfU1lTVEVNEAMSGAoUU0VTU0lPTl9UWVBFX1NVTU1BUlkQBBImCiJTRVNTSU9OX1RZUEVfRklMRV9ISVNUT1JZX1NOQVBTSE9UEAUSIAocU0VTU0lPTl9UWVBFX1FVRVVFX09QRVJBVElPThAGMksKDURhZW1vblNlcnZpY2USOgoIU2VuZExvZ3MSFi5kYWVtb24udjEuU2VuZExvZ3NSZXEaFi5kYWVtb24udjEuU2VuZExvZ3NSZXNCqAEKDWNvbS5kYWVtb24udjFCC0RhZW1vblByb3RvUAFaRWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2RhZW1vbi92MTtkYWVtb252MaICA0RYWKoCCURhZW1vbi5WMcoCCURhZW1vblxWMeICFURhZW1vblxWMVxHUEJNZXRhZGF0YeoCCkRhZW1vbjo6VjFiBnByb3RvMw',
+    [file_google_protobuf_timestamp],
+  )
 
 /**
  * Usage contains token usage information.
  *
  * @generated from message daemon.v1.Usage
  */
-export type Usage = Message$1<"daemon.v1.Usage"> & {
+export type Usage = Message$1<'daemon.v1.Usage'> & {
   /**
    * @generated from field: int32 input_tokens = 1;
    */
-  inputTokens: number;
+  inputTokens: number
 
   /**
    * @generated from field: int32 output_tokens = 2;
    */
-  outputTokens: number;
+  outputTokens: number
 
   /**
    * @generated from field: int32 cache_creation_input_tokens = 3;
    */
-  cacheCreationInputTokens: number;
+  cacheCreationInputTokens: number
 
   /**
    * @generated from field: int32 cache_read_input_tokens = 4;
    */
-  cacheReadInputTokens: number;
+  cacheReadInputTokens: number
 
   /**
    * @generated from field: string service_tier = 5;
    */
-  serviceTier: string;
-};
+  serviceTier: string
+}
 
 /**
  * Describes the message daemon.v1.Usage.
  * Use `create(UsageSchema)` to create a new message.
  */
-export const UsageSchema: GenMessage<Usage> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 0);
+export const UsageSchema: GenMessage<Usage> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 0)
 
 /**
  * Message contains the role and content of a session message.
  *
  * @generated from message daemon.v1.Message
  */
-export type Message = Message$1<"daemon.v1.Message"> & {
+export type Message = Message$1<'daemon.v1.Message'> & {
   /**
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * @generated from field: string type = 2;
    */
-  type: string;
+  type: string
 
   /**
    * @generated from field: string role = 3;
    */
-  role: string;
+  role: string
 
   /**
    * @generated from field: string model = 4;
    */
-  model: string;
+  model: string
 
   /**
    * @generated from field: string content = 5;
    */
-  content: string;
+  content: string
 
   /**
    * @generated from field: string stop_reason = 6;
    */
-  stopReason: string;
+  stopReason: string
 
   /**
    * @generated from field: string stop_sequence = 7;
    */
-  stopSequence: string;
+  stopSequence: string
 
   /**
    * @generated from field: daemon.v1.Usage usage = 8;
    */
-  usage?: Usage;
-};
+  usage?: Usage
+}
 
 /**
  * Describes the message daemon.v1.Message.
  * Use `create(MessageSchema)` to create a new message.
  */
-export const MessageSchema: GenMessage<Message> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 1);
+export const MessageSchema: GenMessage<Message> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 1)
 
 /**
  * SessionRecord represents a single Claude Code JSONL entry.
  *
  * @generated from message daemon.v1.SessionRecord
  */
-export type SessionRecord = Message$1<"daemon.v1.SessionRecord"> & {
+export type SessionRecord = Message$1<'daemon.v1.SessionRecord'> & {
   /**
    * @generated from field: string uuid = 1;
    */
-  uuid: string;
+  uuid: string
 
   /**
    * @generated from field: string parent_uuid = 2;
    */
-  parentUuid: string;
+  parentUuid: string
 
   /**
    * @generated from field: string session_id = 3;
    */
-  sessionId: string;
+  sessionId: string
 
   /**
    * @generated from field: daemon.v1.SessionType type = 4;
    */
-  type: SessionType;
+  type: SessionType
 
   /**
    * @generated from field: google.protobuf.Timestamp timestamp = 5;
    */
-  timestamp?: Timestamp;
+  timestamp?: Timestamp
 
   /**
    * @generated from field: string cwd = 6;
    */
-  cwd: string;
+  cwd: string
 
   /**
    * @generated from field: string git_branch = 7;
    */
-  gitBranch: string;
+  gitBranch: string
 
   /**
    * @generated from field: string version = 8;
    */
-  version: string;
+  version: string
 
   /**
    * @generated from field: string user_type = 9;
    */
-  userType: string;
+  userType: string
 
   /**
    * @generated from field: bool is_sidechain = 10;
    */
-  isSidechain: boolean;
+  isSidechain: boolean
 
   /**
    * @generated from field: bool is_meta = 11;
    */
-  isMeta: boolean;
+  isMeta: boolean
 
   /**
    * @generated from field: string slug = 12;
    */
-  slug: string;
+  slug: string
 
   /**
    * @generated from field: string request_id = 13;
    */
-  requestId: string;
+  requestId: string
 
   /**
    * @generated from field: daemon.v1.Message message = 14;
    */
-  message?: Message;
-};
+  message?: Message
+}
 
 /**
  * Describes the message daemon.v1.SessionRecord.
  * Use `create(SessionRecordSchema)` to create a new message.
  */
-export const SessionRecordSchema: GenMessage<SessionRecord> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 2);
+export const SessionRecordSchema: GenMessage<SessionRecord> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 2)
 
 /**
  * LogBatch contains multiple session records for batch sending.
  *
  * @generated from message daemon.v1.LogBatch
  */
-export type LogBatch = Message$1<"daemon.v1.LogBatch"> & {
+export type LogBatch = Message$1<'daemon.v1.LogBatch'> & {
   /**
    * @generated from field: repeated daemon.v1.SessionRecord records = 1;
    */
-  records: SessionRecord[];
+  records: SessionRecord[]
 
   /**
    * @generated from field: string daemon_id = 2;
    */
-  daemonId: string;
+  daemonId: string
 
   /**
    * @generated from field: google.protobuf.Timestamp created_at = 3;
    */
-  createdAt?: Timestamp;
-};
+  createdAt?: Timestamp
+}
 
 /**
  * Describes the message daemon.v1.LogBatch.
  * Use `create(LogBatchSchema)` to create a new message.
  */
-export const LogBatchSchema: GenMessage<LogBatch> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 3);
+export const LogBatchSchema: GenMessage<LogBatch> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 3)
 
 /**
  * SendLogsReq is the request for sending logs.
  *
  * @generated from message daemon.v1.SendLogsReq
  */
-export type SendLogsReq = Message$1<"daemon.v1.SendLogsReq"> & {
+export type SendLogsReq = Message$1<'daemon.v1.SendLogsReq'> & {
   /**
    * @generated from field: daemon.v1.LogBatch batch = 1;
    */
-  batch?: LogBatch;
-};
+  batch?: LogBatch
+}
 
 /**
  * Describes the message daemon.v1.SendLogsReq.
  * Use `create(SendLogsReqSchema)` to create a new message.
  */
-export const SendLogsReqSchema: GenMessage<SendLogsReq> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 4);
+export const SendLogsReqSchema: GenMessage<SendLogsReq> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 4)
 
 /**
  * SendLogsRes is the response for sending logs.
  *
  * @generated from message daemon.v1.SendLogsRes
  */
-export type SendLogsRes = Message$1<"daemon.v1.SendLogsRes"> & {
+export type SendLogsRes = Message$1<'daemon.v1.SendLogsRes'> & {
   /**
    * @generated from field: bool success = 1;
    */
-  success: boolean;
+  success: boolean
 
   /**
    * @generated from field: string error_message = 2;
    */
-  errorMessage: string;
+  errorMessage: string
 
   /**
    * @generated from field: int32 processed_count = 3;
    */
-  processedCount: number;
-};
+  processedCount: number
+}
 
 /**
  * Describes the message daemon.v1.SendLogsRes.
  * Use `create(SendLogsResSchema)` to create a new message.
  */
-export const SendLogsResSchema: GenMessage<SendLogsRes> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 5);
+export const SendLogsResSchema: GenMessage<SendLogsRes> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 5)
 
 /**
  * SessionType represents the type of session message.
@@ -313,8 +333,9 @@ export enum SessionType {
 /**
  * Describes the enum daemon.v1.SessionType.
  */
-export const SessionTypeSchema: GenEnum<SessionType> = /*@__PURE__*/
-  enumDesc(file_daemon_v1_daemon, 0);
+export const SessionTypeSchema: GenEnum<SessionType> =
+  /*@__PURE__*/
+  enumDesc(file_daemon_v1_daemon, 0)
 
 /**
  * DaemonService handles daemon-to-API communication.
@@ -328,10 +349,8 @@ export const DaemonService: GenService<{
    * @generated from rpc daemon.v1.DaemonService.SendLogs
    */
   sendLogs: {
-    methodKind: "unary";
-    input: typeof SendLogsReqSchema;
-    output: typeof SendLogsResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_daemon_v1_daemon, 0);
-
+    methodKind: 'unary'
+    input: typeof SendLogsReqSchema
+    output: typeof SendLogsResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_daemon_v1_daemon, 0)

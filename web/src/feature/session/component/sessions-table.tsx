@@ -1,5 +1,15 @@
 import { Link } from '@tanstack/react-router'
-import { MessageSquare, GitBranch, Clock, ChevronUp, ChevronDown, Zap, Hash, FolderGit2 } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  FolderGit2,
+  GitBranch,
+  Hash,
+  MessageSquare,
+  Zap,
+} from 'lucide-react'
+import type { SessionSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import {
   Table,
   TableBody,
@@ -9,14 +19,21 @@ import {
   TableRow,
 } from '@/gen/shadcn/ui/table'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/gen/shadcn/ui/tooltip'
-import type { SessionSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
-import { formatRelativeTime, formatTokenCount, truncateId } from '@/shared/util/format'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/gen/shadcn/ui/tooltip'
+import {
+  formatRelativeTime,
+  formatTokenCount,
+  truncateId,
+} from '@/shared/util/format'
 
 type SortField = 'started_at' | 'message_count' | 'usage'
 
 interface SessionsTableProps {
-  sessions: SessionSummary[]
+  sessions: Array<SessionSummary>
   sortBy: SortField
   sortDesc: boolean
   onSortChange: (field: SortField) => void
@@ -44,9 +61,16 @@ const SortableHeader = ({
       className={`cursor-pointer font-mono text-[10px] uppercase tracking-widest text-zinc-600 hover:text-zinc-400 ${align === 'right' ? 'text-right' : ''}`}
       onClick={() => onSort(field)}
     >
-      <div className={`flex items-center gap-1 ${align === 'right' ? 'justify-end' : ''}`}>
+      <div
+        className={`flex items-center gap-1 ${align === 'right' ? 'justify-end' : ''}`}
+      >
         {children}
-        {isActive && (sortDesc ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />)}
+        {isActive &&
+          (sortDesc ? (
+            <ChevronDown className="h-3 w-3" />
+          ) : (
+            <ChevronUp className="h-3 w-3" />
+          ))}
       </div>
     </TableHead>
   )
@@ -83,13 +107,31 @@ export const SessionsTable = ({
           <TableHead className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
             Branch
           </TableHead>
-          <SortableHeader field="message_count" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange} align="right">
+          <SortableHeader
+            field="message_count"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+            align="right"
+          >
             Messages
           </SortableHeader>
-          <SortableHeader field="usage" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange} align="right">
+          <SortableHeader
+            field="usage"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+            align="right"
+          >
             Tokens
           </SortableHeader>
-          <SortableHeader field="started_at" currentSort={sortBy} sortDesc={sortDesc} onSort={onSortChange} align="right">
+          <SortableHeader
+            field="started_at"
+            currentSort={sortBy}
+            sortDesc={sortDesc}
+            onSort={onSortChange}
+            align="right"
+          >
             Started
           </SortableHeader>
         </TableRow>
@@ -137,7 +179,9 @@ export const SessionsTable = ({
                     className="flex items-center gap-1.5 text-zinc-400 transition-colors hover:text-cyan-400"
                   >
                     <FolderGit2 className="h-3 w-3" />
-                    <span className="font-mono text-xs">{truncateId(session.projectId, 8)}</span>
+                    <span className="font-mono text-xs">
+                      {truncateId(session.projectId, 8)}
+                    </span>
                   </Link>
                 </TableCell>
               )}
@@ -152,7 +196,9 @@ export const SessionsTable = ({
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1">
-                  <span className="font-mono text-sm text-zinc-300">{session.messageCount}</span>
+                  <span className="font-mono text-sm text-zinc-300">
+                    {session.messageCount}
+                  </span>
                   <MessageSquare className="h-3 w-3 text-zinc-600" />
                 </div>
               </TableCell>
@@ -170,11 +216,15 @@ export const SessionsTable = ({
                     <div className="space-y-1 font-mono text-xs">
                       <div className="flex justify-between gap-4">
                         <span className="text-zinc-500">Input:</span>
-                        <span className="text-zinc-300">{formatTokenCount(inputTokens)}</span>
+                        <span className="text-zinc-300">
+                          {formatTokenCount(inputTokens)}
+                        </span>
                       </div>
                       <div className="flex justify-between gap-4">
                         <span className="text-zinc-500">Output:</span>
-                        <span className="text-zinc-300">{formatTokenCount(outputTokens)}</span>
+                        <span className="text-zinc-300">
+                          {formatTokenCount(outputTokens)}
+                        </span>
                       </div>
                     </div>
                   </TooltipContent>

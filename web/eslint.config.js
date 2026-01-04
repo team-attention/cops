@@ -5,6 +5,6 @@ import { tanstackConfig } from '@tanstack/eslint-config'
 export default [
   ...tanstackConfig,
   {
-    ignores: ['src/shadcn/**']
-  }
+    ignores: ['src/shadcn/**'],
+  },
 ]

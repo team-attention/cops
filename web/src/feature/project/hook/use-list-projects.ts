@@ -17,6 +17,6 @@ export const useListProjects = ({
     {
       pagination: { page, pageSize },
     },
-    { enabled }
+    { enabled },
   )
 }

@@ -3,7 +3,9 @@ import type { Timestamp } from '@bufbuild/protobuf/wkt'
 /**
  * Formats a protobuf Timestamp to relative time string (e.g., "5m ago", "2d ago")
  */
-export const formatRelativeTime = (timestamp: Timestamp | undefined): string => {
+export const formatRelativeTime = (
+  timestamp: Timestamp | undefined,
+): string => {
   if (!timestamp) return '-'
   const date = new Date(Number(timestamp.seconds) * 1000)
   const now = new Date()
@@ -22,7 +24,9 @@ export const formatRelativeTime = (timestamp: Timestamp | undefined): string => 
 /**
  * Formats a token count to abbreviated form (e.g., "1.2M", "45K")
  */
-export const formatTokenCount = (value: bigint | number | undefined): string => {
+export const formatTokenCount = (
+  value: bigint | number | undefined,
+): string => {
   if (value === undefined || value === null) return '0'
   const num = typeof value === 'bigint' ? Number(value) : value
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`

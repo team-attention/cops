@@ -1,29 +1,29 @@
 import { useNavigate } from '@tanstack/react-router'
 import {
-  Settings,
-  LogOut,
-  ChevronDown,
-  Building2,
-  RefreshCw,
   AlertCircle,
+  Building2,
+  ChevronDown,
+  LogOut,
+  RefreshCw,
+  Settings,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/gen/shadcn/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from '@/gen/shadcn/ui/dropdown-menu'
 import {
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
 } from '@/gen/shadcn/ui/sidebar'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { useAuth } from '@/shared/hook/use-auth'
@@ -32,7 +32,7 @@ import { useUser } from '@/shared/hook/use-user'
 // getInitials extracts initials from name or email for avatar fallback.
 const getInitials = (
   name: string | undefined,
-  email: string | undefined
+  email: string | undefined,
 ): string => {
   // 1. If name exists and has length > 0:
   if (name && name.length > 0) {
@@ -60,7 +60,7 @@ const getInitials = (
 // getDisplayName returns the best available display name.
 const getDisplayName = (
   name: string | undefined,
-  email: string | undefined
+  email: string | undefined,
 ): string => {
   // 1. If name exists and has length > 0, return name.
   if (name && name.length > 0) {

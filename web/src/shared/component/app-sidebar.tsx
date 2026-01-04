@@ -1,3 +1,6 @@
+import { SidebarHeader } from './sidebar-header'
+import { SidebarNav } from './sidebar-nav'
+import { SidebarUser } from './sidebar-user'
 import {
   Sidebar,
   SidebarContent,
@@ -5,19 +8,13 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/gen/shadcn/ui/sidebar'
-import { SidebarHeader } from './sidebar-header'
-import { SidebarNav } from './sidebar-nav'
-import { SidebarUser } from './sidebar-user'
 import { useUser } from '@/shared/hook/use-user'
 
 export const AppSidebar = () => {
   // This triggers the useGetMe query when authenticated
   useUser()
   return (
-    <Sidebar
-      collapsible="icon"
-      className="border-sidebar"
-    >
+    <Sidebar collapsible="icon" className="border-sidebar">
       {/* Subtle background texture */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.015]"

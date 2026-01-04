@@ -1,44 +1,50 @@
-import { useState } from 'react';
-import { CheckCircle, XCircle, Loader2, Terminal } from 'lucide-react';
-import { Code } from '@connectrpc/connect';
-import { Button } from '@/gen/shadcn/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/gen/shadcn/ui/card';
-import { Alert, AlertDescription } from '@/gen/shadcn/ui/alert';
-import { useApproveDevice } from '../hook/use-approve-device';
-import type { DeviceApprovalState } from '../type/device-code';
+import { useState } from 'react'
+import { CheckCircle, Loader2, Terminal, XCircle } from 'lucide-react'
+import { Code } from '@connectrpc/connect'
+import { useApproveDevice } from '../hook/use-approve-device'
+import type { DeviceApprovalState } from '../type/device-code'
+import { Button } from '@/gen/shadcn/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/gen/shadcn/ui/card'
+import { Alert, AlertDescription } from '@/gen/shadcn/ui/alert'
 
 interface DeviceApprovalProps {
-  userCode: string;
+  userCode: string
 }
 
 type DeviceApprovalErrorCode =
   | 'NOT_FOUND'
   | 'EXPIRED'
   | 'ALREADY_APPROVED'
-  | 'UNKNOWN';
+  | 'UNKNOWN'
 
 export const DeviceApproval = ({ userCode }: DeviceApprovalProps) => {
-  const [state, setState] = useState<DeviceApprovalState>({ status: 'pending' });
-  const mutation = useApproveDevice();
+  const [state, setState] = useState<DeviceApprovalState>({ status: 'pending' })
+  const mutation = useApproveDevice()
 
   const handleApprove = async () => {
     try {
-      await mutation.mutateAsync({ userCode });
+      await mutation.mutateAsync({ userCode })
       setState({
         status: 'success',
         message: 'Device approved successfully!',
-      });
+      })
     } catch (error) {
-      const connectError = error as { code?: Code; message: string };
-      const errorCode = connectError.code;
-      let mappedCode: DeviceApprovalErrorCode = 'UNKNOWN';
+      const connectError = error as { code?: Code; message: string }
+      const errorCode = connectError.code
+      let mappedCode: DeviceApprovalErrorCode = 'UNKNOWN'
 
       if (errorCode === Code.NotFound) {
-        mappedCode = 'NOT_FOUND';
+        mappedCode = 'NOT_FOUND'
       } else if (errorCode === Code.DeadlineExceeded) {
-        mappedCode = 'EXPIRED';
+        mappedCode = 'EXPIRED'
       } else if (errorCode === Code.AlreadyExists) {
-        mappedCode = 'ALREADY_APPROVED';
+        mappedCode = 'ALREADY_APPROVED'
       }
       // Note: UNAUTHORIZED case removed - handled by route guard
 
@@ -46,9 +52,9 @@ export const DeviceApproval = ({ userCode }: DeviceApprovalProps) => {
         status: 'error',
         errorCode: mappedCode,
         message: connectError.message || 'An error occurred',
-      });
+      })
     }
-  };
+  }
 
   if (state.status === 'success') {
     return (
@@ -70,7 +76,7 @@ export const DeviceApproval = ({ userCode }: DeviceApprovalProps) => {
           </p>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   if (state.status === 'error') {
@@ -79,7 +85,7 @@ export const DeviceApproval = ({ userCode }: DeviceApprovalProps) => {
       EXPIRED: 'This device code has expired. Please generate a new one.',
       ALREADY_APPROVED: 'This device code has already been approved.',
       UNKNOWN: state.message,
-    };
+    }
 
     return (
       <Card className="border-red-900/50 bg-red-950/20">
@@ -97,7 +103,7 @@ export const DeviceApproval = ({ userCode }: DeviceApprovalProps) => {
           </Alert>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -136,5 +142,5 @@ export const DeviceApproval = ({ userCode }: DeviceApprovalProps) => {
         </Button>
       </CardContent>
     </Card>
-  );
-};
+  )
+}

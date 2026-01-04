@@ -1,14 +1,17 @@
-import { useMemo, useRef, useEffect } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { MessageSquare } from 'lucide-react'
+import {
+  filterRecordsForChat,
+  parseMessageContent,
+} from '../util/parse-content'
+import { MessageBubble } from './message-bubble'
+import type { Record } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import type { Record } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
-import { MessageBubble } from './message-bubble'
-import { parseMessageContent, filterRecordsForChat } from '../util/parse-content'
 
 interface ChatViewProps {
-  records: Record[]
+  records: Array<Record>
   selectedMessageId?: string
   onSelectMessage?: (messageId: string) => void
   onToolClick?: (toolUseId: string) => void
@@ -29,7 +32,9 @@ export const ChatView = ({
   }, [records])
 
   // Count non-meta messages
-  const messageCount = parsedMessages.filter((m) => !m.isMeta && !m.isSidechain).length
+  const messageCount = parsedMessages.filter(
+    (m) => !m.isMeta && !m.isSidechain,
+  ).length
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {

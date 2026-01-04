@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { MessageSquare, RefreshCw, ChevronRight, Home } from 'lucide-react'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { ChevronRight, Home, MessageSquare, RefreshCw } from 'lucide-react'
 import { useListSessions } from '@/feature/project/hook/use-list-sessions'
 import { useListProjects } from '@/feature/project/hook/use-list-projects'
 import { SessionsTable } from '@/feature/session/component/sessions-table'
@@ -56,11 +56,15 @@ function SessionsListPage() {
 
   const handleSortChange = (field: string) => {
     const newSortDesc = field === sortBy ? !sortDesc : true
-    navigate({ search: (prev) => ({ ...prev, sortBy: field, sortDesc: newSortDesc }) })
+    navigate({
+      search: (prev) => ({ ...prev, sortBy: field, sortDesc: newSortDesc }),
+    })
   }
 
   const handleProjectChange = (newProjectId: string | null) => {
-    navigate({ search: (prev) => ({ ...prev, projectId: newProjectId, page: 1 }) })
+    navigate({
+      search: (prev) => ({ ...prev, projectId: newProjectId, page: 1 }),
+    })
   }
 
   const sessions = data?.sessions ?? []
@@ -72,7 +76,10 @@ function SessionsListPage() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 font-mono text-xs text-zinc-500">
-          <Link to="/dashboard" className="flex items-center gap-1 hover:text-zinc-300">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-1 hover:text-zinc-300"
+          >
             <Home className="h-3 w-3" />
             Dashboard
           </Link>
@@ -90,7 +97,9 @@ function SessionsListPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Sessions</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
+                Sessions
+              </h1>
               <p className="mt-0.5 font-mono text-xs text-zinc-600">
                 {pagination ? `${pagination.totalCount} total` : 'Loading...'}
               </p>
@@ -157,7 +166,9 @@ function SessionsListPage() {
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-2 text-zinc-700">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-zinc-800" />
-          <span className="font-mono text-[10px] uppercase tracking-widest">C-Ops v0.1.0</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest">
+            C-Ops v0.1.0
+          </span>
           <div className="h-px flex-1 bg-gradient-to-l from-transparent to-zinc-800" />
         </div>
       </div>

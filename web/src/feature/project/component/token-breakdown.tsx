@@ -1,6 +1,6 @@
-import { ArrowDownRight, Zap, Archive, RefreshCw } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
+import { Archive, ArrowDownRight, RefreshCw, Zap } from 'lucide-react'
 import type { TokenUsageSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
+import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 
 interface TokenBreakdownProps {
   usage?: TokenUsageSummary
@@ -23,7 +23,14 @@ const formatTokenCount = (value: bigint | undefined): string => {
   return num.toLocaleString()
 }
 
-const TokenCategory = ({ label, value, total, color, icon, description }: TokenCategoryProps) => {
+const TokenCategory = ({
+  label,
+  value,
+  total,
+  color,
+  icon,
+  description,
+}: TokenCategoryProps) => {
   const numValue = Number(value ?? 0n)
   const numTotal = Number(total)
   const percentage = numTotal > 0 ? (numValue / numTotal) * 100 : 0
@@ -33,7 +40,9 @@ const TokenCategory = ({ label, value, total, color, icon, description }: TokenC
       {/* Glow on hover */}
       <div
         className="pointer-events-none absolute inset-0 rounded-lg opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-10"
-        style={{ background: `radial-gradient(circle at 50% 50%, ${color}, transparent 70%)` }}
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${color}, transparent 70%)`,
+        }}
       />
 
       <div className="relative flex items-center justify-between">
@@ -45,7 +54,9 @@ const TokenCategory = ({ label, value, total, color, icon, description }: TokenC
             <div style={{ color }}>{icon}</div>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">{label}</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+              {label}
+            </p>
             <p className="font-mono text-xs text-zinc-600">{description}</p>
           </div>
         </div>
@@ -86,7 +97,7 @@ export const TokenBreakdown = ({ usage }: TokenBreakdownProps) => {
   const cacheRead = usage?.totalCacheReadTokens ?? 0n
   const total = inputTokens + outputTokens + cacheCreation + cacheRead
 
-  const categories: Omit<TokenCategoryProps, 'total'>[] = [
+  const categories: Array<Omit<TokenCategoryProps, 'total'>> = [
     {
       label: 'Input Tokens',
       value: inputTokens,
@@ -158,9 +169,10 @@ export const TokenBreakdown = ({ usage }: TokenBreakdownProps) => {
           </p>
           <div className="flex h-3 overflow-hidden rounded-full bg-zinc-800">
             {categories.map((category, index) => {
-              const percentage = Number(total) > 0
-                ? (Number(category.value ?? 0n) / Number(total)) * 100
-                : 0
+              const percentage =
+                Number(total) > 0
+                  ? (Number(category.value ?? 0n) / Number(total)) * 100
+                  : 0
               return (
                 <div
                   key={category.label}

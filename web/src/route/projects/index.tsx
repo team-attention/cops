@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { FolderGit2, RefreshCw, ChevronRight, Home } from 'lucide-react'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { ChevronRight, FolderGit2, Home, RefreshCw } from 'lucide-react'
 import { useListProjects } from '@/feature/project/hook/use-list-projects'
 import { ProjectsTable } from '@/feature/project/component/projects-table'
 import { PaginationControls } from '@/shared/component/pagination-controls'
@@ -43,7 +43,9 @@ function ProjectsListPage() {
 
   const handleSortChange = (field: string) => {
     const newSortDesc = field === sortBy ? !sortDesc : true
-    navigate({ search: (prev) => ({ ...prev, sortBy: field, sortDesc: newSortDesc }) })
+    navigate({
+      search: (prev) => ({ ...prev, sortBy: field, sortDesc: newSortDesc }),
+    })
   }
 
   const projects = data?.projects ?? []
@@ -54,7 +56,10 @@ function ProjectsListPage() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 font-mono text-xs text-zinc-500">
-          <Link to="/dashboard" className="flex items-center gap-1 hover:text-zinc-300">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-1 hover:text-zinc-300"
+          >
             <Home className="h-3 w-3" />
             Dashboard
           </Link>
@@ -72,7 +77,9 @@ function ProjectsListPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Projects</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
+                Projects
+              </h1>
               <p className="mt-0.5 font-mono text-xs text-zinc-600">
                 {pagination ? `${pagination.totalCount} total` : 'Loading...'}
               </p>
@@ -109,7 +116,9 @@ function ProjectsListPage() {
           <div className="overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/80 backdrop-blur-sm">
             <ProjectsTable
               projects={projects}
-              sortBy={sortBy as 'name' | 'session_count' | 'last_activity' | 'usage'}
+              sortBy={
+                sortBy as 'name' | 'session_count' | 'last_activity' | 'usage'
+              }
               sortDesc={sortDesc}
               onSortChange={handleSortChange}
             />
@@ -129,7 +138,9 @@ function ProjectsListPage() {
         {/* Footer */}
         <div className="mt-12 flex items-center justify-center gap-2 text-zinc-700">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-zinc-800" />
-          <span className="font-mono text-[10px] uppercase tracking-widest">C-Ops v0.1.0</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest">
+            C-Ops v0.1.0
+          </span>
           <div className="h-px flex-1 bg-gradient-to-l from-transparent to-zinc-800" />
         </div>
       </div>

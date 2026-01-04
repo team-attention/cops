@@ -26,6 +26,6 @@ export const useListSessions = ({
       sortBy,
       sortDesc,
     },
-    { enabled }
+    { enabled },
   )
 }

@@ -1,5 +1,12 @@
 import { Link } from '@tanstack/react-router'
-import { MessageSquare, GitBranch, ChevronRight, Clock, Hash } from 'lucide-react'
+import {
+  ChevronRight,
+  Clock,
+  GitBranch,
+  Hash,
+  MessageSquare,
+} from 'lucide-react'
+import type { SessionSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import {
   Table,
@@ -10,11 +17,10 @@ import {
   TableRow,
 } from '@/gen/shadcn/ui/table'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import type { SessionSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import { formatRelativeTime, truncateId } from '@/shared/util/format'
 
 interface RecentSessionsProps {
-  sessions: SessionSummary[]
+  sessions: Array<SessionSummary>
 }
 
 export const RecentSessions = ({ sessions }: RecentSessionsProps) => {

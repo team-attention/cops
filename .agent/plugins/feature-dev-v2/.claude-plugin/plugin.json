@@ -1,0 +1,8 @@
+{
+    "name": "feature-dev-v2",
+    "description": "Feature development plugin v2",
+    "version": "0.0.0",
+    "author": {
+        "name": "Jayce Kim <jayce@team-attention.com>"
+    }
+}

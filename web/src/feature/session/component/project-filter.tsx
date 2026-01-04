@@ -1,4 +1,5 @@
 import { FolderGit2 } from 'lucide-react'
+import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import {
   Select,
   SelectContent,
@@ -6,10 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/gen/shadcn/ui/select'
-import type { ProjectSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 
 interface ProjectFilterProps {
-  projects: ProjectSummary[]
+  projects: Array<ProjectSummary>
   selectedProjectId: string | null
   onProjectChange: (projectId: string | null) => void
   isLoading?: boolean
@@ -37,7 +37,11 @@ export const ProjectFilter = ({
             All Projects
           </SelectItem>
           {projects.map((project) => (
-            <SelectItem key={project.id} value={project.id} className="font-mono text-sm">
+            <SelectItem
+              key={project.id}
+              value={project.id}
+              className="font-mono text-sm"
+            >
               {project.name}
             </SelectItem>
           ))}

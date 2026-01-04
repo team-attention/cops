@@ -1,5 +1,15 @@
 import { Link } from '@tanstack/react-router'
-import { MessageSquare, GitBranch, Zap, ExternalLink, Clock } from 'lucide-react'
+import {
+  Clock,
+  ExternalLink,
+  GitBranch,
+  MessageSquare,
+  Zap,
+} from 'lucide-react'
+import type {
+  SessionSummary,
+  TokenUsageSummary,
+} from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import {
   Table,
@@ -10,19 +20,15 @@ import {
   TableRow,
 } from '@/gen/shadcn/ui/table'
 import { Badge } from '@/gen/shadcn/ui/badge'
-import type { SessionSummary, TokenUsageSummary } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import { formatRelativeTime, formatTokenCount } from '@/shared/util/format'
 
 interface SessionListProps {
-  sessions: SessionSummary[]
+  sessions: Array<SessionSummary>
 }
 
 const getTotalTokens = (usage: TokenUsageSummary | undefined): bigint => {
   if (!usage) return 0n
-  return (
-    (usage.totalInputTokens ?? 0n) +
-    (usage.totalOutputTokens ?? 0n)
-  )
+  return (usage.totalInputTokens ?? 0n) + (usage.totalOutputTokens ?? 0n)
 }
 
 const truncateId = (id: string): string => {
