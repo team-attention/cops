@@ -6,7 +6,8 @@ import (
 
 // LocalConfig represents the {projectPath}/.cops/config.json structure.
 type LocalConfig struct {
-	ID domain.ID `json:"id"`
+	ProjectID      domain.ID `json:"projectId"`
+	OrganizationID string    `json:"organizationId,omitempty"`
 }
 
 // LocalConfigPort defines the interface for reading local project configs.

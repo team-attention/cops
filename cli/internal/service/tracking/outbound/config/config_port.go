@@ -9,7 +9,8 @@ type GlobalConfig struct {
 
 // LocalConfig represents the {projectPath}/.cops/config.json structure.
 type LocalConfig struct {
-	ID domain.ID `json:"id"`
+	ProjectID      domain.ID `json:"projectId"`
+	OrganizationID string    `json:"organizationId,omitempty"`
 }
 
 // ConfigPort defines the interface for configuration storage.

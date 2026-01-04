@@ -24,6 +24,9 @@ type RegisterProjectParams struct {
 
 	// IsGitProject indicates whether this is a git repository
 	IsGitProject bool
+
+	// OrganizationID is the organization this project belongs to
+	OrganizationID string
 }
 
 // RegisterProjectResult contains the result of project registration.

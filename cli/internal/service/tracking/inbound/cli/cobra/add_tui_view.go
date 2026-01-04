@@ -17,6 +17,8 @@ func (m addModel) View() string {
 	switch m.step {
 	case stepParentDetection:
 		b.WriteString(m.viewParentConfirmation())
+	case stepOrgSelection:
+		b.WriteString(m.viewOrgSelection())
 	case stepGitSelection:
 		b.WriteString(m.viewGitSelection())
 	case stepNameInput:
@@ -24,6 +26,34 @@ func (m addModel) View() string {
 	case stepSyncSelection:
 		b.WriteString(m.viewSyncSelection())
 	}
+
+	return b.String()
+}
+
+// viewOrgSelection renders the organization selection view.
+func (m addModel) viewOrgSelection() string {
+	var b strings.Builder
+
+	if len(m.organizations) == 0 {
+		b.WriteString("Fetching organizations...\n")
+		return b.String()
+	}
+
+	b.WriteString(m.titleStyle.Render("Select Organization"))
+	b.WriteString("\n\n")
+	b.WriteString("Choose which organization to add this project to:\n\n")
+
+	for i, org := range m.organizations {
+		cursor := "  "
+		if m.orgCursor == i {
+			cursor = m.cursorStyle.Render("> ")
+		}
+		b.WriteString(fmt.Sprintf("%s%s\n", cursor, org.Name))
+	}
+
+	b.WriteString("\n")
+	b.WriteString(m.helpStyle.Render("up/down: navigate | enter: select | ctrl+c: cancel"))
+	b.WriteString("\n")
 
 	return b.String()
 }

@@ -1,6 +1,7 @@
 package cobra
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -18,11 +19,32 @@ func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.parentProject = msg.parent
 		if msg.parent == nil {
-			// No parent found, proceed to git detection
+			// No parent found, proceed to org selection
+			m.step = stepOrgSelection
+			return m, m.fetchOrganizations
+		}
+		// Parent found, stay on stepParentDetection for user confirmation
+		return m, nil
+
+	case orgFetchMsg:
+		if msg.err != nil {
+			m.err = msg.err
+			return m, tea.Quit
+		}
+		m.organizations = msg.organizations
+		if len(msg.organizations) == 0 {
+			m.err = fmt.Errorf("no organizations found. Please create an organization first")
+			return m, tea.Quit
+		}
+		if len(msg.organizations) == 1 {
+			// Auto-select single organization
+			m.selectedOrgID = string(msg.organizations[0].ID)
+			m.selectedOrgName = msg.organizations[0].Name
+			m.result.OrganizationID = m.selectedOrgID
 			m.step = stepGitSelection
 			return m, m.detectGitRepos
 		}
-		// Parent found, stay on stepParentDetection for user confirmation
+		// Multiple orgs, stay on stepOrgSelection for user selection
 		return m, nil
 
 	case gitDetectionMsg:
@@ -37,6 +59,8 @@ func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.step {
 		case stepParentDetection:
 			return m.updateParentSelection(msg)
+		case stepOrgSelection:
+			return m.updateOrgSelection(msg)
 		case stepGitSelection:
 			return m.updateGitSelection(msg)
 		case stepNameInput:
@@ -196,9 +220,9 @@ func (m addModel) updateParentSelection(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 	case "enter":
 		if m.parentCursor == 0 {
-			// Yes - proceed to git detection
-			m.step = stepGitSelection
-			return m, m.detectGitRepos
+			// Yes - proceed to org selection
+			m.step = stepOrgSelection
+			return m, m.fetchOrganizations
 		} else {
 			// No - cancel
 			m.result.Cancelled = true
@@ -206,7 +230,36 @@ func (m addModel) updateParentSelection(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	case "y", "Y":
-		// Yes - proceed to git detection
+		// Yes - proceed to org selection
+		m.step = stepOrgSelection
+		return m, m.fetchOrganizations
+	}
+
+	return m, nil
+}
+
+// updateOrgSelection handles input during organization selection step.
+func (m addModel) updateOrgSelection(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "ctrl+c", "esc":
+		m.result.Cancelled = true
+		return m, tea.Quit
+
+	case "up", "k":
+		if m.orgCursor > 0 {
+			m.orgCursor--
+		}
+
+	case "down", "j":
+		if m.orgCursor < len(m.organizations)-1 {
+			m.orgCursor++
+		}
+
+	case "enter":
+		// Select organization and proceed to git detection
+		m.selectedOrgID = string(m.organizations[m.orgCursor].ID)
+		m.selectedOrgName = m.organizations[m.orgCursor].Name
+		m.result.OrganizationID = m.selectedOrgID
 		m.step = stepGitSelection
 		return m, m.detectGitRepos
 	}

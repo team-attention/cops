@@ -101,8 +101,8 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 			continue
 		}
 
-		// Load ProjectID from local config - skip if not found
-		projectID, err := s.loadProjectID(project.Path)
+		// Load local config - skip if not found
+		localCfg, err := s.loadLocalConfig(project.Path)
 		if err != nil {
 			s.logger.Warn("skipping project without local config (project not registered)",
 				slog.String("path", project.Path),
@@ -111,12 +111,21 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 			continue
 		}
 
+		// Skip projects without OrganizationID
+		if localCfg.OrganizationID == "" {
+			s.logger.Warn("skipping project without organization ID (run 'cops add' to re-register)",
+				slog.String("path", project.Path),
+			)
+			continue
+		}
+
 		// Add main project directory
 		targets = append(targets, domain.WatchTarget{
-			ProjectPath: project.Path,
-			ClaudeDir:   pathutil.GetClaudeProjectDir(project.Path),
-			Type:        domain.WatchTargetRoot,
-			ProjectID:   projectID,
+			ProjectPath:    project.Path,
+			ClaudeDir:      pathutil.GetClaudeProjectDir(project.Path),
+			Type:           domain.WatchTargetRoot,
+			ProjectID:      localCfg.ProjectID,
+			OrganizationID: localCfg.OrganizationID,
 		})
 
 		// Add worktrees if git project
@@ -133,7 +142,7 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 			// Skip first element (main repo) as it's already added
 			// Each worktree reads its own local config
 			for _, wt := range worktrees[1:] {
-				worktreeProjectID, err := s.loadProjectID(wt)
+				worktreeCfg, err := s.loadLocalConfig(wt)
 				if err != nil {
 					s.logger.Warn("skipping worktree without local config (worktree not registered)",
 						slog.String("worktree", wt),
@@ -143,11 +152,20 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 					continue
 				}
 
+				// Skip worktrees without OrganizationID
+				if worktreeCfg.OrganizationID == "" {
+					s.logger.Warn("skipping worktree without organization ID (run 'cops add' to re-register)",
+						slog.String("worktree", wt),
+					)
+					continue
+				}
+
 				targets = append(targets, domain.WatchTarget{
-					ProjectPath: wt,
-					ClaudeDir:   pathutil.GetClaudeProjectDir(wt),
-					Type:        domain.WatchTargetWorktree,
-					ProjectID:   worktreeProjectID,
+					ProjectPath:    wt,
+					ClaudeDir:      pathutil.GetClaudeProjectDir(wt),
+					Type:           domain.WatchTargetWorktree,
+					ProjectID:      worktreeCfg.ProjectID,
+					OrganizationID: worktreeCfg.OrganizationID,
 				})
 			}
 		}
@@ -156,12 +174,12 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 	return targets
 }
 
-// loadProjectID loads the ProjectID from the local config file.
+// loadLocalConfig loads the full LocalConfig from the local config file.
 // Returns error if config file is not found or cannot be read.
-func (s *Service) loadProjectID(projectPath string) (shareddomain.ID, error) {
+func (s *Service) loadLocalConfig(projectPath string) (*localconfig.LocalConfig, error) {
 	localCfg, err := s.localConfigPort.LoadLocalConfig(projectPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return localCfg.ID, nil
+	return localCfg, nil
 }

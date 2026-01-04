@@ -103,14 +103,15 @@ func (h *UserGRPCHandler) GetMe(
 		}
 	}
 
-	// b. Map each UserOrganization to userv1.UserOrganization
-	var protoOrgs []*userv1.UserOrganization
+	// b. Map each UserOrganization to domainv1.Organization
+	var protoOrgs []*domainv1.Organization
 	for _, userOrg := range result.Organizations {
 		if userOrg.Organization != nil {
-			protoOrgs = append(protoOrgs, &userv1.UserOrganization{
+			protoOrgs = append(protoOrgs, &domainv1.Organization{
 				Id:   string(userOrg.Organization.ID),
 				Name: userOrg.Organization.Name,
-				Role: string(userOrg.Role),
+				Slug: userOrg.Organization.Slug,
+				// Note: Members field intentionally not populated for GetMe response
 			})
 		}
 	}

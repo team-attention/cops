@@ -43,6 +43,7 @@ func (c *ProjectClient) RegisterProject(ctx context.Context, params api.Register
 		ExistingProjectId:   params.ExistingProjectID,
 		Name:                params.Name,
 		IsGitProject:        params.IsGitProject,
+		OrganizationId:      params.OrganizationID,
 	})
 
 	resp, err := c.client.RegisterProject(ctx, req)

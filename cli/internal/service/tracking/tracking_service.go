@@ -19,10 +19,11 @@ import (
 
 // AddProjectParams contains parameters for AddProject.
 type AddProjectParams struct {
-	Path  string
-	Name  string
-	NoGit bool
-	Sync  bool
+	Path           string
+	Name           string
+	NoGit          bool
+	Sync           bool
+	OrganizationID string
 }
 
 // ParentProjectInfo contains information about a parent project.
@@ -101,7 +102,7 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		if err != nil {
 			return nil, errutil.Internalf("failed to load local config: %v", err)
 		}
-		existingProjectID = localConfig.ID.String()
+		existingProjectID = localConfig.ProjectID.String()
 	}
 
 	// Get URLs (empty strings if not available)
@@ -119,6 +120,7 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 		ExistingProjectID:   existingProjectID,
 		Name:                name,
 		IsGitProject:        isGitProject,
+		OrganizationID:      params.OrganizationID,
 	})
 	if err != nil {
 		// If we have an existing local ID, use it
@@ -139,7 +141,10 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 	}
 
 	// Save local config with projectID
-	localConfig := &config.LocalConfig{ID: projectID}
+	localConfig := &config.LocalConfig{
+		ProjectID:      projectID,
+		OrganizationID: params.OrganizationID,
+	}
 	if err := s.configRepo.SaveLocalConfig(projectPath, localConfig); err != nil {
 		return nil, errutil.Internalf("failed to save local config: %v", err)
 	}

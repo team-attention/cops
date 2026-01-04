@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { User } from "../../domain/v1/domain_pb";
+import type { Organization, User } from "../../domain/v1/domain_pb";
 import { file_domain_v1_domain } from "../../domain/v1/domain_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -12,39 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file user/v1/user.proto.
  */
 export const file_user_v1_user: GenFile = /*@__PURE__*/
-  fileDesc("ChJ1c2VyL3YxL3VzZXIucHJvdG8SB3VzZXIudjEiOgoQVXNlck9yZ2FuaXphdGlvbhIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEgwKBHJvbGUYAyABKAkiCgoIR2V0TWVSZXEiWwoIR2V0TWVSZXMSHQoEdXNlchgBIAEoCzIPLmRvbWFpbi52MS5Vc2VyEjAKDW9yZ2FuaXphdGlvbnMYAiADKAsyGS51c2VyLnYxLlVzZXJPcmdhbml6YXRpb24yPAoLVXNlclNlcnZpY2USLQoFR2V0TWUSES51c2VyLnYxLkdldE1lUmVxGhEudXNlci52MS5HZXRNZVJlc0KYAQoLY29tLnVzZXIudjFCCVVzZXJQcm90b1ABWkFnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi91c2VyL3YxO3VzZXJ2MaICA1VYWKoCB1VzZXIuVjHKAgdVc2VyXFYx4gITVXNlclxWMVxHUEJNZXRhZGF0YeoCCFVzZXI6OlYxYgZwcm90bzM", [file_domain_v1_domain]);
-
-/**
- * UserOrganization represents a user's membership in an organization.
- * This is a projection that includes the user's role without exposing all members.
- *
- * @generated from message user.v1.UserOrganization
- */
-export type UserOrganization = Message<"user.v1.UserOrganization"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
-
-  /**
-   * "admin" or "member"
-   *
-   * @generated from field: string role = 3;
-   */
-  role: string;
-};
-
-/**
- * Describes the message user.v1.UserOrganization.
- * Use `create(UserOrganizationSchema)` to create a new message.
- */
-export const UserOrganizationSchema: GenMessage<UserOrganization> = /*@__PURE__*/
-  messageDesc(file_user_v1_user, 0);
+  fileDesc("ChJ1c2VyL3YxL3VzZXIucHJvdG8SB3VzZXIudjEiCgoIR2V0TWVSZXEiWQoIR2V0TWVSZXMSHQoEdXNlchgBIAEoCzIPLmRvbWFpbi52MS5Vc2VyEi4KDW9yZ2FuaXphdGlvbnMYAiADKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uMjwKC1VzZXJTZXJ2aWNlEi0KBUdldE1lEhEudXNlci52MS5HZXRNZVJlcRoRLnVzZXIudjEuR2V0TWVSZXNCmAEKC2NvbS51c2VyLnYxQglVc2VyUHJvdG9QAVpBZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvdXNlci92MTt1c2VydjGiAgNVWFiqAgdVc2VyLlYxygIHVXNlclxWMeICE1VzZXJcVjFcR1BCTWV0YWRhdGHqAghVc2VyOjpWMWIGcHJvdG8z", [file_domain_v1_domain]);
 
 /**
  * GetMeReq is empty - user ID is extracted from JWT token.
@@ -59,7 +27,7 @@ export type GetMeReq = Message<"user.v1.GetMeReq"> & {
  * Use `create(GetMeReqSchema)` to create a new message.
  */
 export const GetMeReqSchema: GenMessage<GetMeReq> = /*@__PURE__*/
-  messageDesc(file_user_v1_user, 1);
+  messageDesc(file_user_v1_user, 0);
 
 /**
  * GetMeRes contains the authenticated user's data and organizations.
@@ -73,9 +41,9 @@ export type GetMeRes = Message<"user.v1.GetMeRes"> & {
   user?: User;
 
   /**
-   * @generated from field: repeated user.v1.UserOrganization organizations = 2;
+   * @generated from field: repeated domain.v1.Organization organizations = 2;
    */
-  organizations: UserOrganization[];
+  organizations: Organization[];
 };
 
 /**
@@ -83,7 +51,7 @@ export type GetMeRes = Message<"user.v1.GetMeRes"> & {
  * Use `create(GetMeResSchema)` to create a new message.
  */
 export const GetMeResSchema: GenMessage<GetMeRes> = /*@__PURE__*/
-  messageDesc(file_user_v1_user, 2);
+  messageDesc(file_user_v1_user, 1);
 
 /**
  * UserService handles user-related operations.

@@ -34,6 +34,7 @@ type Service struct {
 	watchedDirs        map[string]bool
 	claudeDirToProject map[string]shareddomain.ID
 	projectPathToID    map[string]shareddomain.ID // ProjectPath -> ProjectID mapping for hierarchical matching
+	projectIDToOrgID   map[shareddomain.ID]string // ProjectID -> OrganizationID mapping
 	bufferByProject    map[shareddomain.ID][]string
 	mu                 sync.Mutex
 }
@@ -53,6 +54,7 @@ func NewService(
 		watchedDirs:        make(map[string]bool),
 		claudeDirToProject: make(map[string]shareddomain.ID),
 		projectPathToID:    make(map[string]shareddomain.ID),
+		projectIDToOrgID:   make(map[shareddomain.ID]string),
 		bufferByProject:    make(map[shareddomain.ID][]string),
 	}
 }
@@ -67,11 +69,13 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	newDirs := make(map[string]bool)
 	newClaudeDirMapping := make(map[string]shareddomain.ID)
 	newProjectPathMapping := make(map[string]shareddomain.ID)
+	newProjectIDToOrgID := make(map[shareddomain.ID]string)
 
 	for _, t := range targets {
 		newDirs[t.ClaudeDir] = true
 		newClaudeDirMapping[t.ClaudeDir] = t.ProjectID
 		newProjectPathMapping[t.ProjectPath] = t.ProjectID
+		newProjectIDToOrgID[t.ProjectID] = t.OrganizationID
 	}
 
 	// Remove watches for directories no longer in targets
@@ -105,11 +109,13 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	// Update mappings
 	s.claudeDirToProject = newClaudeDirMapping
 	s.projectPathToID = newProjectPathMapping
+	s.projectIDToOrgID = newProjectIDToOrgID
 
 	s.logger.Info("updated watch targets",
 		slog.Int("watching", len(s.watchedDirs)),
 		slog.Int("claudeDirMappings", len(s.claudeDirToProject)),
 		slog.Int("projectPathMappings", len(s.projectPathToID)),
+		slog.Int("projectIDToOrgID", len(s.projectIDToOrgID)),
 	)
 
 	return nil
@@ -233,9 +239,11 @@ func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.
 		copy(currentBatch, remainingLines[:batchSize])
 
 		// d. Create domain.LogBatch
+		orgID := s.projectIDToOrgID[projectID]
 		batch := domain.LogBatch{
-			Lines:     currentBatch,
-			ProjectID: projectID,
+			Lines:          currentBatch,
+			ProjectID:      projectID,
+			OrganizationID: orgID,
 		}
 
 		s.logger.Debug("attempting batch",

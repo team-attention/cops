@@ -20,10 +20,11 @@ const (
 
 // WatchTarget represents a directory to watch for Claude Code logs.
 type WatchTarget struct {
-	ProjectPath string               // Original project path from GlobalConfig
-	ClaudeDir   string               // ~/.claude/projects/{encoded-path}
-	Type        WatchTargetType      // Type of watch target
-	ProjectID   shareddomain.ID      // Project ID from local config
+	ProjectPath    string               // Original project path from GlobalConfig
+	ClaudeDir      string               // ~/.claude/projects/{encoded-path}
+	Type           WatchTargetType      // Type of watch target
+	ProjectID      shareddomain.ID      // Project ID from local config
+	OrganizationID string               // Organization ID from local config
 }
 
 // FilePosition tracks read position for incremental file reading.
@@ -35,6 +36,7 @@ type FilePosition struct {
 
 // LogBatch contains raw JSONL lines for API transmission.
 type LogBatch struct {
-	Lines     []string        // Raw JSONL lines (unparsed)
-	ProjectID shareddomain.ID // Project ID (for aggregation API)
+	Lines          []string        // Raw JSONL lines (unparsed)
+	ProjectID      shareddomain.ID // Project ID (for aggregation API)
+	OrganizationID string          // Organization ID (for aggregation API)
 }

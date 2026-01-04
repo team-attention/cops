@@ -1,9 +1,11 @@
 package cobra
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,12 +13,16 @@ import (
 	"golang.org/x/term"
 
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
+	"github.com/team-attention/cops/cli/internal/service/auth"
 	"github.com/team-attention/cops/cli/internal/service/tracking"
+	"github.com/team-attention/cops/cli/internal/service/user"
+	"github.com/team-attention/cops/shared/domain"
 )
 
 // TUI step constants
 const (
 	stepParentDetection = iota
+	stepOrgSelection
 	stepGitSelection
 	stepNameInput
 	stepSyncSelection
@@ -25,11 +31,12 @@ const (
 
 // addTUIResult contains the collected user inputs from the TUI.
 type addTUIResult struct {
-	ProjectPath  string
-	ProjectName  string
-	IsGitProject bool
-	SyncPastLogs bool
-	Cancelled    bool
+	ProjectPath    string
+	ProjectName    string
+	IsGitProject   bool
+	SyncPastLogs   bool
+	Cancelled      bool
+	OrganizationID string
 }
 
 // addModel is the bubbletea model for the add command TUI.
@@ -44,6 +51,14 @@ type addModel struct {
 	parentProject *tracking.ParentProjectInfo // Result from service
 	parentCursor  int                          // 0=Yes, 1=No
 	service       *tracking.Service            // Reference to service for parent detection
+
+	// Organization selection
+	organizations   []*domain.Organization // List of user's organizations
+	orgCursor       int                    // Cursor for organization selection
+	selectedOrgID   string                 // Selected organization ID
+	selectedOrgName string                 // Selected organization name (for display)
+	userSvc         *user.Service          // Reference to user service for fetching orgs
+	authSvc         *auth.Service          // Reference to auth service for auth check
 
 	// Git detection results
 	gitRepos       []string // Found git repos in parents (closest first)
@@ -70,7 +85,13 @@ type addModel struct {
 }
 
 // newAddModel creates a new add TUI model.
-func newAddModel(dir string, noGitFlag bool, service *tracking.Service) addModel {
+func newAddModel(
+	dir string,
+	noGitFlag bool,
+	service *tracking.Service,
+	authSvc *auth.Service,
+	userSvc *user.Service,
+) addModel {
 	ti := textinput.New()
 	ti.Placeholder = "project-name"
 	ti.CharLimit = 100
@@ -81,6 +102,8 @@ func newAddModel(dir string, noGitFlag bool, service *tracking.Service) addModel
 		currentDir:     dir,
 		noGitFlag:      noGitFlag,
 		service:        service,
+		authSvc:        authSvc,
+		userSvc:        userSvc,
 		selectedGitIdx: -1,
 		nameInput:      ti,
 		titleStyle:     lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("205")),
@@ -161,15 +184,36 @@ type gitDetectionMsg struct {
 	err   error
 }
 
+// orgFetchMsg is sent when organization fetching completes.
+type orgFetchMsg struct {
+	organizations []*domain.Organization
+	err           error
+}
+
+// fetchOrganizations is a command that fetches user organizations.
+func (m addModel) fetchOrganizations() tea.Msg {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	orgs, err := m.userSvc.GetMyOrganizations(ctx)
+	return orgFetchMsg{organizations: orgs, err: err}
+}
+
 // runAddTUI runs the add command TUI and returns the result.
 // Returns an error if the terminal is not interactive.
-func runAddTUI(dir string, noGitFlag bool, service *tracking.Service) (*addTUIResult, error) {
+func runAddTUI(
+	dir string,
+	noGitFlag bool,
+	service *tracking.Service,
+	authSvc *auth.Service,
+	userSvc *user.Service,
+) (*addTUIResult, error) {
 	// Check if running in an interactive terminal
 	if !term.IsTerminal(int(os.Stdout.Fd())) {
 		return nil, fmt.Errorf("cops add requires an interactive terminal. Use SSH with -t flag or run in a terminal emulator")
 	}
 
-	model := newAddModel(dir, noGitFlag, service)
+	model := newAddModel(dir, noGitFlag, service, authSvc, userSvc)
 	p := tea.NewProgram(model)
 
 	finalModel, err := p.Run()

@@ -6,21 +6,13 @@ import "domain/v1/domain.proto";
 
 option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/user/v1;userv1";
 
-// UserOrganization represents a user's membership in an organization.
-// This is a projection that includes the user's role without exposing all members.
-message UserOrganization {
-  string id = 1;
-  string name = 2;
-  string role = 3;  // "admin" or "member"
-}
-
 // GetMeReq is empty - user ID is extracted from JWT token.
 message GetMeReq {}
 
 // GetMeRes contains the authenticated user's data and organizations.
 message GetMeRes {
   domain.v1.User user = 1;
-  repeated UserOrganization organizations = 2;
+  repeated domain.v1.Organization organizations = 2;
 }
 
 // UserService handles user-related operations.

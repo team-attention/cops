@@ -22,68 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// UserOrganization represents a user's membership in an organization.
-// This is a projection that includes the user's role without exposing all members.
-type UserOrganization struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"` // "admin" or "member"
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UserOrganization) Reset() {
-	*x = UserOrganization{}
-	mi := &file_user_v1_user_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UserOrganization) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UserOrganization) ProtoMessage() {}
-
-func (x *UserOrganization) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserOrganization.ProtoReflect.Descriptor instead.
-func (*UserOrganization) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *UserOrganization) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *UserOrganization) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *UserOrganization) GetRole() string {
-	if x != nil {
-		return x.Role
-	}
-	return ""
-}
-
 // GetMeReq is empty - user ID is extracted from JWT token.
 type GetMeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -93,7 +31,7 @@ type GetMeReq struct {
 
 func (x *GetMeReq) Reset() {
 	*x = GetMeReq{}
-	mi := &file_user_v1_user_proto_msgTypes[1]
+	mi := &file_user_v1_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -105,7 +43,7 @@ func (x *GetMeReq) String() string {
 func (*GetMeReq) ProtoMessage() {}
 
 func (x *GetMeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[1]
+	mi := &file_user_v1_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -118,21 +56,21 @@ func (x *GetMeReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMeReq.ProtoReflect.Descriptor instead.
 func (*GetMeReq) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{1}
+	return file_user_v1_user_proto_rawDescGZIP(), []int{0}
 }
 
 // GetMeRes contains the authenticated user's data and organizations.
 type GetMeRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *v1.User               `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Organizations []*UserOrganization    `protobuf:"bytes,2,rep,name=organizations,proto3" json:"organizations,omitempty"`
+	Organizations []*v1.Organization     `protobuf:"bytes,2,rep,name=organizations,proto3" json:"organizations,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetMeRes) Reset() {
 	*x = GetMeRes{}
-	mi := &file_user_v1_user_proto_msgTypes[2]
+	mi := &file_user_v1_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +82,7 @@ func (x *GetMeRes) String() string {
 func (*GetMeRes) ProtoMessage() {}
 
 func (x *GetMeRes) ProtoReflect() protoreflect.Message {
-	mi := &file_user_v1_user_proto_msgTypes[2]
+	mi := &file_user_v1_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +95,7 @@ func (x *GetMeRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMeRes.ProtoReflect.Descriptor instead.
 func (*GetMeRes) Descriptor() ([]byte, []int) {
-	return file_user_v1_user_proto_rawDescGZIP(), []int{2}
+	return file_user_v1_user_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetMeRes) GetUser() *v1.User {
@@ -167,7 +105,7 @@ func (x *GetMeRes) GetUser() *v1.User {
 	return nil
 }
 
-func (x *GetMeRes) GetOrganizations() []*UserOrganization {
+func (x *GetMeRes) GetOrganizations() []*v1.Organization {
 	if x != nil {
 		return x.Organizations
 	}
@@ -178,16 +116,12 @@ var File_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12user/v1/user.proto\x12\auser.v1\x1a\x16domain/v1/domain.proto\"J\n" +
-	"\x10UserOrganization\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
-	"\x04role\x18\x03 \x01(\tR\x04role\"\n" +
+	"\x12user/v1/user.proto\x12\auser.v1\x1a\x16domain/v1/domain.proto\"\n" +
 	"\n" +
-	"\bGetMeReq\"p\n" +
+	"\bGetMeReq\"n\n" +
 	"\bGetMeRes\x12#\n" +
-	"\x04user\x18\x01 \x01(\v2\x0f.domain.v1.UserR\x04user\x12?\n" +
-	"\rorganizations\x18\x02 \x03(\v2\x19.user.v1.UserOrganizationR\rorganizations2<\n" +
+	"\x04user\x18\x01 \x01(\v2\x0f.domain.v1.UserR\x04user\x12=\n" +
+	"\rorganizations\x18\x02 \x03(\v2\x17.domain.v1.OrganizationR\rorganizations2<\n" +
 	"\vUserService\x12-\n" +
 	"\x05GetMe\x12\x11.user.v1.GetMeReq\x1a\x11.user.v1.GetMeResB\x98\x01\n" +
 	"\vcom.user.v1B\tUserProtoP\x01ZAgithub.com/team-attention/cops/shared/gen/grpcstub/user/v1;userv1\xa2\x02\x03UXX\xaa\x02\aUser.V1\xca\x02\aUser\\V1\xe2\x02\x13User\\V1\\GPBMetadata\xea\x02\bUser::V1b\x06proto3"
@@ -204,18 +138,18 @@ func file_user_v1_user_proto_rawDescGZIP() []byte {
 	return file_user_v1_user_proto_rawDescData
 }
 
-var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_user_v1_user_proto_goTypes = []any{
-	(*UserOrganization)(nil), // 0: user.v1.UserOrganization
-	(*GetMeReq)(nil),         // 1: user.v1.GetMeReq
-	(*GetMeRes)(nil),         // 2: user.v1.GetMeRes
-	(*v1.User)(nil),          // 3: domain.v1.User
+	(*GetMeReq)(nil),        // 0: user.v1.GetMeReq
+	(*GetMeRes)(nil),        // 1: user.v1.GetMeRes
+	(*v1.User)(nil),         // 2: domain.v1.User
+	(*v1.Organization)(nil), // 3: domain.v1.Organization
 }
 var file_user_v1_user_proto_depIdxs = []int32{
-	3, // 0: user.v1.GetMeRes.user:type_name -> domain.v1.User
-	0, // 1: user.v1.GetMeRes.organizations:type_name -> user.v1.UserOrganization
-	1, // 2: user.v1.UserService.GetMe:input_type -> user.v1.GetMeReq
-	2, // 3: user.v1.UserService.GetMe:output_type -> user.v1.GetMeRes
+	2, // 0: user.v1.GetMeRes.user:type_name -> domain.v1.User
+	3, // 1: user.v1.GetMeRes.organizations:type_name -> domain.v1.Organization
+	0, // 2: user.v1.UserService.GetMe:input_type -> user.v1.GetMeReq
+	1, // 3: user.v1.UserService.GetMe:output_type -> user.v1.GetMeRes
 	3, // [3:4] is the sub-list for method output_type
 	2, // [2:3] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -234,7 +168,7 @@ func file_user_v1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_v1_user_proto_rawDesc), len(file_user_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

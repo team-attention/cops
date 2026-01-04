@@ -33,13 +33,18 @@ Examples:
   cops add . --no-git       # Treat as non-git project`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Check authentication first
+			if !h.authSvc.IsLoggedIn() {
+				return fmt.Errorf("not authenticated. Run 'cops login' first")
+			}
+
 			path := "."
 			if len(args) > 0 {
 				path = args[0]
 			}
 
 			// Run the TUI
-			result, err := runAddTUI(path, noGit, h.svc)
+			result, err := runAddTUI(path, noGit, h.svc, h.authSvc, h.userSvc)
 			if err != nil {
 				return err
 			}
@@ -52,10 +57,11 @@ Examples:
 
 			// Create params from TUI result
 			params := tracking.AddProjectParams{
-				Path:  result.ProjectPath,
-				Name:  result.ProjectName,
-				NoGit: !result.IsGitProject, // NoGit=true means non-git project
-				Sync:  result.SyncPastLogs,
+				Path:           result.ProjectPath,
+				Name:           result.ProjectName,
+				NoGit:          !result.IsGitProject, // NoGit=true means non-git project
+				Sync:           result.SyncPastLogs,
+				OrganizationID: result.OrganizationID,
 			}
 
 			// Call service to register project
