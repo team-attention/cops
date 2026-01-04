@@ -80,6 +80,7 @@ func (h *UserGRPCHandler) GetMe(
 
 	// b. For each item in result.Organizations, if userOrg.Organization is not nil,
 	//    append domainv1.Organization with fields.
+	//    Include current user's membership so frontend can determine role.
 	var protoOrgs []*domainv1.Organization
 	for _, userOrg := range result.Organizations {
 		if userOrg.Organization != nil {
@@ -87,7 +88,12 @@ func (h *UserGRPCHandler) GetMe(
 				Id:   string(userOrg.Organization.ID),
 				Name: userOrg.Organization.Name,
 				Slug: userOrg.Organization.Slug,
-				// Note: Members field intentionally not populated
+				Members: []*domainv1.OrganizationMember{
+					{
+						UserId: userID,
+						Role:   string(userOrg.Role),
+					},
+				},
 			})
 		}
 	}

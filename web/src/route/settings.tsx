@@ -9,6 +9,7 @@ import {
 } from '@/gen/shadcn/ui/card'
 import { Button } from '@/gen/shadcn/ui/button'
 import { DeleteAccountDialog } from '@/feature/user/component/delete-account-dialog'
+import { OrganizationSettingsSection } from '@/feature/organization/component/organization-settings-section'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -36,6 +37,12 @@ function SettingsPage() {
             </p>
           </div>
         </div>
+
+        {/* Organization Settings */}
+        <OrganizationSettingsSection />
+
+        {/* Spacer */}
+        <div className="h-8" />
 
         {/* Danger Zone */}
         <Card className="border-red-900/50 bg-red-950/10">
