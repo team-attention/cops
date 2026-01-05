@@ -1,9 +1,18 @@
-import { useState, useCallback } from 'react'
-import { Loader2, Shield, User, MoreHorizontal, UserMinus, ShieldCheck, ShieldOff } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import {
+  Loader2,
+  MoreHorizontal,
+  Shield,
+  ShieldCheck,
+  ShieldOff,
+  User,
+  UserMinus,
+} from 'lucide-react'
 import { Code } from '@connectrpc/connect'
 import { useGetOrganizationMembers } from '../hook/use-get-organization-members'
 import { useUpdateMemberRole } from '../hook/use-update-member-role'
 import { useRemoveMember } from '../hook/use-remove-member'
+import type { MemberWithDetails } from '../type/member'
 import { Avatar, AvatarFallback, AvatarImage } from '@/gen/shadcn/ui/avatar'
 import { Button } from '@/gen/shadcn/ui/button'
 import { Badge } from '@/gen/shadcn/ui/badge'
@@ -16,8 +25,6 @@ import {
 } from '@/gen/shadcn/ui/dropdown-menu'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { Alert, AlertDescription } from '@/gen/shadcn/ui/alert'
-
-import type { MemberWithDetails } from '../type/member'
 
 interface MemberListProps {
   // organizationId is the ID of the organization
@@ -33,7 +40,11 @@ type ConfirmDialogState =
   | { type: 'changeRole'; member: MemberWithDetails; newRole: string }
   | null
 
-export const MemberList = ({ organizationId, isAdmin, currentUserId }: MemberListProps) => {
+export const MemberList = ({
+  organizationId,
+  isAdmin,
+  currentUserId,
+}: MemberListProps) => {
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -129,7 +140,9 @@ export const MemberList = ({ organizationId, isAdmin, currentUserId }: MemberLis
     )
   }
 
-  const members: MemberWithDetails[] = (membersQuery.data?.members || []).map((m) => ({
+  const members: Array<MemberWithDetails> = (
+    membersQuery.data?.members || []
+  ).map((m) => ({
     userId: m.userId,
     email: m.email,
     name: m.name,
@@ -174,7 +187,9 @@ export const MemberList = ({ organizationId, isAdmin, currentUserId }: MemberLis
                       <span className="ml-2 text-xs text-zinc-500">(You)</span>
                     )}
                   </p>
-                  <Badge variant={member.role === 'admin' ? 'default' : 'secondary'}>
+                  <Badge
+                    variant={member.role === 'admin' ? 'default' : 'secondary'}
+                  >
                     {member.role === 'admin' ? (
                       <>
                         <Shield className="mr-1 h-3 w-3" />
@@ -263,19 +278,25 @@ export const MemberList = ({ organizationId, isAdmin, currentUserId }: MemberLis
             <p className="text-sm text-zinc-400 mb-4">
               {confirmDialog.type === 'remove' && (
                 <>
-                  Are you sure you want to remove <strong>{confirmDialog.member.name}</strong> from
-                  this organization? They will lose access to all projects and data.
+                  Are you sure you want to remove{' '}
+                  <strong>{confirmDialog.member.name}</strong> from this
+                  organization? They will lose access to all projects and data.
                 </>
               )}
               {confirmDialog.type === 'changeRole' && (
                 <>
-                  Are you sure you want to change <strong>{confirmDialog.member.name}</strong>'s role
-                  to <strong>{confirmDialog.newRole}</strong>?
+                  Are you sure you want to change{' '}
+                  <strong>{confirmDialog.member.name}</strong>'s role to{' '}
+                  <strong>{confirmDialog.newRole}</strong>?
                 </>
               )}
             </p>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setConfirmDialog(null)} disabled={actionLoading}>
+              <Button
+                variant="outline"
+                onClick={() => setConfirmDialog(null)}
+                disabled={actionLoading}
+              >
                 Cancel
               </Button>
               <Button
@@ -288,7 +309,9 @@ export const MemberList = ({ organizationId, isAdmin, currentUserId }: MemberLis
                 }}
                 disabled={actionLoading}
               >
-                {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {actionLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Confirm
               </Button>
             </div>

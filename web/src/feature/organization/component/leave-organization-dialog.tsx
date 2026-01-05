@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle, Loader2, LogOut } from 'lucide-react'
 import { Code } from '@connectrpc/connect'
@@ -50,7 +50,8 @@ export const LeaveOrganizationDialog = ({
   })
 
   const mutation = useLeaveOrganization()
-  const { organizations, setOrganizations, setSelectedOrganizationId } = useUserStore()
+  const { organizations, setOrganizations, setSelectedOrganizationId } =
+    useUserStore()
   const navigate = useNavigate()
 
   const handleLeave = useCallback(async () => {
@@ -66,7 +67,9 @@ export const LeaveOrganizationDialog = ({
         navigate({ to: '/' })
       } else {
         // Update organizations in store (remove this org)
-        const newOrganizations = organizations.filter((org) => org.id !== organizationId)
+        const newOrganizations = organizations.filter(
+          (org) => org.id !== organizationId,
+        )
         setOrganizations(newOrganizations)
         // Select first remaining organization
         if (newOrganizations.length > 0) {
@@ -89,10 +92,19 @@ export const LeaveOrganizationDialog = ({
 
       setState({ status: 'error', message: errorMessage })
     }
-  }, [mutation, organizationId, organizations, setOrganizations, setSelectedOrganizationId, navigate])
+  }, [
+    mutation,
+    organizationId,
+    organizations,
+    setOrganizations,
+    setSelectedOrganizationId,
+    navigate,
+  ])
 
   const isConfirmationRequired = isLastOrganization && isSoleMember
-  const isConfirmationValid = isConfirmationRequired ? confirmationInput === 'LEAVE' : true
+  const isConfirmationValid = isConfirmationRequired
+    ? confirmationInput === 'LEAVE'
+    : true
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -114,7 +126,9 @@ export const LeaveOrganizationDialog = ({
           {isLastOrganization && isSoleMember && (
             <Alert className="border-red-900/50 bg-red-950/20">
               <AlertDescription className="text-sm text-red-200">
-                <p className="font-semibold mb-2">This will permanently delete:</p>
+                <p className="font-semibold mb-2">
+                  This will permanently delete:
+                </p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>All projects in this organization</li>
                   <li>All session records and data</li>

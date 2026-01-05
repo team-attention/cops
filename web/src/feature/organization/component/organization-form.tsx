@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Building2, Loader2 } from 'lucide-react'
 import { Code } from '@connectrpc/connect'
@@ -171,10 +171,7 @@ export const OrganizationForm = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name field */}
           <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="text-sm font-medium text-zinc-300"
-            >
+            <label htmlFor="name" className="text-sm font-medium text-zinc-300">
               Organization Name
             </label>
             <Input
@@ -188,10 +185,7 @@ export const OrganizationForm = () => {
 
           {/* Slug field */}
           <div className="space-y-2">
-            <label
-              htmlFor="slug"
-              className="text-sm font-medium text-zinc-300"
-            >
+            <label htmlFor="slug" className="text-sm font-medium text-zinc-300">
               URL Slug
             </label>
             <Input

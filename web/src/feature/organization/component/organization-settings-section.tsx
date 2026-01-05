@@ -1,4 +1,7 @@
-import { Building2, Users, Crown, User, Pencil, LogOut } from 'lucide-react'
+import { Building2, Crown, LogOut, Pencil, User, Users } from 'lucide-react'
+import { EditOrganizationDialog } from './edit-organization-dialog'
+import { MemberList } from './member-list'
+import { LeaveOrganizationDialog } from './leave-organization-dialog'
 import { useUserStore } from '@/shared/store/user-store'
 import {
   Card,
@@ -10,15 +13,14 @@ import {
 import { Badge } from '@/gen/shadcn/ui/badge'
 import { Button } from '@/gen/shadcn/ui/button'
 import { Separator } from '@/gen/shadcn/ui/separator'
-import { EditOrganizationDialog } from './edit-organization-dialog'
-import { MemberList } from './member-list'
-import { LeaveOrganizationDialog } from './leave-organization-dialog'
 
 export const OrganizationSettingsSection = () => {
   const { user, organizations, selectedOrganizationId } = useUserStore()
 
   // Find current organization from organizations array
-  const currentOrg = organizations.find((org) => org.id === selectedOrganizationId)
+  const currentOrg = organizations.find(
+    (org) => org.id === selectedOrganizationId,
+  )
 
   // If no organization selected, return null
   if (!currentOrg || !user) {
@@ -43,7 +45,9 @@ export const OrganizationSettingsSection = () => {
           <Building2 className="h-6 w-6" />
           <div className="flex-1">
             <CardTitle>Organization Settings</CardTitle>
-            <CardDescription>Manage your organization and members</CardDescription>
+            <CardDescription>
+              Manage your organization and members
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -108,7 +112,9 @@ export const OrganizationSettingsSection = () => {
         {/* Leave Organization Section */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-red-400">Leave Organization</h3>
+            <h3 className="text-lg font-semibold text-red-400">
+              Leave Organization
+            </h3>
             <p className="text-sm text-zinc-500">
               {isLastOrganization && isSoleMember
                 ? 'Leaving will permanently delete this organization and all associated data.'

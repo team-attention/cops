@@ -1,7 +1,11 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Code } from '@connectrpc/connect'
 import { useUpdateOrganization } from '../hook/use-update-organization'
+import type {
+  EditOrganizationFormData,
+  SlugValidationResult,
+} from '../type/member'
 import { useUserStore } from '@/shared/store/user-store'
 import { Button } from '@/gen/shadcn/ui/button'
 import { Input } from '@/gen/shadcn/ui/input'
@@ -15,8 +19,6 @@ import {
   DialogTrigger,
 } from '@/gen/shadcn/ui/dialog'
 import { Alert, AlertDescription } from '@/gen/shadcn/ui/alert'
-
-import type { EditOrganizationFormData, SlugValidationResult } from '../type/member'
 
 // EditOrganizationDialogState represents the dialog's internal state.
 type EditOrganizationDialogState =
@@ -45,16 +47,26 @@ const validateSlug = (slug: string): SlugValidationResult => {
   }
 
   if (trimmed.length < 3) {
-    return { isValid: false, errorMessage: 'Slug must be at least 3 characters' }
+    return {
+      isValid: false,
+      errorMessage: 'Slug must be at least 3 characters',
+    }
   }
 
   if (trimmed.length > 63) {
-    return { isValid: false, errorMessage: 'Slug must be at most 63 characters' }
+    return {
+      isValid: false,
+      errorMessage: 'Slug must be at most 63 characters',
+    }
   }
 
   const slugPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/
   if (!slugPattern.test(trimmed)) {
-    return { isValid: false, errorMessage: 'Slug must contain only lowercase letters, numbers, and hyphens' }
+    return {
+      isValid: false,
+      errorMessage:
+        'Slug must contain only lowercase letters, numbers, and hyphens',
+    }
   }
 
   return { isValid: true, errorMessage: null }
@@ -94,23 +106,32 @@ export const EditOrganizationDialog = ({
     }
   }, [isOpen, currentName, currentSlug])
 
-  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, name: e.target.value }))
-    setState({ status: 'idle' })
-  }, [])
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, name: e.target.value }))
+      setState({ status: 'idle' })
+    },
+    [],
+  )
 
-  const handleSlugChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const slug = e.target.value.toLowerCase().trim()
-    setFormData((prev) => ({ ...prev, slug }))
-    const validation = validateSlug(slug)
-    setSlugValidation(validation)
-    setState({ status: 'idle' })
-  }, [])
+  const handleSlugChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const slug = e.target.value.toLowerCase().trim()
+      setFormData((prev) => ({ ...prev, slug }))
+      const validation = validateSlug(slug)
+      setSlugValidation(validation)
+      setState({ status: 'idle' })
+    },
+    [],
+  )
 
   const handleSubmit = useCallback(async () => {
     const validation = validateSlug(formData.slug)
     if (!validation.isValid) {
-      setState({ status: 'error', message: validation.errorMessage || 'Invalid slug' })
+      setState({
+        status: 'error',
+        message: validation.errorMessage || 'Invalid slug',
+      })
       return
     }
 
@@ -148,7 +169,8 @@ export const EditOrganizationDialog = ({
   }, [mutation, organizationId, formData, updateOrganization])
 
   const isFormValid = formData.name.trim() !== '' && slugValidation.isValid
-  const hasChanges = formData.name !== currentName || formData.slug !== currentSlug
+  const hasChanges =
+    formData.name !== currentName || formData.slug !== currentSlug
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -163,7 +185,9 @@ export const EditOrganizationDialog = ({
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">Organization Name</label>
+            <label htmlFor="name" className="text-sm font-medium">
+              Organization Name
+            </label>
             <Input
               id="name"
               value={formData.name}
@@ -174,7 +198,9 @@ export const EditOrganizationDialog = ({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="slug" className="text-sm font-medium">Slug</label>
+            <label htmlFor="slug" className="text-sm font-medium">
+              Slug
+            </label>
             <Input
               id="slug"
               value={formData.slug}
@@ -183,7 +209,9 @@ export const EditOrganizationDialog = ({
               disabled={state.status === 'submitting'}
             />
             {slugValidation.errorMessage && (
-              <p className="text-sm text-red-500">{slugValidation.errorMessage}</p>
+              <p className="text-sm text-red-500">
+                {slugValidation.errorMessage}
+              </p>
             )}
           </div>
 
@@ -207,7 +235,9 @@ export const EditOrganizationDialog = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!isFormValid || !hasChanges || state.status === 'submitting'}
+            disabled={
+              !isFormValid || !hasChanges || state.status === 'submitting'
+            }
           >
             {state.status === 'submitting' && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

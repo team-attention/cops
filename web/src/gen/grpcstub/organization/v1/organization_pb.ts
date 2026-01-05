@@ -2,66 +2,82 @@
 // @generated from file organization/v1/organization.proto (package organization.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Organization } from "../../domain/v1/domain_pb";
-import { file_domain_v1_domain } from "../../domain/v1/domain_pb";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Organization } from '../../domain/v1/domain_pb'
+import { file_domain_v1_domain } from '../../domain/v1/domain_pb'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file organization/v1/organization.proto.
  */
-export const file_organization_v1_organization: GenFile = /*@__PURE__*/
-  fileDesc("CiJvcmdhbml6YXRpb24vdjEvb3JnYW5pemF0aW9uLnByb3RvEg9vcmdhbml6YXRpb24udjEiMwoVQ3JlYXRlT3JnYW5pemF0aW9uUmVxEgwKBG5hbWUYASABKAkSDAoEc2x1ZxgCIAEoCSJGChVDcmVhdGVPcmdhbml6YXRpb25SZXMSLQoMb3JnYW5pemF0aW9uGAEgASgLMhcuZG9tYWluLnYxLk9yZ2FuaXphdGlvbiJvCh1Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscxIPCgd1c2VyX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJEgwKBG5hbWUYAyABKAkSEgoKYXZhdGFyX3VybBgEIAEoCRIMCgRyb2xlGAUgASgJIkwKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRzbHVnGAMgASgJIkYKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcxItCgxvcmdhbml6YXRpb24YASABKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uIjQKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJIlwKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXMSPwoHbWVtYmVycxgBIAMoCzIuLm9yZ2FuaXphdGlvbi52MS5Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscyJNChNVcGRhdGVNZW1iZXJSb2xlUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEgwKBHJvbGUYAyABKAkiJgoTVXBkYXRlTWVtYmVyUm9sZVJlcxIPCgdzdWNjZXNzGAEgASgIIjsKD1JlbW92ZU1lbWJlclJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIiCg9SZW1vdmVNZW1iZXJSZXMSDwoHc3VjY2VzcxgBIAEoCCIvChRMZWF2ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkiRQoUTGVhdmVPcmdhbml6YXRpb25SZXMSDwoHc3VjY2VzcxgBIAEoCBIcChRpc19sYXN0X29yZ2FuaXphdGlvbhgCIAEoCDLqBAoTT3JnYW5pemF0aW9uU2VydmljZRJkChJDcmVhdGVPcmdhbml6YXRpb24SJi5vcmdhbml6YXRpb24udjEuQ3JlYXRlT3JnYW5pemF0aW9uUmVxGiYub3JnYW5pemF0aW9uLnYxLkNyZWF0ZU9yZ2FuaXphdGlvblJlcxJkChJVcGRhdGVPcmdhbml6YXRpb24SJi5vcmdhbml6YXRpb24udjEuVXBkYXRlT3JnYW5pemF0aW9uUmVxGiYub3JnYW5pemF0aW9uLnYxLlVwZGF0ZU9yZ2FuaXphdGlvblJlcxJwChZHZXRPcmdhbml6YXRpb25NZW1iZXJzEioub3JnYW5pemF0aW9uLnYxLkdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXEaKi5vcmdhbml6YXRpb24udjEuR2V0T3JnYW5pemF0aW9uTWVtYmVyc1JlcxJeChBVcGRhdGVNZW1iZXJSb2xlEiQub3JnYW5pemF0aW9uLnYxLlVwZGF0ZU1lbWJlclJvbGVSZXEaJC5vcmdhbml6YXRpb24udjEuVXBkYXRlTWVtYmVyUm9sZVJlcxJSCgxSZW1vdmVNZW1iZXISIC5vcmdhbml6YXRpb24udjEuUmVtb3ZlTWVtYmVyUmVxGiAub3JnYW5pemF0aW9uLnYxLlJlbW92ZU1lbWJlclJlcxJhChFMZWF2ZU9yZ2FuaXphdGlvbhIlLm9yZ2FuaXphdGlvbi52MS5MZWF2ZU9yZ2FuaXphdGlvblJlcRolLm9yZ2FuaXphdGlvbi52MS5MZWF2ZU9yZ2FuaXphdGlvblJlc0LYAQoTY29tLm9yZ2FuaXphdGlvbi52MUIRT3JnYW5pemF0aW9uUHJvdG9QAVpRZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvb3JnYW5pemF0aW9uL3YxO29yZ2FuaXphdGlvbnYxogIDT1hYqgIPT3JnYW5pemF0aW9uLlYxygIPT3JnYW5pemF0aW9uXFYx4gIbT3JnYW5pemF0aW9uXFYxXEdQQk1ldGFkYXRh6gIQT3JnYW5pemF0aW9uOjpWMWIGcHJvdG8z", [file_domain_v1_domain]);
+export const file_organization_v1_organization: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'CiJvcmdhbml6YXRpb24vdjEvb3JnYW5pemF0aW9uLnByb3RvEg9vcmdhbml6YXRpb24udjEiMwoVQ3JlYXRlT3JnYW5pemF0aW9uUmVxEgwKBG5hbWUYASABKAkSDAoEc2x1ZxgCIAEoCSJGChVDcmVhdGVPcmdhbml6YXRpb25SZXMSLQoMb3JnYW5pemF0aW9uGAEgASgLMhcuZG9tYWluLnYxLk9yZ2FuaXphdGlvbiJvCh1Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscxIPCgd1c2VyX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJEgwKBG5hbWUYAyABKAkSEgoKYXZhdGFyX3VybBgEIAEoCRIMCgRyb2xlGAUgASgJIkwKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRzbHVnGAMgASgJIkYKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcxItCgxvcmdhbml6YXRpb24YASABKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uIjQKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJIlwKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXMSPwoHbWVtYmVycxgBIAMoCzIuLm9yZ2FuaXphdGlvbi52MS5Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscyJNChNVcGRhdGVNZW1iZXJSb2xlUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEgwKBHJvbGUYAyABKAkiJgoTVXBkYXRlTWVtYmVyUm9sZVJlcxIPCgdzdWNjZXNzGAEgASgIIjsKD1JlbW92ZU1lbWJlclJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIiCg9SZW1vdmVNZW1iZXJSZXMSDwoHc3VjY2VzcxgBIAEoCCIvChRMZWF2ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkiRQoUTGVhdmVPcmdhbml6YXRpb25SZXMSDwoHc3VjY2VzcxgBIAEoCBIcChRpc19sYXN0X29yZ2FuaXphdGlvbhgCIAEoCDLqBAoTT3JnYW5pemF0aW9uU2VydmljZRJkChJDcmVhdGVPcmdhbml6YXRpb24SJi5vcmdhbml6YXRpb24udjEuQ3JlYXRlT3JnYW5pemF0aW9uUmVxGiYub3JnYW5pemF0aW9uLnYxLkNyZWF0ZU9yZ2FuaXphdGlvblJlcxJkChJVcGRhdGVPcmdhbml6YXRpb24SJi5vcmdhbml6YXRpb24udjEuVXBkYXRlT3JnYW5pemF0aW9uUmVxGiYub3JnYW5pemF0aW9uLnYxLlVwZGF0ZU9yZ2FuaXphdGlvblJlcxJwChZHZXRPcmdhbml6YXRpb25NZW1iZXJzEioub3JnYW5pemF0aW9uLnYxLkdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXEaKi5vcmdhbml6YXRpb24udjEuR2V0T3JnYW5pemF0aW9uTWVtYmVyc1JlcxJeChBVcGRhdGVNZW1iZXJSb2xlEiQub3JnYW5pemF0aW9uLnYxLlVwZGF0ZU1lbWJlclJvbGVSZXEaJC5vcmdhbml6YXRpb24udjEuVXBkYXRlTWVtYmVyUm9sZVJlcxJSCgxSZW1vdmVNZW1iZXISIC5vcmdhbml6YXRpb24udjEuUmVtb3ZlTWVtYmVyUmVxGiAub3JnYW5pemF0aW9uLnYxLlJlbW92ZU1lbWJlclJlcxJhChFMZWF2ZU9yZ2FuaXphdGlvbhIlLm9yZ2FuaXphdGlvbi52MS5MZWF2ZU9yZ2FuaXphdGlvblJlcRolLm9yZ2FuaXphdGlvbi52MS5MZWF2ZU9yZ2FuaXphdGlvblJlc0LYAQoTY29tLm9yZ2FuaXphdGlvbi52MUIRT3JnYW5pemF0aW9uUHJvdG9QAVpRZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvb3JnYW5pemF0aW9uL3YxO29yZ2FuaXphdGlvbnYxogIDT1hYqgIPT3JnYW5pemF0aW9uLlYxygIPT3JnYW5pemF0aW9uXFYx4gIbT3JnYW5pemF0aW9uXFYxXEdQQk1ldGFkYXRh6gIQT3JnYW5pemF0aW9uOjpWMWIGcHJvdG8z',
+    [file_domain_v1_domain],
+  )
 
 /**
  * CreateOrganizationReq contains the data needed to create a new organization.
  *
  * @generated from message organization.v1.CreateOrganizationReq
  */
-export type CreateOrganizationReq = Message<"organization.v1.CreateOrganizationReq"> & {
-  /**
-   * name is the display name for the organization (required)
-   *
-   * @generated from field: string name = 1;
-   */
-  name: string;
+export type CreateOrganizationReq =
+  Message<'organization.v1.CreateOrganizationReq'> & {
+    /**
+     * name is the display name for the organization (required)
+     *
+     * @generated from field: string name = 1;
+     */
+    name: string
 
-  /**
-   * slug is the URL-safe identifier for the organization (required)
-   *
-   * @generated from field: string slug = 2;
-   */
-  slug: string;
-};
+    /**
+     * slug is the URL-safe identifier for the organization (required)
+     *
+     * @generated from field: string slug = 2;
+     */
+    slug: string
+  }
 
 /**
  * Describes the message organization.v1.CreateOrganizationReq.
  * Use `create(CreateOrganizationReqSchema)` to create a new message.
  */
-export const CreateOrganizationReqSchema: GenMessage<CreateOrganizationReq> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 0);
+export const CreateOrganizationReqSchema: GenMessage<CreateOrganizationReq> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 0)
 
 /**
  * CreateOrganizationRes contains the newly created organization.
  *
  * @generated from message organization.v1.CreateOrganizationRes
  */
-export type CreateOrganizationRes = Message<"organization.v1.CreateOrganizationRes"> & {
-  /**
-   * organization is the created organization with generated ID
-   *
-   * @generated from field: domain.v1.Organization organization = 1;
-   */
-  organization?: Organization;
-};
+export type CreateOrganizationRes =
+  Message<'organization.v1.CreateOrganizationRes'> & {
+    /**
+     * organization is the created organization with generated ID
+     *
+     * @generated from field: domain.v1.Organization organization = 1;
+     */
+    organization?: Organization
+  }
 
 /**
  * Describes the message organization.v1.CreateOrganizationRes.
  * Use `create(CreateOrganizationResSchema)` to create a new message.
  */
-export const CreateOrganizationResSchema: GenMessage<CreateOrganizationRes> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 1);
+export const CreateOrganizationResSchema: GenMessage<CreateOrganizationRes> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 1)
 
 /**
  * OrganizationMemberWithDetails represents a member with full user details.
@@ -69,265 +85,285 @@ export const CreateOrganizationResSchema: GenMessage<CreateOrganizationRes> = /*
  *
  * @generated from message organization.v1.OrganizationMemberWithDetails
  */
-export type OrganizationMemberWithDetails = Message<"organization.v1.OrganizationMemberWithDetails"> & {
-  /**
-   * @generated from field: string user_id = 1;
-   */
-  userId: string;
+export type OrganizationMemberWithDetails =
+  Message<'organization.v1.OrganizationMemberWithDetails'> & {
+    /**
+     * @generated from field: string user_id = 1;
+     */
+    userId: string
 
-  /**
-   * @generated from field: string email = 2;
-   */
-  email: string;
+    /**
+     * @generated from field: string email = 2;
+     */
+    email: string
 
-  /**
-   * @generated from field: string name = 3;
-   */
-  name: string;
+    /**
+     * @generated from field: string name = 3;
+     */
+    name: string
 
-  /**
-   * @generated from field: string avatar_url = 4;
-   */
-  avatarUrl: string;
+    /**
+     * @generated from field: string avatar_url = 4;
+     */
+    avatarUrl: string
 
-  /**
-   * "admin" or "member"
-   *
-   * @generated from field: string role = 5;
-   */
-  role: string;
-};
+    /**
+     * "admin" or "member"
+     *
+     * @generated from field: string role = 5;
+     */
+    role: string
+  }
 
 /**
  * Describes the message organization.v1.OrganizationMemberWithDetails.
  * Use `create(OrganizationMemberWithDetailsSchema)` to create a new message.
  */
-export const OrganizationMemberWithDetailsSchema: GenMessage<OrganizationMemberWithDetails> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 2);
+export const OrganizationMemberWithDetailsSchema: GenMessage<OrganizationMemberWithDetails> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 2)
 
 /**
  * UpdateOrganizationReq contains fields to update for an organization.
  *
  * @generated from message organization.v1.UpdateOrganizationReq
  */
-export type UpdateOrganizationReq = Message<"organization.v1.UpdateOrganizationReq"> & {
-  /**
-   * @generated from field: string organization_id = 1;
-   */
-  organizationId: string;
+export type UpdateOrganizationReq =
+  Message<'organization.v1.UpdateOrganizationReq'> & {
+    /**
+     * @generated from field: string organization_id = 1;
+     */
+    organizationId: string
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+    /**
+     * @generated from field: string name = 2;
+     */
+    name: string
 
-  /**
-   * @generated from field: string slug = 3;
-   */
-  slug: string;
-};
+    /**
+     * @generated from field: string slug = 3;
+     */
+    slug: string
+  }
 
 /**
  * Describes the message organization.v1.UpdateOrganizationReq.
  * Use `create(UpdateOrganizationReqSchema)` to create a new message.
  */
-export const UpdateOrganizationReqSchema: GenMessage<UpdateOrganizationReq> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 3);
+export const UpdateOrganizationReqSchema: GenMessage<UpdateOrganizationReq> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 3)
 
 /**
  * UpdateOrganizationRes contains the updated organization.
  *
  * @generated from message organization.v1.UpdateOrganizationRes
  */
-export type UpdateOrganizationRes = Message<"organization.v1.UpdateOrganizationRes"> & {
-  /**
-   * @generated from field: domain.v1.Organization organization = 1;
-   */
-  organization?: Organization;
-};
+export type UpdateOrganizationRes =
+  Message<'organization.v1.UpdateOrganizationRes'> & {
+    /**
+     * @generated from field: domain.v1.Organization organization = 1;
+     */
+    organization?: Organization
+  }
 
 /**
  * Describes the message organization.v1.UpdateOrganizationRes.
  * Use `create(UpdateOrganizationResSchema)` to create a new message.
  */
-export const UpdateOrganizationResSchema: GenMessage<UpdateOrganizationRes> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 4);
+export const UpdateOrganizationResSchema: GenMessage<UpdateOrganizationRes> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 4)
 
 /**
  * GetOrganizationMembersReq requests members of an organization.
  *
  * @generated from message organization.v1.GetOrganizationMembersReq
  */
-export type GetOrganizationMembersReq = Message<"organization.v1.GetOrganizationMembersReq"> & {
-  /**
-   * @generated from field: string organization_id = 1;
-   */
-  organizationId: string;
-};
+export type GetOrganizationMembersReq =
+  Message<'organization.v1.GetOrganizationMembersReq'> & {
+    /**
+     * @generated from field: string organization_id = 1;
+     */
+    organizationId: string
+  }
 
 /**
  * Describes the message organization.v1.GetOrganizationMembersReq.
  * Use `create(GetOrganizationMembersReqSchema)` to create a new message.
  */
-export const GetOrganizationMembersReqSchema: GenMessage<GetOrganizationMembersReq> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 5);
+export const GetOrganizationMembersReqSchema: GenMessage<GetOrganizationMembersReq> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 5)
 
 /**
  * GetOrganizationMembersRes contains the list of members with details.
  *
  * @generated from message organization.v1.GetOrganizationMembersRes
  */
-export type GetOrganizationMembersRes = Message<"organization.v1.GetOrganizationMembersRes"> & {
-  /**
-   * @generated from field: repeated organization.v1.OrganizationMemberWithDetails members = 1;
-   */
-  members: OrganizationMemberWithDetails[];
-};
+export type GetOrganizationMembersRes =
+  Message<'organization.v1.GetOrganizationMembersRes'> & {
+    /**
+     * @generated from field: repeated organization.v1.OrganizationMemberWithDetails members = 1;
+     */
+    members: OrganizationMemberWithDetails[]
+  }
 
 /**
  * Describes the message organization.v1.GetOrganizationMembersRes.
  * Use `create(GetOrganizationMembersResSchema)` to create a new message.
  */
-export const GetOrganizationMembersResSchema: GenMessage<GetOrganizationMembersRes> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 6);
+export const GetOrganizationMembersResSchema: GenMessage<GetOrganizationMembersRes> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 6)
 
 /**
  * UpdateMemberRoleReq changes a member's role in an organization.
  *
  * @generated from message organization.v1.UpdateMemberRoleReq
  */
-export type UpdateMemberRoleReq = Message<"organization.v1.UpdateMemberRoleReq"> & {
-  /**
-   * @generated from field: string organization_id = 1;
-   */
-  organizationId: string;
+export type UpdateMemberRoleReq =
+  Message<'organization.v1.UpdateMemberRoleReq'> & {
+    /**
+     * @generated from field: string organization_id = 1;
+     */
+    organizationId: string
 
-  /**
-   * @generated from field: string user_id = 2;
-   */
-  userId: string;
+    /**
+     * @generated from field: string user_id = 2;
+     */
+    userId: string
 
-  /**
-   * "admin" or "member"
-   *
-   * @generated from field: string role = 3;
-   */
-  role: string;
-};
+    /**
+     * "admin" or "member"
+     *
+     * @generated from field: string role = 3;
+     */
+    role: string
+  }
 
 /**
  * Describes the message organization.v1.UpdateMemberRoleReq.
  * Use `create(UpdateMemberRoleReqSchema)` to create a new message.
  */
-export const UpdateMemberRoleReqSchema: GenMessage<UpdateMemberRoleReq> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 7);
+export const UpdateMemberRoleReqSchema: GenMessage<UpdateMemberRoleReq> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 7)
 
 /**
  * UpdateMemberRoleRes confirms the role update.
  *
  * @generated from message organization.v1.UpdateMemberRoleRes
  */
-export type UpdateMemberRoleRes = Message<"organization.v1.UpdateMemberRoleRes"> & {
-  /**
-   * @generated from field: bool success = 1;
-   */
-  success: boolean;
-};
+export type UpdateMemberRoleRes =
+  Message<'organization.v1.UpdateMemberRoleRes'> & {
+    /**
+     * @generated from field: bool success = 1;
+     */
+    success: boolean
+  }
 
 /**
  * Describes the message organization.v1.UpdateMemberRoleRes.
  * Use `create(UpdateMemberRoleResSchema)` to create a new message.
  */
-export const UpdateMemberRoleResSchema: GenMessage<UpdateMemberRoleRes> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 8);
+export const UpdateMemberRoleResSchema: GenMessage<UpdateMemberRoleRes> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 8)
 
 /**
  * RemoveMemberReq removes a member from an organization.
  *
  * @generated from message organization.v1.RemoveMemberReq
  */
-export type RemoveMemberReq = Message<"organization.v1.RemoveMemberReq"> & {
+export type RemoveMemberReq = Message<'organization.v1.RemoveMemberReq'> & {
   /**
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * @generated from field: string user_id = 2;
    */
-  userId: string;
-};
+  userId: string
+}
 
 /**
  * Describes the message organization.v1.RemoveMemberReq.
  * Use `create(RemoveMemberReqSchema)` to create a new message.
  */
-export const RemoveMemberReqSchema: GenMessage<RemoveMemberReq> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 9);
+export const RemoveMemberReqSchema: GenMessage<RemoveMemberReq> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 9)
 
 /**
  * RemoveMemberRes confirms the member removal.
  *
  * @generated from message organization.v1.RemoveMemberRes
  */
-export type RemoveMemberRes = Message<"organization.v1.RemoveMemberRes"> & {
+export type RemoveMemberRes = Message<'organization.v1.RemoveMemberRes'> & {
   /**
    * @generated from field: bool success = 1;
    */
-  success: boolean;
-};
+  success: boolean
+}
 
 /**
  * Describes the message organization.v1.RemoveMemberRes.
  * Use `create(RemoveMemberResSchema)` to create a new message.
  */
-export const RemoveMemberResSchema: GenMessage<RemoveMemberRes> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 10);
+export const RemoveMemberResSchema: GenMessage<RemoveMemberRes> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 10)
 
 /**
  * LeaveOrganizationReq requests the current user to leave an organization.
  *
  * @generated from message organization.v1.LeaveOrganizationReq
  */
-export type LeaveOrganizationReq = Message<"organization.v1.LeaveOrganizationReq"> & {
-  /**
-   * @generated from field: string organization_id = 1;
-   */
-  organizationId: string;
-};
+export type LeaveOrganizationReq =
+  Message<'organization.v1.LeaveOrganizationReq'> & {
+    /**
+     * @generated from field: string organization_id = 1;
+     */
+    organizationId: string
+  }
 
 /**
  * Describes the message organization.v1.LeaveOrganizationReq.
  * Use `create(LeaveOrganizationReqSchema)` to create a new message.
  */
-export const LeaveOrganizationReqSchema: GenMessage<LeaveOrganizationReq> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 11);
+export const LeaveOrganizationReqSchema: GenMessage<LeaveOrganizationReq> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 11)
 
 /**
  * LeaveOrganizationRes contains the result of leaving.
  *
  * @generated from message organization.v1.LeaveOrganizationRes
  */
-export type LeaveOrganizationRes = Message<"organization.v1.LeaveOrganizationRes"> & {
-  /**
-   * @generated from field: bool success = 1;
-   */
-  success: boolean;
+export type LeaveOrganizationRes =
+  Message<'organization.v1.LeaveOrganizationRes'> & {
+    /**
+     * @generated from field: bool success = 1;
+     */
+    success: boolean
 
-  /**
-   * is_last_organization indicates if this was the user's last organization (cascade deleted)
-   *
-   * @generated from field: bool is_last_organization = 2;
-   */
-  isLastOrganization: boolean;
-};
+    /**
+     * is_last_organization indicates if this was the user's last organization (cascade deleted)
+     *
+     * @generated from field: bool is_last_organization = 2;
+     */
+    isLastOrganization: boolean
+  }
 
 /**
  * Describes the message organization.v1.LeaveOrganizationRes.
  * Use `create(LeaveOrganizationResSchema)` to create a new message.
  */
-export const LeaveOrganizationResSchema: GenMessage<LeaveOrganizationRes> = /*@__PURE__*/
-  messageDesc(file_organization_v1_organization, 12);
+export const LeaveOrganizationResSchema: GenMessage<LeaveOrganizationRes> =
+  /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 12)
 
 /**
  * OrganizationService handles organization management operations.
@@ -342,10 +378,10 @@ export const OrganizationService: GenService<{
    * @generated from rpc organization.v1.OrganizationService.CreateOrganization
    */
   createOrganization: {
-    methodKind: "unary";
-    input: typeof CreateOrganizationReqSchema;
-    output: typeof CreateOrganizationResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof CreateOrganizationReqSchema
+    output: typeof CreateOrganizationResSchema
+  }
   /**
    * UpdateOrganization updates an organization's name and/or slug.
    * Requires admin role in the organization.
@@ -353,10 +389,10 @@ export const OrganizationService: GenService<{
    * @generated from rpc organization.v1.OrganizationService.UpdateOrganization
    */
   updateOrganization: {
-    methodKind: "unary";
-    input: typeof UpdateOrganizationReqSchema;
-    output: typeof UpdateOrganizationResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof UpdateOrganizationReqSchema
+    output: typeof UpdateOrganizationResSchema
+  }
   /**
    * GetOrganizationMembers retrieves all members with their full user details.
    * Requires membership in the organization.
@@ -364,10 +400,10 @@ export const OrganizationService: GenService<{
    * @generated from rpc organization.v1.OrganizationService.GetOrganizationMembers
    */
   getOrganizationMembers: {
-    methodKind: "unary";
-    input: typeof GetOrganizationMembersReqSchema;
-    output: typeof GetOrganizationMembersResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof GetOrganizationMembersReqSchema
+    output: typeof GetOrganizationMembersResSchema
+  }
   /**
    * UpdateMemberRole changes a member's role (admin/member).
    * Requires admin role. Cannot demote the last admin.
@@ -375,10 +411,10 @@ export const OrganizationService: GenService<{
    * @generated from rpc organization.v1.OrganizationService.UpdateMemberRole
    */
   updateMemberRole: {
-    methodKind: "unary";
-    input: typeof UpdateMemberRoleReqSchema;
-    output: typeof UpdateMemberRoleResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof UpdateMemberRoleReqSchema
+    output: typeof UpdateMemberRoleResSchema
+  }
   /**
    * RemoveMember removes a user from the organization.
    * Requires admin role. Cannot remove the last admin.
@@ -386,10 +422,10 @@ export const OrganizationService: GenService<{
    * @generated from rpc organization.v1.OrganizationService.RemoveMember
    */
   removeMember: {
-    methodKind: "unary";
-    input: typeof RemoveMemberReqSchema;
-    output: typeof RemoveMemberResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof RemoveMemberReqSchema
+    output: typeof RemoveMemberResSchema
+  }
   /**
    * LeaveOrganization removes the current user from the organization.
    * If user is in only one organization, cascade deletes all data.
@@ -397,10 +433,8 @@ export const OrganizationService: GenService<{
    * @generated from rpc organization.v1.OrganizationService.LeaveOrganization
    */
   leaveOrganization: {
-    methodKind: "unary";
-    input: typeof LeaveOrganizationReqSchema;
-    output: typeof LeaveOrganizationResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_organization_v1_organization, 0);
-
+    methodKind: 'unary'
+    input: typeof LeaveOrganizationReqSchema
+    output: typeof LeaveOrganizationResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_organization_v1_organization, 0)

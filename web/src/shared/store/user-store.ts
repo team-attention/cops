@@ -34,7 +34,10 @@ interface UserStoreActions {
   setLoading: (isLoading: boolean) => void
   setError: (error: string | null) => void
   addOrganization: (organization: OrganizationData) => void
-  updateOrganization: (organizationId: string, updates: Partial<OrganizationData>) => void
+  updateOrganization: (
+    organizationId: string,
+    updates: Partial<OrganizationData>,
+  ) => void
   removeOrganization: (organizationId: string) => void
   reset: () => void
 }
@@ -86,14 +89,14 @@ export const useUserStore = create<UserStore>()(
       updateOrganization: (organizationId, updates) =>
         set((state) => ({
           organizations: state.organizations.map((org) =>
-            org.id === organizationId ? { ...org, ...updates } : org
+            org.id === organizationId ? { ...org, ...updates } : org,
           ),
         })),
 
       removeOrganization: (organizationId) =>
         set((state) => {
           const newOrganizations = state.organizations.filter(
-            (org) => org.id !== organizationId
+            (org) => org.id !== organizationId,
           )
           return {
             organizations: newOrganizations,

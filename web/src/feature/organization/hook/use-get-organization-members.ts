@@ -8,6 +8,8 @@ interface UseGetOrganizationMembersInput {
 
 // useGetOrganizationMembers provides a query hook for fetching organization members.
 // Returns a TanStack Query object with data, isLoading, error states.
-export const useGetOrganizationMembers = (input: UseGetOrganizationMembersInput) => {
+export const useGetOrganizationMembers = (
+  input: UseGetOrganizationMembersInput,
+) => {
   return useQuery(getOrganizationMembers, input, { transport })
 }
