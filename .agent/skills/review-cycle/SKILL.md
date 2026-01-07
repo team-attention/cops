@@ -25,14 +25,21 @@ Initialize the iteration counter if not already set:
 ITERATION_A=${ITERATION_A:-1}
 ```
 
-Create an artifact file for the review document:
-```bash
-if [ $ITERATION_A -eq 1 ]; then
-  REVIEW_FILE=$(Skill tool: artifact, args: create $ARTIFACT_ID review)
-else
-  REVIEW_FILE=$(Skill tool: artifact, args: create $ARTIFACT_ID "review_iteration${ITERATION_A}")
-fi
+Create an artifact file for the review document using the `artifact` skill:
+
+**If first iteration:**
 ```
+skill: artifact
+args: create $ARTIFACT_ID review
+```
+
+**If subsequent iteration:**
+```
+skill: artifact
+args: create $ARTIFACT_ID review_iteration${ITERATION_A}
+```
+
+Store the returned path in `REVIEW_FILE`.
 
 ### Step A.1: Code Review Agent
 
@@ -62,14 +69,21 @@ REVIEW_STATUS=$(grep "^\*\*Status\*\*:" "$REVIEW_FILE" | cut -d: -f2 | xargs)
 
 ### Step A.3: Plan Agent (Fail Path)
 
-Create a plan artifact file:
-```bash
-if [ $ITERATION_A -eq 1 ]; then
-  PLAN_FILE=$(Skill tool: artifact, args: create $ARTIFACT_ID plan)
-else
-  PLAN_FILE=$(Skill tool: artifact, args: create $ARTIFACT_ID "plan_iteration${ITERATION_A}")
-fi
+Create a plan artifact file using the `artifact` skill:
+
+**If first iteration:**
 ```
+skill: artifact
+args: create $ARTIFACT_ID plan
+```
+
+**If subsequent iteration:**
+```
+skill: artifact
+args: create $ARTIFACT_ID plan_iteration${ITERATION_A}
+```
+
+Store the returned path in `PLAN_FILE`.
 
 Invoke the Plan Agent:
 ```
@@ -151,10 +165,14 @@ Initialize the iteration counter if not already set:
 ITERATION_B=${ITERATION_B:-1}
 ```
 
-Create a new review artifact file:
-```bash
-REVIEW_FILE=$(Skill tool: artifact, args: create $ARTIFACT_ID "user_review_iteration${ITERATION_B}")
+Create a new review artifact file using the `artifact` skill:
+
 ```
+skill: artifact
+args: create $ARTIFACT_ID user_review_iteration${ITERATION_B}
+```
+
+Store the returned path in `REVIEW_FILE`.
 
 Invoke the Code Review Agent with user feedback included:
 ```
@@ -176,10 +194,14 @@ Use Task tool:
 
 ### Step B.2: Plan Agent
 
-Create a plan artifact file:
-```bash
-PLAN_FILE=$(Skill tool: artifact, args: create $ARTIFACT_ID "user_plan_iteration${ITERATION_B}")
+Create a plan artifact file using the `artifact` skill:
+
 ```
+skill: artifact
+args: create $ARTIFACT_ID user_plan_iteration${ITERATION_B}
+```
+
+Store the returned path in `PLAN_FILE`.
 
 Invoke the Plan Agent:
 ```
