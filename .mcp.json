@@ -4,6 +4,10 @@
             "command": "npx",
             "args": [
                 "-y",
+                "@team-attention/mcproxy",
+                "--",
+                "npx",
+                "-y",
                 "mcp-remote",
                 "https://mcp.linear.app/mcp",
                 "--header",
