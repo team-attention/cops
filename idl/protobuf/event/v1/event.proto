@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package event.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/event/v1;eventv1";
+
+// SendEventsReq is the request message for SendEvents RPC.
+// Contains a list of raw JSON strings representing hook events.
+message SendEventsReq {
+  // Raw JSON event strings from Claude Code hooks.
+  // Each string is a JSON-encoded hook event (SessionStart, PostToolUse, etc.)
+  // The server parses and processes these events internally.
+  repeated string events = 1;
+}
+
+// SendEventsRes is the response message for SendEvents RPC.
+// Empty response indicating successful receipt of events.
+message SendEventsRes {
+  // Empty - success is indicated by a successful RPC response
+}
+
+// EventService provides hook event collection operations.
+service EventService {
+  // SendEvents receives a batch of hook events from Claude Code.
+  // Events are raw JSON strings that the server parses internally.
+  // Authentication is handled via request headers.
+  rpc SendEvents(SendEventsReq) returns (SendEventsRes);
+}

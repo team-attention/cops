@@ -13,7 +13,6 @@ import (
 	"golang.org/x/term"
 
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
-	"github.com/team-attention/cops/cli/internal/service/auth"
 	"github.com/team-attention/cops/cli/internal/service/tracking"
 	"github.com/team-attention/cops/cli/internal/service/user"
 	"github.com/team-attention/cops/shared/domain"
@@ -58,7 +57,6 @@ type addModel struct {
 	selectedOrgID   string                 // Selected organization ID
 	selectedOrgName string                 // Selected organization name (for display)
 	userSvc         *user.Service          // Reference to user service for fetching orgs
-	authSvc         *auth.Service          // Reference to auth service for auth check
 
 	// Git detection results
 	gitRepos       []string // Found git repos in parents (closest first)
@@ -89,7 +87,6 @@ func newAddModel(
 	dir string,
 	noGitFlag bool,
 	service *tracking.Service,
-	authSvc *auth.Service,
 	userSvc *user.Service,
 ) addModel {
 	ti := textinput.New()
@@ -102,7 +99,6 @@ func newAddModel(
 		currentDir:     dir,
 		noGitFlag:      noGitFlag,
 		service:        service,
-		authSvc:        authSvc,
 		userSvc:        userSvc,
 		selectedGitIdx: -1,
 		nameInput:      ti,
@@ -205,7 +201,6 @@ func runAddTUI(
 	dir string,
 	noGitFlag bool,
 	service *tracking.Service,
-	authSvc *auth.Service,
 	userSvc *user.Service,
 ) (*addTUIResult, error) {
 	// Check if running in an interactive terminal
@@ -213,7 +208,7 @@ func runAddTUI(
 		return nil, fmt.Errorf("cops add requires an interactive terminal. Use SSH with -t flag or run in a terminal emulator")
 	}
 
-	model := newAddModel(dir, noGitFlag, service, authSvc, userSvc)
+	model := newAddModel(dir, noGitFlag, service, userSvc)
 	p := tea.NewProgram(model)
 
 	finalModel, err := p.Run()

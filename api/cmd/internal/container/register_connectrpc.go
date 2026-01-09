@@ -14,6 +14,7 @@ import (
 	"github.com/team-attention/cops/api/internal/platform/interceptor"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
 	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
+	"github.com/team-attention/cops/api/internal/service/apikey"
 )
 
 // PublicConnectHandler interface for ConnectRPC handlers that do not require authentication.
@@ -26,15 +27,22 @@ type PrivateConnectHandler interface {
 	GetHandler(opts ...connect.HandlerOption) (string, http.Handler)
 }
 
+// APIKeyConnectHandler interface for ConnectRPC handlers that require API key authentication.
+type APIKeyConnectHandler interface {
+	GetHandler(opts ...connect.HandlerOption) (string, http.Handler)
+}
+
 type connectRPCServerParams struct {
 	fx.In
 
-	Lifecycle       fx.Lifecycle
-	Logger          *slog.Logger
-	Config          *config.Config
-	App             *fiber.App
-	PublicHandlers  []PublicConnectHandler  `group:"public_connect_handlers"`
-	PrivateHandlers []PrivateConnectHandler `group:"private_connect_handlers"`
+	Lifecycle        fx.Lifecycle
+	Logger           *slog.Logger
+	Config           *config.Config
+	App              *fiber.App
+	APIKeyService    *apikey.Service
+	PublicHandlers   []PublicConnectHandler   `group:"public_connect_handlers"`
+	PrivateHandlers  []PrivateConnectHandler  `group:"private_connect_handlers"`
+	APIKeyHandlers   []APIKeyConnectHandler   `group:"apikey_connect_handlers"`
 }
 
 func registerConnectRPCServer(params connectRPCServerParams) {
@@ -48,11 +56,21 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 		Issuer:               params.Config.JWT.Issuer,
 	}
 
-	// Create auth interceptor
+	// Create auth interceptor for JWT authentication
 	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg)
+
+	// Create API key interceptor for API key authentication
+	// Apply to SendEvents endpoint (will be added when event service is implemented)
+	apiKeyTargetProcedures := []string{
+		// TODO: Add eventv1connect.EventServiceSendEventsProcedure when event service is implemented
+	}
+	apiKeyInterceptor := interceptor.NewAPIKeyInterceptor(logger, params.APIKeyService, apiKeyTargetProcedures)
 
 	// Create handler options with interceptor for private handlers
 	privateOpts := []connect.HandlerOption{connect.WithInterceptors(authInterceptor)}
+
+	// Create handler options with API key interceptor
+	apiKeyOpts := []connect.HandlerOption{connect.WithInterceptors(apiKeyInterceptor)}
 
 	// Register public handlers WITHOUT any interceptor options
 	for _, handler := range params.PublicHandlers {
@@ -63,6 +81,12 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 	// Register private handlers WITH auth interceptor options
 	for _, handler := range params.PrivateHandlers {
 		path, h := handler.GetHandler(privateOpts...)
+		params.App.All(path+"*", adaptor.HTTPHandler(h))
+	}
+
+	// Register API key handlers WITH API key interceptor options
+	for _, handler := range params.APIKeyHandlers {
+		path, h := handler.GetHandler(apiKeyOpts...)
 		params.App.All(path+"*", adaptor.HTTPHandler(h))
 	}
 

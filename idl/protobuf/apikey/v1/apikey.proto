@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package apikey.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/apikey/v1;apikeyv1";
+
+// APIKeyInfo represents API key metadata (excludes actual key value).
+// Used in list and get responses.
+message APIKeyInfo {
+    string id = 1;
+    string user_id = 2;
+    string name = 3;
+    string key_prefix = 4;          // First 8 chars for identification
+    int64 created_at = 5;           // Unix timestamp
+    int64 last_used_at = 6;         // Unix timestamp (0 if never used)
+    int64 revoked_at = 7;           // Unix timestamp (0 if not revoked)
+    int64 expires_at = 8;           // Unix timestamp (0 if no expiration)
+}
+
+// IssueAPIKeyReq contains parameters for issuing a new API key.
+// The user_id is extracted from the authenticated context (JWT).
+message IssueAPIKeyReq {
+    // name is a human-readable label for the key (e.g., "Production Hook")
+    string name = 1;
+    // expires_in_days optionally sets key expiration (0 = no expiration)
+    int32 expires_in_days = 2;
+}
+
+// IssueAPIKeyRes contains the newly created API key.
+// IMPORTANT: The full api_key value is ONLY returned once at creation time.
+message IssueAPIKeyRes {
+    // api_key is the full key value (format: cops_{random_32_chars})
+    // This is the ONLY time the full key is exposed - store it securely!
+    string api_key = 1;
+    // key_info contains metadata about the created key
+    APIKeyInfo key_info = 2;
+}
+
+// ListAPIKeysReq requests API keys for the authenticated user.
+// The user_id is extracted from the authenticated context (JWT).
+message ListAPIKeysReq {
+    bool include_revoked = 1;       // If true, include revoked keys
+}
+
+// ListAPIKeysRes contains the list of API keys for a project.
+message ListAPIKeysRes {
+    repeated APIKeyInfo keys = 1;
+}
+
+// RevokeAPIKeyReq contains the key ID to revoke.
+message RevokeAPIKeyReq {
+    string key_id = 1;
+}
+
+// RevokeAPIKeyRes confirms the revocation.
+message RevokeAPIKeyRes {
+    bool success = 1;
+}
+
+// ValidateAPIKeyReq contains the API key to validate.
+// Used internally by API server auth interceptor.
+message ValidateAPIKeyReq {
+    // api_key is the full key value from Authorization header
+    string api_key = 1;
+}
+
+// ValidateAPIKeyRes contains validation result with associated metadata.
+message ValidateAPIKeyRes {
+    bool valid = 1;
+    string user_id = 2;             // Empty if invalid
+    string error_message = 3;       // Error reason if invalid
+}
+
+// APIKeyService handles API key management operations.
+// All methods except ValidateAPIKey require JWT authentication.
+service APIKeyService {
+    // IssueAPIKey creates a new API key for a project.
+    // Requires authenticated user with write access to the project.
+    rpc IssueAPIKey(IssueAPIKeyReq) returns (IssueAPIKeyRes);
+
+    // ListAPIKeys retrieves all API keys for a project.
+    // Requires authenticated user with read access to the project.
+    rpc ListAPIKeys(ListAPIKeysReq) returns (ListAPIKeysRes);
+
+    // RevokeAPIKey invalidates an API key.
+    // Requires authenticated user with write access to the project.
+    rpc RevokeAPIKey(RevokeAPIKeyReq) returns (RevokeAPIKeyRes);
+
+    // ValidateAPIKey checks if an API key is valid and returns associated metadata.
+    // This is called internally by the auth interceptor - no JWT required.
+    rpc ValidateAPIKey(ValidateAPIKeyReq) returns (ValidateAPIKeyRes);
+}
