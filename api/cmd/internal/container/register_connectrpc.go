@@ -15,6 +15,7 @@ import (
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
 	"github.com/team-attention/cops/api/internal/platform/util/jwtutil"
 	"github.com/team-attention/cops/api/internal/service/apikey"
+	"github.com/team-attention/cops/shared/gen/grpcstub/event/v1/eventv1connect"
 )
 
 // PublicConnectHandler interface for ConnectRPC handlers that do not require authentication.
@@ -60,9 +61,12 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg)
 
 	// Create API key interceptor for API key authentication
-	// Apply to SendEvents endpoint (will be added when event service is implemented)
+	// Apply to SendEvents endpoint
 	apiKeyTargetProcedures := []string{
-		// TODO: Add eventv1connect.EventServiceSendEventsProcedure when event service is implemented
+		eventv1connect.EventServiceSendEventsProcedure,
+		// 1. Add SendEvents procedure to API key interceptor target list
+		// 2. This ensures API key validation is applied before SendEvents handler
+		// 3. Procedure value is "/event.v1.EventService/SendEvents"
 	}
 	apiKeyInterceptor := interceptor.NewAPIKeyInterceptor(logger, params.APIKeyService, apiKeyTargetProcedures)
 

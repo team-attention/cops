@@ -3,6 +3,8 @@ package container
 import (
 	"go.uber.org/dig"
 
+	"github.com/team-attention/cops/cli/internal/platform/outbound/apikey"
+	apikey_filesystem "github.com/team-attention/cops/cli/internal/platform/outbound/apikey/filesystem"
 	"github.com/team-attention/cops/cli/internal/platform/outbound/authstate"
 	authstate_filesystem "github.com/team-attention/cops/cli/internal/platform/outbound/authstate/filesystem"
 	"github.com/team-attention/cops/cli/internal/platform/outbound/hookconfig"
@@ -47,6 +49,14 @@ func newPlatformModule(c *dig.Container) error {
 	if err := c.Provide(
 		hookconfig_filesystem.NewFilesystemHookConfig,
 		dig.As(new(hookconfig.HookConfigPort)),
+	); err != nil {
+		return err
+	}
+
+	// API key adapter (for hook authentication)
+	if err := c.Provide(
+		apikey_filesystem.NewFilesystemAPIKey,
+		dig.As(new(apikey.APIKeyPort)),
 	); err != nil {
 		return err
 	}
