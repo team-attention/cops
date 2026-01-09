@@ -10,6 +10,7 @@ import {
 import { Button } from '@/gen/shadcn/ui/button'
 import { DeleteAccountDialog } from '@/feature/user/component/delete-account-dialog'
 import { OrganizationSettingsSection } from '@/feature/organization/component/organization-settings-section'
+import { APIKeySettings } from '@/feature/api-key/component/api-key-settings'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -40,6 +41,12 @@ function SettingsPage() {
 
         {/* Organization Settings */}
         <OrganizationSettingsSection />
+
+        {/* Spacer */}
+        <div className="h-8" />
+
+        {/* API Key Settings */}
+        <APIKeySettings />
 
         {/* Spacer */}
         <div className="h-8" />
