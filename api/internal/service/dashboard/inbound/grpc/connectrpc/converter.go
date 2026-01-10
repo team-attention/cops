@@ -4,8 +4,8 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
-	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
 	dashboardv1 "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1"
+	recordv1 "github.com/team-attention/cops/shared/gen/grpcstub/record/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -74,8 +74,8 @@ func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetai
 }
 
 // toProtoRecords converts domain Records to protobuf Records.
-func toProtoRecords(records []shareddomain.Record) []*aggregationv1.Record {
-	result := make([]*aggregationv1.Record, 0, len(records))
+func toProtoRecords(records []shareddomain.Record) []*recordv1.Record {
+	result := make([]*recordv1.Record, 0, len(records))
 	for _, record := range records {
 		protoRec := toProtoRecord(record)
 		if protoRec != nil {
@@ -86,44 +86,44 @@ func toProtoRecords(records []shareddomain.Record) []*aggregationv1.Record {
 }
 
 // toProtoRecord converts a single domain Record to protobuf.
-func toProtoRecord(r shareddomain.Record) *aggregationv1.Record {
-	proto := &aggregationv1.Record{}
+func toProtoRecord(r shareddomain.Record) *recordv1.Record {
+	proto := &recordv1.Record{}
 
 	// Set Type based on r.Type
 	switch r.Type {
 	case shareddomain.RecordTypeUser:
-		proto.Type = aggregationv1.RecordType_RECORD_TYPE_USER
+		proto.Type = recordv1.RecordType_RECORD_TYPE_USER
 		if userRec, ok := r.Data.(*shareddomain.UserRecord); ok {
-			proto.Data = &aggregationv1.Record_UserData{
+			proto.Data = &recordv1.Record_UserData{
 				UserData: toProtoUserRecordData(userRec),
 			}
 		}
 	case shareddomain.RecordTypeMessage:
-		proto.Type = aggregationv1.RecordType_RECORD_TYPE_ASSISTANT
+		proto.Type = recordv1.RecordType_RECORD_TYPE_ASSISTANT
 		if assistantRec, ok := r.Data.(*shareddomain.AssistantRecord); ok {
-			proto.Data = &aggregationv1.Record_AssistantData{
+			proto.Data = &recordv1.Record_AssistantData{
 				AssistantData: toProtoAssistantRecordData(assistantRec),
 			}
 		}
 	case shareddomain.RecordTypeFileHistorySnapshot:
-		proto.Type = aggregationv1.RecordType_RECORD_TYPE_FILE_HISTORY_SNAPSHOT
+		proto.Type = recordv1.RecordType_RECORD_TYPE_FILE_HISTORY_SNAPSHOT
 		if fileHistoryRec, ok := r.Data.(*shareddomain.FileHistorySnapshotRecord); ok {
-			proto.Data = &aggregationv1.Record_FileHistorySnapshotData{
+			proto.Data = &recordv1.Record_FileHistorySnapshotData{
 				FileHistorySnapshotData: toProtoFileHistorySnapshotRecordData(fileHistoryRec),
 			}
 		}
 	default:
-		proto.Type = aggregationv1.RecordType_RECORD_TYPE_UNSPECIFIED
+		proto.Type = recordv1.RecordType_RECORD_TYPE_UNSPECIFIED
 	}
 
 	return proto
 }
 
 // toProtoUserRecordData converts UserRecord to proto UserRecordData.
-func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecordData {
+func toProtoUserRecordData(u *shareddomain.UserRecord) *recordv1.UserRecordData {
 	// 1. Create base UserRecordData with metadata and other fields.
-	data := &aggregationv1.UserRecordData{
-		Metadata: &aggregationv1.MessageMetadata{
+	data := &recordv1.UserRecordData{
+		Metadata: &recordv1.MessageMetadata{
 			ParentUuid:  "",
 			IsSidechain: u.IsSidechain,
 			UserType:    string(u.UserType),
@@ -133,7 +133,7 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 			Uuid:        u.UUID,
 			Timestamp:   timestamppb.New(u.Timestamp),
 		},
-		Message: &aggregationv1.UserMessage{
+		Message: &recordv1.UserMessage{
 			Role: string(u.Message.Role),
 		},
 		IsMeta: u.IsMeta,
@@ -149,18 +149,18 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 		switch content := u.Message.Content.(type) {
 		case string:
 			// a. If string: Set Message.Content to UserMessage_Text.
-			data.Message.Content = &aggregationv1.UserMessage_Text{
+			data.Message.Content = &recordv1.UserMessage_Text{
 				Text: content,
 			}
 		case []*shareddomain.UserMessageBlockContent:
 			// b. If []*UserMessageBlockContent: Convert to protobuf blocks.
-			protoBlocks := make([]*aggregationv1.UserMessageBlockContent, len(content))
+			protoBlocks := make([]*recordv1.UserMessageBlockContent, len(content))
 			for i, block := range content {
 				protoBlocks[i] = toProtoUserMessageBlockContent(block)
 			}
 			// Set Message.Content to UserMessage_Blocks.
-			data.Message.Content = &aggregationv1.UserMessage_Blocks{
-				Blocks: &aggregationv1.UserMessageBlockContentList{
+			data.Message.Content = &recordv1.UserMessage_Blocks{
+				Blocks: &recordv1.UserMessageBlockContentList{
 					Blocks: protoBlocks,
 				},
 			}
@@ -169,14 +169,14 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 
 	// 4. Convert ThinkingMetadata if present.
 	if u.ThinkingMetadata != nil {
-		data.ThinkingMetadata = &aggregationv1.UserRecordThinkingMetadata{
+		data.ThinkingMetadata = &recordv1.UserRecordThinkingMetadata{
 			Level:    u.ThinkingMetadata.Level,
 			Disabled: u.ThinkingMetadata.Disabled,
 		}
 		if len(u.ThinkingMetadata.Triggers) > 0 {
-			data.ThinkingMetadata.Triggers = make([]*aggregationv1.UserRecordThinkingMetadataTrigger, len(u.ThinkingMetadata.Triggers))
+			data.ThinkingMetadata.Triggers = make([]*recordv1.UserRecordThinkingMetadataTrigger, len(u.ThinkingMetadata.Triggers))
 			for i, trigger := range u.ThinkingMetadata.Triggers {
-				data.ThinkingMetadata.Triggers[i] = &aggregationv1.UserRecordThinkingMetadataTrigger{
+				data.ThinkingMetadata.Triggers[i] = &recordv1.UserRecordThinkingMetadataTrigger{
 					Start: int32(trigger.Start),
 					End:   int32(trigger.End),
 					Text:  trigger.Text,
@@ -187,9 +187,9 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 
 	// 5. Convert Todos if present.
 	if len(u.Todos) > 0 {
-		data.Todos = make([]*aggregationv1.UserRecordTodo, len(u.Todos))
+		data.Todos = make([]*recordv1.UserRecordTodo, len(u.Todos))
 		for i, todo := range u.Todos {
-			data.Todos[i] = &aggregationv1.UserRecordTodo{
+			data.Todos[i] = &recordv1.UserRecordTodo{
 				Content:    todo.Content,
 				Status:     todo.Status,
 				ActiveForm: todo.ActiveForm,
@@ -202,9 +202,9 @@ func toProtoUserRecordData(u *shareddomain.UserRecord) *aggregationv1.UserRecord
 }
 
 // toProtoUserMessageBlockContent converts a single domain UserMessageBlockContent to protobuf.
-func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent) *aggregationv1.UserMessageBlockContent {
+func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent) *recordv1.UserMessageBlockContent {
 	// 1. Create base protobuf block with type field.
-	protoBlock := &aggregationv1.UserMessageBlockContent{
+	protoBlock := &recordv1.UserMessageBlockContent{
 		Type: block.Type,
 	}
 
@@ -215,7 +215,7 @@ func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent)
 
 	// 3. If Source is set (image block), convert to proto.
 	if block.Source != nil {
-		protoBlock.Source = &aggregationv1.UserMessageBlockContentSource{
+		protoBlock.Source = &recordv1.UserMessageBlockContentSource{
 			Type:      block.Source.Type,
 			MediaType: block.Source.Media_type,
 			Data:      block.Source.Data,
@@ -237,7 +237,7 @@ func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent)
 				}
 			}
 		}
-		protoBlock.ToolResult = &aggregationv1.UserMessageBlockContentToolResult{
+		protoBlock.ToolResult = &recordv1.UserMessageBlockContentToolResult{
 			ToolUseId: block.UserMessageBlockContentToolResult.ToolUseID,
 			Content:   contentStr,
 		}
@@ -248,9 +248,9 @@ func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent)
 }
 
 // toProtoAssistantRecordData converts AssistantRecord to proto AssistantRecordData.
-func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *aggregationv1.AssistantRecordData {
-	data := &aggregationv1.AssistantRecordData{
-		Metadata: &aggregationv1.MessageMetadata{
+func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *recordv1.AssistantRecordData {
+	data := &recordv1.AssistantRecordData{
+		Metadata: &recordv1.MessageMetadata{
 			ParentUuid:  "",
 			IsSidechain: a.IsSidechain,
 			UserType:    string(a.UserType),
@@ -261,12 +261,12 @@ func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *aggregationv1.
 			Timestamp:   timestamppb.New(a.Timestamp),
 		},
 		RequestId: a.RequestID,
-		Message: &aggregationv1.AssistantMessage{
+		Message: &recordv1.AssistantMessage{
 			Model: a.Message.Model,
 			Id:    a.Message.ID,
 			Type:  string(a.Message.Type),
 			Role:  string(a.Message.Role),
-			Usage: &aggregationv1.AssistantMessageUsage{
+			Usage: &recordv1.AssistantMessageUsage{
 				InputTokens:              int32(a.Message.Usage.InputTokens),
 				OutputTokens:             int32(a.Message.Usage.OutputTokens),
 				CacheCreationInputTokens: int32(a.Message.Usage.CacheCreationInputTokens),
@@ -290,9 +290,9 @@ func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *aggregationv1.
 
 	// Convert content blocks
 	if len(a.Message.Content) > 0 {
-		data.Message.Content = make([]*aggregationv1.AssistantMessageContent, len(a.Message.Content))
+		data.Message.Content = make([]*recordv1.AssistantMessageContent, len(a.Message.Content))
 		for i, content := range a.Message.Content {
-			protoContent := &aggregationv1.AssistantMessageContent{
+			protoContent := &recordv1.AssistantMessageContent{
 				Type: string(content.Type),
 			}
 
@@ -323,13 +323,13 @@ func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *aggregationv1.
 }
 
 // toProtoFileHistorySnapshotRecordData converts FileHistorySnapshotRecord to proto.
-func toProtoFileHistorySnapshotRecordData(f *shareddomain.FileHistorySnapshotRecord) *aggregationv1.FileHistorySnapshotRecordData {
-	data := &aggregationv1.FileHistorySnapshotRecordData{
+func toProtoFileHistorySnapshotRecordData(f *shareddomain.FileHistorySnapshotRecord) *recordv1.FileHistorySnapshotRecordData {
+	data := &recordv1.FileHistorySnapshotRecordData{
 		MessageId:         f.MessageID,
 		IsSnapshotUpdate: f.IsSnapshotUpdate,
-		Snapshot: &aggregationv1.FileHistorySnapshot{
+		Snapshot: &recordv1.FileHistorySnapshot{
 			MessageId:          f.Snapshot.MessageID,
-			TrackedFileBackups: make(map[string]*aggregationv1.FileHistorySnapshotTrackedBackup),
+			TrackedFileBackups: make(map[string]*recordv1.FileHistorySnapshotTrackedBackup),
 		},
 	}
 
@@ -338,7 +338,7 @@ func toProtoFileHistorySnapshotRecordData(f *shareddomain.FileHistorySnapshotRec
 		if backup.BackupFileName != nil {
 			backupFileName = *backup.BackupFileName
 		}
-		data.Snapshot.TrackedFileBackups[path] = &aggregationv1.FileHistorySnapshotTrackedBackup{
+		data.Snapshot.TrackedFileBackups[path] = &recordv1.FileHistorySnapshotTrackedBackup{
 			BackupFileName: backupFileName,
 			Version:        int32(backup.Version),
 			BackupTime:     timestamppb.New(backup.BackupTime),
