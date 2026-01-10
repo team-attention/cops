@@ -35,7 +35,15 @@ func (r *MongoEventRepository) SaveEvent(ctx context.Context, userID string, eve
 	var schema mongoschema.Event
 	schema.FromDomain(userID, event)
 
-	_, err := r.eventsColl.InsertOne(ctx, &schema)
+	doc, err := schema.ToBSONDocument()
+	if err != nil {
+		r.logger.Error("failed to convert event to BSON document",
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	_, err = r.eventsColl.InsertOne(ctx, doc)
 	if err != nil {
 		r.logger.Error("failed to save event",
 			slog.Any("error", err),
@@ -60,7 +68,16 @@ func (r *MongoEventRepository) SaveEvents(ctx context.Context, userID string, ev
 	for i, event := range events {
 		var schema mongoschema.Event
 		schema.FromDomain(userID, event)
-		docs[i] = &schema
+
+		doc, err := schema.ToBSONDocument()
+		if err != nil {
+			r.logger.Error("failed to convert event to BSON document",
+				slog.Int("index", i),
+				slog.Any("error", err),
+			)
+			return err
+		}
+		docs[i] = doc
 	}
 
 	_, err := r.eventsColl.InsertMany(ctx, docs)

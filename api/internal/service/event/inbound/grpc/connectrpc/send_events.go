@@ -43,6 +43,16 @@ func (h *EventGRPCHandler) SendEvents(
 			)
 			continue
 		}
+
+		// Skip events with empty type (log full event for debugging)
+		if event.Type == "" {
+			h.logger.Warn("SendEvents: skipping event with empty type",
+				slog.Int("index", i),
+				slog.String("rawJSON", jsonStr),
+			)
+			continue
+		}
+
 		events = append(events, &event)
 	}
 

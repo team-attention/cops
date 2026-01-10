@@ -57,8 +57,8 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 		Issuer:               params.Config.JWT.Issuer,
 	}
 
-	// Create auth interceptor for JWT authentication
-	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg)
+	// Create auth interceptor for JWT and API key authentication
+	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg, params.APIKeyService)
 
 	// Create API key interceptor for API key authentication
 	// Apply to SendEvents endpoint

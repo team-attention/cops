@@ -11,48 +11,56 @@ import (
 
 var _ = Describe("Event", func() {
 	Describe("UnmarshalJSON", func() {
-		Context("when parsing session_start events", func() {
-			It("parses valid session_start JSON", func() {
+		Context("when parsing PreToolUse events", func() {
+			It("parses valid PreToolUse JSON from Claude Code hook", func() {
 				jsonData := []byte(`{
-					"type": "session_start",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"session_type": "interactive",
-					"tools": ["bash", "read", "write"],
-					"mcp_servers": ["server1", "server2"],
-					"model": "claude-3-opus",
-					"perm_mode": "auto",
-					"max_turns": 100
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"cwd": "/Users/test/project",
+					"permission_mode": "default",
+					"hook_event_name": "PreToolUse",
+					"tool_name": "Write",
+					"tool_input": {
+						"file_path": "/path/to/file.txt",
+						"content": "file content"
+					},
+					"tool_use_id": "toolu_01ABC123"
 				}`)
 
 				var event domain.Event
 				err := json.Unmarshal(jsonData, &event)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(event.Type).To(Equal(domain.EventTypeSessionStart))
+				Expect(event.Type).To(Equal(domain.EventTypePreToolUse))
 
-				sessionStart, ok := event.Data.(*domain.SessionStartEvent)
+				preToolUse, ok := event.Data.(*domain.PreToolUseEvent)
 				Expect(ok).To(BeTrue())
-				Expect(string(sessionStart.SessionID)).To(Equal("test-session-123"))
-				Expect(*sessionStart.SessionType).To(Equal("interactive"))
-				Expect(sessionStart.Tools).To(Equal([]string{"bash", "read", "write"}))
-				Expect(sessionStart.McpServers).To(Equal([]string{"server1", "server2"}))
-				Expect(*sessionStart.Model).To(Equal("claude-3-opus"))
-				Expect(*sessionStart.PermMode).To(Equal("auto"))
-				Expect(*sessionStart.MaxTurns).To(Equal(100))
+				Expect(preToolUse.SessionID).To(Equal("abc123"))
+				Expect(preToolUse.PermissionMode).To(Equal("default"))
+				Expect(preToolUse.ToolName).To(Equal("Write"))
+				Expect(preToolUse.ToolInput).To(HaveKeyWithValue("file_path", "/path/to/file.txt"))
+				Expect(preToolUse.ToolUseID).To(Equal("toolu_01ABC123"))
 			})
 		})
 
-		Context("when parsing post_tool_use events", func() {
-			It("parses valid post_tool_use JSON", func() {
+		Context("when parsing PostToolUse events", func() {
+			It("parses valid PostToolUse JSON from Claude Code hook", func() {
 				jsonData := []byte(`{
-					"type": "post_tool_use",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"tool_name": "bash",
-					"tool_id": "toolu_123",
-					"success": true,
-					"duration_ms": 1500
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"cwd": "/Users/test/project",
+					"permission_mode": "default",
+					"hook_event_name": "PostToolUse",
+					"tool_name": "Write",
+					"tool_input": {
+						"file_path": "/path/to/file.txt",
+						"content": "file content"
+					},
+					"tool_response": {
+						"filePath": "/path/to/file.txt",
+						"success": true
+					},
+					"tool_use_id": "toolu_01ABC123"
 				}`)
 
 				var event domain.Event
@@ -63,44 +71,24 @@ var _ = Describe("Event", func() {
 
 				postToolUse, ok := event.Data.(*domain.PostToolUseEvent)
 				Expect(ok).To(BeTrue())
-				Expect(postToolUse.ToolName).To(Equal("bash"))
-				Expect(postToolUse.ToolID).To(Equal("toolu_123"))
-				Expect(postToolUse.Success).To(BeTrue())
-				Expect(*postToolUse.DurationMs).To(Equal(int64(1500)))
-				Expect(postToolUse.Error).To(BeNil())
-			})
-
-			It("parses post_tool_use with error", func() {
-				jsonData := []byte(`{
-					"type": "post_tool_use",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"tool_name": "bash",
-					"tool_id": "toolu_456",
-					"success": false,
-					"error": "command failed"
-				}`)
-
-				var event domain.Event
-				err := json.Unmarshal(jsonData, &event)
-				Expect(err).NotTo(HaveOccurred())
-
-				postToolUse, ok := event.Data.(*domain.PostToolUseEvent)
-				Expect(ok).To(BeTrue())
-				Expect(postToolUse.Success).To(BeFalse())
-				Expect(*postToolUse.Error).To(Equal("command failed"))
+				Expect(postToolUse.SessionID).To(Equal("abc123"))
+				Expect(postToolUse.ToolName).To(Equal("Write"))
+				Expect(postToolUse.ToolInput).To(HaveKeyWithValue("file_path", "/path/to/file.txt"))
+				Expect(postToolUse.ToolResponse).To(HaveKeyWithValue("success", true))
+				Expect(postToolUse.ToolUseID).To(Equal("toolu_01ABC123"))
 			})
 		})
 
-		Context("when parsing notification events", func() {
-			It("parses valid notification JSON", func() {
+		Context("when parsing Notification events", func() {
+			It("parses valid Notification JSON from Claude Code hook", func() {
 				jsonData := []byte(`{
-					"type": "notification",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"level": "info",
-					"message": "Task completed successfully",
-					"category": "task"
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"cwd": "/Users/test/project",
+					"permission_mode": "default",
+					"hook_event_name": "Notification",
+					"message": "Claude needs your permission to use Bash",
+					"notification_type": "permission_prompt"
 				}`)
 
 				var event domain.Event
@@ -111,20 +99,21 @@ var _ = Describe("Event", func() {
 
 				notification, ok := event.Data.(*domain.NotificationEvent)
 				Expect(ok).To(BeTrue())
-				Expect(notification.Level).To(Equal("info"))
-				Expect(notification.Message).To(Equal("Task completed successfully"))
-				Expect(*notification.Category).To(Equal("task"))
+				Expect(notification.SessionID).To(Equal("abc123"))
+				Expect(notification.Message).To(Equal("Claude needs your permission to use Bash"))
+				Expect(notification.NotificationType).To(Equal("permission_prompt"))
 			})
 		})
 
-		Context("when parsing user_prompt_submit events", func() {
-			It("parses valid user_prompt_submit JSON", func() {
+		Context("when parsing UserPromptSubmit events", func() {
+			It("parses valid UserPromptSubmit JSON from Claude Code hook", func() {
 				jsonData := []byte(`{
-					"type": "user_prompt_submit",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"prompt_length": 256,
-					"has_images": true
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"cwd": "/Users/test/project",
+					"permission_mode": "default",
+					"hook_event_name": "UserPromptSubmit",
+					"prompt": "Write a function to calculate the factorial of a number"
 				}`)
 
 				var event domain.Event
@@ -135,21 +124,19 @@ var _ = Describe("Event", func() {
 
 				userPrompt, ok := event.Data.(*domain.UserPromptSubmitEvent)
 				Expect(ok).To(BeTrue())
-				Expect(*userPrompt.PromptLength).To(Equal(256))
-				Expect(*userPrompt.HasImages).To(BeTrue())
+				Expect(userPrompt.SessionID).To(Equal("abc123"))
+				Expect(userPrompt.Prompt).To(Equal("Write a function to calculate the factorial of a number"))
 			})
 		})
 
-		Context("when parsing stop events", func() {
-			It("parses valid stop JSON", func() {
+		Context("when parsing Stop events", func() {
+			It("parses valid Stop JSON from Claude Code hook", func() {
 				jsonData := []byte(`{
-					"type": "stop",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"stop_reason": "end_turn",
-					"total_turns": 5,
-					"input_tokens": 10000,
-					"output_tokens": 5000
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"permission_mode": "default",
+					"hook_event_name": "Stop",
+					"stop_hook_active": true
 				}`)
 
 				var event domain.Event
@@ -160,23 +147,39 @@ var _ = Describe("Event", func() {
 
 				stopEvent, ok := event.Data.(*domain.StopEvent)
 				Expect(ok).To(BeTrue())
-				Expect(*stopEvent.StopReason).To(Equal("end_turn"))
-				Expect(*stopEvent.TotalTurns).To(Equal(5))
-				Expect(*stopEvent.InputTokens).To(Equal(int64(10000)))
-				Expect(*stopEvent.OutputTokens).To(Equal(int64(5000)))
+				Expect(stopEvent.SessionID).To(Equal("abc123"))
+				Expect(stopEvent.StopHookActive).To(BeTrue())
+			})
+
+			It("parses Stop with stop_hook_active false", func() {
+				jsonData := []byte(`{
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"permission_mode": "default",
+					"hook_event_name": "Stop",
+					"stop_hook_active": false
+				}`)
+
+				var event domain.Event
+				err := json.Unmarshal(jsonData, &event)
+				Expect(err).NotTo(HaveOccurred())
+
+				stopEvent, ok := event.Data.(*domain.StopEvent)
+				Expect(ok).To(BeTrue())
+				Expect(stopEvent.StopHookActive).To(BeFalse())
 			})
 		})
 
-		Context("when parsing subagent_stop events", func() {
-			It("parses valid subagent_stop JSON", func() {
+		Context("when parsing SubagentStop events", func() {
+			It("parses valid SubagentStop JSON from Claude Code hook", func() {
 				jsonData := []byte(`{
-					"type": "subagent_stop",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"subagent_id": "subagent-abc",
-					"stop_reason": "task_complete",
-					"input_tokens": 3000,
-					"output_tokens": 1500
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"permission_mode": "default",
+					"hook_event_name": "SubagentStop",
+					"stop_hook_active": false,
+					"agent_id": "a3bec5d",
+					"agent_transcript_path": "/Users/test/.claude/projects/test/agent-a3bec5d.jsonl"
 				}`)
 
 				var event domain.Event
@@ -187,23 +190,110 @@ var _ = Describe("Event", func() {
 
 				subagentStop, ok := event.Data.(*domain.SubagentStopEvent)
 				Expect(ok).To(BeTrue())
-				Expect(*subagentStop.SubagentID).To(Equal("subagent-abc"))
-				Expect(*subagentStop.StopReason).To(Equal("task_complete"))
-				Expect(*subagentStop.InputTokens).To(Equal(int64(3000)))
-				Expect(*subagentStop.OutputTokens).To(Equal(int64(1500)))
+				Expect(subagentStop.SessionID).To(Equal("abc123"))
+				Expect(subagentStop.StopHookActive).To(BeFalse())
+				Expect(subagentStop.AgentID).To(Equal("a3bec5d"))
 			})
 		})
 
-		Context("when parsing session_end events", func() {
-			It("parses valid session_end JSON", func() {
+		Context("when parsing PreCompact events", func() {
+			It("parses valid PreCompact JSON from Claude Code hook (manual)", func() {
 				jsonData := []byte(`{
-					"type": "session_end",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
-					"exit_code": 0,
-					"total_duration_ms": 120000,
-					"total_input_tokens": 50000,
-					"total_output_tokens": 25000
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"permission_mode": "default",
+					"hook_event_name": "PreCompact",
+					"trigger": "manual",
+					"custom_instructions": "Focus on the authentication flow"
+				}`)
+
+				var event domain.Event
+				err := json.Unmarshal(jsonData, &event)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(event.Type).To(Equal(domain.EventTypePreCompact))
+
+				preCompact, ok := event.Data.(*domain.PreCompactEvent)
+				Expect(ok).To(BeTrue())
+				Expect(preCompact.SessionID).To(Equal("abc123"))
+				Expect(preCompact.Trigger).To(Equal("manual"))
+				Expect(preCompact.CustomInstructions).To(Equal("Focus on the authentication flow"))
+			})
+
+			It("parses valid PreCompact JSON from Claude Code hook (auto)", func() {
+				jsonData := []byte(`{
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"permission_mode": "default",
+					"hook_event_name": "PreCompact",
+					"trigger": "auto",
+					"custom_instructions": ""
+				}`)
+
+				var event domain.Event
+				err := json.Unmarshal(jsonData, &event)
+				Expect(err).NotTo(HaveOccurred())
+
+				preCompact, ok := event.Data.(*domain.PreCompactEvent)
+				Expect(ok).To(BeTrue())
+				Expect(preCompact.Trigger).To(Equal("auto"))
+				Expect(preCompact.CustomInstructions).To(BeEmpty())
+			})
+		})
+
+		Context("when parsing SessionStart events", func() {
+			It("parses valid SessionStart JSON from Claude Code hook (startup)", func() {
+				jsonData := []byte(`{
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"permission_mode": "default",
+					"hook_event_name": "SessionStart",
+					"source": "startup"
+				}`)
+
+				var event domain.Event
+				err := json.Unmarshal(jsonData, &event)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(event.Type).To(Equal(domain.EventTypeSessionStart))
+
+				sessionStart, ok := event.Data.(*domain.SessionStartEvent)
+				Expect(ok).To(BeTrue())
+				Expect(sessionStart.SessionID).To(Equal("abc123"))
+				Expect(sessionStart.Source).To(Equal("startup"))
+			})
+
+			It("parses SessionStart with different sources", func() {
+				sources := []string{"startup", "resume", "clear", "compact"}
+
+				for _, source := range sources {
+					jsonData := []byte(`{
+						"session_id": "abc123",
+						"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+						"hook_event_name": "SessionStart",
+						"source": "` + source + `"
+					}`)
+
+					var event domain.Event
+					err := json.Unmarshal(jsonData, &event)
+					Expect(err).NotTo(HaveOccurred())
+
+					sessionStart, ok := event.Data.(*domain.SessionStartEvent)
+					Expect(ok).To(BeTrue())
+					Expect(sessionStart.Source).To(Equal(source))
+				}
+			})
+		})
+
+		Context("when parsing SessionEnd events", func() {
+			It("parses valid SessionEnd JSON from Claude Code hook", func() {
+				jsonData := []byte(`{
+					"session_id": "abc123",
+					"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+					"cwd": "/Users/test/project",
+					"permission_mode": "default",
+					"hook_event_name": "SessionEnd",
+					"reason": "exit"
 				}`)
 
 				var event domain.Event
@@ -214,19 +304,37 @@ var _ = Describe("Event", func() {
 
 				sessionEnd, ok := event.Data.(*domain.SessionEndEvent)
 				Expect(ok).To(BeTrue())
-				Expect(*sessionEnd.ExitCode).To(Equal(0))
-				Expect(*sessionEnd.TotalDurationMs).To(Equal(int64(120000)))
-				Expect(*sessionEnd.TotalInputTokens).To(Equal(int64(50000)))
-				Expect(*sessionEnd.TotalOutputTokens).To(Equal(int64(25000)))
+				Expect(sessionEnd.SessionID).To(Equal("abc123"))
+				Expect(sessionEnd.Reason).To(Equal("exit"))
+			})
+
+			It("parses SessionEnd with different reasons", func() {
+				reasons := []string{"clear", "logout", "prompt_input_exit", "other"}
+
+				for _, reason := range reasons {
+					jsonData := []byte(`{
+						"session_id": "abc123",
+						"transcript_path": "/Users/test/.claude/projects/test/00893aaf.jsonl",
+						"hook_event_name": "SessionEnd",
+						"reason": "` + reason + `"
+					}`)
+
+					var event domain.Event
+					err := json.Unmarshal(jsonData, &event)
+					Expect(err).NotTo(HaveOccurred())
+
+					sessionEnd, ok := event.Data.(*domain.SessionEndEvent)
+					Expect(ok).To(BeTrue())
+					Expect(sessionEnd.Reason).To(Equal(reason))
+				}
 			})
 		})
 
 		Context("when parsing unknown event types", func() {
 			It("stores unknown type as map[string]any", func() {
 				jsonData := []byte(`{
-					"type": "future_event_type",
-					"sessionId": "test-session-123",
-					"timestamp": "2025-01-01T00:00:00Z",
+					"session_id": "abc123",
+					"hook_event_name": "FutureEventType",
 					"custom_field": "custom_value"
 				}`)
 
@@ -234,11 +342,10 @@ var _ = Describe("Event", func() {
 				err := json.Unmarshal(jsonData, &event)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(event.Type).To(Equal(domain.EventType("future_event_type")))
+				Expect(event.Type).To(Equal(domain.EventType("FutureEventType")))
 
 				mapData, ok := event.Data.(map[string]any)
 				Expect(ok).To(BeTrue())
-				Expect(mapData).To(HaveKey("type"))
 				Expect(mapData).To(HaveKeyWithValue("custom_field", "custom_value"))
 			})
 		})
@@ -253,19 +360,49 @@ var _ = Describe("Event", func() {
 				Expect(err).To(HaveOccurred())
 			})
 		})
+
+		Context("backward compatibility with type field", func() {
+			It("supports legacy type field format", func() {
+				jsonData := []byte(`{
+					"session_id": "abc123",
+					"type": "SessionStart",
+					"source": "startup"
+				}`)
+
+				var event domain.Event
+				err := json.Unmarshal(jsonData, &event)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(event.Type).To(Equal(domain.EventTypeSessionStart))
+			})
+
+			It("prefers hook_event_name over type when both present", func() {
+				jsonData := []byte(`{
+					"session_id": "abc123",
+					"type": "Stop",
+					"hook_event_name": "SessionStart",
+					"source": "startup"
+				}`)
+
+				var event domain.Event
+				err := json.Unmarshal(jsonData, &event)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(event.Type).To(Equal(domain.EventTypeSessionStart))
+			})
+		})
 	})
 
 	Describe("MarshalJSON", func() {
 		Context("when marshaling typed events", func() {
-			It("produces flat JSON with type field", func() {
-				sessionType := "interactive"
-				model := "claude-3-opus"
+			It("produces flat JSON with hook_event_name field", func() {
 				sessionStart := &domain.SessionStartEvent{
-					SessionType: &sessionType,
-					Model:       &model,
-					Tools:       []string{"bash", "read"},
+					HookEventBase: domain.HookEventBase{
+						SessionID:      "test-session-123",
+						PermissionMode: "default",
+					},
+					Source: "startup",
 				}
-				sessionStart.SessionID = "test-session-123"
 
 				event := domain.Event{
 					Type: domain.EventTypeSessionStart,
@@ -279,16 +416,14 @@ var _ = Describe("Event", func() {
 				err = json.Unmarshal(jsonData, &result)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(result).To(HaveKeyWithValue("type", "session_start"))
-				Expect(result).To(HaveKeyWithValue("session_type", "interactive"))
-				Expect(result).To(HaveKeyWithValue("model", "claude-3-opus"))
-				Expect(result).To(HaveKeyWithValue("sessionId", "test-session-123"))
-				Expect(result).To(HaveKey("tools"))
+				Expect(result).To(HaveKeyWithValue("hook_event_name", "SessionStart"))
+				Expect(result).To(HaveKeyWithValue("session_id", "test-session-123"))
+				Expect(result).To(HaveKeyWithValue("source", "startup"))
 			})
 		})
 
 		Context("when marshaling nil Data", func() {
-			It("produces JSON with only type field", func() {
+			It("produces JSON with only hook_event_name field", func() {
 				event := domain.Event{
 					Type: domain.EventTypeSessionStart,
 					Data: nil,
@@ -297,66 +432,24 @@ var _ = Describe("Event", func() {
 				jsonData, err := json.Marshal(event)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(string(jsonData)).To(Equal(`{"type":"session_start"}`))
+				Expect(string(jsonData)).To(Equal(`{"hook_event_name":"SessionStart"}`))
 			})
 		})
 	})
 
 	Describe("Round-trip serialization", func() {
-		It("preserves event through marshal/unmarshal cycle", func() {
-			// Create a session_start event with all fields
-			sessionType := "interactive"
-			model := "claude-3-opus"
-			permMode := "auto"
-			maxTurns := 100
-
-			originalEvent := domain.Event{
-				Type: domain.EventTypeSessionStart,
-				Data: &domain.SessionStartEvent{
-					SessionType: &sessionType,
-					Tools:       []string{"bash", "read", "write"},
-					McpServers:  []string{"server1"},
-					Model:       &model,
-					PermMode:    &permMode,
-					MaxTurns:    &maxTurns,
-				},
-			}
-			originalSessionStart := originalEvent.Data.(*domain.SessionStartEvent)
-			originalSessionStart.SessionID = "test-session-123"
-
-			// Marshal to JSON
-			jsonData, err := json.Marshal(originalEvent)
-			Expect(err).NotTo(HaveOccurred())
-
-			// Unmarshal back
-			var roundTrippedEvent domain.Event
-			err = json.Unmarshal(jsonData, &roundTrippedEvent)
-			Expect(err).NotTo(HaveOccurred())
-
-			// Verify type
-			Expect(roundTrippedEvent.Type).To(Equal(originalEvent.Type))
-
-			// Verify data
-			roundTrippedSessionStart, ok := roundTrippedEvent.Data.(*domain.SessionStartEvent)
-			Expect(ok).To(BeTrue())
-			Expect(*roundTrippedSessionStart.SessionType).To(Equal(*originalSessionStart.SessionType))
-			Expect(roundTrippedSessionStart.Tools).To(Equal(originalSessionStart.Tools))
-			Expect(*roundTrippedSessionStart.Model).To(Equal(*originalSessionStart.Model))
-			Expect(string(roundTrippedSessionStart.SessionID)).To(Equal(string(originalSessionStart.SessionID)))
-		})
-
-		It("preserves post_tool_use event through cycle", func() {
-			durationMs := int64(1500)
-			errorMsg := "test error"
-
+		It("preserves PostToolUse event through marshal/unmarshal cycle", func() {
 			originalEvent := domain.Event{
 				Type: domain.EventTypePostToolUse,
 				Data: &domain.PostToolUseEvent{
-					ToolName:   "bash",
-					ToolID:     "toolu_123",
-					Success:    false,
-					Error:      &errorMsg,
-					DurationMs: &durationMs,
+					HookEventBase: domain.HookEventBase{
+						SessionID:      "test-session-123",
+						PermissionMode: "acceptEdits",
+					},
+					ToolName:     "Bash",
+					ToolInput:    map[string]any{"command": "ls -la"},
+					ToolResponse: map[string]any{"stdout": "file list", "stderr": ""},
+					ToolUseID:    "toolu_123",
 				},
 			}
 
@@ -367,13 +460,38 @@ var _ = Describe("Event", func() {
 			err = json.Unmarshal(jsonData, &roundTrippedEvent)
 			Expect(err).NotTo(HaveOccurred())
 
+			Expect(roundTrippedEvent.Type).To(Equal(originalEvent.Type))
+
 			postToolUse, ok := roundTrippedEvent.Data.(*domain.PostToolUseEvent)
 			Expect(ok).To(BeTrue())
-			Expect(postToolUse.ToolName).To(Equal("bash"))
-			Expect(postToolUse.ToolID).To(Equal("toolu_123"))
-			Expect(postToolUse.Success).To(BeFalse())
-			Expect(*postToolUse.Error).To(Equal("test error"))
-			Expect(*postToolUse.DurationMs).To(Equal(int64(1500)))
+			Expect(postToolUse.SessionID).To(Equal("test-session-123"))
+			Expect(postToolUse.ToolName).To(Equal("Bash"))
+			Expect(postToolUse.ToolUseID).To(Equal("toolu_123"))
+		})
+
+		It("preserves SessionStart event through cycle", func() {
+			originalEvent := domain.Event{
+				Type: domain.EventTypeSessionStart,
+				Data: &domain.SessionStartEvent{
+					HookEventBase: domain.HookEventBase{
+						SessionID:      "test-session-456",
+						PermissionMode: "default",
+					},
+					Source: "resume",
+				},
+			}
+
+			jsonData, err := json.Marshal(originalEvent)
+			Expect(err).NotTo(HaveOccurred())
+
+			var roundTrippedEvent domain.Event
+			err = json.Unmarshal(jsonData, &roundTrippedEvent)
+			Expect(err).NotTo(HaveOccurred())
+
+			sessionStart, ok := roundTrippedEvent.Data.(*domain.SessionStartEvent)
+			Expect(ok).To(BeTrue())
+			Expect(sessionStart.SessionID).To(Equal("test-session-456"))
+			Expect(sessionStart.Source).To(Equal("resume"))
 		})
 	})
 })
