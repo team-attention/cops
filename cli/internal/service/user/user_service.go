@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/team-attention/cops/cli/internal/service/auth"
+	"github.com/team-attention/cops/cli/internal/platform/outbound/authstate"
 	"github.com/team-attention/cops/cli/internal/service/user/outbound/api"
 	"github.com/team-attention/cops/shared/domain"
 	"github.com/team-attention/cops/shared/domain/connectrpcschema"
@@ -14,22 +14,22 @@ import (
 type Service struct {
 	logger    *slog.Logger
 	apiClient api.UserAPIPort
-	authSvc   *auth.Service
+	authState authstate.AuthStatePort
 }
 
 // NewService creates a new user service.
-func NewService(l *slog.Logger, apiClient api.UserAPIPort, authSvc *auth.Service) *Service {
+func NewService(l *slog.Logger, apiClient api.UserAPIPort, authState authstate.AuthStatePort) *Service {
 	return &Service{
 		logger:    l.With(slog.String("name", "user.service")),
 		apiClient: apiClient,
-		authSvc:   authSvc,
+		authState: authState,
 	}
 }
 
 // GetMyOrganizations fetches the authenticated user's organizations.
 // Returns domain.Organization (not protobuf types) for use in TUI and business logic.
 func (s *Service) GetMyOrganizations(ctx context.Context) ([]*domain.Organization, error) {
-	accessToken, err := s.authSvc.GetAccessToken(ctx)
+	accessToken, err := s.authState.GetAccessToken(ctx)
 	if err != nil {
 		s.logger.Error("failed to get access token",
 			slog.Any("error", err),

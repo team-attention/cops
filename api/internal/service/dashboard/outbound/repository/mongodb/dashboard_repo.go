@@ -67,6 +67,11 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context, organiz
 		return nil, fmt.Errorf("failed to get project IDs: %w", err)
 	}
 
+	// Early return if no projects
+	if len(projectIDs) == 0 {
+		return stats, nil
+	}
+
 	// Get total usage from session records for projects in this organization
 	usagePipeline := bson.A{
 		bson.M{"$match": bson.M{mongoschema.RecordProjectIDField: bson.M{"$in": projectIDs}}},
@@ -381,6 +386,9 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.RecordProjectIDField: projectOID}})
 	} else {
 		// All projects in organization
+		if len(projectIDs) == 0 {
+			return structure.NewPaginatedResult([]repository.SessionSummary{}, params.Page, params.PageSize, 0), nil
+		}
 		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.RecordProjectIDField: bson.M{"$in": projectIDs}}})
 	}
 
@@ -605,7 +613,7 @@ func (r *MongoDashboardRepository) getProjectIDsForOrganization(ctx context.Cont
 	}
 	defer cursor.Close(ctx)
 
-	var projectIDs []bson.ObjectID
+	projectIDs := []bson.ObjectID{}
 	for cursor.Next(ctx) {
 		var doc struct {
 			ID bson.ObjectID `bson:"_id"`
@@ -693,6 +701,10 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, orgOID
 }
 
 func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, projectIDs []bson.ObjectID, limit int) ([]repository.SessionSummary, error) {
+	if len(projectIDs) == 0 {
+		return []repository.SessionSummary{}, nil
+	}
+
 	pipeline := bson.A{
 		// Match records for projects in the organization
 		bson.M{"$match": bson.M{mongoschema.RecordProjectIDField: bson.M{"$in": projectIDs}}},

@@ -19,6 +19,8 @@ func Run() {
 		newRBACModule(),
 		newUserModule(),
 		newOrganizationModule(),
+		newAPIKeyModule(),
+		newEventModule(),
 
 		// Registrations (invoked for side effects)
 		fx.Invoke(registerConnectRPCServer),

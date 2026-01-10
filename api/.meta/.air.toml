@@ -1,4 +1,4 @@
-root = ".."
+root = "."
 tmp_dir = "tmp"
 
 [build]
@@ -11,7 +11,7 @@ tmp_dir = "tmp"
   # Exclude directories
   exclude_dir = ["tmp", "vendor", ".git", ".meta"]
   # Include directories to watch (relative to root)
-  include_dir = ["cmd", "internal", "../shared"]
+  include_dir = ["cmd", "internal"]
   # Delay before rebuild (milliseconds)
   delay = 1000
   # Stop old binary before building new one

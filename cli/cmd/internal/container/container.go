@@ -7,11 +7,6 @@ func Run() error {
 	c := dig.New()
 
 	// Register modules (providers + group registrations)
-	// Note: Auth module must be registered before platform module
-	// because platform's AuthStatePort depends on auth's AuthAPIPort
-	if err := newAuthModule(c); err != nil {
-		return err
-	}
 	if err := newPlatformModule(c); err != nil {
 		return err
 	}
@@ -22,6 +17,9 @@ func Run() error {
 		return err
 	}
 	if err := newDaemonModule(c); err != nil {
+		return err
+	}
+	if err := newHookModule(c); err != nil {
 		return err
 	}
 

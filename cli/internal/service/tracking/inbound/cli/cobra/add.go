@@ -33,18 +33,13 @@ Examples:
   cops add . --no-git       # Treat as non-git project`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Check authentication first
-			if !h.authSvc.IsLoggedIn() {
-				return fmt.Errorf("not authenticated. Run 'cops login' first")
-			}
-
 			path := "."
 			if len(args) > 0 {
 				path = args[0]
 			}
 
 			// Run the TUI
-			result, err := runAddTUI(path, noGit, h.svc, h.authSvc, h.userSvc)
+			result, err := runAddTUI(path, noGit, h.svc, h.userSvc)
 			if err != nil {
 				return err
 			}

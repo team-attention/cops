@@ -16,7 +16,7 @@ require (
 	github.com/team-attention/cops/shared v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver/v2 v2.4.1
 	go.uber.org/fx v1.24.0
-	golang.org/x/oauth2 v0.34.0
+	golang.org/x/text v0.32.0
 	google.golang.org/protobuf v1.36.11
 )
 
@@ -55,8 +55,8 @@ require (
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/mod v0.31.0 // indirect
 	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect
 )
