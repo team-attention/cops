@@ -10,19 +10,19 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
 	"github.com/team-attention/cops/daemon/internal/platform/util/errutil"
-	aggregationv1 "github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1"
-	"github.com/team-attention/cops/shared/gen/grpcstub/aggregation/v1/aggregationv1connect"
+	eventv1 "github.com/team-attention/cops/shared/gen/grpcstub/event/v1"
+	"github.com/team-attention/cops/shared/gen/grpcstub/event/v1/eventv1connect"
 )
 
 // APIClient implements APIClientPort using ConnectRPC.
 type APIClient struct {
 	logger *slog.Logger
-	client aggregationv1connect.AggregationServiceClient
+	client eventv1connect.EventServiceClient
 }
 
 // NewAPIClient creates a new ConnectRPC API client adapter.
 func NewAPIClient(l *slog.Logger, apiClient *setup.APIClient, cfg *setup.Config) *APIClient {
-	client := aggregationv1connect.NewAggregationServiceClient(
+	client := eventv1connect.NewEventServiceClient(
 		apiClient.StandardHTTPClient(),
 		cfg.API.URL,
 		apiClient.ConnectOptions()...,
@@ -36,8 +36,8 @@ func NewAPIClient(l *slog.Logger, apiClient *setup.APIClient, cfg *setup.Config)
 
 // SendLogs sends a batch of raw JSONL lines to the API server.
 func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
-	req := &aggregationv1.SendLogsReq{
-		Batch: &aggregationv1.LogBatch{
+	req := &eventv1.SendLogsReq{
+		Batch: &eventv1.LogBatch{
 			OrganizationId: batch.OrganizationID,
 			ProjectId:      batch.ProjectID.String(),
 			Jsonl:          batch.Lines,
@@ -46,10 +46,8 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 
 	resp, err := c.client.SendLogs(ctx, connect.NewRequest(req))
 	if err != nil {
-		// Check if error indicates payload too large
 		code := connect.CodeOf(err)
 		if code == connect.CodeUnknown {
-			// Check error message for "413" or "Request Entity Too Large"
 			errMsg := err.Error()
 			if strings.Contains(errMsg, "413") || strings.Contains(strings.ToLower(errMsg), "request entity too large") {
 				return errutil.Wrap(errutil.ErrorTypePayloadTooLarge, "batch rejected by server", err)
@@ -62,11 +60,14 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 	}
 
 	if !resp.Msg.Success {
-		c.logger.Warn("API returned failure")
+		c.logger.Warn("API returned failure",
+			slog.String("error", resp.Msg.ErrorMessage),
+		)
 	}
 
 	c.logger.Debug("logs sent",
 		slog.Int("count", len(batch.Lines)),
+		slog.Int("processed", int(resp.Msg.ProcessedCount)),
 	)
 
 	return nil

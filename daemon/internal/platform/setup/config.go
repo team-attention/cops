@@ -42,7 +42,7 @@ type APIConfig struct {
 type CopsConfig struct {
 	GlobalConfigPath string        `env:"COPS_GLOBAL_CONFIG_PATH" envDefault:"~/.cops/config.json"`
 	DaemonDataDir    string        `env:"COPS_DAEMON_DATA_DIR" envDefault:"~/.cops/daemon"`
-	FlushInterval    time.Duration `env:"COPS_FLUSH_INTERVAL" envDefault:"60s"`
+	FlushInterval    time.Duration `env:"COPS_FLUSH_INTERVAL" envDefault:"15s"`
 	MaxBatchSize     int           `env:"COPS_MAX_BATCH_SIZE" envDefault:"100"`
 }
 
