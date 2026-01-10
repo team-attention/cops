@@ -12,3 +12,11 @@ import { EventService } from "./event_pb";
  * @generated from rpc event.v1.EventService.SendEvents
  */
 export const sendEvents = EventService.method.sendEvents;
+
+/**
+ * SendLogs receives a batch of JSONL log lines from the Daemon.
+ * Parses user, assistant, file-history-snapshot records and stores to events collection.
+ *
+ * @generated from rpc event.v1.EventService.SendLogs
+ */
+export const sendLogs = EventService.method.sendLogs;

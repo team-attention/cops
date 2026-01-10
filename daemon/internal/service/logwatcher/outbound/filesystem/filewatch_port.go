@@ -6,4 +6,6 @@ type FileWatchPort interface {
 	Add(path string) error
 	// Remove removes a directory from watching.
 	Remove(path string) error
+	// WatchList returns list of currently watched paths.
+	WatchList() []string
 }

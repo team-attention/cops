@@ -12,6 +12,7 @@ import (
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/dirutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/errutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api"
@@ -24,6 +25,25 @@ const (
 	minBatchSize = 1
 )
 
+// WatchTargetPriority defines the priority order for project matching.
+// Lower value = higher priority.
+type WatchTargetPriority int
+
+const (
+	PriorityMainProject    WatchTargetPriority = 1 // Directly registered project
+	PriorityWorktree       WatchTargetPriority = 2 // Git worktree
+	PriorityMainSubdir     WatchTargetPriority = 3 // Subdirectory of main project
+	PriorityWorktreeSubdir WatchTargetPriority = 4 // Subdirectory of worktree
+)
+
+// projectMapping stores project info with priority.
+type projectMapping struct {
+	ProjectID      shareddomain.ID
+	OrganizationID string
+	Priority       WatchTargetPriority
+	PathLength     int // For longest prefix match within same priority
+}
+
 // Service contains pure business logic for log file watching and processing.
 // No goroutines, no event loops - just business logic.
 type Service struct {
@@ -33,8 +53,9 @@ type Service struct {
 	maxBatchSize       int                      // Maximum lines per batch (from config)
 	watchedDirs        map[string]bool
 	claudeDirToProject map[string]shareddomain.ID
-	projectPathToID    map[string]shareddomain.ID // ProjectPath -> ProjectID mapping for hierarchical matching
-	projectIDToOrgID   map[shareddomain.ID]string // ProjectID -> OrganizationID mapping
+	projectPathToID    map[string]shareddomain.ID  // ProjectPath -> ProjectID mapping for hierarchical matching
+	projectMappings    map[string]projectMapping   // ProjectPath -> mapping info with priority
+	projectIDToOrgID   map[shareddomain.ID]string  // ProjectID -> OrganizationID mapping
 	bufferByProject    map[shareddomain.ID][]string
 	mu                 sync.Mutex
 }
@@ -54,6 +75,7 @@ func NewService(
 		watchedDirs:        make(map[string]bool),
 		claudeDirToProject: make(map[string]shareddomain.ID),
 		projectPathToID:    make(map[string]shareddomain.ID),
+		projectMappings:    make(map[string]projectMapping),
 		projectIDToOrgID:   make(map[shareddomain.ID]string),
 		bufferByProject:    make(map[shareddomain.ID][]string),
 	}
@@ -65,17 +87,43 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Build set of new directories and ProjectID mappings
+	// Build set of new directories and mappings
 	newDirs := make(map[string]bool)
 	newClaudeDirMapping := make(map[string]shareddomain.ID)
-	newProjectPathMapping := make(map[string]shareddomain.ID)
+	newProjectMappings := make(map[string]projectMapping)
 	newProjectIDToOrgID := make(map[shareddomain.ID]string)
+	newProjectPathToID := make(map[string]shareddomain.ID)
 
 	for _, t := range targets {
 		newDirs[t.ClaudeDir] = true
 		newClaudeDirMapping[t.ClaudeDir] = t.ProjectID
-		newProjectPathMapping[t.ProjectPath] = t.ProjectID
 		newProjectIDToOrgID[t.ProjectID] = t.OrganizationID
+		newProjectPathToID[t.ProjectPath] = t.ProjectID
+
+		// Determine priority based on WatchTargetType
+		var priority WatchTargetPriority
+		switch t.Type {
+		case domain.WatchTargetRoot:
+			priority = PriorityMainProject
+		case domain.WatchTargetWorktree:
+			priority = PriorityWorktree
+		case domain.WatchTargetSubdirectory:
+			if t.ParentProjectPath != "" {
+				// Check if parent is a worktree or main project
+				// For now, assume subdirectory of main by default
+				// Will be refined when parent type is tracked
+				priority = PriorityMainSubdir
+			} else {
+				priority = PriorityMainSubdir
+			}
+		}
+
+		newProjectMappings[t.ProjectPath] = projectMapping{
+			ProjectID:      t.ProjectID,
+			OrganizationID: t.OrganizationID,
+			Priority:       priority,
+			PathLength:     len(t.ProjectPath),
+		}
 	}
 
 	// Remove watches for directories no longer in targets
@@ -108,13 +156,14 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 
 	// Update mappings
 	s.claudeDirToProject = newClaudeDirMapping
-	s.projectPathToID = newProjectPathMapping
+	s.projectMappings = newProjectMappings
 	s.projectIDToOrgID = newProjectIDToOrgID
+	s.projectPathToID = newProjectPathToID
 
 	s.logger.Info("updated watch targets",
 		slog.Int("watching", len(s.watchedDirs)),
 		slog.Int("claudeDirMappings", len(s.claudeDirToProject)),
-		slog.Int("projectPathMappings", len(s.projectPathToID)),
+		slog.Int("projectMappings", len(s.projectMappings)),
 		slog.Int("projectIDToOrgID", len(s.projectIDToOrgID)),
 	)
 
@@ -405,7 +454,8 @@ func (s *Service) returnLinesToBuffer(projectID shareddomain.ID, lines []string)
 }
 
 // GetProjectIDForClaudeDir returns the ProjectID for a given ClaudeDir.
-// Uses hierarchical matching: first tries exact match, then finds longest path prefix.
+// Uses priority-based matching: first tries exact match, then finds best match
+// based on priority (Main > Worktree > MainSubdir > WorktreeSubdir) and path length.
 // Returns empty ID if not found.
 func (s *Service) GetProjectIDForClaudeDir(claudeDir string) shareddomain.ID {
 	s.mu.Lock()
@@ -416,36 +466,150 @@ func (s *Service) GetProjectIDForClaudeDir(claudeDir string) shareddomain.ID {
 		return projectID
 	}
 
-	// No exact match - try hierarchical matching
 	// Decode claudeDir to original path
 	decodedPath := pathutil.DecodeClaudeProjectDir(claudeDir)
 	if decodedPath == "" {
-		// Invalid Claude directory format
 		return ""
 	}
 
-	// Find all matching parent paths
-	var longestMatch string
-	var matchedID shareddomain.ID
+	// Find best match based on priority and path length
+	var bestMatch *projectMapping
+	var bestMatchPath string
 
-	for projectPath, projectID := range s.projectPathToID {
-		// Check if projectPath is a prefix of decodedPath
-		// Must be exact match OR decodedPath must start with projectPath followed by separator
+	for projectPath, mapping := range s.projectMappings {
 		if projectPath == decodedPath {
-			// Exact match (already checked above, but keep for completeness)
-			return projectID
+			return mapping.ProjectID
 		}
 
-		// Check if it's a proper prefix (with separator)
 		if strings.HasPrefix(decodedPath, projectPath+"/") {
-			// This is a parent directory match
-			// Keep the longest (most specific) match
-			if len(projectPath) > len(longestMatch) {
-				longestMatch = projectPath
-				matchedID = projectID
+			if bestMatch == nil {
+				m := mapping // Create a copy to avoid aliasing
+				bestMatch = &m
+				bestMatchPath = projectPath
+				continue
+			}
+
+			// Compare priority (lower is better)
+			if mapping.Priority < bestMatch.Priority {
+				m := mapping
+				bestMatch = &m
+				bestMatchPath = projectPath
+			} else if mapping.Priority == bestMatch.Priority {
+				// Same priority: prefer longer path (more specific match)
+				if len(projectPath) > len(bestMatchPath) {
+					m := mapping
+					bestMatch = &m
+					bestMatchPath = projectPath
+				}
 			}
 		}
 	}
 
-	return matchedID
+	if bestMatch != nil {
+		return bestMatch.ProjectID
+	}
+	return ""
+}
+
+// FindParentProjectPath finds the parent project path for a given path.
+// Returns empty string if path is not within a watched project.
+func (s *Service) FindParentProjectPath(path string) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var longestMatch string
+	var matchedParentPath string
+
+	for projectPath, mapping := range s.projectMappings {
+		// Only consider root and worktree projects as potential parents
+		if mapping.Priority != PriorityMainProject && mapping.Priority != PriorityWorktree {
+			continue
+		}
+
+		if strings.HasPrefix(path, projectPath+"/") {
+			if len(projectPath) > len(longestMatch) {
+				longestMatch = projectPath
+				matchedParentPath = projectPath
+			}
+		}
+	}
+
+	return matchedParentPath
+}
+
+// AddWatchForSubdirectory adds a watch for a new subdirectory.
+// This is called by the inbound handler when a new directory is created.
+func (s *Service) AddWatchForSubdirectory(path string, parentProjectPath string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Find parent project's mapping
+	parentMapping, ok := s.projectMappings[parentProjectPath]
+	if !ok {
+		return fmt.Errorf("parent project not found: %s", parentProjectPath)
+	}
+
+	// Determine priority based on parent type
+	var priority WatchTargetPriority
+	if parentMapping.Priority == PriorityMainProject {
+		priority = PriorityMainSubdir
+	} else {
+		priority = PriorityWorktreeSubdir
+	}
+
+	// Add watch through outbound port
+	claudeDir := pathutil.GetClaudeProjectDir(path)
+	if err := s.fileWatcher.Add(claudeDir); err != nil {
+		// Directory may not have Claude logs yet, that's OK
+		s.logger.Debug("failed to add watch for subdirectory (claude dir may not exist)",
+			slog.String("path", path),
+			slog.String("claudeDir", claudeDir),
+			slog.Any("error", err),
+		)
+		// Continue to add mapping anyway - watch will be retried on next UpdateTargets
+	} else {
+		s.watchedDirs[claudeDir] = true
+	}
+
+	// Update internal mappings
+	s.claudeDirToProject[claudeDir] = parentMapping.ProjectID
+	s.projectMappings[path] = projectMapping{
+		ProjectID:      parentMapping.ProjectID,
+		OrganizationID: parentMapping.OrganizationID,
+		Priority:       priority,
+		PathLength:     len(path),
+	}
+	s.projectPathToID[path] = parentMapping.ProjectID
+
+	s.logger.Debug("added watch for new subdirectory",
+		slog.String("path", path),
+		slog.String("parentProject", parentProjectPath),
+	)
+
+	return nil
+}
+
+// AddNestedDirectoryWatches adds watches for all nested directories.
+// This is called by the inbound handler after adding a new directory.
+func (s *Service) AddNestedDirectoryWatches(root string, parentProjectPath string) {
+	dirs, err := dirutil.WalkDirectories(root)
+	if err != nil {
+		s.logger.Debug("failed to walk nested directories",
+			slog.String("root", root),
+			slog.Any("error", err),
+		)
+		return
+	}
+
+	for _, dir := range dirs {
+		if dir == root {
+			continue
+		}
+		if err := s.AddWatchForSubdirectory(dir, parentProjectPath); err != nil {
+			s.logger.Debug("failed to add nested directory",
+				slog.String("path", dir),
+				slog.Any("error", err),
+			)
+		}
+	}
 }

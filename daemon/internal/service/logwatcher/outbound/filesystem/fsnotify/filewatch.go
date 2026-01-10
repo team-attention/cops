@@ -27,3 +27,8 @@ func (a *FileWatchAdapter) Add(path string) error {
 func (a *FileWatchAdapter) Remove(path string) error {
 	return a.watcher.Remove(path)
 }
+
+// WatchList returns list of currently watched paths.
+func (a *FileWatchAdapter) WatchList() []string {
+	return a.watcher.WatchList()
+}

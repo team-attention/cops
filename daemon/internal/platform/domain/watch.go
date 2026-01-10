@@ -20,11 +20,12 @@ const (
 
 // WatchTarget represents a directory to watch for Claude Code logs.
 type WatchTarget struct {
-	ProjectPath    string               // Original project path from GlobalConfig
-	ClaudeDir      string               // ~/.claude/projects/{encoded-path}
-	Type           WatchTargetType      // Type of watch target
-	ProjectID      shareddomain.ID      // Project ID from local config
-	OrganizationID string               // Organization ID from local config
+	ProjectPath       string               // Original project path from GlobalConfig
+	ClaudeDir         string               // ~/.claude/projects/{encoded-path}
+	Type              WatchTargetType      // Type of watch target
+	ProjectID         shareddomain.ID      // Project ID from local config
+	OrganizationID    string               // Organization ID from local config
+	ParentProjectPath string               // Parent project path (for subdirectories)
 }
 
 // FilePosition tracks read position for incremental file reading.

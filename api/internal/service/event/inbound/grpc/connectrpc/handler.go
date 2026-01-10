@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	eventservice "github.com/team-attention/cops/api/internal/service/event"
 	"github.com/team-attention/cops/api/internal/service/event/outbound/repository"
 	"github.com/team-attention/cops/shared/gen/grpcstub/event/v1/eventv1connect"
 )
@@ -13,13 +14,15 @@ import (
 // EventGRPCHandler handles gRPC requests for event service.
 type EventGRPCHandler struct {
 	logger *slog.Logger
+	svc    *eventservice.Service
 	repo   repository.EventRepositoryPort
 }
 
 // NewEventGRPCHandler creates a new event gRPC handler.
-func NewEventGRPCHandler(l *slog.Logger, repo repository.EventRepositoryPort) *EventGRPCHandler {
+func NewEventGRPCHandler(l *slog.Logger, svc *eventservice.Service, repo repository.EventRepositoryPort) *EventGRPCHandler {
 	return &EventGRPCHandler{
 		logger: l.With(slog.String("name", "event.grpc.connectrpc")),
+		svc:    svc,
 		repo:   repo,
 	}
 }

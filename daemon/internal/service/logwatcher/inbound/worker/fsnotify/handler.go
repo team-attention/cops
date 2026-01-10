@@ -3,6 +3,7 @@ package fsnotify
 import (
 	"context"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -112,6 +113,35 @@ func (h *LogFsnotifyHandler) loop() {
 }
 
 func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
+	// Handle new directory creation - delegate to service layer
+	if event.Has(fsnotify.Create) {
+		if info, err := os.Stat(event.Name); err == nil && info.IsDir() {
+			// Skip hidden directories
+			if len(filepath.Base(event.Name)) > 0 && filepath.Base(event.Name)[0] == '.' {
+				return
+			}
+
+			// Find parent project through service
+			parentPath := h.svc.FindParentProjectPath(event.Name)
+			if parentPath != "" {
+				// Add watch through service layer (NOT direct watcher access)
+				if err := h.svc.AddWatchForSubdirectory(event.Name, parentPath); err != nil {
+					h.logger.Warn("failed to add watch for new directory",
+						slog.String("path", event.Name),
+						slog.Any("error", err),
+					)
+				} else {
+					h.logger.Debug("added watch for new directory",
+						slog.String("path", event.Name),
+					)
+					// Also scan and add any nested directories through service
+					h.svc.AddNestedDirectoryWatches(event.Name, parentPath)
+				}
+			}
+			return
+		}
+	}
+
 	// Only process JSONL files
 	if !strings.HasSuffix(event.Name, ".jsonl") {
 		return

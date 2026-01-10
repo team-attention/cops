@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file event/v1/event.proto.
  */
 export const file_event_v1_event: GenFile = /*@__PURE__*/
-  fileDesc("ChRldmVudC92MS9ldmVudC5wcm90bxIIZXZlbnQudjEiHwoNU2VuZEV2ZW50c1JlcRIOCgZldmVudHMYASADKAkiDwoNU2VuZEV2ZW50c1JlczJOCgxFdmVudFNlcnZpY2USPgoKU2VuZEV2ZW50cxIXLmV2ZW50LnYxLlNlbmRFdmVudHNSZXEaFy5ldmVudC52MS5TZW5kRXZlbnRzUmVzQqABCgxjb20uZXZlbnQudjFCCkV2ZW50UHJvdG9QAVpDZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZXZlbnQvdjE7ZXZlbnR2MaICA0VYWKoCCEV2ZW50LlYxygIIRXZlbnRcVjHiAhRFdmVudFxWMVxHUEJNZXRhZGF0YeoCCUV2ZW50OjpWMWIGcHJvdG8z");
+  fileDesc("ChRldmVudC92MS9ldmVudC5wcm90bxIIZXZlbnQudjEiHwoNU2VuZEV2ZW50c1JlcRIOCgZldmVudHMYASADKAkiDwoNU2VuZEV2ZW50c1JlcyJGCghMb2dCYXRjaBIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCRINCgVqc29ubBgDIAMoCSIwCgtTZW5kTG9nc1JlcRIhCgViYXRjaBgBIAEoCzISLmV2ZW50LnYxLkxvZ0JhdGNoIk4KC1NlbmRMb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSFQoNZXJyb3JfbWVzc2FnZRgCIAEoCRIXCg9wcm9jZXNzZWRfY291bnQYAyABKAUyiAEKDEV2ZW50U2VydmljZRI+CgpTZW5kRXZlbnRzEhcuZXZlbnQudjEuU2VuZEV2ZW50c1JlcRoXLmV2ZW50LnYxLlNlbmRFdmVudHNSZXMSOAoIU2VuZExvZ3MSFS5ldmVudC52MS5TZW5kTG9nc1JlcRoVLmV2ZW50LnYxLlNlbmRMb2dzUmVzQqABCgxjb20uZXZlbnQudjFCCkV2ZW50UHJvdG9QAVpDZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZXZlbnQvdjE7ZXZlbnR2MaICA0VYWKoCCEV2ZW50LlYxygIIRXZlbnRcVjHiAhRFdmVudFxWMVxHUEJNZXRhZGF0YeoCCUV2ZW50OjpWMWIGcHJvdG8z");
 
 /**
  * SendEventsReq is the request message for SendEvents RPC.
@@ -55,6 +55,97 @@ export const SendEventsResSchema: GenMessage<SendEventsRes> = /*@__PURE__*/
   messageDesc(file_event_v1_event, 1);
 
 /**
+ * LogBatch contains raw JSONL lines for batch sending.
+ *
+ * @generated from message event.v1.LogBatch
+ */
+export type LogBatch = Message<"event.v1.LogBatch"> & {
+  /**
+   * Organization identifier (required - project belongs to this org)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
+   * Project identifier
+   *
+   * @generated from field: string project_id = 2;
+   */
+  projectId: string;
+
+  /**
+   * Raw JSONL lines
+   *
+   * @generated from field: repeated string jsonl = 3;
+   */
+  jsonl: string[];
+};
+
+/**
+ * Describes the message event.v1.LogBatch.
+ * Use `create(LogBatchSchema)` to create a new message.
+ */
+export const LogBatchSchema: GenMessage<LogBatch> = /*@__PURE__*/
+  messageDesc(file_event_v1_event, 2);
+
+/**
+ * SendLogsReq is the request message for SendLogs RPC.
+ *
+ * @generated from message event.v1.SendLogsReq
+ */
+export type SendLogsReq = Message<"event.v1.SendLogsReq"> & {
+  /**
+   * Batch of JSONL log lines
+   *
+   * @generated from field: event.v1.LogBatch batch = 1;
+   */
+  batch?: LogBatch;
+};
+
+/**
+ * Describes the message event.v1.SendLogsReq.
+ * Use `create(SendLogsReqSchema)` to create a new message.
+ */
+export const SendLogsReqSchema: GenMessage<SendLogsReq> = /*@__PURE__*/
+  messageDesc(file_event_v1_event, 3);
+
+/**
+ * SendLogsRes is the response message for SendLogs RPC.
+ *
+ * @generated from message event.v1.SendLogsRes
+ */
+export type SendLogsRes = Message<"event.v1.SendLogsRes"> & {
+  /**
+   * Whether the operation was successful
+   *
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+
+  /**
+   * Error message if success is false
+   *
+   * @generated from field: string error_message = 2;
+   */
+  errorMessage: string;
+
+  /**
+   * Number of records successfully processed
+   *
+   * @generated from field: int32 processed_count = 3;
+   */
+  processedCount: number;
+};
+
+/**
+ * Describes the message event.v1.SendLogsRes.
+ * Use `create(SendLogsResSchema)` to create a new message.
+ */
+export const SendLogsResSchema: GenMessage<SendLogsRes> = /*@__PURE__*/
+  messageDesc(file_event_v1_event, 4);
+
+/**
  * EventService provides hook event collection operations.
  *
  * @generated from service event.v1.EventService
@@ -71,6 +162,17 @@ export const EventService: GenService<{
     methodKind: "unary";
     input: typeof SendEventsReqSchema;
     output: typeof SendEventsResSchema;
+  },
+  /**
+   * SendLogs receives a batch of JSONL log lines from the Daemon.
+   * Parses user, assistant, file-history-snapshot records and stores to events collection.
+   *
+   * @generated from rpc event.v1.EventService.SendLogs
+   */
+  sendLogs: {
+    methodKind: "unary";
+    input: typeof SendLogsReqSchema;
+    output: typeof SendLogsResSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_event_v1_event, 0);

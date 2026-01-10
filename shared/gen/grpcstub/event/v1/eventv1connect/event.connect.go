@@ -35,6 +35,8 @@ const (
 const (
 	// EventServiceSendEventsProcedure is the fully-qualified name of the EventService's SendEvents RPC.
 	EventServiceSendEventsProcedure = "/event.v1.EventService/SendEvents"
+	// EventServiceSendLogsProcedure is the fully-qualified name of the EventService's SendLogs RPC.
+	EventServiceSendLogsProcedure = "/event.v1.EventService/SendLogs"
 )
 
 // EventServiceClient is a client for the event.v1.EventService service.
@@ -43,6 +45,9 @@ type EventServiceClient interface {
 	// Events are raw JSON strings that the server parses internally.
 	// Authentication is handled via request headers.
 	SendEvents(context.Context, *connect.Request[v1.SendEventsReq]) (*connect.Response[v1.SendEventsRes], error)
+	// SendLogs receives a batch of JSONL log lines from the Daemon.
+	// Parses user, assistant, file-history-snapshot records and stores to events collection.
+	SendLogs(context.Context, *connect.Request[v1.SendLogsReq]) (*connect.Response[v1.SendLogsRes], error)
 }
 
 // NewEventServiceClient constructs a client for the event.v1.EventService service. By default, it
@@ -62,17 +67,29 @@ func NewEventServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(eventServiceMethods.ByName("SendEvents")),
 			connect.WithClientOptions(opts...),
 		),
+		sendLogs: connect.NewClient[v1.SendLogsReq, v1.SendLogsRes](
+			httpClient,
+			baseURL+EventServiceSendLogsProcedure,
+			connect.WithSchema(eventServiceMethods.ByName("SendLogs")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // eventServiceClient implements EventServiceClient.
 type eventServiceClient struct {
 	sendEvents *connect.Client[v1.SendEventsReq, v1.SendEventsRes]
+	sendLogs   *connect.Client[v1.SendLogsReq, v1.SendLogsRes]
 }
 
 // SendEvents calls event.v1.EventService.SendEvents.
 func (c *eventServiceClient) SendEvents(ctx context.Context, req *connect.Request[v1.SendEventsReq]) (*connect.Response[v1.SendEventsRes], error) {
 	return c.sendEvents.CallUnary(ctx, req)
+}
+
+// SendLogs calls event.v1.EventService.SendLogs.
+func (c *eventServiceClient) SendLogs(ctx context.Context, req *connect.Request[v1.SendLogsReq]) (*connect.Response[v1.SendLogsRes], error) {
+	return c.sendLogs.CallUnary(ctx, req)
 }
 
 // EventServiceHandler is an implementation of the event.v1.EventService service.
@@ -81,6 +98,9 @@ type EventServiceHandler interface {
 	// Events are raw JSON strings that the server parses internally.
 	// Authentication is handled via request headers.
 	SendEvents(context.Context, *connect.Request[v1.SendEventsReq]) (*connect.Response[v1.SendEventsRes], error)
+	// SendLogs receives a batch of JSONL log lines from the Daemon.
+	// Parses user, assistant, file-history-snapshot records and stores to events collection.
+	SendLogs(context.Context, *connect.Request[v1.SendLogsReq]) (*connect.Response[v1.SendLogsRes], error)
 }
 
 // NewEventServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -96,10 +116,18 @@ func NewEventServiceHandler(svc EventServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(eventServiceMethods.ByName("SendEvents")),
 		connect.WithHandlerOptions(opts...),
 	)
+	eventServiceSendLogsHandler := connect.NewUnaryHandler(
+		EventServiceSendLogsProcedure,
+		svc.SendLogs,
+		connect.WithSchema(eventServiceMethods.ByName("SendLogs")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/event.v1.EventService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case EventServiceSendEventsProcedure:
 			eventServiceSendEventsHandler.ServeHTTP(w, r)
+		case EventServiceSendLogsProcedure:
+			eventServiceSendLogsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -111,4 +139,8 @@ type UnimplementedEventServiceHandler struct{}
 
 func (UnimplementedEventServiceHandler) SendEvents(context.Context, *connect.Request[v1.SendEventsReq]) (*connect.Response[v1.SendEventsRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("event.v1.EventService.SendEvents is not implemented"))
+}
+
+func (UnimplementedEventServiceHandler) SendLogs(context.Context, *connect.Request[v1.SendLogsReq]) (*connect.Response[v1.SendLogsRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("event.v1.EventService.SendLogs is not implemented"))
 }

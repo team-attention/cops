@@ -6,13 +6,14 @@ import (
 	"os"
 
 	"github.com/bytedance/sonic"
-	shareddomain "github.com/team-attention/cops/shared/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/dirutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/gitutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/configwatcher/outbound/localconfig"
+	shareddomain "github.com/team-attention/cops/shared/domain"
 )
 
 // Service contains pure business logic for config watching.
@@ -91,10 +92,18 @@ func (s *Service) saveConfig(path string, cfg *domain.GlobalConfig) error {
 }
 
 // buildWatchTargets builds watch targets from global config.
-// This includes main project directories and git worktrees.
+// This includes main project directories, git worktrees, and their subdirectories.
 // Projects and worktrees without local config are skipped.
 func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarget {
 	var targets []domain.WatchTarget
+
+	// First pass: collect all main project paths for priority checking
+	mainProjectPaths := make(map[string]bool)
+	for _, project := range cfg.Projects {
+		if project != nil {
+			mainProjectPaths[project.Path] = true
+		}
+	}
 
 	for _, project := range cfg.Projects {
 		if project == nil {
@@ -121,12 +130,41 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 
 		// Add main project directory
 		targets = append(targets, domain.WatchTarget{
-			ProjectPath:    project.Path,
-			ClaudeDir:      pathutil.GetClaudeProjectDir(project.Path),
-			Type:           domain.WatchTargetRoot,
-			ProjectID:      localCfg.ProjectID,
-			OrganizationID: localCfg.OrganizationID,
+			ProjectPath:       project.Path,
+			ClaudeDir:         pathutil.GetClaudeProjectDir(project.Path),
+			Type:              domain.WatchTargetRoot,
+			ProjectID:         localCfg.ProjectID,
+			OrganizationID:    localCfg.OrganizationID,
+			ParentProjectPath: "",
 		})
+
+		// Add subdirectories (excluding those that are main projects)
+		subDirs, err := dirutil.WalkDirectories(project.Path)
+		if err != nil {
+			s.logger.Warn("failed to walk subdirectories",
+				slog.String("path", project.Path),
+				slog.Any("error", err),
+			)
+		} else {
+			for _, subDir := range subDirs {
+				if subDir == project.Path {
+					continue // Skip root itself
+				}
+				// Skip if this subdirectory is a registered main project
+				if mainProjectPaths[subDir] {
+					continue
+				}
+
+				targets = append(targets, domain.WatchTarget{
+					ProjectPath:       subDir,
+					ClaudeDir:         pathutil.GetClaudeProjectDir(subDir),
+					Type:              domain.WatchTargetSubdirectory,
+					ProjectID:         localCfg.ProjectID,
+					OrganizationID:    localCfg.OrganizationID,
+					ParentProjectPath: project.Path,
+				})
+			}
+		}
 
 		// Add worktrees if git project
 		if project.IsGitProject {
@@ -161,12 +199,36 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 				}
 
 				targets = append(targets, domain.WatchTarget{
-					ProjectPath:    wt,
-					ClaudeDir:      pathutil.GetClaudeProjectDir(wt),
-					Type:           domain.WatchTargetWorktree,
-					ProjectID:      worktreeCfg.ProjectID,
-					OrganizationID: worktreeCfg.OrganizationID,
+					ProjectPath:       wt,
+					ClaudeDir:         pathutil.GetClaudeProjectDir(wt),
+					Type:              domain.WatchTargetWorktree,
+					ProjectID:         worktreeCfg.ProjectID,
+					OrganizationID:    worktreeCfg.OrganizationID,
+					ParentProjectPath: project.Path,
 				})
+
+				// Add worktree subdirectories
+				wtSubDirs, err := dirutil.WalkDirectories(wt)
+				if err != nil {
+					continue
+				}
+				for _, subDir := range wtSubDirs {
+					if subDir == wt {
+						continue
+					}
+					if mainProjectPaths[subDir] {
+						continue
+					}
+
+					targets = append(targets, domain.WatchTarget{
+						ProjectPath:       subDir,
+						ClaudeDir:         pathutil.GetClaudeProjectDir(subDir),
+						Type:              domain.WatchTargetSubdirectory,
+						ProjectID:         worktreeCfg.ProjectID,
+						OrganizationID:    worktreeCfg.OrganizationID,
+						ParentProjectPath: wt,
+					})
+				}
 			}
 		}
 	}

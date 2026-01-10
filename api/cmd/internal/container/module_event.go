@@ -3,6 +3,7 @@ package container
 import (
 	"go.uber.org/fx"
 
+	eventservice "github.com/team-attention/cops/api/internal/service/event"
 	"github.com/team-attention/cops/api/internal/service/event/inbound/grpc/connectrpc"
 	"github.com/team-attention/cops/api/internal/service/event/outbound/repository"
 	"github.com/team-attention/cops/api/internal/service/event/outbound/repository/mongodb"
@@ -10,13 +11,16 @@ import (
 
 func newEventModule() fx.Option {
 	return fx.Module("event",
-		// Repository (existing)
+		// Repository
 		fx.Provide(
 			fx.Annotate(
 				mongodb.NewMongoEventRepository,
 				fx.As(new(repository.EventRepositoryPort)),
 			),
 		),
+
+		// Service
+		fx.Provide(eventservice.NewService),
 
 		// ConnectRPC handler (API key auth required)
 		fx.Provide(

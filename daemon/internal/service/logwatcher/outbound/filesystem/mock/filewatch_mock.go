@@ -6,8 +6,9 @@ import (
 
 // FileWatch implements filesystem.FileWatchPort for testing.
 type FileWatch struct {
-	AddFunc    func(path string) error
-	RemoveFunc func(path string) error
+	AddFunc       func(path string) error
+	RemoveFunc    func(path string) error
+	WatchListFunc func() []string
 }
 
 // Add implements filesystem.FileWatchPort.
@@ -30,6 +31,17 @@ func (m *FileWatch) Remove(path string) error {
 
 	// 2. Otherwise return nil
 	return nil
+}
+
+// WatchList implements filesystem.FileWatchPort.
+func (m *FileWatch) WatchList() []string {
+	// 1. If WatchListFunc is set, call it and return result
+	if m.WatchListFunc != nil {
+		return m.WatchListFunc()
+	}
+
+	// 2. Otherwise return empty slice
+	return []string{}
 }
 
 // Compile-time interface verification.

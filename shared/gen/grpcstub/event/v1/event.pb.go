@@ -108,6 +108,180 @@ func (*SendEventsRes) Descriptor() ([]byte, []int) {
 	return file_event_v1_event_proto_rawDescGZIP(), []int{1}
 }
 
+// LogBatch contains raw JSONL lines for batch sending.
+type LogBatch struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required - project belongs to this org)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// Project identifier
+	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	// Raw JSONL lines
+	Jsonl         []string `protobuf:"bytes,3,rep,name=jsonl,proto3" json:"jsonl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LogBatch) Reset() {
+	*x = LogBatch{}
+	mi := &file_event_v1_event_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LogBatch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogBatch) ProtoMessage() {}
+
+func (x *LogBatch) ProtoReflect() protoreflect.Message {
+	mi := &file_event_v1_event_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogBatch.ProtoReflect.Descriptor instead.
+func (*LogBatch) Descriptor() ([]byte, []int) {
+	return file_event_v1_event_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LogBatch) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *LogBatch) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *LogBatch) GetJsonl() []string {
+	if x != nil {
+		return x.Jsonl
+	}
+	return nil
+}
+
+// SendLogsReq is the request message for SendLogs RPC.
+type SendLogsReq struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Batch of JSONL log lines
+	Batch         *LogBatch `protobuf:"bytes,1,opt,name=batch,proto3" json:"batch,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendLogsReq) Reset() {
+	*x = SendLogsReq{}
+	mi := &file_event_v1_event_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendLogsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendLogsReq) ProtoMessage() {}
+
+func (x *SendLogsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_event_v1_event_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendLogsReq.ProtoReflect.Descriptor instead.
+func (*SendLogsReq) Descriptor() ([]byte, []int) {
+	return file_event_v1_event_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SendLogsReq) GetBatch() *LogBatch {
+	if x != nil {
+		return x.Batch
+	}
+	return nil
+}
+
+// SendLogsRes is the response message for SendLogs RPC.
+type SendLogsRes struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Whether the operation was successful
+	Success bool `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	// Error message if success is false
+	ErrorMessage string `protobuf:"bytes,2,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	// Number of records successfully processed
+	ProcessedCount int32 `protobuf:"varint,3,opt,name=processed_count,json=processedCount,proto3" json:"processed_count,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *SendLogsRes) Reset() {
+	*x = SendLogsRes{}
+	mi := &file_event_v1_event_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendLogsRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendLogsRes) ProtoMessage() {}
+
+func (x *SendLogsRes) ProtoReflect() protoreflect.Message {
+	mi := &file_event_v1_event_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendLogsRes.ProtoReflect.Descriptor instead.
+func (*SendLogsRes) Descriptor() ([]byte, []int) {
+	return file_event_v1_event_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SendLogsRes) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *SendLogsRes) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *SendLogsRes) GetProcessedCount() int32 {
+	if x != nil {
+		return x.ProcessedCount
+	}
+	return 0
+}
+
 var File_event_v1_event_proto protoreflect.FileDescriptor
 
 const file_event_v1_event_proto_rawDesc = "" +
@@ -115,10 +289,22 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x14event/v1/event.proto\x12\bevent.v1\"'\n" +
 	"\rSendEventsReq\x12\x16\n" +
 	"\x06events\x18\x01 \x03(\tR\x06events\"\x0f\n" +
-	"\rSendEventsRes2N\n" +
+	"\rSendEventsRes\"h\n" +
+	"\bLogBatch\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x14\n" +
+	"\x05jsonl\x18\x03 \x03(\tR\x05jsonl\"7\n" +
+	"\vSendLogsReq\x12(\n" +
+	"\x05batch\x18\x01 \x01(\v2\x12.event.v1.LogBatchR\x05batch\"u\n" +
+	"\vSendLogsRes\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12#\n" +
+	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\x12'\n" +
+	"\x0fprocessed_count\x18\x03 \x01(\x05R\x0eprocessedCount2\x88\x01\n" +
 	"\fEventService\x12>\n" +
 	"\n" +
-	"SendEvents\x12\x17.event.v1.SendEventsReq\x1a\x17.event.v1.SendEventsResB\xa0\x01\n" +
+	"SendEvents\x12\x17.event.v1.SendEventsReq\x1a\x17.event.v1.SendEventsRes\x128\n" +
+	"\bSendLogs\x12\x15.event.v1.SendLogsReq\x1a\x15.event.v1.SendLogsResB\xa0\x01\n" +
 	"\fcom.event.v1B\n" +
 	"EventProtoP\x01ZCgithub.com/team-attention/cops/shared/gen/grpcstub/event/v1;eventv1\xa2\x02\x03EXX\xaa\x02\bEvent.V1\xca\x02\bEvent\\V1\xe2\x02\x14Event\\V1\\GPBMetadata\xea\x02\tEvent::V1b\x06proto3"
 
@@ -134,19 +320,25 @@ func file_event_v1_event_proto_rawDescGZIP() []byte {
 	return file_event_v1_event_proto_rawDescData
 }
 
-var file_event_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_event_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_event_v1_event_proto_goTypes = []any{
 	(*SendEventsReq)(nil), // 0: event.v1.SendEventsReq
 	(*SendEventsRes)(nil), // 1: event.v1.SendEventsRes
+	(*LogBatch)(nil),      // 2: event.v1.LogBatch
+	(*SendLogsReq)(nil),   // 3: event.v1.SendLogsReq
+	(*SendLogsRes)(nil),   // 4: event.v1.SendLogsRes
 }
 var file_event_v1_event_proto_depIdxs = []int32{
-	0, // 0: event.v1.EventService.SendEvents:input_type -> event.v1.SendEventsReq
-	1, // 1: event.v1.EventService.SendEvents:output_type -> event.v1.SendEventsRes
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: event.v1.SendLogsReq.batch:type_name -> event.v1.LogBatch
+	0, // 1: event.v1.EventService.SendEvents:input_type -> event.v1.SendEventsReq
+	3, // 2: event.v1.EventService.SendLogs:input_type -> event.v1.SendLogsReq
+	1, // 3: event.v1.EventService.SendEvents:output_type -> event.v1.SendEventsRes
+	4, // 4: event.v1.EventService.SendLogs:output_type -> event.v1.SendLogsRes
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_event_v1_event_proto_init() }
@@ -160,7 +352,7 @@ func file_event_v1_event_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_event_v1_event_proto_rawDesc), len(file_event_v1_event_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

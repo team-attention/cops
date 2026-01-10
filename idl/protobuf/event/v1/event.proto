@@ -19,10 +19,44 @@ message SendEventsRes {
   // Empty - success is indicated by a successful RPC response
 }
 
+// LogBatch contains raw JSONL lines for batch sending.
+message LogBatch {
+  // Organization identifier (required - project belongs to this org)
+  string organization_id = 1;
+
+  // Project identifier
+  string project_id = 2;
+
+  // Raw JSONL lines
+  repeated string jsonl = 3;
+}
+
+// SendLogsReq is the request message for SendLogs RPC.
+message SendLogsReq {
+  // Batch of JSONL log lines
+  LogBatch batch = 1;
+}
+
+// SendLogsRes is the response message for SendLogs RPC.
+message SendLogsRes {
+  // Whether the operation was successful
+  bool success = 1;
+
+  // Error message if success is false
+  string error_message = 2;
+
+  // Number of records successfully processed
+  int32 processed_count = 3;
+}
+
 // EventService provides hook event collection operations.
 service EventService {
   // SendEvents receives a batch of hook events from Claude Code.
   // Events are raw JSON strings that the server parses internally.
   // Authentication is handled via request headers.
   rpc SendEvents(SendEventsReq) returns (SendEventsRes);
+
+  // SendLogs receives a batch of JSONL log lines from the Daemon.
+  // Parses user, assistant, file-history-snapshot records and stores to events collection.
+  rpc SendLogs(SendLogsReq) returns (SendLogsRes);
 }
