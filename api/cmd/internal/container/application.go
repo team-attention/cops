@@ -13,7 +13,6 @@ func Run() {
 		newPlatformModule(),
 		newHealthModule(),
 		newAuthModule(),
-		newAggregationModule(),
 		newDashboardModule(),
 		newProjectModule(),
 		newRBACModule(),
