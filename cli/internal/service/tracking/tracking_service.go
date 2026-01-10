@@ -2,7 +2,6 @@ package tracking
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"path/filepath"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/api"
-	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/claudesettings"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/config"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/parser"
 	"github.com/team-attention/cops/shared/domain"
@@ -40,11 +38,10 @@ type ParentProjectInfo struct {
 type Service struct {
 	logger *slog.Logger
 
-	authState      authstate.AuthStatePort
-	configRepo     config.ConfigPort
-	parser         parser.ParserPort
-	project        api.ProjectPort
-	claudeSettings claudesettings.ClaudeSettingsPort
+	authState  authstate.AuthStatePort
+	configRepo config.ConfigPort
+	parser     parser.ParserPort
+	project    api.ProjectPort
 }
 
 // NewService creates a new tracking service.
@@ -54,15 +51,13 @@ func NewService(
 	configRepo config.ConfigPort,
 	parser parser.ParserPort,
 	project api.ProjectPort,
-	claudeSettings claudesettings.ClaudeSettingsPort,
 ) *Service {
 	return &Service{
-		logger:         l.With(slog.String("name", "tracking.service")),
-		authState:      authState,
-		configRepo:     configRepo,
-		parser:         parser,
-		project:        project,
-		claudeSettings: claudeSettings,
+		logger:     l.With(slog.String("name", "tracking.service")),
+		authState:  authState,
+		configRepo: configRepo,
+		parser:     parser,
+		project:    project,
 	}
 }
 
@@ -163,16 +158,6 @@ func (s *Service) AddProject(ctx context.Context, params AddProjectParams) (*dom
 	}
 	if err := s.configRepo.SaveLocalConfig(projectPath, localConfig); err != nil {
 		return nil, errutil.Internalf("failed to save local config: %v", err)
-	}
-
-	// Install cops hooks to .claude/settings.json
-	// Algorithm:
-	//   1. Call installHooks helper method
-	//   2. Log warning if fails, don't fail entire add operation
-	if err := s.installHooks(ctx, projectPath); err != nil {
-		s.logger.Warn("failed to install hooks, continuing without hooks",
-			slog.Any("error", err),
-		)
 	}
 
 	// Create project
@@ -388,37 +373,4 @@ func (s *Service) FindParentProject(targetPath string) (*ParentProjectInfo, erro
 
 	// No parent project found
 	return nil, nil
-}
-
-// installHooks installs cops hooks to .claude/settings.json.
-// Algorithm:
-//  1. Check if API key is configured by attempting GetAccessToken
-//  2. If not configured, log warning (but continue installation)
-//  3. Call claudeSettings.InstallCopsHooks(projectPath)
-//  4. Return error if installation fails
-func (s *Service) installHooks(ctx context.Context, projectPath string) error {
-	// Check if API key is configured (warn if not)
-	// Algorithm:
-	//   1. Call authState.GetAccessToken(ctx)
-	//   2. If error, log warning that hooks won't work until authenticated
-	//   3. Continue with installation anyway (user may authenticate later)
-	if _, err := s.authState.GetAccessToken(ctx); err != nil {
-		s.logger.Warn("API key not configured, hooks will not work until authenticated. Run 'cops login' to authenticate.",
-			slog.Any("error", err),
-		)
-	}
-
-	// Install cops hooks
-	// Algorithm:
-	//   1. Call claudeSettings.InstallCopsHooks(projectPath)
-	//   2. Return error if fails
-	if err := s.claudeSettings.InstallCopsHooks(ctx, projectPath); err != nil {
-		return fmt.Errorf("failed to install hooks: %w", err)
-	}
-
-	s.logger.Info("installed cops hooks to .claude/settings.json",
-		slog.String("projectPath", projectPath),
-	)
-
-	return nil
 }

@@ -7,8 +7,6 @@ import (
 	"github.com/team-attention/cops/cli/internal/service/tracking/inbound/cli/cobra"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/api"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/api/connectrpc"
-	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/claudesettings"
-	claudesettingsfs "github.com/team-attention/cops/cli/internal/service/tracking/outbound/claudesettings/filesystem"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/config"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/config/filesystem"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/parser"
@@ -45,18 +43,7 @@ func newTrackingModule(c *dig.Container) error {
 		return err
 	}
 
-	// Claude settings adapter
-	// Algorithm:
-	//   1. Provide NewFilesystemClaudeSettings constructor
-	//   2. Cast to ClaudeSettingsPort interface
-	if err := c.Provide(
-		claudesettingsfs.NewFilesystemClaudeSettings,
-		dig.As(new(claudesettings.ClaudeSettingsPort)),
-	); err != nil {
-		return err
-	}
-
-	// Service (automatically picks up new dependency)
+	// Service
 	if err := c.Provide(tracking.NewService); err != nil {
 		return err
 	}

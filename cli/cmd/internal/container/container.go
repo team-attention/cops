@@ -19,9 +19,6 @@ func Run() error {
 	if err := newDaemonModule(c); err != nil {
 		return err
 	}
-	if err := newHookModule(c); err != nil {
-		return err
-	}
 
 	// Register and execute commands (trigger)
 	return RegisterCobraCommands(c)
