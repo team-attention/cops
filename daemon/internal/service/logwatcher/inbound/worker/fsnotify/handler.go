@@ -112,32 +112,50 @@ func (h *LogFsnotifyHandler) loop() {
 	}
 }
 
+// isValidWatchTarget checks if the directory path belongs to a registered project.
+// Returns the parent project path if valid, empty string otherwise.
+func (h *LogFsnotifyHandler) isValidWatchTarget(path string) string {
+	// Check if path is a hidden directory (starts with '.')
+	base := filepath.Base(path)
+	if len(base) > 0 && base[0] == '.' {
+		return ""
+	}
+
+	// Check if directory belongs to a registered project
+	return h.svc.FindParentProjectPath(path)
+}
+
+// handleDirectoryCreate processes a new directory creation event.
+// Non-registered directories are silently ignored.
+func (h *LogFsnotifyHandler) handleDirectoryCreate(path string) {
+	// Validate if directory is a valid watch target
+	parentPath := h.isValidWatchTarget(path)
+	if parentPath == "" {
+		// Not registered - silently ignore
+		return
+	}
+
+	// Add watch through service layer
+	if err := h.svc.AddWatchForSubdirectory(path, parentPath); err != nil {
+		h.logger.Debug("failed to add watch for new directory",
+			slog.String("path", path),
+			slog.Any("error", err),
+		)
+		return
+	}
+
+	h.logger.Debug("added watch for new directory",
+		slog.String("path", path),
+	)
+	// Also scan and add any nested directories through service
+	h.svc.AddNestedDirectoryWatches(path, parentPath)
+}
+
 func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
-	// Handle new directory creation - delegate to service layer
+	// Handle new directory creation
 	if event.Has(fsnotify.Create) {
 		if info, err := os.Stat(event.Name); err == nil && info.IsDir() {
-			// Skip hidden directories
-			if len(filepath.Base(event.Name)) > 0 && filepath.Base(event.Name)[0] == '.' {
-				return
-			}
-
-			// Find parent project through service
-			parentPath := h.svc.FindParentProjectPath(event.Name)
-			if parentPath != "" {
-				// Add watch through service layer (NOT direct watcher access)
-				if err := h.svc.AddWatchForSubdirectory(event.Name, parentPath); err != nil {
-					h.logger.Warn("failed to add watch for new directory",
-						slog.String("path", event.Name),
-						slog.Any("error", err),
-					)
-				} else {
-					h.logger.Debug("added watch for new directory",
-						slog.String("path", event.Name),
-					)
-					// Also scan and add any nested directories through service
-					h.svc.AddNestedDirectoryWatches(event.Name, parentPath)
-				}
-			}
+			h.handleDirectoryCreate(event.Name)
 			return
 		}
 	}
