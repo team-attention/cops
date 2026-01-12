@@ -25,14 +25,14 @@ func NewJSONLParser(l *slog.Logger) *JSONLParser {
 }
 
 // ParseSessionFiles parses all JSONL files in a project's Claude directory.
-func (p *JSONLParser) ParseSessionFiles(claudeProjectDir string) ([]*domain.Record, error) {
-	var records []*domain.Record
+func (p *JSONLParser) ParseSessionFiles(claudeProjectDir string) ([]*domain.Transcript, error) {
+	var transcripts []*domain.Transcript
 
 	// Check if directory exists
 	if _, err := os.Stat(claudeProjectDir); os.IsNotExist(err) {
 		p.logger.Debug("claude project directory does not exist",
 			slog.String("path", claudeProjectDir))
-		return records, nil
+		return transcripts, nil
 	}
 
 	files, err := filepath.Glob(filepath.Join(claudeProjectDir, "*.jsonl"))
@@ -45,27 +45,27 @@ func (p *JSONLParser) ParseSessionFiles(claudeProjectDir string) ([]*domain.Reco
 		slog.String("path", claudeProjectDir))
 
 	for _, file := range files {
-		fileRecords, err := p.parseFile(file)
+		fileTranscripts, err := p.parseFile(file)
 		if err != nil {
 			p.logger.Warn("failed to parse file",
 				slog.String("file", file),
 				slog.Any("error", err))
 			continue
 		}
-		records = append(records, fileRecords...)
+		transcripts = append(transcripts, fileTranscripts...)
 	}
 
-	return records, nil
+	return transcripts, nil
 }
 
-func (p *JSONLParser) parseFile(filePath string) ([]*domain.Record, error) {
+func (p *JSONLParser) parseFile(filePath string) ([]*domain.Transcript, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var records []*domain.Record
+	var transcripts []*domain.Transcript
 	scanner := bufio.NewScanner(file)
 	// Increase buffer for large lines (Claude messages can be very long)
 	scanner.Buffer(make([]byte, 1024*1024), 10*1024*1024)
@@ -78,8 +78,8 @@ func (p *JSONLParser) parseFile(filePath string) ([]*domain.Record, error) {
 			continue
 		}
 
-		var record domain.Record
-		if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+		var transcript domain.Transcript
+		if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 			p.logger.Debug("skipping malformed line",
 				slog.String("file", filePath),
 				slog.Int("line", lineNum),
@@ -87,16 +87,16 @@ func (p *JSONLParser) parseFile(filePath string) ([]*domain.Record, error) {
 			continue
 		}
 
-		// Parse ALL record types (user, assistant, file-history-snapshot)
-		// The Record.UnmarshalJSON handles type dispatch automatically
-		records = append(records, &record)
+		// Parse ALL transcript types (user, assistant, system, summary, file-history-snapshot)
+		// The Transcript.UnmarshalJSON handles type dispatch automatically
+		transcripts = append(transcripts, &transcript)
 	}
 
 	if err := scanner.Err(); err != nil {
-		return records, err
+		return transcripts, err
 	}
 
-	return records, nil
+	return transcripts, nil
 }
 
 // Compile-time interface verification
