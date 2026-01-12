@@ -126,9 +126,22 @@ func (h *LogFsnotifyHandler) isValidWatchTarget(path string) string {
 }
 
 // handleDirectoryCreate processes a new directory creation event.
-// Non-registered directories are silently ignored.
+// Handles two cases:
+// 1. New directories under ~/.claude/projects/ - always watch for log files
+// 2. New directories under registered project paths - add as subdirectory watch
 func (h *LogFsnotifyHandler) handleDirectoryCreate(path string) {
-	// Validate if directory is a valid watch target
+	// Case 1: Check if this is a new directory under ~/.claude/projects/
+	if h.svc.IsClaudeProjectsDir(path) {
+		if err := h.svc.AddWatchForClaudeSubdir(path); err != nil {
+			h.logger.Debug("failed to add watch for claude projects subdirectory",
+				slog.String("path", path),
+				slog.Any("error", err),
+			)
+		}
+		return
+	}
+
+	// Case 2: Validate if directory is a valid watch target (under registered project)
 	parentPath := h.isValidWatchTarget(path)
 	if parentPath == "" {
 		// Not registered - silently ignore

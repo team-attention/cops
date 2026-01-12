@@ -61,12 +61,10 @@ func registerConnectRPCServer(params connectRPCServerParams) {
 	authInterceptor := interceptor.NewAuthInterceptor(logger, jwtCfg, params.APIKeyService)
 
 	// Create API key interceptor for API key authentication
-	// Apply to SendEvents endpoint
+	// Apply to Event service endpoints that require API key auth
 	apiKeyTargetProcedures := []string{
 		eventv1connect.EventServiceSendEventsProcedure,
-		// 1. Add SendEvents procedure to API key interceptor target list
-		// 2. This ensures API key validation is applied before SendEvents handler
-		// 3. Procedure value is "/event.v1.EventService/SendEvents"
+		eventv1connect.EventServiceSendLogsProcedure,
 	}
 	apiKeyInterceptor := interceptor.NewAPIKeyInterceptor(logger, params.APIKeyService, apiKeyTargetProcedures)
 

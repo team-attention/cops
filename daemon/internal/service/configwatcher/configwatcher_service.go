@@ -9,7 +9,6 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
-	"github.com/team-attention/cops/daemon/internal/platform/util/dirutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/gitutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/configwatcher/outbound/localconfig"
@@ -138,33 +137,9 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 			ParentProjectPath: "",
 		})
 
-		// Add subdirectories (excluding those that are main projects)
-		subDirs, err := dirutil.WalkDirectories(project.Path)
-		if err != nil {
-			s.logger.Warn("failed to walk subdirectories",
-				slog.String("path", project.Path),
-				slog.Any("error", err),
-			)
-		} else {
-			for _, subDir := range subDirs {
-				if subDir == project.Path {
-					continue // Skip root itself
-				}
-				// Skip if this subdirectory is a registered main project
-				if mainProjectPaths[subDir] {
-					continue
-				}
-
-				targets = append(targets, domain.WatchTarget{
-					ProjectPath:       subDir,
-					ClaudeDir:         pathutil.GetClaudeProjectDir(subDir),
-					Type:              domain.WatchTargetSubdirectory,
-					ProjectID:         localCfg.ProjectID,
-					OrganizationID:    localCfg.OrganizationID,
-					ParentProjectPath: project.Path,
-				})
-			}
-		}
+		// Note: Subdirectories are no longer pre-walked here.
+		// The log watcher watches ~/.claude/projects/ and its subdirectories directly,
+		// then matches log file paths to registered projects using prefix matching.
 
 		// Add worktrees if git project
 		if project.IsGitProject {
@@ -206,29 +181,6 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 					OrganizationID:    worktreeCfg.OrganizationID,
 					ParentProjectPath: project.Path,
 				})
-
-				// Add worktree subdirectories
-				wtSubDirs, err := dirutil.WalkDirectories(wt)
-				if err != nil {
-					continue
-				}
-				for _, subDir := range wtSubDirs {
-					if subDir == wt {
-						continue
-					}
-					if mainProjectPaths[subDir] {
-						continue
-					}
-
-					targets = append(targets, domain.WatchTarget{
-						ProjectPath:       subDir,
-						ClaudeDir:         pathutil.GetClaudeProjectDir(subDir),
-						Type:              domain.WatchTargetSubdirectory,
-						ProjectID:         worktreeCfg.ProjectID,
-						OrganizationID:    worktreeCfg.OrganizationID,
-						ParentProjectPath: wt,
-					})
-				}
 			}
 		}
 	}

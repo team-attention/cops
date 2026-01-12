@@ -12,8 +12,7 @@ services:
   api:
     build:
       context: ../..
-      dockerfile: api/.meta/Dockerfile
-      target: development
+      dockerfile: api/.meta/local.Dockerfile
     ports:
       - "8080:8080"
     env_file:

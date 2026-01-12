@@ -126,6 +126,25 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 		}
 	}
 
+	// Add ~/.claude/projects/ base directory and all its subdirectories to watch list
+	claudeProjectsBase := pathutil.GetClaudeProjectsBaseDir()
+	if claudeProjectsBase != "" {
+		newDirs[claudeProjectsBase] = true
+
+		// Also watch all existing subdirectories under ~/.claude/projects/
+		subdirs, err := dirutil.WalkDirectories(claudeProjectsBase)
+		if err != nil {
+			s.logger.Debug("failed to walk claude projects directory",
+				slog.String("path", claudeProjectsBase),
+				slog.Any("error", err),
+			)
+		} else {
+			for _, subdir := range subdirs {
+				newDirs[subdir] = true
+			}
+		}
+	}
+
 	// Remove watches for directories no longer in targets
 	for dir := range s.watchedDirs {
 		if !newDirs[dir] {
@@ -211,12 +230,75 @@ func (s *Service) HandleFileChange(path string, fromOffset int64) ([]string, int
 }
 
 // AddLinesForClaudeDir adds raw JSONL lines to the buffer, associating them with the given ClaudeDir.
+// Uses priority-based matching to find the correct project when exact match is not found.
 func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	projectID := s.claudeDirToProject[claudeDir]
+	// Try exact match first
+	projectID, ok := s.claudeDirToProject[claudeDir]
+	if !ok {
+		// No exact match, use prefix matching (unlocked version to avoid deadlock)
+		projectID = s.getProjectIDForClaudeDirUnlocked(claudeDir)
+	}
+
+	if projectID == "" {
+		s.logger.Debug("no project found for claude dir, skipping lines",
+			slog.String("claudeDir", claudeDir),
+			slog.Int("lineCount", len(lines)),
+		)
+		return
+	}
+
 	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], lines...)
+}
+
+// getProjectIDForClaudeDirUnlocked is the unlocked version of GetProjectIDForClaudeDir.
+// Caller must hold s.mu lock.
+func (s *Service) getProjectIDForClaudeDirUnlocked(claudeDir string) shareddomain.ID {
+	// Decode claudeDir to original path
+	decodedPath := pathutil.DecodeClaudeProjectDir(claudeDir)
+	if decodedPath == "" {
+		return ""
+	}
+
+	// Find best match based on priority and path length
+	var bestMatch *projectMapping
+	var bestMatchPath string
+
+	for projectPath, mapping := range s.projectMappings {
+		if projectPath == decodedPath {
+			return mapping.ProjectID
+		}
+
+		if strings.HasPrefix(decodedPath, projectPath+"/") {
+			if bestMatch == nil {
+				m := mapping // Create a copy to avoid aliasing
+				bestMatch = &m
+				bestMatchPath = projectPath
+				continue
+			}
+
+			// Compare priority (lower is better)
+			if mapping.Priority < bestMatch.Priority {
+				m := mapping
+				bestMatch = &m
+				bestMatchPath = projectPath
+			} else if mapping.Priority == bestMatch.Priority {
+				// Same priority: prefer longer path (more specific match)
+				if len(projectPath) > len(bestMatchPath) {
+					m := mapping
+					bestMatch = &m
+					bestMatchPath = projectPath
+				}
+			}
+		}
+	}
+
+	if bestMatch != nil {
+		return bestMatch.ProjectID
+	}
+	return ""
 }
 
 // Flush sends buffered lines to the API server using adaptive batching.
@@ -612,4 +694,36 @@ func (s *Service) AddNestedDirectoryWatches(root string, parentProjectPath strin
 			)
 		}
 	}
+}
+
+// AddWatchForClaudeSubdir adds a watch for a new subdirectory under ~/.claude/projects/.
+// This is called by the inbound handler when a new directory is created under claude projects base.
+// No project mapping is added - prefix matching in AddLinesForClaudeDir handles project association.
+func (s *Service) AddWatchForClaudeSubdir(path string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.watchedDirs[path] {
+		return nil // Already watching
+	}
+
+	if err := s.fileWatcher.Add(path); err != nil {
+		return err
+	}
+	s.watchedDirs[path] = true
+
+	s.logger.Debug("added watch for claude projects subdirectory",
+		slog.String("path", path),
+	)
+
+	return nil
+}
+
+// IsClaudeProjectsDir checks if the given path is under ~/.claude/projects/.
+func (s *Service) IsClaudeProjectsDir(path string) bool {
+	baseDir := pathutil.GetClaudeProjectsBaseDir()
+	if baseDir == "" {
+		return false
+	}
+	return strings.HasPrefix(path, baseDir+"/") || path == baseDir
 }
