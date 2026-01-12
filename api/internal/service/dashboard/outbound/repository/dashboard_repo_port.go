@@ -57,13 +57,13 @@ type SessionSummary struct {
 	Usage        TokenUsageSummary
 }
 
-// SessionDetail contains full session information with records.
+// SessionDetail contains full session information with transcripts.
 // Embeds SessionBase for common identification.
 type SessionDetail struct {
 	SessionBase
-	Version string
-	Usage   TokenUsageSummary
-	Records []shareddomain.Record
+	Version     string
+	Usage       TokenUsageSummary
+	Transcripts []shareddomain.Transcript
 }
 
 // OverviewStats contains dashboard overview statistics.

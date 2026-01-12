@@ -477,7 +477,7 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 	return structure.NewPaginatedResult(sessions, params.Page, params.PageSize, totalCount), nil
 }
 
-// GetSession retrieves detailed session information with all records.
+// GetSession retrieves detailed session information with all transcripts.
 // Returns nil, error if session not found or its project does not belong to organization.
 func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationID, sessionID string) (*repository.SessionDetail, error) {
 	// Convert organizationID to ObjectID
@@ -486,15 +486,15 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 		return nil, fmt.Errorf("invalid organization ID: %w", err)
 	}
 
-	// Find all records for this session
+	// Find all transcripts for this session
 	cursor, err := r.sessionRecordsColl.Find(ctx, bson.M{mongoschema.RecordSessionIDField: sessionID}, options.Find().SetSort(bson.M{mongoschema.RecordTimestampField: 1}))
 	if err != nil {
-		r.logger.Error("failed to find session records", slog.String("sessionID", sessionID), slog.Any("error", err))
-		return nil, fmt.Errorf("failed to find session records: %w", err)
+		r.logger.Error("failed to find session transcripts", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to find session transcripts: %w", err)
 	}
 	defer cursor.Close(ctx)
 
-	var records []shareddomain.Record
+	var transcripts []shareddomain.Transcript
 	var detail *repository.SessionDetail
 
 	for cursor.Next(ctx) {
@@ -503,7 +503,7 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 			continue
 		}
 
-		// Initialize detail from first record
+		// Initialize detail from first transcript
 		if detail == nil {
 			projectOID, ok := doc[mongoschema.RecordProjectIDField].(bson.ObjectID)
 			if !ok {
@@ -512,7 +512,7 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 
 			// Verify project belongs to organization
 			projectCount, err := r.projectsColl.CountDocuments(ctx, bson.M{
-				"_id":                              projectOID,
+				"_id":                                  projectOID,
 				mongoschema.ProjectOrganizationIDField: orgOID,
 			})
 			if err != nil {
@@ -534,10 +534,6 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 			}
 		}
 
-		// Reconstruct domain.Record from document
-		// Read "type" field to determine RecordType
-		recordType := shareddomain.RecordType(mongoutil.Get[string](doc, mongoschema.RecordTypeField))
-
 		// Marshal document back to JSON
 		docBytes, err := sonic.Marshal(doc)
 		if err != nil {
@@ -547,48 +543,56 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 			continue
 		}
 
-		// Unmarshal JSON into domain.Record (uses custom UnmarshalJSON)
-		var record shareddomain.Record
-		if err := sonic.Unmarshal(docBytes, &record); err != nil {
-			r.logger.Error("failed to unmarshal record",
+		// Unmarshal JSON into domain.Transcript (uses custom UnmarshalJSON)
+		var transcript shareddomain.Transcript
+		if err := sonic.Unmarshal(docBytes, &transcript); err != nil {
+			r.logger.Error("failed to unmarshal transcript",
 				slog.String("sessionID", sessionID),
-				slog.String("type", string(recordType)),
+				slog.String("type", mongoutil.Get[string](doc, mongoschema.TranscriptTypeField)),
 				slog.Any("error", err))
 			continue
 		}
 
-		records = append(records, record)
+		transcripts = append(transcripts, transcript)
 	}
 
 	if detail == nil {
 		return nil, fmt.Errorf("session not found")
 	}
 
-	detail.Records = records
+	detail.Transcripts = transcripts
 
-	// Calculate aggregated usage and timestamps from records
-	if len(records) > 0 {
-		// Extract timestamps from first and last records
-		if firstUserRec, ok := records[0].Data.(*shareddomain.UserRecord); ok {
-			detail.StartedAt = firstUserRec.Timestamp
-		} else if firstAssistantRec, ok := records[0].Data.(*shareddomain.AssistantRecord); ok {
-			detail.StartedAt = firstAssistantRec.Timestamp
+	// Calculate aggregated usage and timestamps from transcripts
+	if len(transcripts) > 0 {
+		// Extract timestamps from first and last transcripts using type switch
+		switch data := transcripts[0].Data.(type) {
+		case *shareddomain.UserTranscript:
+			detail.StartedAt = data.Timestamp
+		case *shareddomain.AssistantTranscript:
+			detail.StartedAt = data.Timestamp
+		case *shareddomain.SystemTranscript:
+			detail.StartedAt = data.Timestamp
 		}
 
-		if lastUserRec, ok := records[len(records)-1].Data.(*shareddomain.UserRecord); ok {
-			detail.EndedAt = lastUserRec.Timestamp
-		} else if lastAssistantRec, ok := records[len(records)-1].Data.(*shareddomain.AssistantRecord); ok {
-			detail.EndedAt = lastAssistantRec.Timestamp
+		switch data := transcripts[len(transcripts)-1].Data.(type) {
+		case *shareddomain.UserTranscript:
+			detail.EndedAt = data.Timestamp
+		case *shareddomain.AssistantTranscript:
+			detail.EndedAt = data.Timestamp
+		case *shareddomain.SystemTranscript:
+			detail.EndedAt = data.Timestamp
 		}
 
-		// Calculate token usage from assistant records
+		// Calculate token usage from assistant transcripts
 		var inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens int64
-		for _, r := range records {
-			if assistantRec, ok := r.Data.(*shareddomain.AssistantRecord); ok {
-				inputTokens += int64(assistantRec.Message.Usage.InputTokens)
-				outputTokens += int64(assistantRec.Message.Usage.OutputTokens)
-				cacheCreationTokens += int64(assistantRec.Message.Usage.CacheCreationInputTokens)
-				cacheReadTokens += int64(assistantRec.Message.Usage.CacheReadInputTokens)
+		for _, t := range transcripts {
+			if assistantTranscript, ok := t.Data.(*shareddomain.AssistantTranscript); ok {
+				if assistantTranscript.Message.Usage != nil {
+					inputTokens += int64(assistantTranscript.Message.Usage.InputTokens)
+					outputTokens += int64(assistantTranscript.Message.Usage.OutputTokens)
+					cacheCreationTokens += int64(assistantTranscript.Message.Usage.CacheCreationInputTokens)
+					cacheReadTokens += int64(assistantTranscript.Message.Usage.CacheReadInputTokens)
+				}
 			}
 		}
 

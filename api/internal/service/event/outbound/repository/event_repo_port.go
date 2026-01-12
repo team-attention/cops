@@ -6,10 +6,10 @@ import (
 	"github.com/team-attention/cops/shared/domain"
 )
 
-// LogBatch represents a batch of records from a daemon for events collection.
+// LogBatch represents a batch of transcripts from a daemon for events collection.
 type LogBatch struct {
-	// Records contains the parsed Record instances (all types: user, assistant, file-history-snapshot).
-	Records []*domain.Record
+	// Transcripts contains the parsed Transcript instances (all types: user, assistant, system, summary, file-history-snapshot).
+	Transcripts []*domain.Transcript
 	// ProjectID is the project identifier for this batch.
 	ProjectID string
 	// OrganizationID is the organization identifier for RBAC validation.

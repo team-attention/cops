@@ -14,27 +14,27 @@ var _ = Describe("SendLogs JSONL Parsing", func() {
 			It("parses all lines successfully", func() {
 				lines := []string{
 					`{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`,
-					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`,
+					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"input_tokens":10,"output_tokens":20,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"service_tier":"standard"}}}`,
 					`{"type":"file-history-snapshot","messageId":"m1","snapshot":{"messageId":"m1","trackedFileBackups":{}},"isSnapshotUpdate":false}`,
 				}
 
-				var records []shareddomain.Record
+				var transcripts []shareddomain.Transcript
 				var parseErrors []error
 
 				for _, line := range lines {
-					var record shareddomain.Record
-					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+					var transcript shareddomain.Transcript
+					if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 						parseErrors = append(parseErrors, err)
 						continue
 					}
-					records = append(records, record)
+					transcripts = append(transcripts, transcript)
 				}
 
-				Expect(records).To(HaveLen(3))
+				Expect(transcripts).To(HaveLen(3))
 				Expect(parseErrors).To(BeEmpty())
-				Expect(records[0].Type).To(Equal(shareddomain.RecordTypeUser))
-				Expect(records[1].Type).To(Equal(shareddomain.RecordTypeMessage))
-				Expect(records[2].Type).To(Equal(shareddomain.RecordTypeFileHistorySnapshot))
+				Expect(transcripts[0].Type).To(Equal(shareddomain.TranscriptTypeUser))
+				Expect(transcripts[1].Type).To(Equal(shareddomain.TranscriptTypeAssistant))
+				Expect(transcripts[2].Type).To(Equal(shareddomain.TranscriptTypeFileHistorySnapshot))
 			})
 		})
 	})
@@ -45,22 +45,22 @@ var _ = Describe("SendLogs JSONL Parsing", func() {
 				lines := []string{
 					`{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`,
 					`invalid json`,
-					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`,
+					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"input_tokens":10,"output_tokens":20,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"service_tier":"standard"}}}`,
 				}
 
-				var records []shareddomain.Record
+				var transcripts []shareddomain.Transcript
 				var parseErrors []error
 
 				for _, line := range lines {
-					var record shareddomain.Record
-					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+					var transcript shareddomain.Transcript
+					if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 						parseErrors = append(parseErrors, err)
 						continue
 					}
-					records = append(records, record)
+					transcripts = append(transcripts, transcript)
 				}
 
-				Expect(records).To(HaveLen(2))
+				Expect(transcripts).To(HaveLen(2))
 				Expect(parseErrors).To(HaveLen(1))
 			})
 		})
@@ -72,64 +72,90 @@ var _ = Describe("SendLogs JSONL Parsing", func() {
 				lines := []string{
 					`{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`,
 					``,
-					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`,
+					`{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"input_tokens":10,"output_tokens":20,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"service_tier":"standard"}}}`,
 				}
 
-				var records []shareddomain.Record
+				var transcripts []shareddomain.Transcript
 
 				for _, line := range lines {
 					if line == "" {
 						continue
 					}
-					var record shareddomain.Record
-					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+					var transcript shareddomain.Transcript
+					if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 						continue
 					}
-					records = append(records, record)
+					transcripts = append(transcripts, transcript)
 				}
 
-				Expect(records).To(HaveLen(2))
+				Expect(transcripts).To(HaveLen(2))
 			})
 		})
 	})
 
-	Describe("parsing all record types", func() {
-		Context("when parsing user record", func() {
-			It("returns Record with UserRecord data", func() {
+	Describe("parsing all transcript types", func() {
+		Context("when parsing user transcript", func() {
+			It("returns Transcript with UserTranscript data", func() {
 				userLine := `{"type":"user","sessionId":"s1","uuid":"1","timestamp":"2024-01-01T00:00:00Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","message":{"role":"user","content":"test"},"isMeta":false}`
 
-				var record shareddomain.Record
-				err := sonic.Unmarshal([]byte(userLine), &record)
+				var transcript shareddomain.Transcript
+				err := sonic.Unmarshal([]byte(userLine), &transcript)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(record.Type).To(Equal(shareddomain.RecordTypeUser))
-				Expect(record.Data).To(BeAssignableToTypeOf(&shareddomain.UserRecord{}))
+				Expect(transcript.Type).To(Equal(shareddomain.TranscriptTypeUser))
+				Expect(transcript.Data).To(BeAssignableToTypeOf(&shareddomain.UserTranscript{}))
 			})
 		})
 
-		Context("when parsing assistant record", func() {
-			It("returns Record with AssistantRecord data", func() {
-				assistantLine := `{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"inputTokens":10,"outputTokens":20,"cacheCreationInputTokens":0,"cacheReadInputTokens":0,"serviceTier":"standard"}}}`
+		Context("when parsing assistant transcript", func() {
+			It("returns Transcript with AssistantTranscript data", func() {
+				assistantLine := `{"type":"assistant","sessionId":"s1","uuid":"2","timestamp":"2024-01-01T00:00:01Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","requestId":"r1","message":{"model":"claude","id":"m1","type":"message","role":"assistant","content":[],"usage":{"input_tokens":10,"output_tokens":20,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"service_tier":"standard"}}}`
 
-				var record shareddomain.Record
-				err := sonic.Unmarshal([]byte(assistantLine), &record)
+				var transcript shareddomain.Transcript
+				err := sonic.Unmarshal([]byte(assistantLine), &transcript)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(record.Type).To(Equal(shareddomain.RecordTypeMessage))
-				Expect(record.Data).To(BeAssignableToTypeOf(&shareddomain.AssistantRecord{}))
+				Expect(transcript.Type).To(Equal(shareddomain.TranscriptTypeAssistant))
+				Expect(transcript.Data).To(BeAssignableToTypeOf(&shareddomain.AssistantTranscript{}))
 			})
 		})
 
-		Context("when parsing file-history-snapshot record", func() {
-			It("returns Record with FileHistorySnapshotRecord data", func() {
+		Context("when parsing file-history-snapshot transcript", func() {
+			It("returns Transcript with FileHistorySnapshotTranscript data", func() {
 				snapshotLine := `{"type":"file-history-snapshot","messageId":"m1","snapshot":{"messageId":"m1","trackedFileBackups":{}},"isSnapshotUpdate":false}`
 
-				var record shareddomain.Record
-				err := sonic.Unmarshal([]byte(snapshotLine), &record)
+				var transcript shareddomain.Transcript
+				err := sonic.Unmarshal([]byte(snapshotLine), &transcript)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(record.Type).To(Equal(shareddomain.RecordTypeFileHistorySnapshot))
-				Expect(record.Data).To(BeAssignableToTypeOf(&shareddomain.FileHistorySnapshotRecord{}))
+				Expect(transcript.Type).To(Equal(shareddomain.TranscriptTypeFileHistorySnapshot))
+				Expect(transcript.Data).To(BeAssignableToTypeOf(&shareddomain.FileHistorySnapshotTranscript{}))
+			})
+		})
+
+		Context("when parsing system transcript", func() {
+			It("returns Transcript with SystemTranscript data", func() {
+				systemLine := `{"type":"system","sessionId":"s1","uuid":"3","timestamp":"2024-01-01T00:00:02Z","isSidechain":false,"userType":"external","version":"1.0","gitBranch":"main","subtype":"turn_duration","durationMs":1234,"isMeta":true}`
+
+				var transcript shareddomain.Transcript
+				err := sonic.Unmarshal([]byte(systemLine), &transcript)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(transcript.Type).To(Equal(shareddomain.TranscriptTypeSystem))
+				Expect(transcript.Data).To(BeAssignableToTypeOf(&shareddomain.SystemTranscript{}))
+			})
+		})
+
+		Context("when parsing summary transcript", func() {
+			It("returns Transcript with SummaryTranscript data", func() {
+				summaryLine := `{"type":"summary","summary":"This is a conversation summary","leafUuid":"leaf-uuid-123"}`
+
+				var transcript shareddomain.Transcript
+				err := sonic.Unmarshal([]byte(summaryLine), &transcript)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(transcript.Type).To(Equal(shareddomain.TranscriptTypeSummary))
+				Expect(transcript.Data).To(BeAssignableToTypeOf(&shareddomain.SummaryTranscript{}))
 			})
 		})
 	})

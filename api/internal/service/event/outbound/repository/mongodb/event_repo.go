@@ -98,10 +98,10 @@ func (r *MongoEventRepository) SaveEvents(ctx context.Context, userID string, ev
 	return nil
 }
 
-// SaveLogBatch saves a batch of JSONL records to events collection.
+// SaveLogBatch saves a batch of JSONL transcripts to events collection.
 // Validates project belongs to organization before saving.
 func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *repository.LogBatch) error {
-	if len(batch.Records) == 0 {
+	if len(batch.Transcripts) == 0 {
 		return nil
 	}
 
@@ -137,23 +137,23 @@ func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *reposito
 	}
 
 	// Prepare documents for insertion
-	docs := make([]interface{}, len(batch.Records))
-	for i, record := range batch.Records {
-		docs[i] = recordToDocument(record, projectObjID)
+	docs := make([]interface{}, len(batch.Transcripts))
+	for i, transcript := range batch.Transcripts {
+		docs[i] = transcriptToDocument(transcript, projectObjID)
 	}
 
 	result, err := r.eventsColl.InsertMany(ctx, docs)
 	if err != nil {
-		r.logger.Error("failed to insert log records",
+		r.logger.Error("failed to insert log transcripts",
 			slog.String("projectId", batch.ProjectID),
 			slog.String("organizationId", batch.OrganizationID),
-			slog.Int("count", len(batch.Records)),
+			slog.Int("count", len(batch.Transcripts)),
 			slog.Any("error", err),
 		)
-		return fmt.Errorf("failed to insert log records: %w", err)
+		return fmt.Errorf("failed to insert log transcripts: %w", err)
 	}
 
-	r.logger.Debug("inserted log records to events collection",
+	r.logger.Debug("inserted log transcripts to events collection",
 		slog.String("projectId", batch.ProjectID),
 		slog.String("organizationId", batch.OrganizationID),
 		slog.Int("count", len(result.InsertedIDs)),
@@ -162,19 +162,19 @@ func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *reposito
 	return nil
 }
 
-// recordToDocument converts a Record to a BSON document.
-func recordToDocument(record *domain.Record, projectObjID bson.ObjectID) bson.M {
-	// Marshal record to JSON using record.MarshalJSON() (produces flat JSON)
-	jsonBytes, err := record.MarshalJSON()
+// transcriptToDocument converts a Transcript to a BSON document.
+func transcriptToDocument(transcript *domain.Transcript, projectObjID bson.ObjectID) bson.M {
+	// Marshal transcript to JSON using transcript.MarshalJSON() (produces flat JSON)
+	jsonBytes, err := transcript.MarshalJSON()
 	if err != nil {
 		// Log error and return minimal document
-		slog.Error("failed to marshal record to JSON",
-			slog.String("type", string(record.Type)),
+		slog.Error("failed to marshal transcript to JSON",
+			slog.String("type", string(transcript.Type)),
 			slog.Any("error", err),
 		)
 		return bson.M{
-			mongoschema.RecordProjectIDField: projectObjID,
-			mongoschema.RecordTypeField:      string(record.Type),
+			mongoschema.RecordProjectIDField:    projectObjID,
+			mongoschema.TranscriptTypeField:     string(transcript.Type),
 		}
 	}
 
@@ -183,12 +183,12 @@ func recordToDocument(record *domain.Record, projectObjID bson.ObjectID) bson.M 
 	if err := sonic.Unmarshal(jsonBytes, &doc); err != nil {
 		// Log error and return minimal document
 		slog.Error("failed to unmarshal JSON to bson.M",
-			slog.String("type", string(record.Type)),
+			slog.String("type", string(transcript.Type)),
 			slog.Any("error", err),
 		)
 		return bson.M{
-			mongoschema.RecordProjectIDField: projectObjID,
-			mongoschema.RecordTypeField:      string(record.Type),
+			mongoschema.RecordProjectIDField:    projectObjID,
+			mongoschema.TranscriptTypeField:     string(transcript.Type),
 		}
 	}
 
