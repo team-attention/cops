@@ -5,7 +5,7 @@ import (
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
 	dashboardv1 "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1"
-	recordv1 "github.com/team-attention/cops/shared/gen/grpcstub/record/v1"
+	transcriptv1 "github.com/team-attention/cops/shared/gen/grpcstub/transcript/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -59,124 +59,114 @@ func toProtoSessionSummary(s repository.SessionSummary) *dashboardv1.SessionSumm
 
 // toProtoSessionDetail converts repository session detail to protobuf.
 func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetail {
-	records := toProtoTranscripts(s.Transcripts)
+	transcripts := toProtoTranscripts(s.Transcripts)
 
 	return &dashboardv1.SessionDetail{
-		Id:        s.SessionBase.ID,
-		ProjectId: s.SessionBase.ProjectID,
-		GitBranch: s.SessionBase.GitBranch,
-		Version:   s.Version,
-		Usage:     toProtoTokenUsageSummary(s.Usage),
-		StartedAt: timestamppb.New(s.SessionBase.StartedAt),
-		EndedAt:   timestamppb.New(s.SessionBase.EndedAt),
-		Records:   records,
+		Id:          s.SessionBase.ID,
+		ProjectId:   s.SessionBase.ProjectID,
+		GitBranch:   s.SessionBase.GitBranch,
+		Version:     s.Version,
+		Usage:       toProtoTokenUsageSummary(s.Usage),
+		StartedAt:   timestamppb.New(s.SessionBase.StartedAt),
+		EndedAt:     timestamppb.New(s.SessionBase.EndedAt),
+		Transcripts: transcripts,
 	}
 }
 
-// toProtoTranscripts converts domain Transcripts to protobuf Records.
-func toProtoTranscripts(transcripts []shareddomain.Transcript) []*recordv1.Record {
-	result := make([]*recordv1.Record, 0, len(transcripts))
+// toProtoTranscripts converts domain Transcripts to protobuf Transcripts.
+func toProtoTranscripts(transcripts []shareddomain.Transcript) []*transcriptv1.Transcript {
+	result := make([]*transcriptv1.Transcript, 0, len(transcripts))
 	for _, transcript := range transcripts {
-		protoRec := toProtoTranscript(transcript)
-		if protoRec != nil {
-			result = append(result, protoRec)
+		protoTranscript := toProtoTranscript(transcript)
+		if protoTranscript != nil {
+			result = append(result, protoTranscript)
 		}
 	}
 	return result
 }
 
-// toProtoTranscript converts a single domain Transcript to protobuf Record.
-func toProtoTranscript(t shareddomain.Transcript) *recordv1.Record {
-	proto := &recordv1.Record{}
+// toProtoTranscript converts a single domain Transcript to protobuf Transcript.
+func toProtoTranscript(t shareddomain.Transcript) *transcriptv1.Transcript {
+	proto := &transcriptv1.Transcript{}
 
 	// Set Type based on t.Type using type switch on Data
 	switch data := t.Data.(type) {
 	case *shareddomain.UserTranscript:
-		proto.Type = recordv1.RecordType_RECORD_TYPE_USER
-		proto.Data = &recordv1.Record_UserData{
+		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_USER
+		proto.Data = &transcriptv1.Transcript_UserData{
 			UserData: toProtoUserTranscriptData(data),
 		}
 	case *shareddomain.AssistantTranscript:
-		proto.Type = recordv1.RecordType_RECORD_TYPE_ASSISTANT
-		proto.Data = &recordv1.Record_AssistantData{
+		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_ASSISTANT
+		proto.Data = &transcriptv1.Transcript_AssistantData{
 			AssistantData: toProtoAssistantTranscriptData(data),
 		}
 	case *shareddomain.FileHistorySnapshotTranscript:
-		proto.Type = recordv1.RecordType_RECORD_TYPE_FILE_HISTORY_SNAPSHOT
-		proto.Data = &recordv1.Record_FileHistorySnapshotData{
+		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_FILE_HISTORY_SNAPSHOT
+		proto.Data = &transcriptv1.Transcript_FileHistorySnapshotData{
 			FileHistorySnapshotData: toProtoFileHistorySnapshotTranscriptData(data),
 		}
 	case *shareddomain.SystemTranscript:
-		// Map to UNSPECIFIED - proto doesn't support system type yet
-		proto.Type = recordv1.RecordType_RECORD_TYPE_UNSPECIFIED
+		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_SYSTEM
+		proto.Data = &transcriptv1.Transcript_SystemData{
+			SystemData: toProtoSystemTranscriptData(data),
+		}
 	case *shareddomain.SummaryTranscript:
-		// Map to UNSPECIFIED - proto doesn't support summary type yet
-		proto.Type = recordv1.RecordType_RECORD_TYPE_UNSPECIFIED
+		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_SUMMARY
+		proto.Data = &transcriptv1.Transcript_SummaryData{
+			SummaryData: toProtoSummaryTranscriptData(data),
+		}
 	default:
-		proto.Type = recordv1.RecordType_RECORD_TYPE_UNSPECIFIED
+		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_UNSPECIFIED
 	}
 
 	return proto
 }
 
-// toProtoUserTranscriptData converts UserTranscript to proto UserRecordData.
-func toProtoUserTranscriptData(u *shareddomain.UserTranscript) *recordv1.UserRecordData {
-	// 1. Create base UserRecordData with metadata and other fields.
-	data := &recordv1.UserRecordData{
-		Metadata: &recordv1.MessageMetadata{
-			ParentUuid:  "",
-			IsSidechain: u.IsSidechain,
-			UserType:    u.UserType,
-			SessionId:   u.SessionID,
-			Version:     u.Version,
-			GitBranch:   u.GitBranch,
-			Uuid:        u.UUID,
-			Timestamp:   timestamppb.New(u.Timestamp),
-		},
-		Message: &recordv1.UserMessage{
+// toProtoUserTranscriptData converts UserTranscript to proto UserTranscriptData.
+func toProtoUserTranscriptData(u *shareddomain.UserTranscript) *transcriptv1.UserTranscriptData {
+	// 1. Create base UserTranscriptData with metadata and other fields.
+	data := &transcriptv1.UserTranscriptData{
+		Metadata: toProtoTreeNodeMeta(u.TreeNodeMeta),
+		Message: &transcriptv1.UserMessage{
 			Role: u.Message.Role,
 		},
 		IsMeta: u.IsMeta,
 	}
 
-	// 2. Set ParentUuid if present.
-	if u.ParentUUID != nil {
-		data.Metadata.ParentUuid = *u.ParentUUID
-	}
-
-	// 3. Convert Content based on its type (string or []*UserMessageBlock).
+	// 2. Convert Content based on its type (string or []*UserMessageBlock).
 	if u.Message.Content != nil {
 		switch content := u.Message.Content.(type) {
 		case string:
 			// a. If string: Set Message.Content to UserMessage_Text.
-			data.Message.Content = &recordv1.UserMessage_Text{
+			data.Message.Content = &transcriptv1.UserMessage_Text{
 				Text: content,
 			}
 		case []*shareddomain.UserMessageBlock:
 			// b. If []*UserMessageBlock: Convert to protobuf blocks.
-			protoBlocks := make([]*recordv1.UserMessageBlockContent, len(content))
+			protoBlocks := make([]*transcriptv1.UserMessageBlock, len(content))
 			for i, block := range content {
 				protoBlocks[i] = toProtoUserMessageBlock(block)
 			}
 			// Set Message.Content to UserMessage_Blocks.
-			data.Message.Content = &recordv1.UserMessage_Blocks{
-				Blocks: &recordv1.UserMessageBlockContentList{
+			data.Message.Content = &transcriptv1.UserMessage_Blocks{
+				Blocks: &transcriptv1.UserMessageBlockList{
 					Blocks: protoBlocks,
 				},
 			}
 		}
 	}
 
-	// 4. Convert ThinkingMetadata if present.
+	// 3. Convert ThinkingMetadata if present.
 	if u.ThinkingMetadata != nil {
-		data.ThinkingMetadata = &recordv1.UserRecordThinkingMetadata{
+		data.ThinkingMetadata = &transcriptv1.ThinkingMetadata{
 			Level:    u.ThinkingMetadata.Level,
 			Disabled: u.ThinkingMetadata.Disabled,
 		}
 		if len(u.ThinkingMetadata.Triggers) > 0 {
-			data.ThinkingMetadata.Triggers = make([]*recordv1.UserRecordThinkingMetadataTrigger, len(u.ThinkingMetadata.Triggers))
+			data.ThinkingMetadata.Triggers = make([]*transcriptv1.ThinkingTrigger, len(u.ThinkingMetadata.Triggers))
 			for i, trigger := range u.ThinkingMetadata.Triggers {
-				data.ThinkingMetadata.Triggers[i] = &recordv1.UserRecordThinkingMetadataTrigger{
+				data.ThinkingMetadata.Triggers[i] = &transcriptv1.ThinkingTrigger{
 					Start: int32(trigger.Start),
 					End:   int32(trigger.End),
 					Text:  trigger.Text,
@@ -185,11 +175,11 @@ func toProtoUserTranscriptData(u *shareddomain.UserTranscript) *recordv1.UserRec
 		}
 	}
 
-	// 5. Convert Todos if present.
+	// 4. Convert Todos if present.
 	if len(u.Todos) > 0 {
-		data.Todos = make([]*recordv1.UserRecordTodo, len(u.Todos))
+		data.Todos = make([]*transcriptv1.Todo, len(u.Todos))
 		for i, todo := range u.Todos {
-			data.Todos[i] = &recordv1.UserRecordTodo{
+			data.Todos[i] = &transcriptv1.Todo{
 				Content:    todo.Content,
 				Status:     todo.Status,
 				ActiveForm: todo.ActiveForm,
@@ -197,14 +187,32 @@ func toProtoUserTranscriptData(u *shareddomain.UserTranscript) *recordv1.UserRec
 		}
 	}
 
-	// 6. Return the fully constructed data.
+	// 5. Convert ToolUseResult if present.
+	if u.ToolUseResult != nil {
+		data.ToolUseResult = &transcriptv1.ToolUseResult{
+			Success: u.ToolUseResult.Success,
+		}
+		if u.ToolUseResult.CommandName != nil {
+			data.ToolUseResult.CommandName = *u.ToolUseResult.CommandName
+		}
+		if u.ToolUseResult.Model != nil {
+			data.ToolUseResult.Model = *u.ToolUseResult.Model
+		}
+	}
+
+	// 6. Set SourceToolAssistantUuid if present.
+	if u.SourceToolAssistantUUID != nil {
+		data.SourceToolAssistantUuid = *u.SourceToolAssistantUUID
+	}
+
+	// 7. Return the fully constructed data.
 	return data
 }
 
 // toProtoUserMessageBlock converts a single domain UserMessageBlock to protobuf.
-func toProtoUserMessageBlock(block *shareddomain.UserMessageBlock) *recordv1.UserMessageBlockContent {
+func toProtoUserMessageBlock(block *shareddomain.UserMessageBlock) *transcriptv1.UserMessageBlock {
 	// 1. Create base protobuf block with type field.
-	protoBlock := &recordv1.UserMessageBlockContent{
+	protoBlock := &transcriptv1.UserMessageBlock{
 		Type: block.Type,
 	}
 
@@ -215,7 +223,7 @@ func toProtoUserMessageBlock(block *shareddomain.UserMessageBlock) *recordv1.Use
 
 	// 3. If Source is set (image block), convert to proto.
 	if block.Source != nil {
-		protoBlock.Source = &recordv1.UserMessageBlockContentSource{
+		protoBlock.Source = &transcriptv1.ImageSource{
 			Type:      block.Source.Type,
 			MediaType: block.Source.MediaType,
 			Data:      block.Source.Data,
@@ -237,7 +245,7 @@ func toProtoUserMessageBlock(block *shareddomain.UserMessageBlock) *recordv1.Use
 				}
 			}
 		}
-		protoBlock.ToolResult = &recordv1.UserMessageBlockContentToolResult{
+		protoBlock.ToolResult = &transcriptv1.ToolResultContent{
 			ToolUseId: *block.ToolUseID,
 			Content:   contentStr,
 		}
@@ -247,21 +255,12 @@ func toProtoUserMessageBlock(block *shareddomain.UserMessageBlock) *recordv1.Use
 	return protoBlock
 }
 
-// toProtoAssistantTranscriptData converts AssistantTranscript to proto AssistantRecordData.
-func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *recordv1.AssistantRecordData {
-	data := &recordv1.AssistantRecordData{
-		Metadata: &recordv1.MessageMetadata{
-			ParentUuid:  "",
-			IsSidechain: a.IsSidechain,
-			UserType:    a.UserType,
-			SessionId:   a.SessionID,
-			Version:     a.Version,
-			GitBranch:   a.GitBranch,
-			Uuid:        a.UUID,
-			Timestamp:   timestamppb.New(a.Timestamp),
-		},
+// toProtoAssistantTranscriptData converts AssistantTranscript to proto AssistantTranscriptData.
+func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *transcriptv1.AssistantTranscriptData {
+	data := &transcriptv1.AssistantTranscriptData{
+		Metadata:  toProtoTreeNodeMeta(a.TreeNodeMeta),
 		RequestId: a.RequestID,
-		Message: &recordv1.AssistantMessage{
+		Message: &transcriptv1.AssistantMessage{
 			Model: a.Message.Model,
 			Id:    a.Message.ID,
 			Type:  a.Message.Type,
@@ -271,17 +270,20 @@ func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *record
 
 	// Set usage if present
 	if a.Message.Usage != nil {
-		data.Message.Usage = &recordv1.AssistantMessageUsage{
+		data.Message.Usage = &transcriptv1.AssistantUsage{
 			InputTokens:              int32(a.Message.Usage.InputTokens),
 			OutputTokens:             int32(a.Message.Usage.OutputTokens),
 			CacheCreationInputTokens: int32(a.Message.Usage.CacheCreationInputTokens),
 			CacheReadInputTokens:     int32(a.Message.Usage.CacheReadInputTokens),
 			ServiceTier:              a.Message.Usage.ServiceTier,
 		}
-	}
-
-	if a.ParentUUID != nil {
-		data.Metadata.ParentUuid = *a.ParentUUID
+		// Set cache creation if present
+		if a.Message.Usage.CacheCreation != nil {
+			data.Message.Usage.CacheCreation = &transcriptv1.CacheCreation{
+				Ephemeral_5MInputTokens: int32(a.Message.Usage.CacheCreation.Ephemeral5mInputTokens),
+				Ephemeral_1HInputTokens: int32(a.Message.Usage.CacheCreation.Ephemeral1hInputTokens),
+			}
+		}
 	}
 
 	if a.Message.StopReason != nil {
@@ -289,14 +291,14 @@ func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *record
 	}
 
 	if a.Message.StopSequence != nil {
-		data.Message.StopSequence = 0 // StopSequence is string in Transcript, int32 in proto
+		data.Message.StopSequence = *a.Message.StopSequence
 	}
 
 	// Convert content blocks
 	if len(a.Message.Content) > 0 {
-		data.Message.Content = make([]*recordv1.AssistantMessageContent, len(a.Message.Content))
+		data.Message.Content = make([]*transcriptv1.AssistantContentBlock, len(a.Message.Content))
 		for i, content := range a.Message.Content {
-			protoContent := &recordv1.AssistantMessageContent{
+			protoContent := &transcriptv1.AssistantContentBlock{
 				Type: content.Type,
 			}
 
@@ -309,16 +311,19 @@ func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *record
 				if content.Thinking != nil {
 					protoContent.Thinking = *content.Thinking
 				}
+				if content.Signature != nil {
+					protoContent.Signature = *content.Signature
+				}
 			case "tool_use":
 				if content.ID != nil {
-					protoContent.ToolUseId = *content.ID
+					protoContent.Id = *content.ID
 				}
 				if content.Name != nil {
-					protoContent.ToolUseName = *content.Name
+					protoContent.Name = *content.Name
 				}
 				if content.Input != nil {
 					if inputBytes, err := sonic.Marshal(content.Input); err == nil {
-						protoContent.ToolUseInputJson = string(inputBytes)
+						protoContent.InputJson = string(inputBytes)
 					}
 				}
 			}
@@ -331,13 +336,14 @@ func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *record
 }
 
 // toProtoFileHistorySnapshotTranscriptData converts FileHistorySnapshotTranscript to proto.
-func toProtoFileHistorySnapshotTranscriptData(f *shareddomain.FileHistorySnapshotTranscript) *recordv1.FileHistorySnapshotRecordData {
-	data := &recordv1.FileHistorySnapshotRecordData{
+func toProtoFileHistorySnapshotTranscriptData(f *shareddomain.FileHistorySnapshotTranscript) *transcriptv1.FileHistorySnapshotTranscriptData {
+	data := &transcriptv1.FileHistorySnapshotTranscriptData{
 		MessageId:        f.MessageID,
 		IsSnapshotUpdate: f.IsSnapshotUpdate,
-		Snapshot: &recordv1.FileHistorySnapshot{
+		Snapshot: &transcriptv1.FileSnapshot{
 			MessageId:          f.Snapshot.MessageID,
-			TrackedFileBackups: make(map[string]*recordv1.FileHistorySnapshotTrackedBackup),
+			TrackedFileBackups: make(map[string]*transcriptv1.FileBackup),
+			Timestamp:          timestamppb.New(f.Snapshot.Timestamp),
 		},
 	}
 
@@ -346,7 +352,7 @@ func toProtoFileHistorySnapshotTranscriptData(f *shareddomain.FileHistorySnapsho
 		if backup.BackupFileName != nil {
 			backupFileName = *backup.BackupFileName
 		}
-		data.Snapshot.TrackedFileBackups[path] = &recordv1.FileHistorySnapshotTrackedBackup{
+		data.Snapshot.TrackedFileBackups[path] = &transcriptv1.FileBackup{
 			BackupFileName: backupFileName,
 			Version:        int32(backup.Version),
 			BackupTime:     timestamppb.New(backup.BackupTime),
@@ -356,233 +362,53 @@ func toProtoFileHistorySnapshotTranscriptData(f *shareddomain.FileHistorySnapsho
 	return data
 }
 
-// toProtoUserRecordData converts UserRecord to proto UserRecordData.
-func toProtoUserRecordData(u *shareddomain.UserRecord) *recordv1.UserRecordData {
-	// 1. Create base UserRecordData with metadata and other fields.
-	data := &recordv1.UserRecordData{
-		Metadata: &recordv1.MessageMetadata{
-			ParentUuid:  "",
-			IsSidechain: u.IsSidechain,
-			UserType:    string(u.UserType),
-			SessionId:   u.SessionID,
-			Version:     u.Version,
-			GitBranch:   u.GitBranch,
-			Uuid:        u.UUID,
-			Timestamp:   timestamppb.New(u.Timestamp),
-		},
-		Message: &recordv1.UserMessage{
-			Role: string(u.Message.Role),
-		},
-		IsMeta: u.IsMeta,
+// toProtoSystemTranscriptData converts SystemTranscript to proto SystemTranscriptData.
+func toProtoSystemTranscriptData(s *shareddomain.SystemTranscript) *transcriptv1.SystemTranscriptData {
+	data := &transcriptv1.SystemTranscriptData{
+		Metadata:   toProtoTreeNodeMeta(s.TreeNodeMeta),
+		DurationMs: int32(s.DurationMs),
+		IsMeta:     s.IsMeta,
 	}
 
-	// 2. Set ParentUuid if present.
-	if u.ParentUUID != nil {
-		data.Metadata.ParentUuid = *u.ParentUUID
-	}
-
-	// 3. Convert Content based on its type (string or []*UserMessageBlockContent).
-	if u.Message.Content != nil {
-		switch content := u.Message.Content.(type) {
-		case string:
-			// a. If string: Set Message.Content to UserMessage_Text.
-			data.Message.Content = &recordv1.UserMessage_Text{
-				Text: content,
-			}
-		case []*shareddomain.UserMessageBlockContent:
-			// b. If []*UserMessageBlockContent: Convert to protobuf blocks.
-			protoBlocks := make([]*recordv1.UserMessageBlockContent, len(content))
-			for i, block := range content {
-				protoBlocks[i] = toProtoUserMessageBlockContent(block)
-			}
-			// Set Message.Content to UserMessage_Blocks.
-			data.Message.Content = &recordv1.UserMessage_Blocks{
-				Blocks: &recordv1.UserMessageBlockContentList{
-					Blocks: protoBlocks,
-				},
-			}
-		}
-	}
-
-	// 4. Convert ThinkingMetadata if present.
-	if u.ThinkingMetadata != nil {
-		data.ThinkingMetadata = &recordv1.UserRecordThinkingMetadata{
-			Level:    u.ThinkingMetadata.Level,
-			Disabled: u.ThinkingMetadata.Disabled,
-		}
-		if len(u.ThinkingMetadata.Triggers) > 0 {
-			data.ThinkingMetadata.Triggers = make([]*recordv1.UserRecordThinkingMetadataTrigger, len(u.ThinkingMetadata.Triggers))
-			for i, trigger := range u.ThinkingMetadata.Triggers {
-				data.ThinkingMetadata.Triggers[i] = &recordv1.UserRecordThinkingMetadataTrigger{
-					Start: int32(trigger.Start),
-					End:   int32(trigger.End),
-					Text:  trigger.Text,
-				}
-			}
-		}
-	}
-
-	// 5. Convert Todos if present.
-	if len(u.Todos) > 0 {
-		data.Todos = make([]*recordv1.UserRecordTodo, len(u.Todos))
-		for i, todo := range u.Todos {
-			data.Todos[i] = &recordv1.UserRecordTodo{
-				Content:    todo.Content,
-				Status:     todo.Status,
-				ActiveForm: todo.ActiveForm,
-			}
-		}
-	}
-
-	// 6. Return the fully constructed data.
-	return data
-}
-
-// toProtoUserMessageBlockContent converts a single domain UserMessageBlockContent to protobuf.
-func toProtoUserMessageBlockContent(block *shareddomain.UserMessageBlockContent) *recordv1.UserMessageBlockContent {
-	// 1. Create base protobuf block with type field.
-	protoBlock := &recordv1.UserMessageBlockContent{
-		Type: block.Type,
-	}
-
-	// 2. If Text is set, copy to proto.
-	if block.Text != nil {
-		protoBlock.Text = *block.Text
-	}
-
-	// 3. If Source is set (image block), convert to proto.
-	if block.Source != nil {
-		protoBlock.Source = &recordv1.UserMessageBlockContentSource{
-			Type:      block.Source.Type,
-			MediaType: block.Source.Media_type,
-			Data:      block.Source.Data,
-		}
-	}
-
-	// 4. If UserMessageBlockContentToolResult is set (tool_result block), convert to proto.
-	if block.UserMessageBlockContentToolResult != nil {
-		// Convert Content to string (may be string or other type).
-		contentStr := ""
-		if block.UserMessageBlockContentToolResult.Content != nil {
-			switch c := block.UserMessageBlockContentToolResult.Content.(type) {
-			case string:
-				contentStr = c
-			default:
-				// Marshal non-string content to JSON.
-				if jsonBytes, err := sonic.Marshal(c); err == nil {
-					contentStr = string(jsonBytes)
-				}
-			}
-		}
-		protoBlock.ToolResult = &recordv1.UserMessageBlockContentToolResult{
-			ToolUseId: block.UserMessageBlockContentToolResult.ToolUseID,
-			Content:   contentStr,
-		}
-	}
-
-	// 5. Return the converted block.
-	return protoBlock
-}
-
-// toProtoAssistantRecordData converts AssistantRecord to proto AssistantRecordData.
-func toProtoAssistantRecordData(a *shareddomain.AssistantRecord) *recordv1.AssistantRecordData {
-	data := &recordv1.AssistantRecordData{
-		Metadata: &recordv1.MessageMetadata{
-			ParentUuid:  "",
-			IsSidechain: a.IsSidechain,
-			UserType:    string(a.UserType),
-			SessionId:   a.SessionID,
-			Version:     a.Version,
-			GitBranch:   a.GitBranch,
-			Uuid:        a.UUID,
-			Timestamp:   timestamppb.New(a.Timestamp),
-		},
-		RequestId: a.RequestID,
-		Message: &recordv1.AssistantMessage{
-			Model: a.Message.Model,
-			Id:    a.Message.ID,
-			Type:  string(a.Message.Type),
-			Role:  string(a.Message.Role),
-			Usage: &recordv1.AssistantMessageUsage{
-				InputTokens:              int32(a.Message.Usage.InputTokens),
-				OutputTokens:             int32(a.Message.Usage.OutputTokens),
-				CacheCreationInputTokens: int32(a.Message.Usage.CacheCreationInputTokens),
-				CacheReadInputTokens:     int32(a.Message.Usage.CacheReadInputTokens),
-				ServiceTier:              a.Message.Usage.ServiceTier,
-			},
-		},
-	}
-
-	if a.ParentUUID != nil {
-		data.Metadata.ParentUuid = *a.ParentUUID
-	}
-
-	if a.Message.StopReason != nil {
-		data.Message.StopReason = *a.Message.StopReason
-	}
-
-	if a.Message.StopSequence != nil {
-		data.Message.StopSequence = int32(*a.Message.StopSequence)
-	}
-
-	// Convert content blocks
-	if len(a.Message.Content) > 0 {
-		data.Message.Content = make([]*recordv1.AssistantMessageContent, len(a.Message.Content))
-		for i, content := range a.Message.Content {
-			protoContent := &recordv1.AssistantMessageContent{
-				Type: string(content.Type),
-			}
-
-			switch content.Type {
-			case shareddomain.AssistantMessageContentTypeText:
-				if content.Text != nil {
-					protoContent.Text = *content.Text
-				}
-			case shareddomain.AssistantMessageContentTypeTool:
-				if content.Thinking != nil {
-					protoContent.Thinking = *content.Thinking
-				}
-			case shareddomain.AssistantMessageContentTypeToolUse:
-				if content.AssistantMessageToolUseContent != nil {
-					protoContent.ToolUseId = content.ID
-					protoContent.ToolUseName = content.Name
-					if inputBytes, err := sonic.Marshal(content.Input); err == nil {
-						protoContent.ToolUseInputJson = string(inputBytes)
-					}
-				}
-			}
-
-			data.Message.Content[i] = protoContent
-		}
+	// Map subtype string to enum
+	switch s.Subtype {
+	case shareddomain.SystemTranscriptSubtypeTurnDuration:
+		data.Subtype = transcriptv1.SystemTranscriptSubtype_SYSTEM_TRANSCRIPT_SUBTYPE_TURN_DURATION
+	default:
+		data.Subtype = transcriptv1.SystemTranscriptSubtype_SYSTEM_TRANSCRIPT_SUBTYPE_UNSPECIFIED
 	}
 
 	return data
 }
 
-// toProtoFileHistorySnapshotRecordData converts FileHistorySnapshotRecord to proto.
-func toProtoFileHistorySnapshotRecordData(f *shareddomain.FileHistorySnapshotRecord) *recordv1.FileHistorySnapshotRecordData {
-	data := &recordv1.FileHistorySnapshotRecordData{
-		MessageId:         f.MessageID,
-		IsSnapshotUpdate: f.IsSnapshotUpdate,
-		Snapshot: &recordv1.FileHistorySnapshot{
-			MessageId:          f.Snapshot.MessageID,
-			TrackedFileBackups: make(map[string]*recordv1.FileHistorySnapshotTrackedBackup),
-		},
+// toProtoSummaryTranscriptData converts SummaryTranscript to proto SummaryTranscriptData.
+func toProtoSummaryTranscriptData(s *shareddomain.SummaryTranscript) *transcriptv1.SummaryTranscriptData {
+	return &transcriptv1.SummaryTranscriptData{
+		Summary:  s.Summary,
+		LeafUuid: s.LeafUUID,
+	}
+}
+
+// toProtoTreeNodeMeta converts domain TreeNodeMeta to proto TreeNodeMeta.
+func toProtoTreeNodeMeta(m shareddomain.TreeNodeMeta) *transcriptv1.TreeNodeMeta {
+	proto := &transcriptv1.TreeNodeMeta{
+		Uuid:        m.UUID,
+		SessionId:   m.SessionID,
+		Timestamp:   timestamppb.New(m.Timestamp),
+		Version:     m.Version,
+		Cwd:         m.Cwd,
+		GitBranch:   m.GitBranch,
+		Slug:        m.Slug,
+		UserType:    m.UserType,
+		IsSidechain: m.IsSidechain,
 	}
 
-	for path, backup := range f.Snapshot.TrackedFileBackups {
-		backupFileName := ""
-		if backup.BackupFileName != nil {
-			backupFileName = *backup.BackupFileName
-		}
-		data.Snapshot.TrackedFileBackups[path] = &recordv1.FileHistorySnapshotTrackedBackup{
-			BackupFileName: backupFileName,
-			Version:        int32(backup.Version),
-			BackupTime:     timestamppb.New(backup.BackupTime),
-		}
+	// Set ParentUuid if present
+	if m.ParentUUID != nil {
+		proto.ParentUuid = *m.ParentUUID
 	}
 
-	return data
+	return proto
 }
 
 // toProtoPagination converts pagination metadata to protobuf.
