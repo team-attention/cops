@@ -43,7 +43,12 @@ const (
 )
 
 // ThinkingMetadata fields (inside UserTranscript.ThinkingMetadata)
-// See session_record.go for ThinkingMetadataLevelField, ThinkingMetadataDisabledField, ThinkingMetadataTriggersField
+// Naming pattern: ThinkingMetadata<FieldName>Field
+const (
+	ThinkingMetadataLevelField    = "level"
+	ThinkingMetadataDisabledField = "disabled"
+	ThinkingMetadataTriggersField = "triggers"
+)
 
 // Todo fields (inside UserTranscript.Todos array)
 // Naming pattern: Todo<FieldName>Field

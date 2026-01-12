@@ -495,10 +495,10 @@ func (s *Service) LeaveOrganization(ctx context.Context, userID, organizationID 
 
 	// If organization has only this user as member (sole member), delete the organization.
 	if memberCount == 1 {
-		// Cascade delete session records
-		err = s.cascadeDeleteRepo.DeleteSessionRecordsByOrganization(ctx, organizationID)
+		// Cascade delete events
+		err = s.cascadeDeleteRepo.DeleteEventsByOrganization(ctx, organizationID)
 		if err != nil {
-			s.logger.Error("failed to delete session records",
+			s.logger.Error("failed to delete events",
 				slog.String("organizationID", organizationID),
 				slog.Any("error", err),
 			)

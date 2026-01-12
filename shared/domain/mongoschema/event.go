@@ -21,6 +21,7 @@ const (
 	EventUserIDField        = "userId"
 	EventSessionIDField     = "sessionId"
 	EventCreatedAtField     = "createdAt"
+	EventProjectIDField     = "projectId"
 )
 
 // Common fields (HookEventBase)

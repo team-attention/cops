@@ -10,9 +10,9 @@ type CascadeDeleteRepositoryPort interface {
 	// Returns error if database error occurs.
 	DeleteProjectsByOrganization(ctx context.Context, organizationID string) error
 
-	// DeleteSessionRecordsByOrganization permanently deletes all session records for projects in an organization.
-	// First queries projects to get project IDs, then deletes records matching those project IDs.
-	// Returns nil if successful or if no records existed.
+	// DeleteEventsByOrganization permanently deletes all events for projects in an organization.
+	// First queries projects to get project IDs, then deletes events matching those project IDs.
+	// Returns nil if successful or if no events existed.
 	// Returns error if database error occurs.
-	DeleteSessionRecordsByOrganization(ctx context.Context, organizationID string) error
+	DeleteEventsByOrganization(ctx context.Context, organizationID string) error
 }

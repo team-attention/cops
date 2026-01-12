@@ -173,7 +173,7 @@ func transcriptToDocument(transcript *domain.Transcript, projectObjID bson.Objec
 			slog.Any("error", err),
 		)
 		return bson.M{
-			mongoschema.RecordProjectIDField:    projectObjID,
+			mongoschema.EventProjectIDField:    projectObjID,
 			mongoschema.TranscriptTypeField:     string(transcript.Type),
 		}
 	}
@@ -187,13 +187,13 @@ func transcriptToDocument(transcript *domain.Transcript, projectObjID bson.Objec
 			slog.Any("error", err),
 		)
 		return bson.M{
-			mongoschema.RecordProjectIDField:    projectObjID,
+			mongoschema.EventProjectIDField:    projectObjID,
 			mongoschema.TranscriptTypeField:     string(transcript.Type),
 		}
 	}
 
 	// Add projectId field with projectObjID
-	doc[mongoschema.RecordProjectIDField] = projectObjID
+	doc[mongoschema.EventProjectIDField] = projectObjID
 
 	return doc
 }

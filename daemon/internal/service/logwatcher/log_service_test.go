@@ -33,7 +33,7 @@ var _ = Describe("LogService Integration", func() {
 
 	Describe("parsing real JSONL files", func() {
 		Context("when processing user messages", func() {
-			It("parses user records correctly", func() {
+			It("parses user transcripts correctly", func() {
 				for _, jsonlFile := range jsonlFiles {
 					file, err := os.Open(jsonlFile)
 					if err != nil {
@@ -51,15 +51,15 @@ var _ = Describe("LogService Integration", func() {
 							continue
 						}
 
-						var record shareddomain.Record
-						if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+						var transcript shareddomain.Transcript
+						if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 							continue
 						}
 
-						if record.Type == shareddomain.RecordTypeUser {
-							userRec, ok := record.Data.(*shareddomain.UserRecord)
-							Expect(ok).To(BeTrue(), "User record should have UserRecord data")
-							Expect(userRec.Message.Content).NotTo(BeEmpty(),
+						if transcript.Type == shareddomain.TranscriptTypeUser {
+							userTranscript, ok := transcript.Data.(*shareddomain.UserTranscript)
+							Expect(ok).To(BeTrue(), "User transcript should have UserTranscript data")
+							Expect(userTranscript.Message.Content).NotTo(BeNil(),
 								"User message should have content")
 							return // Found and validated at least one
 						}
@@ -69,7 +69,7 @@ var _ = Describe("LogService Integration", func() {
 		})
 
 		Context("when processing assistant messages", func() {
-			It("parses assistant records correctly", func() {
+			It("parses assistant transcripts correctly", func() {
 				foundAssistant := false
 
 				for _, jsonlFile := range jsonlFiles {
@@ -89,16 +89,16 @@ var _ = Describe("LogService Integration", func() {
 							continue
 						}
 
-						var record shareddomain.Record
-						if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+						var transcript shareddomain.Transcript
+						if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 							continue
 						}
 
-						if record.Type == shareddomain.RecordTypeMessage {
-							assistantRec, ok := record.Data.(*shareddomain.AssistantRecord)
-							Expect(ok).To(BeTrue(), "Assistant record should have AssistantRecord data")
-							Expect(assistantRec.Message.Model).NotTo(BeEmpty())
-							// RequestID may be empty in some records
+						if transcript.Type == shareddomain.TranscriptTypeAssistant {
+							assistantTranscript, ok := transcript.Data.(*shareddomain.AssistantTranscript)
+							Expect(ok).To(BeTrue(), "Assistant transcript should have AssistantTranscript data")
+							Expect(assistantTranscript.Message.Model).NotTo(BeEmpty())
+							// RequestID may be empty in some transcripts
 							foundAssistant = true
 							break
 						}
@@ -109,13 +109,13 @@ var _ = Describe("LogService Integration", func() {
 				}
 
 				if !foundAssistant {
-					Skip("No assistant records found in JSONL files")
+					Skip("No assistant transcripts found in JSONL files")
 				}
 			})
 		})
 
-		Context("when processing file-history-snapshot records", func() {
-			It("parses snapshot records correctly", func() {
+		Context("when processing file-history-snapshot transcripts", func() {
+			It("parses snapshot transcripts correctly", func() {
 				foundSnapshot := false
 
 				for _, jsonlFile := range jsonlFiles {
@@ -135,15 +135,15 @@ var _ = Describe("LogService Integration", func() {
 							continue
 						}
 
-						var record shareddomain.Record
-						if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+						var transcript shareddomain.Transcript
+						if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 							continue
 						}
 
-						if record.Type == shareddomain.RecordTypeFileHistorySnapshot {
-							snapshotRec, ok := record.Data.(*shareddomain.FileHistorySnapshotRecord)
-							Expect(ok).To(BeTrue(), "Snapshot record should have FileHistorySnapshotRecord data")
-							Expect(snapshotRec.MessageID).NotTo(BeEmpty())
+						if transcript.Type == shareddomain.TranscriptTypeFileHistorySnapshot {
+							snapshotTranscript, ok := transcript.Data.(*shareddomain.FileHistorySnapshotTranscript)
+							Expect(ok).To(BeTrue(), "Snapshot transcript should have FileHistorySnapshotTranscript data")
+							Expect(snapshotTranscript.MessageID).NotTo(BeEmpty())
 							foundSnapshot = true
 							break
 						}
@@ -154,14 +154,14 @@ var _ = Describe("LogService Integration", func() {
 				}
 
 				if !foundSnapshot {
-					Skip("No file-history-snapshot records found in JSONL files")
+					Skip("No file-history-snapshot transcripts found in JSONL files")
 				}
 			})
 		})
 	})
 
 	Describe("serialization round-trip", func() {
-		It("preserves records through sonic.Marshal/Unmarshal", func() {
+		It("preserves transcripts through sonic.Marshal/Unmarshal", func() {
 			for _, jsonlFile := range jsonlFiles {
 				file, err := os.Open(jsonlFile)
 				if err != nil {
@@ -180,25 +180,25 @@ var _ = Describe("LogService Integration", func() {
 						continue
 					}
 
-					var record shareddomain.Record
-					if err := sonic.Unmarshal([]byte(line), &record); err != nil {
+					var transcript shareddomain.Transcript
+					if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
 						continue
 					}
 
-					if record.Data != nil {
-						// Marshal the record
-						recordBytes, err := sonic.Marshal(record)
+					if transcript.Data != nil {
+						// Marshal the transcript
+						transcriptBytes, err := sonic.Marshal(transcript)
 						Expect(err).NotTo(HaveOccurred())
-						Expect(string(recordBytes)).NotTo(Equal(`""`),
-							"Record should not serialize to empty string")
+						Expect(string(transcriptBytes)).NotTo(Equal(`""`),
+							"Transcript should not serialize to empty string")
 
 						// Unmarshal back
-						var restored shareddomain.Record
-						err = sonic.Unmarshal(recordBytes, &restored)
+						var restored shareddomain.Transcript
+						err = sonic.Unmarshal(transcriptBytes, &restored)
 						Expect(err).NotTo(HaveOccurred())
 
 						// Verify structure preserved
-						Expect(restored.Type).To(Equal(record.Type))
+						Expect(restored.Type).To(Equal(transcript.Type))
 
 						testedCount++
 					}

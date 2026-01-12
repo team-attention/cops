@@ -152,11 +152,11 @@ func (s *Service) DeleteAccount(ctx context.Context, userID, confirmationPhrase 
 
 		//    a. If MemberCount == 1 (user is sole member):
 		if orgWithCount.MemberCount == 1 {
-			//       i. Call cascadeDeleteRepo.DeleteSessionRecordsByOrganization.
-			err = s.cascadeDeleteRepo.DeleteSessionRecordsByOrganization(ctx, orgID)
+			//       i. Call cascadeDeleteRepo.DeleteEventsByOrganization.
+			err = s.cascadeDeleteRepo.DeleteEventsByOrganization(ctx, orgID)
 			//          - If error, log error and return nil, error.
 			if err != nil {
-				s.logger.Error("failed to delete session records for organization",
+				s.logger.Error("failed to delete events for organization",
 					slog.String("userID", userID),
 					slog.String("organizationID", orgID),
 					slog.Any("error", err),
