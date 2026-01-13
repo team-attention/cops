@@ -1,4 +1,4 @@
 # Environment files (keep .env.example)
 .env
 .env.*
-!.env.example
+!*.example

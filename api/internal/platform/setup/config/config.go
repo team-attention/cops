@@ -21,7 +21,7 @@ type Config struct {
 // AppConfig holds application-level settings.
 type AppConfig struct {
 	Name    string `env:"APP_NAME" envDefault:"cops-api"`
-	Version string `env:"APP_VERSION" envDefault:"0.0.1"`
+	Version string `env:"APP_VERSION" envDefault:"dev"`
 	Env     string `env:"APP_ENV" envDefault:"development"`
 }
 
