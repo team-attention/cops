@@ -16,7 +16,7 @@ const (
 	transcriptAssistantTestDataFile = "transcript_assistant.jsonl"
 	transcriptSystemTestDataFile    = "transcript_system.jsonl"
 	transcriptSummaryTestDataFile   = "transcript_summary.jsonl"
-	transcriptSnapshotTestDataFile  = "transcript_file_history_snapshot.jsonl"
+	transcriptSnapshotTestDataFile  = "transcript_snapshot.jsonl"
 )
 
 // readLineFromFile reads a specific line number from a file (1-indexed)
