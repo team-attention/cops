@@ -14,6 +14,7 @@ type Config struct {
 	Logging LoggingConfig
 	API     APIConfig
 	Daemon  DaemonConfig
+	Upgrade UpgradeConfig
 }
 
 // AppConfig holds application-level settings.
@@ -39,6 +40,13 @@ type DaemonConfig struct {
 	BinaryPath string
 }
 
+// UpgradeConfig holds auto-upgrade settings.
+type UpgradeConfig struct {
+	Owner     string
+	Repo      string
+	AutoCheck bool
+}
+
 // LoadConfig loads configuration from environment variables using Viper.
 // Environment variables are prefixed with COPS_ (e.g., COPS_LOG_LEVEL).
 // Version is read from COPS_APP_VERSION environment variable.
@@ -58,6 +66,9 @@ func LoadConfig() (*Config, error) {
 	v.SetDefault("api.url", "http://localhost:8080")
 	v.SetDefault("api.timeout", "30s")
 	v.SetDefault("daemon.binarypath", "~/.cops/bin/cops-daemon")
+	v.SetDefault("upgrade.owner", "team-attention")
+	v.SetDefault("upgrade.repo", "cops")
+	v.SetDefault("upgrade.autocheck", true)
 
 	cfg := &Config{
 		App: AppConfig{
@@ -74,6 +85,11 @@ func LoadConfig() (*Config, error) {
 		},
 		Daemon: DaemonConfig{
 			BinaryPath: v.GetString("daemon.binarypath"),
+		},
+		Upgrade: UpgradeConfig{
+			Owner:     v.GetString("upgrade.owner"),
+			Repo:      v.GetString("upgrade.repo"),
+			AutoCheck: v.GetBool("upgrade.autocheck"),
 		},
 	}
 

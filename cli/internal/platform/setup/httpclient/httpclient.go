@@ -33,3 +33,18 @@ func (c *APIHTTPClient) StandardHTTPClient() *http.Client {
 func (c *APIHTTPClient) WithAuth(accessToken string) *req.Client {
 	return c.Client.Clone().SetCommonBearerAuthToken(accessToken)
 }
+
+// GitHubHTTPClient is an HTTP client configured for GitHub API.
+type GitHubHTTPClient struct {
+	*req.Client
+}
+
+// InitGitHubHTTPClient creates a new HTTP client for GitHub API.
+func InitGitHubHTTPClient() *GitHubHTTPClient {
+	client := req.C().
+		SetBaseURL("https://api.github.com").
+		SetCommonHeader("Accept", "application/vnd.github.v3+json").
+		SetCommonHeader("User-Agent", "cops-cli")
+
+	return &GitHubHTTPClient{Client: client}
+}
