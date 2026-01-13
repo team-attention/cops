@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -534,18 +533,18 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 			}
 		}
 
-		// Marshal document back to JSON
-		docBytes, err := sonic.Marshal(doc)
+		// Convert bson.M to BSON bytes for mongoschema unmarshal
+		docBytes, err := bson.Marshal(doc)
 		if err != nil {
-			r.logger.Error("failed to marshal document to JSON",
+			r.logger.Error("failed to marshal document to BSON",
 				slog.String("sessionID", sessionID),
 				slog.Any("error", err))
 			continue
 		}
 
-		// Unmarshal JSON into domain.Transcript (uses custom UnmarshalJSON)
-		var transcript shareddomain.Transcript
-		if err := sonic.Unmarshal(docBytes, &transcript); err != nil {
+		// Unmarshal BSON into mongoschema.Transcript (uses custom UnmarshalBSON)
+		var schemaTranscript mongoschema.Transcript
+		if err := bson.Unmarshal(docBytes, &schemaTranscript); err != nil {
 			r.logger.Error("failed to unmarshal transcript",
 				slog.String("sessionID", sessionID),
 				slog.String("type", mongoutil.Get[string](doc, mongoschema.TranscriptTypeField)),
@@ -553,7 +552,7 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, organizationI
 			continue
 		}
 
-		transcripts = append(transcripts, transcript)
+		transcripts = append(transcripts, *schemaTranscript.ToDomain())
 	}
 
 	if detail == nil {

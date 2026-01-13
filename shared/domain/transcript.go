@@ -25,7 +25,7 @@ type TreeNodeMeta struct {
 	SessionID   string    `json:"sessionId" bson:"sessionId"`
 	Timestamp   time.Time `json:"timestamp" bson:"timestamp"`
 	Version     string    `json:"version" bson:"version"`
-	Cwd         string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
+	CWD         string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	GitBranch   string    `json:"gitBranch,omitempty" bson:"gitBranch,omitempty"`
 	Slug        string    `json:"slug,omitempty" bson:"slug,omitempty"`
 	UserType    string    `json:"userType,omitempty" bson:"userType,omitempty"`

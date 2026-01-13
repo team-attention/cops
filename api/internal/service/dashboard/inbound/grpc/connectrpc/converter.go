@@ -396,7 +396,7 @@ func toProtoTreeNodeMeta(m shareddomain.TreeNodeMeta) *transcriptv1.TreeNodeMeta
 		SessionId:   m.SessionID,
 		Timestamp:   timestamppb.New(m.Timestamp),
 		Version:     m.Version,
-		Cwd:         m.Cwd,
+		Cwd:         m.CWD,
 		GitBranch:   m.GitBranch,
 		Slug:        m.Slug,
 		UserType:    m.UserType,

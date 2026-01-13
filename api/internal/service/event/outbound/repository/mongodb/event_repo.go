@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/bytedance/sonic"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
@@ -137,9 +136,18 @@ func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *reposito
 	}
 
 	// Prepare documents for insertion
-	docs := make([]interface{}, len(batch.Transcripts))
+	docs := make([]any, len(batch.Transcripts))
 	for i, transcript := range batch.Transcripts {
-		docs[i] = transcriptToDocument(transcript, projectObjID)
+		doc, err := transcriptToDocument(transcript, projectObjID)
+		if err != nil {
+			r.logger.Error("failed to convert transcript to document",
+				slog.Int("index", i),
+				slog.String("type", string(transcript.Type)),
+				slog.Any("error", err),
+			)
+			return fmt.Errorf("failed to convert transcript at index %d: %w", i, err)
+		}
+		docs[i] = doc
 	}
 
 	result, err := r.eventsColl.InsertMany(ctx, docs)
@@ -162,40 +170,23 @@ func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *reposito
 	return nil
 }
 
-// transcriptToDocument converts a Transcript to a BSON document.
-func transcriptToDocument(transcript *domain.Transcript, projectObjID bson.ObjectID) bson.M {
-	// Marshal transcript to JSON using transcript.MarshalJSON() (produces flat JSON)
-	jsonBytes, err := transcript.MarshalJSON()
+// transcriptToDocument converts a Transcript to a BSON document using mongoschema.Transcript.
+func transcriptToDocument(transcript *domain.Transcript, projectObjID bson.ObjectID) (bson.M, error) {
+	var schema mongoschema.Transcript
+	schema.FromDomain(projectObjID, transcript)
+
+	// Use bson.Marshal which calls MarshalBSON
+	data, err := bson.Marshal(&schema)
 	if err != nil {
-		// Log error and return minimal document
-		slog.Error("failed to marshal transcript to JSON",
-			slog.String("type", string(transcript.Type)),
-			slog.Any("error", err),
-		)
-		return bson.M{
-			mongoschema.EventProjectIDField:    projectObjID,
-			mongoschema.TranscriptTypeField:     string(transcript.Type),
-		}
+		return nil, fmt.Errorf("failed to marshal transcript: %w", err)
 	}
 
-	// Unmarshal JSON into bson.M
 	var doc bson.M
-	if err := sonic.Unmarshal(jsonBytes, &doc); err != nil {
-		// Log error and return minimal document
-		slog.Error("failed to unmarshal JSON to bson.M",
-			slog.String("type", string(transcript.Type)),
-			slog.Any("error", err),
-		)
-		return bson.M{
-			mongoschema.EventProjectIDField:    projectObjID,
-			mongoschema.TranscriptTypeField:     string(transcript.Type),
-		}
+	if err := bson.Unmarshal(data, &doc); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal transcript to bson.M: %w", err)
 	}
 
-	// Add projectId field with projectObjID
-	doc[mongoschema.EventProjectIDField] = projectObjID
-
-	return doc
+	return doc, nil
 }
 
 // Interface verification
