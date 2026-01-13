@@ -45,11 +45,11 @@ function SessionDetailPage() {
 
   const session = data?.session
 
-  // Extract tool calls from session records
+  // Extract tool calls from session transcripts
   const toolCalls = useMemo(() => {
-    if (!session?.records) return []
-    return extractToolCalls(session.records)
-  }, [session?.records])
+    if (!session?.transcripts) return []
+    return extractToolCalls(session.transcripts)
+  }, [session?.transcripts])
 
   // Handle tool click from chat - scroll to and highlight the tool
   const handleToolClick = (toolUseId: string) => {
@@ -96,7 +96,7 @@ function SessionDetailPage() {
             <div className="grid gap-6 lg:grid-cols-5">
               <div className="lg:col-span-3">
                 <ChatView
-                  records={session.records ?? []}
+                  transcripts={session.transcripts ?? []}
                   selectedMessageId={selectedMessageId}
                   onSelectMessage={setSelectedMessageId}
                   onToolClick={handleToolClick}

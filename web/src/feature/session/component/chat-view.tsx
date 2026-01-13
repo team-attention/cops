@@ -1,35 +1,35 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { MessageSquare } from 'lucide-react'
 import {
-  filterRecordsForChat,
+  filterTranscriptsForChat,
   parseMessageContent,
 } from '../util/parse-content'
 import { MessageBubble } from './message-bubble'
-import type { Record } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
+import type { Transcript } from '@/gen/grpcstub/transcript/v1/transcript_pb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
 import { Badge } from '@/gen/shadcn/ui/badge'
 
 interface ChatViewProps {
-  records: Array<Record>
+  transcripts: Array<Transcript>
   selectedMessageId?: string
   onSelectMessage?: (messageId: string) => void
   onToolClick?: (toolUseId: string) => void
 }
 
 export const ChatView = ({
-  records,
+  transcripts,
   selectedMessageId,
   onSelectMessage,
   onToolClick,
 }: ChatViewProps) => {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Filter and parse records
+  // Filter and parse transcripts
   const parsedMessages = useMemo(() => {
-    const filtered = filterRecordsForChat(records)
+    const filtered = filterTranscriptsForChat(transcripts)
     return filtered.map(parseMessageContent)
-  }, [records])
+  }, [transcripts])
 
   // Count non-meta messages
   const messageCount = parsedMessages.filter(

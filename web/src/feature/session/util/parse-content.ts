@@ -1,8 +1,9 @@
 import type {
-  AssistantMessageContent,
-  Record,
-  UserRecordData,
-} from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
+  AssistantContentBlock,
+  Transcript,
+  UserTranscriptData,
+} from '@/gen/grpcstub/transcript/v1/transcript_pb'
+import { TranscriptType } from '@/gen/grpcstub/transcript/v1/transcript_pb'
 import type {
   ContentBlock,
   LinkedToolCall,
@@ -10,10 +11,9 @@ import type {
   ToolResultContentBlock,
   ToolUseContentBlock,
 } from '../type/content-block'
-import { RecordType } from '@/gen/grpcstub/aggregation/v1/aggregation_pb'
 
-// Helper to extract user message text content from UserRecordData
-const extractUserMessageText = (userData: UserRecordData): string => {
+// Helper to extract user message text content from UserTranscriptData
+const extractUserMessageText = (userData: UserTranscriptData): string => {
   if (!userData.message) {
     return ''
   }
@@ -34,9 +34,9 @@ const extractUserMessageText = (userData: UserRecordData): string => {
   return ''
 }
 
-// Helper to convert AssistantMessageContent[] to ContentBlock[]
+// Helper to convert AssistantContentBlock[] to ContentBlock[]
 const convertAssistantContent = (
-  content: Array<AssistantMessageContent>,
+  content: Array<AssistantContentBlock>,
 ): Array<ContentBlock> => {
   const blocks: Array<ContentBlock> = []
 
@@ -54,22 +54,16 @@ const convertAssistantContent = (
     } else if (item.type === 'tool_use') {
       let input: globalThis.Record<string, unknown> = {}
       try {
-        input = JSON.parse(item.toolUseInputJson)
+        input = JSON.parse(item.inputJson)
       } catch {
         // Keep empty object if parsing fails
       }
 
       blocks.push({
         type: 'tool_use',
-        id: item.toolUseId,
-        name: item.toolUseName,
+        id: item.id,
+        name: item.name,
         input,
-      })
-    } else if (item.type === 'tool_result') {
-      blocks.push({
-        type: 'tool_result',
-        tool_use_id: item.toolUseId,
-        content: item.text,
       })
     }
   }
@@ -77,10 +71,13 @@ const convertAssistantContent = (
   return blocks
 }
 
-// Parse a single Record into a renderable ParsedMessage
-export const parseMessageContent = (record: Record): ParsedMessage => {
-  if (record.type === RecordType.USER && record.data.case === 'userData') {
-    const userData = record.data.value
+// Parse a single Transcript into a renderable ParsedMessage
+export const parseMessageContent = (transcript: Transcript): ParsedMessage => {
+  if (
+    transcript.type === TranscriptType.USER &&
+    transcript.data.case === 'userData'
+  ) {
+    const userData = transcript.data.value
     const metadata = userData.metadata
 
     return {
@@ -99,10 +96,10 @@ export const parseMessageContent = (record: Record): ParsedMessage => {
   }
 
   if (
-    record.type === RecordType.ASSISTANT &&
-    record.data.case === 'assistantData'
+    transcript.type === TranscriptType.ASSISTANT &&
+    transcript.data.case === 'assistantData'
   ) {
-    const assistantData = record.data.value
+    const assistantData = transcript.data.value
     const metadata = assistantData.metadata
 
     return {
@@ -118,7 +115,24 @@ export const parseMessageContent = (record: Record): ParsedMessage => {
     }
   }
 
-  if (record.type === RecordType.FILE_HISTORY_SNAPSHOT) {
+  if (
+    transcript.type === TranscriptType.SYSTEM &&
+    transcript.data.case === 'systemData'
+  ) {
+    const systemData = transcript.data.value
+    const metadata = systemData.metadata
+
+    return {
+      uuid: metadata?.uuid || '',
+      type: 'system',
+      timestamp: metadata?.timestamp,
+      isMeta: systemData.isMeta,
+      isSidechain: metadata?.isSidechain || false,
+      content: [],
+    }
+  }
+
+  if (transcript.type === TranscriptType.FILE_HISTORY_SNAPSHOT) {
     return {
       uuid: '',
       type: 'system',
@@ -128,7 +142,7 @@ export const parseMessageContent = (record: Record): ParsedMessage => {
     }
   }
 
-  // Fallback for UNSPECIFIED or unknown types
+  // Fallback for UNSPECIFIED, SUMMARY, or unknown types
   return {
     uuid: '',
     type: 'system',
@@ -138,9 +152,9 @@ export const parseMessageContent = (record: Record): ParsedMessage => {
   }
 }
 
-// Extract and link tool calls from records
+// Extract and link tool calls from transcripts
 export const extractToolCalls = (
-  records: Array<Record>,
+  transcripts: Array<Transcript>,
 ): Array<LinkedToolCall> => {
   const toolUseMap = new Map<
     string,
@@ -152,13 +166,13 @@ export const extractToolCalls = (
   >()
   const toolResults = new Map<string, ToolResultContentBlock>()
 
-  // First pass - collect tool_use blocks from assistant records
-  for (const record of records) {
+  // First pass - collect tool_use blocks from assistant transcripts
+  for (const transcript of transcripts) {
     if (
-      record.type === RecordType.ASSISTANT &&
-      record.data.case === 'assistantData'
+      transcript.type === TranscriptType.ASSISTANT &&
+      transcript.data.case === 'assistantData'
     ) {
-      const assistantData = record.data.value
+      const assistantData = transcript.data.value
       const metadata = assistantData.metadata
       const content = assistantData.message?.content || []
 
@@ -166,16 +180,16 @@ export const extractToolCalls = (
         if (item.type === 'tool_use') {
           let input: globalThis.Record<string, unknown> = {}
           try {
-            input = JSON.parse(item.toolUseInputJson)
+            input = JSON.parse(item.inputJson)
           } catch {
             // Keep empty object if parsing fails
           }
 
-          toolUseMap.set(item.toolUseId, {
+          toolUseMap.set(item.id, {
             block: {
               type: 'tool_use',
-              id: item.toolUseId,
-              name: item.toolUseName,
+              id: item.id,
+              name: item.name,
               input,
             },
             sourceUuid: metadata?.uuid || '',
@@ -186,22 +200,23 @@ export const extractToolCalls = (
     }
   }
 
-  // Second pass - collect tool_result blocks
-  for (const record of records) {
+  // Second pass - collect tool_result blocks from user transcripts
+  for (const transcript of transcripts) {
     if (
-      record.type === RecordType.ASSISTANT &&
-      record.data.case === 'assistantData'
+      transcript.type === TranscriptType.USER &&
+      transcript.data.case === 'userData'
     ) {
-      const assistantData = record.data.value
-      const content = assistantData.message?.content || []
-
-      for (const item of content) {
-        if (item.type === 'tool_result') {
-          toolResults.set(item.toolUseId, {
-            type: 'tool_result',
-            tool_use_id: item.toolUseId,
-            content: item.text,
-          })
+      const userData = transcript.data.value
+      const message = userData.message
+      if (message?.content.case === 'blocks') {
+        for (const block of message.content.value.blocks) {
+          if (block.type === 'tool_result' && block.toolResult) {
+            toolResults.set(block.toolResult.toolUseId, {
+              type: 'tool_result',
+              tool_use_id: block.toolResult.toolUseId,
+              content: block.toolResult.content,
+            })
+          }
         }
       }
     }
@@ -218,9 +233,11 @@ export const extractToolCalls = (
   )
 }
 
-// Filter records for chat view display
-export const filterRecordsForChat = (records: Array<Record>): Array<Record> => {
-  return records.filter(
-    (record) => record.type !== RecordType.FILE_HISTORY_SNAPSHOT,
+// Filter transcripts for chat view display
+export const filterTranscriptsForChat = (
+  transcripts: Array<Transcript>,
+): Array<Transcript> => {
+  return transcripts.filter(
+    (transcript) => transcript.type !== TranscriptType.FILE_HISTORY_SNAPSHOT,
   )
 }
