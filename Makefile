@@ -20,7 +20,7 @@ deploy-api:
 ## release: Create git tag and release CLI/Daemon via GoReleaser
 release: _check-version tag
 	@echo "Releasing CLI and Daemon $(VERSION)..."
-	goreleaser release --clean
+	GITHUB_TOKEN=$(TEAM_ATTENTION_GITHUB_TOKEN) goreleaser release --clean
 
 ## release-snapshot: Build release without publishing (for testing)
 release-snapshot:
