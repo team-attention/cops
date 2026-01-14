@@ -68,7 +68,71 @@ func (h *LogFsnotifyHandler) Start(ctx context.Context) error {
 
 	h.logger.Info("log fsnotify handler started")
 	go h.loop()
+
+	// Perform initial scan of existing files after event loop starts
+	// This ensures any file changes during scan are captured by fsnotify
+	h.scanExistingFiles()
+
 	return nil
+}
+
+// scanExistingFiles scans all watched directories for existing JSONL files
+// and processes any new content since the last recorded position.
+// This must be called after fsnotify watches are set up to avoid missing
+// events that occur during the scan.
+func (h *LogFsnotifyHandler) scanExistingFiles() {
+	watchList := h.watcher.WatchList()
+	if len(watchList) == 0 {
+		h.logger.Info("no watched directories, skipping initial scan")
+		return
+	}
+
+	h.logger.Info("starting initial scan of existing files",
+		slog.Int("watchedDirs", len(watchList)),
+	)
+
+	var totalFiles int
+
+	for _, dir := range watchList {
+		// Find all .jsonl files in the directory
+		pattern := filepath.Join(dir, "*.jsonl")
+		files, err := filepath.Glob(pattern)
+		if err != nil {
+			h.logger.Warn("failed to glob directory",
+				slog.String("dir", dir),
+				slog.Any("error", err),
+			)
+			continue
+		}
+
+		for _, filePath := range files {
+			// Get the stored offset (0 if new file)
+			offset := h.filePositions[filePath]
+
+			// Get current file size to check if file has new content
+			info, err := os.Stat(filePath)
+			if err != nil {
+				h.logger.Debug("failed to stat file during scan",
+					slog.String("path", filePath),
+					slog.Any("error", err),
+				)
+				continue
+			}
+
+			// Skip if file hasn't grown since last position
+			if info.Size() <= offset {
+				continue
+			}
+
+			// Process the file from the stored offset
+			h.processFileFromOffset(filePath, offset)
+			totalFiles++
+		}
+	}
+
+	h.logger.Info("initial scan completed",
+		slog.Int("filesProcessed", totalFiles),
+	)
 }
 
 // Stop implements FsnotifyHandler interface.
@@ -183,31 +247,40 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 		return
 	}
 
+	// Get stored offset (0 if not found for new files)
 	offset := h.filePositions[event.Name]
-	lines, newOffset, err := h.svc.HandleFileChange(event.Name, offset)
+	h.processFileFromOffset(event.Name, offset)
+}
+
+// processFileFromOffset reads and processes a single file from the given offset.
+// This is a shared helper used by both initial scan and fsnotify event handling.
+func (h *LogFsnotifyHandler) processFileFromOffset(filePath string, offset int64) {
+	lines, newOffset, err := h.svc.HandleFileChange(filePath, offset)
 	if err != nil {
 		h.logger.Debug("failed to handle file change",
-			slog.String("path", event.Name),
+			slog.String("path", filePath),
 			slog.Any("error", err),
 		)
 		return
 	}
 
-	if len(lines) > 0 {
-		// Extract ClaudeDir from file path (parent directory)
-		claudeDir := filepath.Dir(event.Name)
-		h.svc.AddLinesForClaudeDir(claudeDir, lines)
-		h.filePositions[event.Name] = newOffset
+	if len(lines) == 0 {
+		return
+	}
 
-		// Save position to SQLite
-		if err := h.stateRepo.SaveFilePosition(h.ctx, &domain.FilePosition{
-			Path:   event.Name,
-			Offset: newOffset,
-		}); err != nil {
-			h.logger.Warn("failed to save file position",
-				slog.String("path", event.Name),
-				slog.Any("error", err),
-			)
-		}
+	// Extract ClaudeDir from file path (parent directory)
+	claudeDir := filepath.Dir(filePath)
+	h.svc.AddLinesForClaudeDir(claudeDir, lines)
+	h.filePositions[filePath] = newOffset
+
+	// Save position to SQLite
+	if err := h.stateRepo.SaveFilePosition(h.ctx, &domain.FilePosition{
+		Path:   filePath,
+		Offset: newOffset,
+	}); err != nil {
+		h.logger.Warn("failed to save file position",
+			slog.String("path", filePath),
+			slog.Any("error", err),
+		)
 	}
 }
