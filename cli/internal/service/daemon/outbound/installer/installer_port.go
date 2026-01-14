@@ -10,6 +10,15 @@ type InstallerPort interface {
 	// Uninstall removes the daemon from system services.
 	Uninstall(ctx context.Context) error
 
+	// Start starts the daemon service.
+	Start(ctx context.Context) error
+
+	// Stop stops the daemon service.
+	Stop(ctx context.Context) error
+
+	// Restart restarts the daemon service.
+	Restart(ctx context.Context) error
+
 	// Status returns the current status of the daemon service.
 	Status() (ServiceStatus, error)
 }

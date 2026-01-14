@@ -51,20 +51,29 @@ func (s *Service) Install(ctx context.Context) error {
 		return errutil.Internalf("failed to check service status: %v", err)
 	}
 
-	if status != installer.StatusNotInstalled {
-		s.logger.Info("daemon service is already installed",
-			slog.String("status", status.String()))
-		// TODO: Ask user for reinstall confirmation
-		return errutil.BadRequestf("service is already installed (status: %s)", status)
+	if status == installer.StatusNotInstalled {
+		// Install the service
+		if err := s.installer.Install(ctx); err != nil {
+			return errutil.Internalf("failed to install daemon service: %v", err)
+		}
+
+		// Start the service after installation
+		if err := s.installer.Start(ctx); err != nil {
+			return errutil.Internalf("failed to start daemon service: %v", err)
+		}
+
+		s.logger.Info("daemon service installed and started",
+			slog.String("binary", binaryPath))
+	} else {
+		// Already installed - restart
+		if err := s.installer.Restart(ctx); err != nil {
+			return errutil.Internalf("failed to restart daemon service: %v", err)
+		}
+
+		s.logger.Info("daemon service restarted",
+			slog.String("binary", binaryPath))
 	}
 
-	// Install the service
-	if err := s.installer.Install(ctx); err != nil {
-		return errutil.Internalf("failed to install daemon service: %v", err)
-	}
-
-	s.logger.Info("daemon service installed successfully",
-		slog.String("binary", binaryPath))
 	return nil
 }
 

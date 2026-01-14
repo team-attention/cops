@@ -59,6 +59,51 @@ func (i *KardianosInstaller) Uninstall(ctx context.Context) error {
 	return nil
 }
 
+// Start starts the daemon service.
+func (i *KardianosInstaller) Start(ctx context.Context) error {
+	svc, err := i.createService()
+	if err != nil {
+		return fmt.Errorf("failed to create service: %w", err)
+	}
+
+	if err := service.Control(svc, "start"); err != nil {
+		return fmt.Errorf("failed to start service: %w", err)
+	}
+
+	i.logger.Info("daemon service started successfully")
+	return nil
+}
+
+// Stop stops the daemon service.
+func (i *KardianosInstaller) Stop(ctx context.Context) error {
+	svc, err := i.createService()
+	if err != nil {
+		return fmt.Errorf("failed to create service: %w", err)
+	}
+
+	if err := service.Control(svc, "stop"); err != nil {
+		return fmt.Errorf("failed to stop service: %w", err)
+	}
+
+	i.logger.Info("daemon service stopped successfully")
+	return nil
+}
+
+// Restart restarts the daemon service.
+func (i *KardianosInstaller) Restart(ctx context.Context) error {
+	svc, err := i.createService()
+	if err != nil {
+		return fmt.Errorf("failed to create service: %w", err)
+	}
+
+	if err := service.Control(svc, "restart"); err != nil {
+		return fmt.Errorf("failed to restart service: %w", err)
+	}
+
+	i.logger.Info("daemon service restarted successfully")
+	return nil
+}
+
 // Status returns the current status of the daemon service.
 func (i *KardianosInstaller) Status() (installer.ServiceStatus, error) {
 	svc, err := i.createService()
