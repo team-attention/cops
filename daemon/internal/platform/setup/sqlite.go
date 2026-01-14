@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // InitSQLite initializes SQLite database connection with WAL mode and creates tables.
@@ -21,8 +21,8 @@ func InitSQLite(cfg *Config, logger *slog.Logger) (*sql.DB, error) {
 
 	dbPath := filepath.Join(dataDir, "state.db")
 
-	// Open DB with WAL mode
-	db, err := sql.Open("sqlite3", dbPath+"?_journal_mode=WAL")
+	// Open database connection
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -31,6 +31,12 @@ func InitSQLite(cfg *Config, logger *slog.Logger) (*sql.DB, error) {
 	if err := db.Ping(); err != nil {
 		db.Close()
 		return nil, fmt.Errorf("failed to ping SQLite database: %w", err)
+	}
+
+	// Enable WAL mode
+	if _, err := db.Exec("PRAGMA journal_mode = WAL"); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to enable WAL mode: %w", err)
 	}
 
 	// Create tables
