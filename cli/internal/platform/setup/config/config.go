@@ -63,7 +63,7 @@ func LoadConfig() (*Config, error) {
 	v.SetDefault("app.version", "dev")
 	v.SetDefault("logging.level", "info")
 	v.SetDefault("logging.format", "text")
-	v.SetDefault("api.url", "http://localhost:8080")
+	v.SetDefault("api.url", "https://cops-api-392947101616.asia-northeast3.run.app")
 	v.SetDefault("api.timeout", "30s")
 	v.SetDefault("daemon.binarypath", "~/.cops/bin/cops-daemon")
 	v.SetDefault("upgrade.owner", "team-attention")

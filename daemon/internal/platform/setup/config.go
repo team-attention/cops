@@ -34,7 +34,7 @@ type LoggingConfig struct {
 
 // APIConfig holds API server connection settings.
 type APIConfig struct {
-	URL     string        `env:"COPS_API_URL" envDefault:"http://localhost:8080"`
+	URL     string        `env:"COPS_API_URL" envDefault:"https://cops-api-392947101616.asia-northeast3.run.app"`
 	Timeout time.Duration `env:"COPS_API_TIMEOUT" envDefault:"30s"`
 }
 
