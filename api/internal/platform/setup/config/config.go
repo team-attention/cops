@@ -17,6 +17,14 @@ type Config struct {
 	OAuth      OAuthConfig
 	DeviceCode DeviceCodeConfig
 	SMTP       SMTPConfig
+	Resend     ResendConfig
+}
+
+// ResendConfig holds Resend email service configuration.
+type ResendConfig struct {
+	APIKey   string `env:"RESEND_API_KEY" envDefault:""`
+	FromName string `env:"RESEND_FROM_NAME" envDefault:"C-Ops"`
+	FromAddr string `env:"RESEND_FROM_ADDR" envDefault:""`
 }
 
 // SMTPConfig holds SMTP email server configuration.

@@ -7,6 +7,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/team-attention/cops/api/internal/platform/outbound/email"
+	"github.com/team-attention/cops/api/internal/platform/outbound/email/resend"
 	"github.com/team-attention/cops/api/internal/platform/outbound/email/smtp"
 	"github.com/team-attention/cops/api/internal/platform/outbound/txmanager"
 	mongotx "github.com/team-attention/cops/api/internal/platform/outbound/txmanager/mongodb"
@@ -40,10 +41,23 @@ func newPlatformModule() fx.Option {
 		// Fiber app (depends on config, logger)
 		fx.Provide(server.InitFiber),
 
-		// Email service (depends on config, logger)
+		// Email services with factory pattern
 		fx.Provide(
 			fx.Annotate(
 				smtp.NewSMTPEmailService,
+				fx.ResultTags(`name:"smtp_email"`),
+			),
+		),
+		fx.Provide(
+			fx.Annotate(
+				resend.NewResendEmailService,
+				fx.ResultTags(`name:"resend_email"`),
+			),
+		),
+		fx.Provide(
+			fx.Annotate(
+				email.NewEmailService,
+				fx.ParamTags(``, ``, `name:"resend_email"`, `name:"smtp_email"`),
 				fx.As(new(email.EmailServicePort)),
 			),
 		),
