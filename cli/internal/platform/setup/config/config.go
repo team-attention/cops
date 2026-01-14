@@ -38,6 +38,7 @@ type APIConfig struct {
 // DaemonConfig holds daemon settings.
 type DaemonConfig struct {
 	BinaryPath string
+	SocketPath string
 }
 
 // UpgradeConfig holds auto-upgrade settings.
@@ -66,6 +67,7 @@ func LoadConfig() (*Config, error) {
 	v.SetDefault("api.url", "https://cops-api-392947101616.asia-northeast3.run.app")
 	v.SetDefault("api.timeout", "30s")
 	v.SetDefault("daemon.binarypath", "~/.cops/bin/cops-daemon")
+	v.SetDefault("daemon.socketpath", "~/.cops/daemon.sock")
 	v.SetDefault("upgrade.owner", "team-attention")
 	v.SetDefault("upgrade.repo", "cops")
 	v.SetDefault("upgrade.autocheck", true)
@@ -85,6 +87,7 @@ func LoadConfig() (*Config, error) {
 		},
 		Daemon: DaemonConfig{
 			BinaryPath: v.GetString("daemon.binarypath"),
+			SocketPath: v.GetString("daemon.socketpath"),
 		},
 		Upgrade: UpgradeConfig{
 			Owner:     v.GetString("upgrade.owner"),

@@ -44,6 +44,7 @@ type CopsConfig struct {
 	DaemonDataDir    string        `env:"COPS_DAEMON_DATA_DIR" envDefault:"~/.cops/daemon"`
 	FlushInterval    time.Duration `env:"COPS_FLUSH_INTERVAL" envDefault:"15s"`
 	MaxBatchSize     int           `env:"COPS_MAX_BATCH_SIZE" envDefault:"100"`
+	SocketPath       string        `env:"COPS_SOCKET_PATH" envDefault:"~/.cops/daemon.sock"`
 }
 
 // LoadConfig loads configuration from environment variables.

@@ -12,6 +12,7 @@ import (
 	"github.com/team-attention/cops/cli/internal/platform/util/errutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/gitutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/pathutil"
+	"github.com/team-attention/cops/cli/internal/service/daemon"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/api"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/config"
 	"github.com/team-attention/cops/cli/internal/service/tracking/outbound/parser"
@@ -42,6 +43,7 @@ type Service struct {
 	configRepo config.ConfigPort
 	parser     parser.ParserPort
 	project    api.ProjectPort
+	daemonSvc  *daemon.Service
 }
 
 // NewService creates a new tracking service.
@@ -51,6 +53,7 @@ func NewService(
 	configRepo config.ConfigPort,
 	parser parser.ParserPort,
 	project api.ProjectPort,
+	daemonSvc *daemon.Service,
 ) *Service {
 	return &Service{
 		logger:     l.With(slog.String("name", "tracking.service")),
@@ -58,6 +61,7 @@ func NewService(
 		configRepo: configRepo,
 		parser:     parser,
 		project:    project,
+		daemonSvc:  daemonSvc,
 	}
 }
 
@@ -326,9 +330,38 @@ func (s *Service) RemoveProjectByPath(ctx context.Context, params RemoveProjectB
 }
 
 // SyncProject syncs session records for a project to the collector.
-// This feature is not yet implemented.
+// Requests the daemon to scan and upload log files for the specified project.
 func (s *Service) SyncProject(ctx context.Context, projectID domain.ID) error {
-	return errutil.Internalf("sync is not yet implemented")
+	// Load global config to find project by ID
+	globalConfig, err := s.configRepo.LoadGlobalConfig()
+	if err != nil {
+		return errutil.Internalf("failed to load global config: %v", err)
+	}
+
+	// Find project by ID
+	var project *domain.Project
+	for _, p := range globalConfig.Projects {
+		if p.ID == projectID {
+			project = p
+			break
+		}
+	}
+	if project == nil {
+		return errutil.NotFoundf("project not found: %s", projectID)
+	}
+
+	// Load local config to get OrganizationID
+	localConfig, err := s.configRepo.LoadLocalConfig(project.Path)
+	if err != nil {
+		return errutil.Internalf("failed to load local config: %v", err)
+	}
+
+	// Request daemon to scan logs
+	return s.daemonSvc.RequestLogScan(ctx, daemon.RequestLogScanParams{
+		ProjectID:      projectID.String(),
+		ProjectPath:    project.Path,
+		OrganizationID: localConfig.OrganizationID,
+	})
 }
 
 // FindParentProject checks if any parent directory of the target path is already registered.

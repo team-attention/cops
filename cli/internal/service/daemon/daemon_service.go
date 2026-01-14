@@ -9,6 +9,7 @@ import (
 	"github.com/team-attention/cops/cli/internal/platform/util/errutil"
 	"github.com/team-attention/cops/cli/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/cli/internal/service/daemon/outbound/installer"
+	"github.com/team-attention/cops/cli/internal/service/daemon/outbound/ipc"
 )
 
 // Service provides daemon service installation operations.
@@ -16,6 +17,7 @@ type Service struct {
 	logger    *slog.Logger
 	cfg       *config.Config
 	installer installer.InstallerPort
+	ipcClient ipc.IPCPort
 }
 
 // NewService creates a new daemon service.
@@ -23,11 +25,13 @@ func NewService(
 	l *slog.Logger,
 	cfg *config.Config,
 	installer installer.InstallerPort,
+	ipcClient ipc.IPCPort,
 ) *Service {
 	return &Service{
 		logger:    l.With(slog.String("name", "daemon.service")),
 		cfg:       cfg,
 		installer: installer,
+		ipcClient: ipcClient,
 	}
 }
 
@@ -106,4 +110,41 @@ func (s *Service) Status(ctx context.Context) (installer.ServiceStatus, error) {
 	}
 
 	return status, nil
+}
+
+// RequestLogScanParams contains parameters for RequestLogScan.
+type RequestLogScanParams struct {
+	ProjectID      string
+	ProjectPath    string
+	OrganizationID string
+}
+
+// RequestLogScan requests the daemon to scan logs for a project.
+// Returns error if daemon is not running.
+func (s *Service) RequestLogScan(ctx context.Context, params RequestLogScanParams) error {
+	// Check if daemon is available
+	if !s.ipcClient.IsAvailable(ctx) {
+		return errutil.NotFoundf("daemon is not running")
+	}
+
+	// Request log scan
+	result, err := s.ipcClient.ScanLogs(ctx, ipc.ScanLogsParams{
+		ProjectID:      params.ProjectID,
+		ProjectPath:    params.ProjectPath,
+		OrganizationID: params.OrganizationID,
+	})
+	if err != nil {
+		return errutil.Internalf("failed to request log scan: %v", err)
+	}
+
+	if !result.Success {
+		return errutil.Internalf("log scan failed: %s", result.Message)
+	}
+
+	s.logger.Info("log scan request completed",
+		slog.String("projectID", params.ProjectID),
+		slog.String("message", result.Message),
+	)
+
+	return nil
 }

@@ -727,3 +727,86 @@ func (s *Service) IsClaudeProjectsDir(path string) bool {
 	}
 	return strings.HasPrefix(path, baseDir+"/") || path == baseDir
 }
+
+// ScanProjectLogsParams contains parameters for ScanProjectLogs operation.
+type ScanProjectLogsParams struct {
+	ProjectID      shareddomain.ID
+	ProjectPath    string
+	OrganizationID string
+}
+
+// ScanProjectLogs scans all log files for a specific project and sends them to the API.
+// This is called by the IPC service when CLI requests a scan.
+func (s *Service) ScanProjectLogs(ctx context.Context, params ScanProjectLogsParams) error {
+	// Get Claude log directory for the project path
+	claudeDir := pathutil.GetClaudeProjectDir(params.ProjectPath)
+
+	s.logger.Info("scanning project logs",
+		slog.String("projectID", params.ProjectID.String()),
+		slog.String("projectPath", params.ProjectPath),
+		slog.String("claudeDir", claudeDir),
+	)
+
+	// Find all .jsonl files in the Claude log directory
+	files, err := dirutil.FindJSONLFiles(claudeDir)
+	if err != nil {
+		s.logger.Debug("no log files found",
+			slog.String("claudeDir", claudeDir),
+			slog.Any("error", err),
+		)
+		return nil // No logs to scan is not an error
+	}
+
+	if len(files) == 0 {
+		s.logger.Info("no log files found in claude directory",
+			slog.String("claudeDir", claudeDir),
+		)
+		return nil
+	}
+
+	s.logger.Info("found log files to scan",
+		slog.String("claudeDir", claudeDir),
+		slog.Int("fileCount", len(files)),
+	)
+
+	// Process each log file
+	var totalLines int
+	for _, file := range files {
+		// Read file contents from beginning (offset 0)
+		lines, _, err := s.HandleFileChange(file, 0)
+		if err != nil {
+			s.logger.Warn("failed to read log file",
+				slog.String("file", file),
+				slog.Any("error", err),
+			)
+			continue
+		}
+
+		if len(lines) == 0 {
+			continue
+		}
+
+		// Add lines to buffer
+		s.mu.Lock()
+		s.bufferByProject[params.ProjectID] = append(s.bufferByProject[params.ProjectID], lines...)
+		s.projectIDToOrgID[params.ProjectID] = params.OrganizationID
+		s.mu.Unlock()
+
+		totalLines += len(lines)
+	}
+
+	// Flush buffered lines to API
+	if totalLines > 0 {
+		if err := s.Flush(ctx); err != nil {
+			return fmt.Errorf("failed to flush logs: %w", err)
+		}
+	}
+
+	s.logger.Info("scan completed",
+		slog.String("projectID", params.ProjectID.String()),
+		slog.Int("filesProcessed", len(files)),
+		slog.Int("totalLines", totalLines),
+	)
+
+	return nil
+}

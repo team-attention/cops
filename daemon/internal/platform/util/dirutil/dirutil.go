@@ -3,6 +3,7 @@ package dirutil
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // WalkDirectories returns all directories (including nested) under the given root.
@@ -29,4 +30,25 @@ func WalkDirectories(root string) ([]string, error) {
 		return nil, err
 	}
 	return dirs, nil
+}
+
+// FindJSONLFiles returns all .jsonl files in the given directory.
+func FindJSONLFiles(dir string) ([]string, error) {
+	var files []string
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		if strings.HasSuffix(entry.Name(), ".jsonl") {
+			files = append(files, filepath.Join(dir, entry.Name()))
+		}
+	}
+
+	return files, nil
 }

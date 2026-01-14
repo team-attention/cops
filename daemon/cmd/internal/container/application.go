@@ -13,9 +13,10 @@ func Run() {
 		newPlatformModule(),
 		newConfigModule(),
 		newLogModule(),
+		newIPCModule(),
 
 		// Handler registration (ordered: subscribers -> publishers -> fsnotify)
-		fx.Invoke(registerHandlers),
+		fx.Invoke(registerHandlers, registerIPCHandlers),
 
 		// Lifecycle timeouts
 		fx.StartTimeout(30*time.Second),

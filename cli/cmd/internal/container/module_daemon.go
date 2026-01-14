@@ -6,6 +6,8 @@ import (
 	"github.com/team-attention/cops/cli/internal/service/daemon"
 	cliadapter "github.com/team-attention/cops/cli/internal/service/daemon/inbound/cli/cobra"
 	"github.com/team-attention/cops/cli/internal/service/daemon/outbound/installer"
+	"github.com/team-attention/cops/cli/internal/service/daemon/outbound/ipc"
+	connectrpcadapter "github.com/team-attention/cops/cli/internal/service/daemon/outbound/ipc/connectrpc"
 	kardianosadapter "github.com/team-attention/cops/cli/internal/service/daemon/outbound/installer/kardianos"
 )
 
@@ -15,6 +17,14 @@ func newDaemonModule(c *dig.Container) error {
 	if err := c.Provide(
 		kardianosadapter.NewKardianosInstaller,
 		dig.As(new(installer.InstallerPort)),
+	); err != nil {
+		return err
+	}
+
+	// Outbound adapter - IPC client for CLI-Daemon communication
+	if err := c.Provide(
+		connectrpcadapter.NewIPCClient,
+		dig.As(new(ipc.IPCPort)),
 	); err != nil {
 		return err
 	}
