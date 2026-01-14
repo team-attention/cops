@@ -30,9 +30,9 @@ builds:
 
 archives:
   - id: cops-archive
-    builds: [cops, cops-daemon]
+    ids: [cops, cops-daemon]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: tar.gz
+    formats: ['tar.gz']
 
 checksum:
   name_template: "checksums.txt"
