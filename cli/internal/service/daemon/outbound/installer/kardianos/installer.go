@@ -97,8 +97,9 @@ func (i *KardianosInstaller) createService() (service.Service, error) {
 		Description: "C-Ops background service for Claude Code session tracking",
 		Executable:  binaryPath,
 		Option: service.KeyValue{
-			"KeepAlive": true,
-			"RunAtLoad": true,
+			"KeepAlive":   true,
+			"RunAtLoad":   true,
+			"UserService": true,
 		},
 	}
 

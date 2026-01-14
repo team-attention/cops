@@ -12,13 +12,13 @@ INSTALL_DIR="$HOME/.cops/bin"
 REPO_OWNER="team-attention"
 REPO_NAME="cops"
 
-# Print colored message
+# Print colored message (to stderr to avoid capturing in subshells)
 info() {
-    echo -e "${GREEN}==>${NC} $1"
+    echo -e "${GREEN}==>${NC} $1" >&2
 }
 
 warn() {
-    echo -e "${YELLOW}Warning:${NC} $1"
+    echo -e "${YELLOW}Warning:${NC} $1" >&2
 }
 
 error() {
@@ -33,6 +33,25 @@ check_requirements() {
     fi
     if ! gh auth status &> /dev/null; then
         error "GitHub authentication required. Run: gh auth login"
+    fi
+
+    # Verify access to the repository
+    info "Verifying repository access..."
+    if ! gh repo view "$REPO_OWNER/$REPO_NAME" &> /dev/null; then
+        warn "Cannot access $REPO_OWNER/$REPO_NAME with current account."
+        info "Please select an account with access to team-attention org:"
+        echo "" >&2
+
+        # Run interactive account switch
+        if ! gh auth switch; then
+            error "Failed to switch account. Run 'gh auth login' with an account that has access."
+        fi
+
+        # Retry access check after switch
+        info "Retrying repository access..."
+        if ! gh repo view "$REPO_OWNER/$REPO_NAME" &> /dev/null; then
+            error "Still cannot access $REPO_OWNER/$REPO_NAME. Please login with an authorized account: gh auth login"
+        fi
     fi
 }
 

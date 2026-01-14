@@ -12,13 +12,13 @@ INSTALL_DIR="$HOME/.cops/bin"
 REPO_OWNER="team-attention"
 REPO_NAME="cops"
 
-# Print colored message
+# Print colored message (to stderr to avoid capturing in subshells)
 info() {
-    echo -e "${GREEN}==>${NC} $1"
+    echo -e "${GREEN}==>${NC} $1" >&2
 }
 
 warn() {
-    echo -e "${YELLOW}Warning:${NC} $1"
+    echo -e "${YELLOW}Warning:${NC} $1" >&2
 }
 
 error() {
