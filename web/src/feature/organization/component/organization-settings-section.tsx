@@ -1,8 +1,11 @@
-import { Building2, Crown, LogOut, Pencil, User, Users } from 'lucide-react'
+import { Building2, Crown, LogOut, Mail, Pencil, User, UserPlus, Users } from 'lucide-react'
 import { EditOrganizationDialog } from './edit-organization-dialog'
 import { MemberList } from './member-list'
 import { LeaveOrganizationDialog } from './leave-organization-dialog'
+import { InviteMemberDialog } from './invite-member-dialog'
+import { PendingInvitationsList } from './pending-invitations-list'
 import { useUserStore } from '@/shared/store/user-store'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   Card,
   CardContent,
@@ -16,6 +19,7 @@ import { Separator } from '@/gen/shadcn/ui/separator'
 
 export const OrganizationSettingsSection = () => {
   const { user, organizations, selectedOrganizationId } = useUserStore()
+  const queryClient = useQueryClient()
 
   // Find current organization from organizations array
   const currentOrg = organizations.find(
@@ -96,9 +100,28 @@ export const OrganizationSettingsSection = () => {
 
         {/* Members Section */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            <h3 className="text-lg font-semibold">Members</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              <h3 className="text-lg font-semibold">Members</h3>
+            </div>
+            {isAdmin && (
+              <InviteMemberDialog
+                organizationId={currentOrg.id}
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Invite Member
+                  </Button>
+                }
+                onSuccess={() => {
+                  // Invalidate invitations query to refresh the list
+                  queryClient.invalidateQueries({
+                    queryKey: ['organization.v1.OrganizationService', 'ListInvitations'],
+                  })
+                }}
+              />
+            )}
           </div>
           <MemberList
             organizationId={currentOrg.id}
@@ -106,6 +129,23 @@ export const OrganizationSettingsSection = () => {
             currentUserId={user.id}
           />
         </div>
+
+        {/* Pending Invitations Section (Admin only) */}
+        {isAdmin && (
+          <>
+            <Separator />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                <h3 className="text-lg font-semibold">Pending Invitations</h3>
+              </div>
+              <PendingInvitationsList
+                organizationId={currentOrg.id}
+                isAdmin={isAdmin}
+              />
+            </div>
+          </>
+        )}
 
         <Separator />
 

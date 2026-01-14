@@ -18,6 +18,7 @@ func Run() {
 		newRBACModule(),
 		newUserModule(),
 		newOrganizationModule(),
+		newInvitationModule(),
 		newAPIKeyModule(),
 		newEventModule(),
 

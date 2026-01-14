@@ -51,6 +51,21 @@ const (
 	// OrganizationServiceLeaveOrganizationProcedure is the fully-qualified name of the
 	// OrganizationService's LeaveOrganization RPC.
 	OrganizationServiceLeaveOrganizationProcedure = "/organization.v1.OrganizationService/LeaveOrganization"
+	// OrganizationServiceCreateInvitationProcedure is the fully-qualified name of the
+	// OrganizationService's CreateInvitation RPC.
+	OrganizationServiceCreateInvitationProcedure = "/organization.v1.OrganizationService/CreateInvitation"
+	// OrganizationServiceListInvitationsProcedure is the fully-qualified name of the
+	// OrganizationService's ListInvitations RPC.
+	OrganizationServiceListInvitationsProcedure = "/organization.v1.OrganizationService/ListInvitations"
+	// OrganizationServiceRevokeInvitationProcedure is the fully-qualified name of the
+	// OrganizationService's RevokeInvitation RPC.
+	OrganizationServiceRevokeInvitationProcedure = "/organization.v1.OrganizationService/RevokeInvitation"
+	// OrganizationServiceGetInvitationByTokenProcedure is the fully-qualified name of the
+	// OrganizationService's GetInvitationByToken RPC.
+	OrganizationServiceGetInvitationByTokenProcedure = "/organization.v1.OrganizationService/GetInvitationByToken"
+	// OrganizationServiceAcceptInvitationProcedure is the fully-qualified name of the
+	// OrganizationService's AcceptInvitation RPC.
+	OrganizationServiceAcceptInvitationProcedure = "/organization.v1.OrganizationService/AcceptInvitation"
 )
 
 // OrganizationServiceClient is a client for the organization.v1.OrganizationService service.
@@ -73,6 +88,21 @@ type OrganizationServiceClient interface {
 	// LeaveOrganization removes the current user from the organization.
 	// If user is in only one organization, cascade deletes all data.
 	LeaveOrganization(context.Context, *connect.Request[v1.LeaveOrganizationReq]) (*connect.Response[v1.LeaveOrganizationRes], error)
+	// CreateInvitation creates a new member invitation and sends email.
+	// Requires admin role in the organization.
+	CreateInvitation(context.Context, *connect.Request[v1.CreateInvitationReq]) (*connect.Response[v1.CreateInvitationRes], error)
+	// ListInvitations retrieves pending invitations for an organization.
+	// Requires admin role in the organization.
+	ListInvitations(context.Context, *connect.Request[v1.ListInvitationsReq]) (*connect.Response[v1.ListInvitationsRes], error)
+	// RevokeInvitation cancels a pending invitation.
+	// Requires admin role in the organization.
+	RevokeInvitation(context.Context, *connect.Request[v1.RevokeInvitationReq]) (*connect.Response[v1.RevokeInvitationRes], error)
+	// GetInvitationByToken retrieves invitation details by token.
+	// Public endpoint (no auth required for viewing invitation).
+	GetInvitationByToken(context.Context, *connect.Request[v1.GetInvitationByTokenReq]) (*connect.Response[v1.GetInvitationByTokenRes], error)
+	// AcceptInvitation adds the authenticated user to the organization.
+	// Requires authentication. Verifies email matches invitation.
+	AcceptInvitation(context.Context, *connect.Request[v1.AcceptInvitationReq]) (*connect.Response[v1.AcceptInvitationRes], error)
 }
 
 // NewOrganizationServiceClient constructs a client for the organization.v1.OrganizationService
@@ -122,6 +152,36 @@ func NewOrganizationServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(organizationServiceMethods.ByName("LeaveOrganization")),
 			connect.WithClientOptions(opts...),
 		),
+		createInvitation: connect.NewClient[v1.CreateInvitationReq, v1.CreateInvitationRes](
+			httpClient,
+			baseURL+OrganizationServiceCreateInvitationProcedure,
+			connect.WithSchema(organizationServiceMethods.ByName("CreateInvitation")),
+			connect.WithClientOptions(opts...),
+		),
+		listInvitations: connect.NewClient[v1.ListInvitationsReq, v1.ListInvitationsRes](
+			httpClient,
+			baseURL+OrganizationServiceListInvitationsProcedure,
+			connect.WithSchema(organizationServiceMethods.ByName("ListInvitations")),
+			connect.WithClientOptions(opts...),
+		),
+		revokeInvitation: connect.NewClient[v1.RevokeInvitationReq, v1.RevokeInvitationRes](
+			httpClient,
+			baseURL+OrganizationServiceRevokeInvitationProcedure,
+			connect.WithSchema(organizationServiceMethods.ByName("RevokeInvitation")),
+			connect.WithClientOptions(opts...),
+		),
+		getInvitationByToken: connect.NewClient[v1.GetInvitationByTokenReq, v1.GetInvitationByTokenRes](
+			httpClient,
+			baseURL+OrganizationServiceGetInvitationByTokenProcedure,
+			connect.WithSchema(organizationServiceMethods.ByName("GetInvitationByToken")),
+			connect.WithClientOptions(opts...),
+		),
+		acceptInvitation: connect.NewClient[v1.AcceptInvitationReq, v1.AcceptInvitationRes](
+			httpClient,
+			baseURL+OrganizationServiceAcceptInvitationProcedure,
+			connect.WithSchema(organizationServiceMethods.ByName("AcceptInvitation")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -133,6 +193,11 @@ type organizationServiceClient struct {
 	updateMemberRole       *connect.Client[v1.UpdateMemberRoleReq, v1.UpdateMemberRoleRes]
 	removeMember           *connect.Client[v1.RemoveMemberReq, v1.RemoveMemberRes]
 	leaveOrganization      *connect.Client[v1.LeaveOrganizationReq, v1.LeaveOrganizationRes]
+	createInvitation       *connect.Client[v1.CreateInvitationReq, v1.CreateInvitationRes]
+	listInvitations        *connect.Client[v1.ListInvitationsReq, v1.ListInvitationsRes]
+	revokeInvitation       *connect.Client[v1.RevokeInvitationReq, v1.RevokeInvitationRes]
+	getInvitationByToken   *connect.Client[v1.GetInvitationByTokenReq, v1.GetInvitationByTokenRes]
+	acceptInvitation       *connect.Client[v1.AcceptInvitationReq, v1.AcceptInvitationRes]
 }
 
 // CreateOrganization calls organization.v1.OrganizationService.CreateOrganization.
@@ -165,6 +230,31 @@ func (c *organizationServiceClient) LeaveOrganization(ctx context.Context, req *
 	return c.leaveOrganization.CallUnary(ctx, req)
 }
 
+// CreateInvitation calls organization.v1.OrganizationService.CreateInvitation.
+func (c *organizationServiceClient) CreateInvitation(ctx context.Context, req *connect.Request[v1.CreateInvitationReq]) (*connect.Response[v1.CreateInvitationRes], error) {
+	return c.createInvitation.CallUnary(ctx, req)
+}
+
+// ListInvitations calls organization.v1.OrganizationService.ListInvitations.
+func (c *organizationServiceClient) ListInvitations(ctx context.Context, req *connect.Request[v1.ListInvitationsReq]) (*connect.Response[v1.ListInvitationsRes], error) {
+	return c.listInvitations.CallUnary(ctx, req)
+}
+
+// RevokeInvitation calls organization.v1.OrganizationService.RevokeInvitation.
+func (c *organizationServiceClient) RevokeInvitation(ctx context.Context, req *connect.Request[v1.RevokeInvitationReq]) (*connect.Response[v1.RevokeInvitationRes], error) {
+	return c.revokeInvitation.CallUnary(ctx, req)
+}
+
+// GetInvitationByToken calls organization.v1.OrganizationService.GetInvitationByToken.
+func (c *organizationServiceClient) GetInvitationByToken(ctx context.Context, req *connect.Request[v1.GetInvitationByTokenReq]) (*connect.Response[v1.GetInvitationByTokenRes], error) {
+	return c.getInvitationByToken.CallUnary(ctx, req)
+}
+
+// AcceptInvitation calls organization.v1.OrganizationService.AcceptInvitation.
+func (c *organizationServiceClient) AcceptInvitation(ctx context.Context, req *connect.Request[v1.AcceptInvitationReq]) (*connect.Response[v1.AcceptInvitationRes], error) {
+	return c.acceptInvitation.CallUnary(ctx, req)
+}
+
 // OrganizationServiceHandler is an implementation of the organization.v1.OrganizationService
 // service.
 type OrganizationServiceHandler interface {
@@ -186,6 +276,21 @@ type OrganizationServiceHandler interface {
 	// LeaveOrganization removes the current user from the organization.
 	// If user is in only one organization, cascade deletes all data.
 	LeaveOrganization(context.Context, *connect.Request[v1.LeaveOrganizationReq]) (*connect.Response[v1.LeaveOrganizationRes], error)
+	// CreateInvitation creates a new member invitation and sends email.
+	// Requires admin role in the organization.
+	CreateInvitation(context.Context, *connect.Request[v1.CreateInvitationReq]) (*connect.Response[v1.CreateInvitationRes], error)
+	// ListInvitations retrieves pending invitations for an organization.
+	// Requires admin role in the organization.
+	ListInvitations(context.Context, *connect.Request[v1.ListInvitationsReq]) (*connect.Response[v1.ListInvitationsRes], error)
+	// RevokeInvitation cancels a pending invitation.
+	// Requires admin role in the organization.
+	RevokeInvitation(context.Context, *connect.Request[v1.RevokeInvitationReq]) (*connect.Response[v1.RevokeInvitationRes], error)
+	// GetInvitationByToken retrieves invitation details by token.
+	// Public endpoint (no auth required for viewing invitation).
+	GetInvitationByToken(context.Context, *connect.Request[v1.GetInvitationByTokenReq]) (*connect.Response[v1.GetInvitationByTokenRes], error)
+	// AcceptInvitation adds the authenticated user to the organization.
+	// Requires authentication. Verifies email matches invitation.
+	AcceptInvitation(context.Context, *connect.Request[v1.AcceptInvitationReq]) (*connect.Response[v1.AcceptInvitationRes], error)
 }
 
 // NewOrganizationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -231,6 +336,36 @@ func NewOrganizationServiceHandler(svc OrganizationServiceHandler, opts ...conne
 		connect.WithSchema(organizationServiceMethods.ByName("LeaveOrganization")),
 		connect.WithHandlerOptions(opts...),
 	)
+	organizationServiceCreateInvitationHandler := connect.NewUnaryHandler(
+		OrganizationServiceCreateInvitationProcedure,
+		svc.CreateInvitation,
+		connect.WithSchema(organizationServiceMethods.ByName("CreateInvitation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	organizationServiceListInvitationsHandler := connect.NewUnaryHandler(
+		OrganizationServiceListInvitationsProcedure,
+		svc.ListInvitations,
+		connect.WithSchema(organizationServiceMethods.ByName("ListInvitations")),
+		connect.WithHandlerOptions(opts...),
+	)
+	organizationServiceRevokeInvitationHandler := connect.NewUnaryHandler(
+		OrganizationServiceRevokeInvitationProcedure,
+		svc.RevokeInvitation,
+		connect.WithSchema(organizationServiceMethods.ByName("RevokeInvitation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	organizationServiceGetInvitationByTokenHandler := connect.NewUnaryHandler(
+		OrganizationServiceGetInvitationByTokenProcedure,
+		svc.GetInvitationByToken,
+		connect.WithSchema(organizationServiceMethods.ByName("GetInvitationByToken")),
+		connect.WithHandlerOptions(opts...),
+	)
+	organizationServiceAcceptInvitationHandler := connect.NewUnaryHandler(
+		OrganizationServiceAcceptInvitationProcedure,
+		svc.AcceptInvitation,
+		connect.WithSchema(organizationServiceMethods.ByName("AcceptInvitation")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/organization.v1.OrganizationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case OrganizationServiceCreateOrganizationProcedure:
@@ -245,6 +380,16 @@ func NewOrganizationServiceHandler(svc OrganizationServiceHandler, opts ...conne
 			organizationServiceRemoveMemberHandler.ServeHTTP(w, r)
 		case OrganizationServiceLeaveOrganizationProcedure:
 			organizationServiceLeaveOrganizationHandler.ServeHTTP(w, r)
+		case OrganizationServiceCreateInvitationProcedure:
+			organizationServiceCreateInvitationHandler.ServeHTTP(w, r)
+		case OrganizationServiceListInvitationsProcedure:
+			organizationServiceListInvitationsHandler.ServeHTTP(w, r)
+		case OrganizationServiceRevokeInvitationProcedure:
+			organizationServiceRevokeInvitationHandler.ServeHTTP(w, r)
+		case OrganizationServiceGetInvitationByTokenProcedure:
+			organizationServiceGetInvitationByTokenHandler.ServeHTTP(w, r)
+		case OrganizationServiceAcceptInvitationProcedure:
+			organizationServiceAcceptInvitationHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -276,4 +421,24 @@ func (UnimplementedOrganizationServiceHandler) RemoveMember(context.Context, *co
 
 func (UnimplementedOrganizationServiceHandler) LeaveOrganization(context.Context, *connect.Request[v1.LeaveOrganizationReq]) (*connect.Response[v1.LeaveOrganizationRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.OrganizationService.LeaveOrganization is not implemented"))
+}
+
+func (UnimplementedOrganizationServiceHandler) CreateInvitation(context.Context, *connect.Request[v1.CreateInvitationReq]) (*connect.Response[v1.CreateInvitationRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.OrganizationService.CreateInvitation is not implemented"))
+}
+
+func (UnimplementedOrganizationServiceHandler) ListInvitations(context.Context, *connect.Request[v1.ListInvitationsReq]) (*connect.Response[v1.ListInvitationsRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.OrganizationService.ListInvitations is not implemented"))
+}
+
+func (UnimplementedOrganizationServiceHandler) RevokeInvitation(context.Context, *connect.Request[v1.RevokeInvitationReq]) (*connect.Response[v1.RevokeInvitationRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.OrganizationService.RevokeInvitation is not implemented"))
+}
+
+func (UnimplementedOrganizationServiceHandler) GetInvitationByToken(context.Context, *connect.Request[v1.GetInvitationByTokenReq]) (*connect.Response[v1.GetInvitationByTokenRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.OrganizationService.GetInvitationByToken is not implemented"))
+}
+
+func (UnimplementedOrganizationServiceHandler) AcceptInvitation(context.Context, *connect.Request[v1.AcceptInvitationReq]) (*connect.Response[v1.AcceptInvitationRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.OrganizationService.AcceptInvitation is not implemented"))
 }

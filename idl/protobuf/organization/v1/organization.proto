@@ -87,6 +87,69 @@ message LeaveOrganizationRes {
   bool is_last_organization = 2;
 }
 
+// Invitation represents a pending member invitation.
+message Invitation {
+  string id = 1;
+  string organization_id = 2;
+  string email = 3;
+  string status = 4;           // "pending", "accepted", "revoked"
+  string invited_by_id = 5;
+  string created_at = 6;       // ISO8601 timestamp
+}
+
+// CreateInvitationReq requests creating a new invitation.
+message CreateInvitationReq {
+  string organization_id = 1;
+  string email = 2;
+}
+
+// CreateInvitationRes contains the created invitation.
+message CreateInvitationRes {
+  Invitation invitation = 1;
+}
+
+// ListInvitationsReq requests pending invitations for an organization.
+message ListInvitationsReq {
+  string organization_id = 1;
+}
+
+// ListInvitationsRes contains the list of pending invitations.
+message ListInvitationsRes {
+  repeated Invitation invitations = 1;
+}
+
+// RevokeInvitationReq requests revoking an invitation.
+message RevokeInvitationReq {
+  string invitation_id = 1;
+}
+
+// RevokeInvitationRes confirms the revocation.
+message RevokeInvitationRes {
+  bool success = 1;
+}
+
+// GetInvitationByTokenReq requests invitation details by token.
+message GetInvitationByTokenReq {
+  string token = 1;
+}
+
+// GetInvitationByTokenRes contains invitation and organization details.
+message GetInvitationByTokenRes {
+  Invitation invitation = 1;
+  string organization_name = 2;
+}
+
+// AcceptInvitationReq requests accepting an invitation.
+message AcceptInvitationReq {
+  string token = 1;
+}
+
+// AcceptInvitationRes contains the result of accepting.
+message AcceptInvitationRes {
+  bool success = 1;
+  string organization_id = 2;
+}
+
 // OrganizationService handles organization management operations.
 service OrganizationService {
   // CreateOrganization creates a new organization with the authenticated user as admin.
@@ -112,4 +175,24 @@ service OrganizationService {
   // LeaveOrganization removes the current user from the organization.
   // If user is in only one organization, cascade deletes all data.
   rpc LeaveOrganization(LeaveOrganizationReq) returns (LeaveOrganizationRes);
+
+  // CreateInvitation creates a new member invitation and sends email.
+  // Requires admin role in the organization.
+  rpc CreateInvitation(CreateInvitationReq) returns (CreateInvitationRes);
+
+  // ListInvitations retrieves pending invitations for an organization.
+  // Requires admin role in the organization.
+  rpc ListInvitations(ListInvitationsReq) returns (ListInvitationsRes);
+
+  // RevokeInvitation cancels a pending invitation.
+  // Requires admin role in the organization.
+  rpc RevokeInvitation(RevokeInvitationReq) returns (RevokeInvitationRes);
+
+  // GetInvitationByToken retrieves invitation details by token.
+  // Public endpoint (no auth required for viewing invitation).
+  rpc GetInvitationByToken(GetInvitationByTokenReq) returns (GetInvitationByTokenRes);
+
+  // AcceptInvitation adds the authenticated user to the organization.
+  // Requires authentication. Verifies email matches invitation.
+  rpc AcceptInvitation(AcceptInvitationReq) returns (AcceptInvitationRes);
 }

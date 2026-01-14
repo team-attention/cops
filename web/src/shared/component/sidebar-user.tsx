@@ -4,6 +4,7 @@ import {
   Building2,
   ChevronDown,
   LogOut,
+  Plus,
   RefreshCw,
   Settings,
 } from 'lucide-react'
@@ -107,6 +108,11 @@ export const SidebarUser = () => {
 
   const handleOrganizationChange = (orgId: string) => {
     setSelectedOrganizationId(orgId)
+  }
+
+  // handleCreateOrganizationClick navigates to the organization creation page.
+  const handleCreateOrganizationClick = () => {
+    navigate({ to: '/organizations/new' })
   }
 
   // Render loading state
@@ -248,6 +254,13 @@ export const SidebarUser = () => {
                 <DropdownMenuSeparator />
               </>
             )}
+
+            {/* Create Organization menu item */}
+            <DropdownMenuItem onClick={handleCreateOrganizationClick}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Organization
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
 
             {/* Settings menu item */}
             <DropdownMenuItem onClick={handleSettingsClick}>

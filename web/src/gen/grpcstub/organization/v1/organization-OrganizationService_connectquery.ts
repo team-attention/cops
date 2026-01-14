@@ -51,3 +51,43 @@ export const removeMember = OrganizationService.method.removeMember;
  * @generated from rpc organization.v1.OrganizationService.LeaveOrganization
  */
 export const leaveOrganization = OrganizationService.method.leaveOrganization;
+
+/**
+ * CreateInvitation creates a new member invitation and sends email.
+ * Requires admin role in the organization.
+ *
+ * @generated from rpc organization.v1.OrganizationService.CreateInvitation
+ */
+export const createInvitation = OrganizationService.method.createInvitation;
+
+/**
+ * ListInvitations retrieves pending invitations for an organization.
+ * Requires admin role in the organization.
+ *
+ * @generated from rpc organization.v1.OrganizationService.ListInvitations
+ */
+export const listInvitations = OrganizationService.method.listInvitations;
+
+/**
+ * RevokeInvitation cancels a pending invitation.
+ * Requires admin role in the organization.
+ *
+ * @generated from rpc organization.v1.OrganizationService.RevokeInvitation
+ */
+export const revokeInvitation = OrganizationService.method.revokeInvitation;
+
+/**
+ * GetInvitationByToken retrieves invitation details by token.
+ * Public endpoint (no auth required for viewing invitation).
+ *
+ * @generated from rpc organization.v1.OrganizationService.GetInvitationByToken
+ */
+export const getInvitationByToken = OrganizationService.method.getInvitationByToken;
+
+/**
+ * AcceptInvitation adds the authenticated user to the organization.
+ * Requires authentication. Verifies email matches invitation.
+ *
+ * @generated from rpc organization.v1.OrganizationService.AcceptInvitation
+ */
+export const acceptInvitation = OrganizationService.method.acceptInvitation;

@@ -70,4 +70,12 @@ type OrganizationRepositoryPort interface {
 	// DeleteOrganization permanently deletes an organization.
 	// Returns error if database error occurs.
 	DeleteOrganization(ctx context.Context, organizationID string) error
+
+	// AddMember adds a new member to an organization.
+	// Returns error if database error occurs.
+	AddMember(ctx context.Context, organizationID, userID string, role domain.MemberRole) error
+
+	// CheckMemberExists checks if a user is already a member.
+	// Returns true if member exists, false otherwise.
+	CheckMemberExists(ctx context.Context, organizationID, userID string) (bool, error)
 }

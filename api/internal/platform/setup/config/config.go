@@ -16,6 +16,17 @@ type Config struct {
 	JWT        JWTConfig
 	OAuth      OAuthConfig
 	DeviceCode DeviceCodeConfig
+	SMTP       SMTPConfig
+}
+
+// SMTPConfig holds SMTP email server configuration.
+type SMTPConfig struct {
+	Host     string `env:"SMTP_HOST" envDefault:""`
+	Port     int    `env:"SMTP_PORT" envDefault:"587"`
+	Username string `env:"SMTP_USERNAME" envDefault:""`
+	Password string `env:"SMTP_PASSWORD" envDefault:""`
+	FromName string `env:"SMTP_FROM_NAME" envDefault:"C-Ops"`
+	FromAddr string `env:"SMTP_FROM_ADDR" envDefault:""`
 }
 
 // AppConfig holds application-level settings.

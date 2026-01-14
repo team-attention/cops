@@ -18,6 +18,7 @@ import { Route as AuthIndexRouteImport } from './route/auth/index'
 import { Route as SessionsSessionIdRouteImport } from './route/sessions/$sessionId'
 import { Route as ProjectsProjectIdRouteImport } from './route/projects/$projectId'
 import { Route as OrganizationsNewRouteImport } from './route/organizations/new'
+import { Route as InviteTokenRouteImport } from './route/invite/$token'
 import { Route as AuthDeviceRouteImport } from './route/auth/device'
 import { Route as AuthCallbackRouteImport } from './route/auth/callback'
 
@@ -66,6 +67,11 @@ const OrganizationsNewRoute = OrganizationsNewRouteImport.update({
   path: '/organizations/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthDeviceRoute = AuthDeviceRouteImport.update({
   id: '/auth/device',
   path: '/auth/device',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/invite/$token'
     | '/organizations/new'
     | '/projects/$projectId'
     | '/sessions/$sessionId'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/invite/$token'
     | '/organizations/new'
     | '/projects/$projectId'
     | '/sessions/$sessionId'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/invite/$token'
     | '/organizations/new'
     | '/projects/$projectId'
     | '/sessions/$sessionId'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthDeviceRoute: typeof AuthDeviceRoute
+  InviteTokenRoute: typeof InviteTokenRoute
   OrganizationsNewRoute: typeof OrganizationsNewRoute
   ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
   SessionsSessionIdRoute: typeof SessionsSessionIdRoute
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganizationsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/device': {
       id: '/auth/device'
       path: '/auth/device'
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthDeviceRoute: AuthDeviceRoute,
+  InviteTokenRoute: InviteTokenRoute,
   OrganizationsNewRoute: OrganizationsNewRoute,
   ProjectsProjectIdRoute: ProjectsProjectIdRoute,
   SessionsSessionIdRoute: SessionsSessionIdRoute,

@@ -449,5 +449,76 @@ func (r *MongoOrganizationRepository) DeleteOrganization(ctx context.Context, or
 	return nil
 }
 
+// AddMember adds a new member to an organization.
+func (r *MongoOrganizationRepository) AddMember(ctx context.Context, organizationID, userID string, role domain.MemberRole) error {
+	orgObjectID, err := bson.ObjectIDFromHex(organizationID)
+	if err != nil {
+		return err
+	}
+
+	userObjectID, err := bson.ObjectIDFromHex(userID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{mongoschema.OrganizationIDField: orgObjectID}
+
+	update := bson.M{
+		"$push": bson.M{
+			mongoschema.OrganizationMembersField: bson.M{
+				mongoschema.OrganizationMemberUserIDField: userObjectID,
+				mongoschema.OrganizationMemberRoleField:   role,
+			},
+		},
+	}
+
+	_, err = r.orgColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		r.logger.Error("failed to add member",
+			slog.String("organizationID", organizationID),
+			slog.String("userID", userID),
+			slog.String("role", string(role)),
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	return nil
+}
+
+// CheckMemberExists checks if a user is already a member.
+func (r *MongoOrganizationRepository) CheckMemberExists(ctx context.Context, organizationID, userID string) (bool, error) {
+	orgObjectID, err := bson.ObjectIDFromHex(organizationID)
+	if err != nil {
+		return false, err
+	}
+
+	userObjectID, err := bson.ObjectIDFromHex(userID)
+	if err != nil {
+		return false, err
+	}
+
+	filter := bson.M{
+		mongoschema.OrganizationIDField: orgObjectID,
+		mongoschema.OrganizationMembersField: bson.M{
+			"$elemMatch": bson.M{
+				mongoschema.OrganizationMemberUserIDField: userObjectID,
+			},
+		},
+	}
+
+	count, err := r.orgColl.CountDocuments(ctx, filter)
+	if err != nil {
+		r.logger.Error("failed to check member exists",
+			slog.String("organizationID", organizationID),
+			slog.String("userID", userID),
+			slog.Any("error", err),
+		)
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 // Interface verification
 var _ repository.OrganizationRepositoryPort = (*MongoOrganizationRepository)(nil)

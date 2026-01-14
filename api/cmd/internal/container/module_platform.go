@@ -6,6 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.uber.org/fx"
 
+	"github.com/team-attention/cops/api/internal/platform/outbound/email"
+	"github.com/team-attention/cops/api/internal/platform/outbound/email/smtp"
 	"github.com/team-attention/cops/api/internal/platform/outbound/txmanager"
 	mongotx "github.com/team-attention/cops/api/internal/platform/outbound/txmanager/mongodb"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
@@ -37,5 +39,13 @@ func newPlatformModule() fx.Option {
 
 		// Fiber app (depends on config, logger)
 		fx.Provide(server.InitFiber),
+
+		// Email service (depends on config, logger)
+		fx.Provide(
+			fx.Annotate(
+				smtp.NewSMTPEmailService,
+				fx.As(new(email.EmailServicePort)),
+			),
+		),
 	)
 }

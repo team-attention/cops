@@ -10,7 +10,9 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/team-attention/cops/api/internal/platform/interceptor"
+	"github.com/team-attention/cops/api/internal/service/invitation"
 	"github.com/team-attention/cops/api/internal/service/organization"
+	userrepo "github.com/team-attention/cops/api/internal/service/user/outbound/repository"
 	domainv1 "github.com/team-attention/cops/shared/gen/grpcstub/domain/v1"
 	organizationv1 "github.com/team-attention/cops/shared/gen/grpcstub/organization/v1"
 	"github.com/team-attention/cops/shared/gen/grpcstub/organization/v1/organizationv1connect"
@@ -18,15 +20,24 @@ import (
 
 // OrganizationGRPCHandler handles gRPC requests for organization service.
 type OrganizationGRPCHandler struct {
-	svc    *organization.Service
-	logger *slog.Logger
+	svc       *organization.Service
+	inviteSvc *invitation.Service
+	userRepo  userrepo.UserRepositoryPort
+	logger    *slog.Logger
 }
 
 // NewOrganizationGRPCHandler creates a new organization gRPC handler.
-func NewOrganizationGRPCHandler(l *slog.Logger, svc *organization.Service) *OrganizationGRPCHandler {
+func NewOrganizationGRPCHandler(
+	l *slog.Logger,
+	svc *organization.Service,
+	inviteSvc *invitation.Service,
+	userRepo userrepo.UserRepositoryPort,
+) *OrganizationGRPCHandler {
 	return &OrganizationGRPCHandler{
-		svc:    svc,
-		logger: l.With(slog.String("name", "organization.grpc.connectrpc")),
+		svc:       svc,
+		inviteSvc: inviteSvc,
+		userRepo:  userRepo,
+		logger:    l.With(slog.String("name", "organization.grpc.connectrpc")),
 	}
 }
 
@@ -285,6 +296,243 @@ func (h *OrganizationGRPCHandler) LeaveOrganization(
 	res := &organizationv1.LeaveOrganizationRes{
 		Success:            result.Success,
 		IsLastOrganization: result.IsLastOrganization,
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+// CreateInvitation creates a new member invitation.
+func (h *OrganizationGRPCHandler) CreateInvitation(
+	ctx context.Context,
+	req *connect.Request[organizationv1.CreateInvitationReq],
+) (*connect.Response[organizationv1.CreateInvitationRes], error) {
+	// Extract userID from context
+	userID := interceptor.UserIDFromContext(ctx)
+	if userID == "" {
+		h.logger.Warn("CreateInvitation: user not authenticated")
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
+	}
+
+	// Call service
+	result, err := h.inviteSvc.CreateInvitation(ctx, userID, req.Msg.OrganizationId, req.Msg.Email)
+	if err != nil {
+		if strings.Contains(err.Error(), "admin role required") {
+			return nil, connect.NewError(connect.CodePermissionDenied, err)
+		}
+		if strings.Contains(err.Error(), "already a member") {
+			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+		}
+		if strings.Contains(err.Error(), "cannot invite yourself") {
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		}
+		if strings.Contains(err.Error(), "invitation already sent") {
+			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+		}
+		if strings.Contains(err.Error(), "required") {
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		}
+
+		h.logger.Error("CreateInvitation failed",
+			slog.String("userID", userID),
+			slog.String("organizationID", req.Msg.OrganizationId),
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Convert to protobuf
+	protoInvitation := &organizationv1.Invitation{
+		Id:             string(result.Invitation.ID),
+		OrganizationId: string(result.Invitation.OrganizationID),
+		Email:          result.Invitation.Email,
+		Status:         string(result.Invitation.Status),
+		InvitedById:    string(result.Invitation.InvitedByID),
+		CreatedAt:      result.Invitation.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
+
+	res := &organizationv1.CreateInvitationRes{
+		Invitation: protoInvitation,
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+// ListInvitations retrieves pending invitations for an organization.
+func (h *OrganizationGRPCHandler) ListInvitations(
+	ctx context.Context,
+	req *connect.Request[organizationv1.ListInvitationsReq],
+) (*connect.Response[organizationv1.ListInvitationsRes], error) {
+	// Extract userID from context
+	userID := interceptor.UserIDFromContext(ctx)
+	if userID == "" {
+		h.logger.Warn("ListInvitations: user not authenticated")
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
+	}
+
+	// Call service
+	result, err := h.inviteSvc.ListInvitations(ctx, userID, req.Msg.OrganizationId)
+	if err != nil {
+		if strings.Contains(err.Error(), "admin role required") {
+			return nil, connect.NewError(connect.CodePermissionDenied, err)
+		}
+
+		h.logger.Error("ListInvitations failed",
+			slog.String("userID", userID),
+			slog.String("organizationID", req.Msg.OrganizationId),
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Convert to protobuf
+	var protoInvitations []*organizationv1.Invitation
+	for _, inv := range result.Invitations {
+		protoInvitations = append(protoInvitations, &organizationv1.Invitation{
+			Id:             string(inv.ID),
+			OrganizationId: string(inv.OrganizationID),
+			Email:          inv.Email,
+			Status:         string(inv.Status),
+			InvitedById:    string(inv.InvitedByID),
+			CreatedAt:      inv.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		})
+	}
+
+	res := &organizationv1.ListInvitationsRes{
+		Invitations: protoInvitations,
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+// RevokeInvitation cancels a pending invitation.
+func (h *OrganizationGRPCHandler) RevokeInvitation(
+	ctx context.Context,
+	req *connect.Request[organizationv1.RevokeInvitationReq],
+) (*connect.Response[organizationv1.RevokeInvitationRes], error) {
+	// Extract userID from context
+	userID := interceptor.UserIDFromContext(ctx)
+	if userID == "" {
+		h.logger.Warn("RevokeInvitation: user not authenticated")
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
+	}
+
+	// Call service
+	err := h.inviteSvc.RevokeInvitation(ctx, userID, req.Msg.InvitationId)
+	if err != nil {
+		if strings.Contains(err.Error(), "admin role required") {
+			return nil, connect.NewError(connect.CodePermissionDenied, err)
+		}
+		if strings.Contains(err.Error(), "not found") {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		if strings.Contains(err.Error(), "already processed") {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+		}
+
+		h.logger.Error("RevokeInvitation failed",
+			slog.String("userID", userID),
+			slog.String("invitationID", req.Msg.InvitationId),
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &organizationv1.RevokeInvitationRes{
+		Success: true,
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+// GetInvitationByToken retrieves invitation details (public endpoint).
+func (h *OrganizationGRPCHandler) GetInvitationByToken(
+	ctx context.Context,
+	req *connect.Request[organizationv1.GetInvitationByTokenReq],
+) (*connect.Response[organizationv1.GetInvitationByTokenRes], error) {
+	// No auth required for viewing invitation details
+
+	// Call service
+	result, err := h.inviteSvc.GetInvitationByToken(ctx, req.Msg.Token)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		if strings.Contains(err.Error(), "no longer valid") {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+		}
+
+		h.logger.Error("GetInvitationByToken failed",
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Convert to protobuf
+	protoInvitation := &organizationv1.Invitation{
+		Id:             string(result.Invitation.ID),
+		OrganizationId: string(result.Invitation.OrganizationID),
+		Email:          result.Invitation.Email,
+		Status:         string(result.Invitation.Status),
+		InvitedById:    string(result.Invitation.InvitedByID),
+		CreatedAt:      result.Invitation.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
+
+	res := &organizationv1.GetInvitationByTokenRes{
+		Invitation:       protoInvitation,
+		OrganizationName: result.OrganizationName,
+	}
+
+	return connect.NewResponse(res), nil
+}
+
+// AcceptInvitation adds user to organization.
+func (h *OrganizationGRPCHandler) AcceptInvitation(
+	ctx context.Context,
+	req *connect.Request[organizationv1.AcceptInvitationReq],
+) (*connect.Response[organizationv1.AcceptInvitationRes], error) {
+	// Extract userID from context (requires auth)
+	userID := interceptor.UserIDFromContext(ctx)
+	if userID == "" {
+		h.logger.Warn("AcceptInvitation: user not authenticated")
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
+	}
+
+	// Get user email from repository
+	user, err := h.userRepo.GetByID(ctx, userID)
+	if err != nil {
+		h.logger.Error("AcceptInvitation: failed to get user",
+			slog.String("userID", userID),
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get user details"))
+	}
+	if user == nil {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("user not found"))
+	}
+
+	// Call service
+	result, err := h.inviteSvc.AcceptInvitation(ctx, userID, user.Email, req.Msg.Token)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		if strings.Contains(err.Error(), "no longer valid") {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+		}
+		if strings.Contains(err.Error(), "email mismatch") {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+		}
+
+		h.logger.Error("AcceptInvitation failed",
+			slog.String("userID", userID),
+			slog.Any("error", err),
+		)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &organizationv1.AcceptInvitationRes{
+		Success:        result.Success,
+		OrganizationId: result.OrganizationID,
 	}
 
 	return connect.NewResponse(res), nil

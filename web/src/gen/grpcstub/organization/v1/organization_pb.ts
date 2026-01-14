@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file organization/v1/organization.proto.
  */
 export const file_organization_v1_organization: GenFile = /*@__PURE__*/
-  fileDesc("CiJvcmdhbml6YXRpb24vdjEvb3JnYW5pemF0aW9uLnByb3RvEg9vcmdhbml6YXRpb24udjEiMwoVQ3JlYXRlT3JnYW5pemF0aW9uUmVxEgwKBG5hbWUYASABKAkSDAoEc2x1ZxgCIAEoCSJGChVDcmVhdGVPcmdhbml6YXRpb25SZXMSLQoMb3JnYW5pemF0aW9uGAEgASgLMhcuZG9tYWluLnYxLk9yZ2FuaXphdGlvbiJvCh1Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscxIPCgd1c2VyX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJEgwKBG5hbWUYAyABKAkSEgoKYXZhdGFyX3VybBgEIAEoCRIMCgRyb2xlGAUgASgJIkwKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRzbHVnGAMgASgJIkYKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcxItCgxvcmdhbml6YXRpb24YASABKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uIjQKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJIlwKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXMSPwoHbWVtYmVycxgBIAMoCzIuLm9yZ2FuaXphdGlvbi52MS5Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscyJNChNVcGRhdGVNZW1iZXJSb2xlUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEgwKBHJvbGUYAyABKAkiJgoTVXBkYXRlTWVtYmVyUm9sZVJlcxIPCgdzdWNjZXNzGAEgASgIIjsKD1JlbW92ZU1lbWJlclJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIiCg9SZW1vdmVNZW1iZXJSZXMSDwoHc3VjY2VzcxgBIAEoCCIvChRMZWF2ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkiRQoUTGVhdmVPcmdhbml6YXRpb25SZXMSDwoHc3VjY2VzcxgBIAEoCBIcChRpc19sYXN0X29yZ2FuaXphdGlvbhgCIAEoCDLqBAoTT3JnYW5pemF0aW9uU2VydmljZRJkChJDcmVhdGVPcmdhbml6YXRpb24SJi5vcmdhbml6YXRpb24udjEuQ3JlYXRlT3JnYW5pemF0aW9uUmVxGiYub3JnYW5pemF0aW9uLnYxLkNyZWF0ZU9yZ2FuaXphdGlvblJlcxJkChJVcGRhdGVPcmdhbml6YXRpb24SJi5vcmdhbml6YXRpb24udjEuVXBkYXRlT3JnYW5pemF0aW9uUmVxGiYub3JnYW5pemF0aW9uLnYxLlVwZGF0ZU9yZ2FuaXphdGlvblJlcxJwChZHZXRPcmdhbml6YXRpb25NZW1iZXJzEioub3JnYW5pemF0aW9uLnYxLkdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXEaKi5vcmdhbml6YXRpb24udjEuR2V0T3JnYW5pemF0aW9uTWVtYmVyc1JlcxJeChBVcGRhdGVNZW1iZXJSb2xlEiQub3JnYW5pemF0aW9uLnYxLlVwZGF0ZU1lbWJlclJvbGVSZXEaJC5vcmdhbml6YXRpb24udjEuVXBkYXRlTWVtYmVyUm9sZVJlcxJSCgxSZW1vdmVNZW1iZXISIC5vcmdhbml6YXRpb24udjEuUmVtb3ZlTWVtYmVyUmVxGiAub3JnYW5pemF0aW9uLnYxLlJlbW92ZU1lbWJlclJlcxJhChFMZWF2ZU9yZ2FuaXphdGlvbhIlLm9yZ2FuaXphdGlvbi52MS5MZWF2ZU9yZ2FuaXphdGlvblJlcRolLm9yZ2FuaXphdGlvbi52MS5MZWF2ZU9yZ2FuaXphdGlvblJlc0LYAQoTY29tLm9yZ2FuaXphdGlvbi52MUIRT3JnYW5pemF0aW9uUHJvdG9QAVpRZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvb3JnYW5pemF0aW9uL3YxO29yZ2FuaXphdGlvbnYxogIDT1hYqgIPT3JnYW5pemF0aW9uLlYxygIPT3JnYW5pemF0aW9uXFYx4gIbT3JnYW5pemF0aW9uXFYxXEdQQk1ldGFkYXRh6gIQT3JnYW5pemF0aW9uOjpWMWIGcHJvdG8z", [file_domain_v1_domain]);
+  fileDesc("CiJvcmdhbml6YXRpb24vdjEvb3JnYW5pemF0aW9uLnByb3RvEg9vcmdhbml6YXRpb24udjEiMwoVQ3JlYXRlT3JnYW5pemF0aW9uUmVxEgwKBG5hbWUYASABKAkSDAoEc2x1ZxgCIAEoCSJGChVDcmVhdGVPcmdhbml6YXRpb25SZXMSLQoMb3JnYW5pemF0aW9uGAEgASgLMhcuZG9tYWluLnYxLk9yZ2FuaXphdGlvbiJvCh1Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscxIPCgd1c2VyX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJEgwKBG5hbWUYAyABKAkSEgoKYXZhdGFyX3VybBgEIAEoCRIMCgRyb2xlGAUgASgJIkwKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRzbHVnGAMgASgJIkYKFVVwZGF0ZU9yZ2FuaXphdGlvblJlcxItCgxvcmdhbml6YXRpb24YASABKAsyFy5kb21haW4udjEuT3JnYW5pemF0aW9uIjQKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJIlwKGUdldE9yZ2FuaXphdGlvbk1lbWJlcnNSZXMSPwoHbWVtYmVycxgBIAMoCzIuLm9yZ2FuaXphdGlvbi52MS5Pcmdhbml6YXRpb25NZW1iZXJXaXRoRGV0YWlscyJNChNVcGRhdGVNZW1iZXJSb2xlUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEgwKBHJvbGUYAyABKAkiJgoTVXBkYXRlTWVtYmVyUm9sZVJlcxIPCgdzdWNjZXNzGAEgASgIIjsKD1JlbW92ZU1lbWJlclJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIiCg9SZW1vdmVNZW1iZXJSZXMSDwoHc3VjY2VzcxgBIAEoCCIvChRMZWF2ZU9yZ2FuaXphdGlvblJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkiRQoUTGVhdmVPcmdhbml6YXRpb25SZXMSDwoHc3VjY2VzcxgBIAEoCBIcChRpc19sYXN0X29yZ2FuaXphdGlvbhgCIAEoCCJ7CgpJbnZpdGF0aW9uEgoKAmlkGAEgASgJEhcKD29yZ2FuaXphdGlvbl9pZBgCIAEoCRINCgVlbWFpbBgDIAEoCRIOCgZzdGF0dXMYBCABKAkSFQoNaW52aXRlZF9ieV9pZBgFIAEoCRISCgpjcmVhdGVkX2F0GAYgASgJIj0KE0NyZWF0ZUludml0YXRpb25SZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJIkYKE0NyZWF0ZUludml0YXRpb25SZXMSLwoKaW52aXRhdGlvbhgBIAEoCzIbLm9yZ2FuaXphdGlvbi52MS5JbnZpdGF0aW9uIi0KEkxpc3RJbnZpdGF0aW9uc1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkiRgoSTGlzdEludml0YXRpb25zUmVzEjAKC2ludml0YXRpb25zGAEgAygLMhsub3JnYW5pemF0aW9uLnYxLkludml0YXRpb24iLAoTUmV2b2tlSW52aXRhdGlvblJlcRIVCg1pbnZpdGF0aW9uX2lkGAEgASgJIiYKE1Jldm9rZUludml0YXRpb25SZXMSDwoHc3VjY2VzcxgBIAEoCCIoChdHZXRJbnZpdGF0aW9uQnlUb2tlblJlcRINCgV0b2tlbhgBIAEoCSJlChdHZXRJbnZpdGF0aW9uQnlUb2tlblJlcxIvCgppbnZpdGF0aW9uGAEgASgLMhsub3JnYW5pemF0aW9uLnYxLkludml0YXRpb24SGQoRb3JnYW5pemF0aW9uX25hbWUYAiABKAkiJAoTQWNjZXB0SW52aXRhdGlvblJlcRINCgV0b2tlbhgBIAEoCSI/ChNBY2NlcHRJbnZpdGF0aW9uUmVzEg8KB3N1Y2Nlc3MYASABKAgSFwoPb3JnYW5pemF0aW9uX2lkGAIgASgJMtMIChNPcmdhbml6YXRpb25TZXJ2aWNlEmQKEkNyZWF0ZU9yZ2FuaXphdGlvbhImLm9yZ2FuaXphdGlvbi52MS5DcmVhdGVPcmdhbml6YXRpb25SZXEaJi5vcmdhbml6YXRpb24udjEuQ3JlYXRlT3JnYW5pemF0aW9uUmVzEmQKElVwZGF0ZU9yZ2FuaXphdGlvbhImLm9yZ2FuaXphdGlvbi52MS5VcGRhdGVPcmdhbml6YXRpb25SZXEaJi5vcmdhbml6YXRpb24udjEuVXBkYXRlT3JnYW5pemF0aW9uUmVzEnAKFkdldE9yZ2FuaXphdGlvbk1lbWJlcnMSKi5vcmdhbml6YXRpb24udjEuR2V0T3JnYW5pemF0aW9uTWVtYmVyc1JlcRoqLm9yZ2FuaXphdGlvbi52MS5HZXRPcmdhbml6YXRpb25NZW1iZXJzUmVzEl4KEFVwZGF0ZU1lbWJlclJvbGUSJC5vcmdhbml6YXRpb24udjEuVXBkYXRlTWVtYmVyUm9sZVJlcRokLm9yZ2FuaXphdGlvbi52MS5VcGRhdGVNZW1iZXJSb2xlUmVzElIKDFJlbW92ZU1lbWJlchIgLm9yZ2FuaXphdGlvbi52MS5SZW1vdmVNZW1iZXJSZXEaIC5vcmdhbml6YXRpb24udjEuUmVtb3ZlTWVtYmVyUmVzEmEKEUxlYXZlT3JnYW5pemF0aW9uEiUub3JnYW5pemF0aW9uLnYxLkxlYXZlT3JnYW5pemF0aW9uUmVxGiUub3JnYW5pemF0aW9uLnYxLkxlYXZlT3JnYW5pemF0aW9uUmVzEl4KEENyZWF0ZUludml0YXRpb24SJC5vcmdhbml6YXRpb24udjEuQ3JlYXRlSW52aXRhdGlvblJlcRokLm9yZ2FuaXphdGlvbi52MS5DcmVhdGVJbnZpdGF0aW9uUmVzElsKD0xpc3RJbnZpdGF0aW9ucxIjLm9yZ2FuaXphdGlvbi52MS5MaXN0SW52aXRhdGlvbnNSZXEaIy5vcmdhbml6YXRpb24udjEuTGlzdEludml0YXRpb25zUmVzEl4KEFJldm9rZUludml0YXRpb24SJC5vcmdhbml6YXRpb24udjEuUmV2b2tlSW52aXRhdGlvblJlcRokLm9yZ2FuaXphdGlvbi52MS5SZXZva2VJbnZpdGF0aW9uUmVzEmoKFEdldEludml0YXRpb25CeVRva2VuEigub3JnYW5pemF0aW9uLnYxLkdldEludml0YXRpb25CeVRva2VuUmVxGigub3JnYW5pemF0aW9uLnYxLkdldEludml0YXRpb25CeVRva2VuUmVzEl4KEEFjY2VwdEludml0YXRpb24SJC5vcmdhbml6YXRpb24udjEuQWNjZXB0SW52aXRhdGlvblJlcRokLm9yZ2FuaXphdGlvbi52MS5BY2NlcHRJbnZpdGF0aW9uUmVzQtgBChNjb20ub3JnYW5pemF0aW9uLnYxQhFPcmdhbml6YXRpb25Qcm90b1ABWlFnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9vcmdhbml6YXRpb24vdjE7b3JnYW5pemF0aW9udjGiAgNPWFiqAg9Pcmdhbml6YXRpb24uVjHKAg9Pcmdhbml6YXRpb25cVjHiAhtPcmdhbml6YXRpb25cVjFcR1BCTWV0YWRhdGHqAhBPcmdhbml6YXRpb246OlYxYgZwcm90bzM", [file_domain_v1_domain]);
 
 /**
  * CreateOrganizationReq contains the data needed to create a new organization.
@@ -330,6 +330,259 @@ export const LeaveOrganizationResSchema: GenMessage<LeaveOrganizationRes> = /*@_
   messageDesc(file_organization_v1_organization, 12);
 
 /**
+ * Invitation represents a pending member invitation.
+ *
+ * @generated from message organization.v1.Invitation
+ */
+export type Invitation = Message<"organization.v1.Invitation"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string organization_id = 2;
+   */
+  organizationId: string;
+
+  /**
+   * @generated from field: string email = 3;
+   */
+  email: string;
+
+  /**
+   * "pending", "accepted", "revoked"
+   *
+   * @generated from field: string status = 4;
+   */
+  status: string;
+
+  /**
+   * @generated from field: string invited_by_id = 5;
+   */
+  invitedById: string;
+
+  /**
+   * ISO8601 timestamp
+   *
+   * @generated from field: string created_at = 6;
+   */
+  createdAt: string;
+};
+
+/**
+ * Describes the message organization.v1.Invitation.
+ * Use `create(InvitationSchema)` to create a new message.
+ */
+export const InvitationSchema: GenMessage<Invitation> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 13);
+
+/**
+ * CreateInvitationReq requests creating a new invitation.
+ *
+ * @generated from message organization.v1.CreateInvitationReq
+ */
+export type CreateInvitationReq = Message<"organization.v1.CreateInvitationReq"> & {
+  /**
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
+   * @generated from field: string email = 2;
+   */
+  email: string;
+};
+
+/**
+ * Describes the message organization.v1.CreateInvitationReq.
+ * Use `create(CreateInvitationReqSchema)` to create a new message.
+ */
+export const CreateInvitationReqSchema: GenMessage<CreateInvitationReq> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 14);
+
+/**
+ * CreateInvitationRes contains the created invitation.
+ *
+ * @generated from message organization.v1.CreateInvitationRes
+ */
+export type CreateInvitationRes = Message<"organization.v1.CreateInvitationRes"> & {
+  /**
+   * @generated from field: organization.v1.Invitation invitation = 1;
+   */
+  invitation?: Invitation;
+};
+
+/**
+ * Describes the message organization.v1.CreateInvitationRes.
+ * Use `create(CreateInvitationResSchema)` to create a new message.
+ */
+export const CreateInvitationResSchema: GenMessage<CreateInvitationRes> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 15);
+
+/**
+ * ListInvitationsReq requests pending invitations for an organization.
+ *
+ * @generated from message organization.v1.ListInvitationsReq
+ */
+export type ListInvitationsReq = Message<"organization.v1.ListInvitationsReq"> & {
+  /**
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+};
+
+/**
+ * Describes the message organization.v1.ListInvitationsReq.
+ * Use `create(ListInvitationsReqSchema)` to create a new message.
+ */
+export const ListInvitationsReqSchema: GenMessage<ListInvitationsReq> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 16);
+
+/**
+ * ListInvitationsRes contains the list of pending invitations.
+ *
+ * @generated from message organization.v1.ListInvitationsRes
+ */
+export type ListInvitationsRes = Message<"organization.v1.ListInvitationsRes"> & {
+  /**
+   * @generated from field: repeated organization.v1.Invitation invitations = 1;
+   */
+  invitations: Invitation[];
+};
+
+/**
+ * Describes the message organization.v1.ListInvitationsRes.
+ * Use `create(ListInvitationsResSchema)` to create a new message.
+ */
+export const ListInvitationsResSchema: GenMessage<ListInvitationsRes> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 17);
+
+/**
+ * RevokeInvitationReq requests revoking an invitation.
+ *
+ * @generated from message organization.v1.RevokeInvitationReq
+ */
+export type RevokeInvitationReq = Message<"organization.v1.RevokeInvitationReq"> & {
+  /**
+   * @generated from field: string invitation_id = 1;
+   */
+  invitationId: string;
+};
+
+/**
+ * Describes the message organization.v1.RevokeInvitationReq.
+ * Use `create(RevokeInvitationReqSchema)` to create a new message.
+ */
+export const RevokeInvitationReqSchema: GenMessage<RevokeInvitationReq> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 18);
+
+/**
+ * RevokeInvitationRes confirms the revocation.
+ *
+ * @generated from message organization.v1.RevokeInvitationRes
+ */
+export type RevokeInvitationRes = Message<"organization.v1.RevokeInvitationRes"> & {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+};
+
+/**
+ * Describes the message organization.v1.RevokeInvitationRes.
+ * Use `create(RevokeInvitationResSchema)` to create a new message.
+ */
+export const RevokeInvitationResSchema: GenMessage<RevokeInvitationRes> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 19);
+
+/**
+ * GetInvitationByTokenReq requests invitation details by token.
+ *
+ * @generated from message organization.v1.GetInvitationByTokenReq
+ */
+export type GetInvitationByTokenReq = Message<"organization.v1.GetInvitationByTokenReq"> & {
+  /**
+   * @generated from field: string token = 1;
+   */
+  token: string;
+};
+
+/**
+ * Describes the message organization.v1.GetInvitationByTokenReq.
+ * Use `create(GetInvitationByTokenReqSchema)` to create a new message.
+ */
+export const GetInvitationByTokenReqSchema: GenMessage<GetInvitationByTokenReq> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 20);
+
+/**
+ * GetInvitationByTokenRes contains invitation and organization details.
+ *
+ * @generated from message organization.v1.GetInvitationByTokenRes
+ */
+export type GetInvitationByTokenRes = Message<"organization.v1.GetInvitationByTokenRes"> & {
+  /**
+   * @generated from field: organization.v1.Invitation invitation = 1;
+   */
+  invitation?: Invitation;
+
+  /**
+   * @generated from field: string organization_name = 2;
+   */
+  organizationName: string;
+};
+
+/**
+ * Describes the message organization.v1.GetInvitationByTokenRes.
+ * Use `create(GetInvitationByTokenResSchema)` to create a new message.
+ */
+export const GetInvitationByTokenResSchema: GenMessage<GetInvitationByTokenRes> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 21);
+
+/**
+ * AcceptInvitationReq requests accepting an invitation.
+ *
+ * @generated from message organization.v1.AcceptInvitationReq
+ */
+export type AcceptInvitationReq = Message<"organization.v1.AcceptInvitationReq"> & {
+  /**
+   * @generated from field: string token = 1;
+   */
+  token: string;
+};
+
+/**
+ * Describes the message organization.v1.AcceptInvitationReq.
+ * Use `create(AcceptInvitationReqSchema)` to create a new message.
+ */
+export const AcceptInvitationReqSchema: GenMessage<AcceptInvitationReq> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 22);
+
+/**
+ * AcceptInvitationRes contains the result of accepting.
+ *
+ * @generated from message organization.v1.AcceptInvitationRes
+ */
+export type AcceptInvitationRes = Message<"organization.v1.AcceptInvitationRes"> & {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+
+  /**
+   * @generated from field: string organization_id = 2;
+   */
+  organizationId: string;
+};
+
+/**
+ * Describes the message organization.v1.AcceptInvitationRes.
+ * Use `create(AcceptInvitationResSchema)` to create a new message.
+ */
+export const AcceptInvitationResSchema: GenMessage<AcceptInvitationRes> = /*@__PURE__*/
+  messageDesc(file_organization_v1_organization, 23);
+
+/**
  * OrganizationService handles organization management operations.
  *
  * @generated from service organization.v1.OrganizationService
@@ -400,6 +653,61 @@ export const OrganizationService: GenService<{
     methodKind: "unary";
     input: typeof LeaveOrganizationReqSchema;
     output: typeof LeaveOrganizationResSchema;
+  },
+  /**
+   * CreateInvitation creates a new member invitation and sends email.
+   * Requires admin role in the organization.
+   *
+   * @generated from rpc organization.v1.OrganizationService.CreateInvitation
+   */
+  createInvitation: {
+    methodKind: "unary";
+    input: typeof CreateInvitationReqSchema;
+    output: typeof CreateInvitationResSchema;
+  },
+  /**
+   * ListInvitations retrieves pending invitations for an organization.
+   * Requires admin role in the organization.
+   *
+   * @generated from rpc organization.v1.OrganizationService.ListInvitations
+   */
+  listInvitations: {
+    methodKind: "unary";
+    input: typeof ListInvitationsReqSchema;
+    output: typeof ListInvitationsResSchema;
+  },
+  /**
+   * RevokeInvitation cancels a pending invitation.
+   * Requires admin role in the organization.
+   *
+   * @generated from rpc organization.v1.OrganizationService.RevokeInvitation
+   */
+  revokeInvitation: {
+    methodKind: "unary";
+    input: typeof RevokeInvitationReqSchema;
+    output: typeof RevokeInvitationResSchema;
+  },
+  /**
+   * GetInvitationByToken retrieves invitation details by token.
+   * Public endpoint (no auth required for viewing invitation).
+   *
+   * @generated from rpc organization.v1.OrganizationService.GetInvitationByToken
+   */
+  getInvitationByToken: {
+    methodKind: "unary";
+    input: typeof GetInvitationByTokenReqSchema;
+    output: typeof GetInvitationByTokenResSchema;
+  },
+  /**
+   * AcceptInvitation adds the authenticated user to the organization.
+   * Requires authentication. Verifies email matches invitation.
+   *
+   * @generated from rpc organization.v1.OrganizationService.AcceptInvitation
+   */
+  acceptInvitation: {
+    methodKind: "unary";
+    input: typeof AcceptInvitationReqSchema;
+    output: typeof AcceptInvitationResSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_organization_v1_organization, 0);
