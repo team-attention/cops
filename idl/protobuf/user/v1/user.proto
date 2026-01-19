@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "domain/v1/domain.proto";
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/user/v1;userv1";
+
+// GetMeReq is empty - user ID is extracted from JWT token.
+message GetMeReq {}
+
+// GetMeRes contains the authenticated user's data and organizations.
+message GetMeRes {
+  domain.v1.User user = 1;
+  repeated domain.v1.Organization organizations = 2;
+}
+
+// DeleteAccountReq contains the confirmation phrase for account deletion.
+// User must type 'DELETE' exactly to confirm the deletion.
+message DeleteAccountReq {
+  // confirmation_phrase must be exactly 'DELETE' (case-sensitive)
+  string confirmation_phrase = 1;
+}
+
+// DeleteAccountRes contains the result of account deletion.
+message DeleteAccountRes {
+  // success indicates whether the account was deleted
+  bool success = 1;
+  // message provides additional context about the deletion result
+  string message = 2;
+}
+
+// UserService handles user-related operations.
+service UserService {
+  // GetMe returns the authenticated user's information and organizations.
+  // Requires valid JWT token in Authorization header.
+  rpc GetMe(GetMeReq) returns (GetMeRes);
+
+  // DeleteAccount permanently deletes the authenticated user's account.
+  // Requires valid JWT token in Authorization header.
+  // Performs cascade deletion for organizations where user is sole member.
+  rpc DeleteAccount(DeleteAccountReq) returns (DeleteAccountRes);
+}

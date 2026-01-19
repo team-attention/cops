@@ -1,0 +1,43 @@
+version: 2
+project_name: cops
+
+before:
+  hooks:
+    - go mod tidy -C ./cli
+    - go mod tidy -C ./daemon
+
+builds:
+  - id: cops
+    main: ./cli/cmd/cops
+    binary: cops
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+    ldflags:
+      # -s: symbol table removal, -w: DWARF debug info removal (30-50% size reduction)
+      - -s -w
+      - -X main.version={{.Version}}
+
+  - id: cops-daemon
+    main: ./daemon/cmd/daemon
+    binary: cops-daemon
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+
+archives:
+  - id: cops-archive
+    ids: [cops, cops-daemon]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: ['tar.gz']
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: team-attention
+    name: cops

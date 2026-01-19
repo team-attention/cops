@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package organization.v1;
+
+import "domain/v1/domain.proto";
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/organization/v1;organizationv1";
+
+// CreateOrganizationReq contains the data needed to create a new organization.
+message CreateOrganizationReq {
+  // name is the display name for the organization (required)
+  string name = 1;
+  // slug is the URL-safe identifier for the organization (required)
+  string slug = 2;
+}
+
+// CreateOrganizationRes contains the newly created organization.
+message CreateOrganizationRes {
+  // organization is the created organization with generated ID
+  domain.v1.Organization organization = 1;
+}
+
+// OrganizationMemberWithDetails represents a member with full user details.
+// Used in GetOrganizationMembers response to avoid N+1 queries.
+message OrganizationMemberWithDetails {
+  string user_id = 1;
+  string email = 2;
+  string name = 3;
+  string avatar_url = 4;
+  string role = 5;  // "admin" or "member"
+}
+
+// UpdateOrganizationReq contains fields to update for an organization.
+message UpdateOrganizationReq {
+  string organization_id = 1;
+  string name = 2;
+  string slug = 3;
+}
+
+// UpdateOrganizationRes contains the updated organization.
+message UpdateOrganizationRes {
+  domain.v1.Organization organization = 1;
+}
+
+// GetOrganizationMembersReq requests members of an organization.
+message GetOrganizationMembersReq {
+  string organization_id = 1;
+}
+
+// GetOrganizationMembersRes contains the list of members with details.
+message GetOrganizationMembersRes {
+  repeated OrganizationMemberWithDetails members = 1;
+}
+
+// UpdateMemberRoleReq changes a member's role in an organization.
+message UpdateMemberRoleReq {
+  string organization_id = 1;
+  string user_id = 2;
+  string role = 3;  // "admin" or "member"
+}
+
+// UpdateMemberRoleRes confirms the role update.
+message UpdateMemberRoleRes {
+  bool success = 1;
+}
+
+// RemoveMemberReq removes a member from an organization.
+message RemoveMemberReq {
+  string organization_id = 1;
+  string user_id = 2;
+}
+
+// RemoveMemberRes confirms the member removal.
+message RemoveMemberRes {
+  bool success = 1;
+}
+
+// LeaveOrganizationReq requests the current user to leave an organization.
+message LeaveOrganizationReq {
+  string organization_id = 1;
+}
+
+// LeaveOrganizationRes contains the result of leaving.
+message LeaveOrganizationRes {
+  bool success = 1;
+  // is_last_organization indicates if this was the user's last organization (cascade deleted)
+  bool is_last_organization = 2;
+}
+
+// Invitation represents a pending member invitation.
+message Invitation {
+  string id = 1;
+  string organization_id = 2;
+  string email = 3;
+  string status = 4;           // "pending", "accepted", "revoked"
+  string invited_by_id = 5;
+  string created_at = 6;       // ISO8601 timestamp
+}
+
+// CreateInvitationReq requests creating a new invitation.
+message CreateInvitationReq {
+  string organization_id = 1;
+  string email = 2;
+}
+
+// CreateInvitationRes contains the created invitation.
+message CreateInvitationRes {
+  Invitation invitation = 1;
+}
+
+// ListInvitationsReq requests pending invitations for an organization.
+message ListInvitationsReq {
+  string organization_id = 1;
+}
+
+// ListInvitationsRes contains the list of pending invitations.
+message ListInvitationsRes {
+  repeated Invitation invitations = 1;
+}
+
+// RevokeInvitationReq requests revoking an invitation.
+message RevokeInvitationReq {
+  string invitation_id = 1;
+}
+
+// RevokeInvitationRes confirms the revocation.
+message RevokeInvitationRes {
+  bool success = 1;
+}
+
+// GetInvitationByTokenReq requests invitation details by token.
+message GetInvitationByTokenReq {
+  string token = 1;
+}
+
+// GetInvitationByTokenRes contains invitation and organization details.
+message GetInvitationByTokenRes {
+  Invitation invitation = 1;
+  string organization_name = 2;
+}
+
+// AcceptInvitationReq requests accepting an invitation.
+message AcceptInvitationReq {
+  string token = 1;
+}
+
+// AcceptInvitationRes contains the result of accepting.
+message AcceptInvitationRes {
+  bool success = 1;
+  string organization_id = 2;
+}
+
+// OrganizationService handles organization management operations.
+service OrganizationService {
+  // CreateOrganization creates a new organization with the authenticated user as admin.
+  // Requires valid JWT token in Authorization header.
+  rpc CreateOrganization(CreateOrganizationReq) returns (CreateOrganizationRes);
+
+  // UpdateOrganization updates an organization's name and/or slug.
+  // Requires admin role in the organization.
+  rpc UpdateOrganization(UpdateOrganizationReq) returns (UpdateOrganizationRes);
+
+  // GetOrganizationMembers retrieves all members with their full user details.
+  // Requires membership in the organization.
+  rpc GetOrganizationMembers(GetOrganizationMembersReq) returns (GetOrganizationMembersRes);
+
+  // UpdateMemberRole changes a member's role (admin/member).
+  // Requires admin role. Cannot demote the last admin.
+  rpc UpdateMemberRole(UpdateMemberRoleReq) returns (UpdateMemberRoleRes);
+
+  // RemoveMember removes a user from the organization.
+  // Requires admin role. Cannot remove the last admin.
+  rpc RemoveMember(RemoveMemberReq) returns (RemoveMemberRes);
+
+  // LeaveOrganization removes the current user from the organization.
+  // If user is in only one organization, cascade deletes all data.
+  rpc LeaveOrganization(LeaveOrganizationReq) returns (LeaveOrganizationRes);
+
+  // CreateInvitation creates a new member invitation and sends email.
+  // Requires admin role in the organization.
+  rpc CreateInvitation(CreateInvitationReq) returns (CreateInvitationRes);
+
+  // ListInvitations retrieves pending invitations for an organization.
+  // Requires admin role in the organization.
+  rpc ListInvitations(ListInvitationsReq) returns (ListInvitationsRes);
+
+  // RevokeInvitation cancels a pending invitation.
+  // Requires admin role in the organization.
+  rpc RevokeInvitation(RevokeInvitationReq) returns (RevokeInvitationRes);
+
+  // GetInvitationByToken retrieves invitation details by token.
+  // Public endpoint (no auth required for viewing invitation).
+  rpc GetInvitationByToken(GetInvitationByTokenReq) returns (GetInvitationByTokenRes);
+
+  // AcceptInvitation adds the authenticated user to the organization.
+  // Requires authentication. Verifies email matches invitation.
+  rpc AcceptInvitation(AcceptInvitationReq) returns (AcceptInvitationRes);
+}

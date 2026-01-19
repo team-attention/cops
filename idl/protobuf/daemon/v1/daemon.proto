@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package daemon.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/daemon/v1;daemonv1";
+
+// ScanLogsReq is the request message for ScanLogs RPC.
+message ScanLogsReq {
+  // project_id is the ID of the project to scan logs for
+  string project_id = 1;
+
+  // project_path is the filesystem path of the project
+  string project_path = 2;
+
+  // organization_id is the organization this project belongs to
+  string organization_id = 3;
+}
+
+// ScanLogsRes is the response message for ScanLogs RPC.
+message ScanLogsRes {
+  // success indicates whether the scan request was accepted
+  bool success = 1;
+
+  // message provides additional information about the result
+  string message = 2;
+}
+
+// DaemonService provides IPC operations for CLI-Daemon communication.
+service DaemonService {
+  // ScanLogs triggers log file scanning for a specific project.
+  // Called by CLI when user selects "sync past logs" option during project registration.
+  rpc ScanLogs(ScanLogsReq) returns (ScanLogsRes);
+}

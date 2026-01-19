@@ -1,0 +1,32 @@
+services:
+  mongodb:
+    image: mongodb/mongodb-atlas-local:latest
+    container_name: cops-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - DO_NOT_TRACK=1
+    volumes:
+      - mongodb-data:/data/db
+
+  api:
+    build:
+      context: ../..
+      dockerfile: api/.meta/local.Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+      - .env.${ENV:-local}
+    volumes:
+      - ../..:/app
+      - go-mod-cache:/go/pkg/mod
+    working_dir: /app/api
+    command: ["air", "-c", ".meta/.air.toml"]
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  go-mod-cache:
+  mongodb-data:

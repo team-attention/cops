@@ -1,0 +1,15 @@
+{
+  "name": "cops-mongodb-migrations",
+  "version": "1.0.0",
+  "description": "MongoDB migrations for C-Ops system",
+  "private": true,
+  "scripts": {
+    "migrate:up": "migrate-mongo up",
+    "migrate:down": "migrate-mongo down",
+    "migrate:status": "migrate-mongo status",
+    "migrate:create": "migrate-mongo create"
+  },
+  "dependencies": {
+    "migrate-mongo": "latest"
+  }
+}

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package project.v1;
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/project/v1;projectv1";
+
+// RegisterProjectReq contains parameters for registering a project with the API server.
+// The server performs duplicate detection using remote URLs and existing project ID.
+message RegisterProjectReq {
+  // configured_remote_url is from git config (git config --get remote.origin.url)
+  string configured_remote_url = 1;
+
+  // actual_remote_url is from git ls-remote (git ls-remote --get-url origin)
+  // This may differ from configured URL if the GitHub repo was renamed
+  string actual_remote_url = 2;
+
+  // existing_project_id is optional - from local config if available
+  // Used as fallback for finding existing projects
+  string existing_project_id = 3;
+
+  // name is the human-readable project name
+  // If empty, the server will generate a default from the remote URL
+  string name = 4;
+
+  // is_git_project indicates whether this is a git repository
+  bool is_git_project = 5;
+
+  // organization_id is the organization this project belongs to
+  string organization_id = 6;
+}
+
+// RegisterProjectRes contains the result of project registration.
+message RegisterProjectRes {
+  // project_id is the MongoDB ObjectID hex representation
+  string project_id = 1;
+
+  // is_new indicates whether a new project was created (true) or existing found (false)
+  bool is_new = 2;
+
+  // name is the project name (either provided or generated)
+  string name = 3;
+
+  // is_git_project indicates whether this is a git repository
+  bool is_git_project = 4;
+
+  // organization_id is the organization this project belongs to
+  string organization_id = 5;
+}
+
+// GetProjectByIdAndOrgReq contains parameters for getting a project by ID within an organization.
+message GetProjectByIdAndOrgReq {
+  // project_id is the MongoDB ObjectID hex representation
+  string project_id = 1;
+
+  // organization_id is the organization ID to scope the query
+  string organization_id = 2;
+}
+
+// GetProjectByIdAndOrgRes contains the result of getting a project by ID within an organization.
+message GetProjectByIdAndOrgRes {
+  // found indicates whether the project was found within the organization
+  bool found = 1;
+
+  // project_id is the MongoDB ObjectID hex representation (only set if found)
+  string project_id = 2;
+
+  // name is the project name (only set if found)
+  string name = 3;
+
+  // organization_id is the organization this project belongs to (only set if found)
+  string organization_id = 4;
+}
+
+// ProjectService handles project registration and management.
+service ProjectService {
+  // RegisterProject registers a project or returns existing project ID if already registered.
+  // Performs duplicate detection using remote URLs and optional existing project ID.
+  rpc RegisterProject(RegisterProjectReq) returns (RegisterProjectRes);
+
+  // GetProjectByIdAndOrg checks if a project exists by ID within a specific organization.
+  rpc GetProjectByIdAndOrg(GetProjectByIdAndOrgReq) returns (GetProjectByIdAndOrgRes);
+}

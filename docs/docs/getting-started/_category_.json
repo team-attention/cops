@@ -1,0 +1,8 @@
+{
+  "label": "시작하기",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "C-Ops 설치부터 첫 프로젝트 등록까지의 가이드입니다."
+  }
+}

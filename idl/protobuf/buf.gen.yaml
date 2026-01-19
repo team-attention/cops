@@ -1,0 +1,31 @@
+version: v2
+
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/team-attention/cops/shared/gen/grpcstub
+
+plugins:
+  # Go protobuf types
+  - remote: buf.build/protocolbuffers/go
+    out: ../../shared/gen/grpcstub
+    opt: paths=source_relative
+
+  # Go ConnectRPC handlers
+  - remote: buf.build/connectrpc/go
+    out: ../../shared/gen/grpcstub
+    opt: paths=source_relative
+
+  # TypeScript protobuf types
+  - remote: buf.build/bufbuild/es
+    out: ../../web/src/gen/grpcstub
+    opt: target=ts
+
+  # TypeScript Connect-Query hooks for TanStack Query
+  - remote: buf.build/connectrpc/query-es
+    out: ../../web/src/gen/grpcstub
+    opt: target=ts
+
+inputs:
+  - directory: .
