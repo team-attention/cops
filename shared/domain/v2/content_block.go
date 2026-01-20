@@ -1,4 +1,4 @@
-package v2
+package session
 
 // ImageData represents image content with base64-encoded data.
 type ImageData struct {

@@ -10,7 +10,7 @@ export
 ## build: Build the SPA for production
 .PHONY: build deploy
 build:
-	npm run build
+	VITE_APP_VERSION=$(VERSION) npm run build
 
 ## deploy: Build and deploy to GCS with CDN cache invalidation
 .PHONY: deploy

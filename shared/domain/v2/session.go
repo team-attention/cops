@@ -1,8 +1,8 @@
-// Package v2 provides provider-agnostic transcript models for AI agent sessions.
+// Package session provides provider-agnostic session models for AI agent sessions.
 //
 // # Design Goals
 //
-// This package abstracts transcript data from Claude Code-specific structures,
+// This package abstracts session data from Claude Code-specific structures,
 // enabling support for multiple AI providers (Claude, OpenAI, Gemini, etc.).
 //
 // # Key Abstractions
@@ -13,7 +13,7 @@
 //
 // # Type Hierarchy
 //
-//	Transcript (discriminated union)
+//	Session (discriminated union)
 //	├── HumanMessage     - User input (text, image only)
 //	├── AgentMessage     - AI response (text, thinking, tool_call refs)
 //	├── ToolExecution    - Tool call + result (independent)
@@ -32,7 +32,7 @@
 //   - summary                -> SystemMessage (subtype=summary)
 //   - file-history-snapshot  -> SystemMessage (subtype=file_snapshot)
 //   - progress               -> Progress
-package v2
+package session
 
 import (
 	"encoding/json"
@@ -40,29 +40,29 @@ import (
 	"time"
 )
 
-// TranscriptType represents the type discriminator for v2 transcript entries.
-type TranscriptType string
+// SessionType represents the type discriminator for v2 session entries.
+type SessionType string
 
 const (
-	// TranscriptTypeHuman represents user input in conversation tree.
+	// SessionTypeHuman represents user input in conversation tree.
 	// Contains only text and image content blocks (no tool_result).
-	TranscriptTypeHuman TranscriptType = "human"
+	SessionTypeHuman SessionType = "human"
 
-	// TranscriptTypeAgent represents AI agent response in conversation tree.
+	// SessionTypeAgent represents AI agent response in conversation tree.
 	// Contains text, thinking, and tool_call references (actual tool calls are in ToolExecution).
-	TranscriptTypeAgent TranscriptType = "agent"
+	SessionTypeAgent SessionType = "agent"
 
-	// TranscriptTypeToolExecution represents a tool call with its result.
+	// SessionTypeToolExecution represents a tool call with its result.
 	// Independent type that links to the originating agent via SourceAgentUUID.
-	TranscriptTypeToolExecution TranscriptType = "tool_execution"
+	SessionTypeToolExecution SessionType = "tool_execution"
 
-	// TranscriptTypeSystem represents system-level metadata.
+	// SessionTypeSystem represents system-level metadata.
 	// Uses Subtype to distinguish: turn_duration, summary, file_snapshot.
-	TranscriptTypeSystem TranscriptType = "system"
+	SessionTypeSystem SessionType = "system"
 
-	// TranscriptTypeProgress represents real-time progress updates during tool execution.
+	// SessionTypeProgress represents real-time progress updates during tool execution.
 	// Links to ToolExecution via ToolExecutionID.
-	TranscriptTypeProgress TranscriptType = "progress"
+	SessionTypeProgress SessionType = "progress"
 )
 
 // TreeNodeMeta contains common fields for conversation tree nodes.
@@ -80,31 +80,31 @@ type TreeNodeMeta struct {
 	IsSidechain bool      `json:"isSidechain,omitempty" bson:"isSidechain,omitempty"`
 }
 
-// Transcript represents a single entry with polymorphic data.
-type Transcript struct {
-	Type TranscriptType `json:"type" bson:"type"`
-	Data any            `bson:",inline"`
+// Session represents a single entry with polymorphic data.
+type Session struct {
+	Type SessionType `json:"type" bson:"type"`
+	Data any         `bson:",inline"`
 }
 
-// transcriptTypeFactory creates new instances of transcript data types.
-type transcriptTypeFactory func() any
+// sessionTypeFactory creates new instances of session data types.
+type sessionTypeFactory func() any
 
-// transcriptTypeRegistry maps TranscriptType to factory functions.
-var transcriptTypeRegistry = map[TranscriptType]transcriptTypeFactory{
-	TranscriptTypeHuman:         func() any { return &HumanMessage{} },
-	TranscriptTypeAgent:         func() any { return &AgentMessage{} },
-	TranscriptTypeToolExecution: func() any { return &ToolExecution{} },
-	TranscriptTypeSystem:        func() any { return &SystemMessage{} },
-	TranscriptTypeProgress:      func() any { return &Progress{} },
+// sessionTypeRegistry maps SessionType to factory functions.
+var sessionTypeRegistry = map[SessionType]sessionTypeFactory{
+	SessionTypeHuman:         func() any { return &HumanMessage{} },
+	SessionTypeAgent:         func() any { return &AgentMessage{} },
+	SessionTypeToolExecution: func() any { return &ToolExecution{} },
+	SessionTypeSystem:        func() any { return &SystemMessage{} },
+	SessionTypeProgress:      func() any { return &Progress{} },
 }
 
 // MarshalJSON flattens Data fields alongside "type" field.
-func (t Transcript) MarshalJSON() ([]byte, error) {
-	if t.Data == nil {
-		return json.Marshal(map[string]any{"type": t.Type})
+func (s Session) MarshalJSON() ([]byte, error) {
+	if s.Data == nil {
+		return json.Marshal(map[string]any{"type": s.Type})
 	}
 
-	dataBytes, err := json.Marshal(t.Data)
+	dataBytes, err := json.Marshal(s.Data)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (t Transcript) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	typeBytes, err := json.Marshal(t.Type)
+	typeBytes, err := json.Marshal(s.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -124,9 +124,9 @@ func (t Transcript) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON dispatches to correct concrete type based on "type" field.
-func (t *Transcript) UnmarshalJSON(data []byte) error {
+func (s *Session) UnmarshalJSON(data []byte) error {
 	type typeExtractor struct {
-		Type TranscriptType `json:"type"`
+		Type SessionType `json:"type"`
 	}
 
 	var extractor typeExtractor
@@ -134,20 +134,20 @@ func (t *Transcript) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	t.Type = extractor.Type
+	s.Type = extractor.Type
 
-	factory, found := transcriptTypeRegistry[t.Type]
+	factory, found := sessionTypeRegistry[s.Type]
 	if found {
 		typedData := factory()
 		if err := json.Unmarshal(data, typedData); err != nil {
-			slog.Error("failed to unmarshal transcript data",
-				"type", t.Type, "error", err)
+			slog.Error("failed to unmarshal session data",
+				"type", s.Type, "error", err)
 		} else {
-			t.Data = typedData
+			s.Data = typedData
 			return nil
 		}
 	} else {
-		slog.Error("unknown transcript type", "type", t.Type)
+		slog.Error("unknown session type", "type", s.Type)
 	}
 
 	// Fallback to map for unknown types
@@ -155,6 +155,6 @@ func (t *Transcript) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &mapData); err != nil {
 		return err
 	}
-	t.Data = mapData
+	s.Data = mapData
 	return nil
 }

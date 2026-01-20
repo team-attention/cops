@@ -1,10 +1,10 @@
-// Package claudecodeadapter provides conversion from Claude Code v1 transcript format to v2.
+// Package claudecodeadapter provides conversion from Claude Code v1 transcript format to v2 session format.
 //
 // Claude Code produces JSONL logs with Claude API-specific structures:
 //   - User messages contain tool_result blocks
 //   - Assistant messages contain tool_use blocks
 //
-// This adapter converts these to the provider-agnostic v2 format where:
+// This adapter converts these to the provider-agnostic v2 session format where:
 //   - ToolExecution is an independent type containing both call and result
 //   - HumanMessage contains only text/image content
 //   - AgentMessage contains text/thinking and tool call references
@@ -12,10 +12,10 @@ package claudecodeadapter
 
 import (
 	"github.com/team-attention/cops/shared/domain"
-	v2 "github.com/team-attention/cops/shared/domain/v2"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
-// Adapter converts Claude Code v1 transcripts to v2 format.
+// Adapter converts Claude Code v1 transcripts to v2 session format.
 type Adapter struct{}
 
 // NewAdapter creates a new ClaudeCodeAdapter.
@@ -23,9 +23,9 @@ func NewAdapter() *Adapter {
 	return &Adapter{}
 }
 
-// Adapt converts a v1 Transcript to v2 format.
-// May return multiple v2 Transcripts (e.g., assistant message splits into AgentMessage + ToolExecutions).
-func (a *Adapter) Adapt(t *domain.Transcript) ([]*v2.Transcript, error) {
+// Adapt converts a v1 Transcript to v2 Session format.
+// May return multiple v2 Sessions (e.g., assistant message splits into AgentMessage + ToolExecutions).
+func (a *Adapter) Adapt(t *domain.Transcript) ([]*session.Session, error) {
 	switch t.Type {
 	case domain.TranscriptTypeUser:
 		return a.adaptUser(t.Data.(*domain.UserTranscript))
@@ -44,9 +44,9 @@ func (a *Adapter) Adapt(t *domain.Transcript) ([]*v2.Transcript, error) {
 	}
 }
 
-// AdaptBatch converts multiple v1 Transcripts to v2 format.
-func (a *Adapter) AdaptBatch(transcripts []*domain.Transcript) ([]*v2.Transcript, error) {
-	var result []*v2.Transcript
+// AdaptBatch converts multiple v1 Transcripts to v2 Session format.
+func (a *Adapter) AdaptBatch(transcripts []*domain.Transcript) ([]*session.Session, error) {
+	var result []*session.Session
 	for _, t := range transcripts {
 		adapted, err := a.Adapt(t)
 		if err != nil {

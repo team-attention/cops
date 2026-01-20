@@ -1,36 +1,36 @@
 package geminicliadapter
 
 import (
-	v2 "github.com/team-attention/cops/shared/domain/v2"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
 // adaptUserMessage converts a Gemini user message to HumanMessage.
-func (a *Adapter) adaptUserMessage(msg *GeminiMessage, sessionID string) []*v2.Transcript {
+func (a *Adapter) adaptUserMessage(msg *GeminiMessage, sessionID string) []*session.Session {
 	content := msg.Content
-	human := &v2.HumanMessage{
-		TreeNodeMeta: v2.TreeNodeMeta{
+	human := &session.HumanMessage{
+		TreeNodeMeta: session.TreeNodeMeta{
 			UUID:      msg.ID,
 			SessionID: sessionID,
 			Timestamp: msg.Timestamp,
 		},
-		Content: []*v2.HumanContentBlock{
+		Content: []*session.HumanContentBlock{
 			{
-				Type: v2.HumanContentBlockTypeText,
+				Type: session.HumanContentBlockTypeText,
 				Text: &content,
 			},
 		},
 	}
 
-	return []*v2.Transcript{{
-		Type: v2.TranscriptTypeHuman,
+	return []*session.Session{{
+		Type: session.SessionTypeHuman,
 		Data: human,
 	}}
 }
 
 // adaptGeminiMessage converts a Gemini agent message to AgentMessage and ToolExecutions.
-func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*v2.Transcript {
-	var results []*v2.Transcript
-	var agentContent []*v2.AgentContentBlock
+func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*session.Session {
+	var results []*session.Session
+	var agentContent []*session.AgentContentBlock
 
 	// Add thinking blocks
 	agentContent = append(agentContent, a.convertThoughts(msg.Thoughts)...)
@@ -38,19 +38,19 @@ func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*v2
 	// Add text content if present
 	if msg.Content != "" {
 		content := msg.Content
-		agentContent = append(agentContent, &v2.AgentContentBlock{
-			Type: v2.AgentContentBlockTypeText,
+		agentContent = append(agentContent, &session.AgentContentBlock{
+			Type: session.AgentContentBlockTypeText,
 			Text: &content,
 		})
 	}
 
 	// Add tool call references
-	var toolExecs []*v2.ToolExecution
+	var toolExecs []*session.ToolExecution
 	for _, tc := range msg.ToolCalls {
 		// Add reference in agent content
-		agentContent = append(agentContent, &v2.AgentContentBlock{
-			Type: v2.AgentContentBlockTypeToolCallRef,
-			ToolCallRef: &v2.ToolCallReference{
+		agentContent = append(agentContent, &session.AgentContentBlock{
+			Type: session.AgentContentBlockTypeToolCallRef,
+			ToolCallRef: &session.ToolCallReference{
 				ToolExecutionID: tc.ID,
 				ToolName:        tc.Name,
 			},
@@ -62,8 +62,8 @@ func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*v2
 	}
 
 	// Create AgentMessage
-	agent := &v2.AgentMessage{
-		TreeNodeMeta: v2.TreeNodeMeta{
+	agent := &session.AgentMessage{
+		TreeNodeMeta: session.TreeNodeMeta{
 			UUID:      msg.ID,
 			SessionID: sessionID,
 			Timestamp: msg.Timestamp,
@@ -73,15 +73,15 @@ func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*v2
 		Content:  agentContent,
 		Usage:    a.convertTokens(msg.Tokens),
 	}
-	results = append(results, &v2.Transcript{
-		Type: v2.TranscriptTypeAgent,
+	results = append(results, &session.Session{
+		Type: session.SessionTypeAgent,
 		Data: agent,
 	})
 
 	// Add ToolExecutions
 	for _, toolExec := range toolExecs {
-		results = append(results, &v2.Transcript{
-			Type: v2.TranscriptTypeToolExecution,
+		results = append(results, &session.Session{
+			Type: session.SessionTypeToolExecution,
 			Data: toolExec,
 		})
 	}
@@ -90,20 +90,20 @@ func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*v2
 }
 
 // adaptInfoMessage converts a Gemini info message to SystemMessage.
-func (a *Adapter) adaptInfoMessage(msg *GeminiMessage, sessionID string) []*v2.Transcript {
+func (a *Adapter) adaptInfoMessage(msg *GeminiMessage, sessionID string) []*session.Session {
 	// Info messages are system-level metadata in Gemini CLI.
 	// Map to SystemMessage with the info subtype.
-	sys := &v2.SystemMessage{
-		TreeNodeMeta: v2.TreeNodeMeta{
+	sys := &session.SystemMessage{
+		TreeNodeMeta: session.TreeNodeMeta{
 			UUID:      msg.ID,
 			SessionID: sessionID,
 			Timestamp: msg.Timestamp,
 		},
-		Subtype: v2.SystemMessageSubtypeInfo,
+		Subtype: session.SystemMessageSubtypeInfo,
 	}
 
-	return []*v2.Transcript{{
-		Type: v2.TranscriptTypeSystem,
+	return []*session.Session{{
+		Type: session.SessionTypeSystem,
 		Data: sys,
 	}}
 }
@@ -111,7 +111,7 @@ func (a *Adapter) adaptInfoMessage(msg *GeminiMessage, sessionID string) []*v2.T
 // adaptToolCall converts a Gemini tool call to ToolExecution.
 // Unlike Claude Code where tool_use and tool_result are separate,
 // Gemini combines call and result in a single toolCalls entry.
-func (a *Adapter) adaptToolCall(tc *GeminiToolCall, sourceAgentUUID, sessionID string) *v2.ToolExecution {
+func (a *Adapter) adaptToolCall(tc *GeminiToolCall, sourceAgentUUID, sessionID string) *session.ToolExecution {
 	// Determine result status
 	status := convertToolStatus(tc.Status)
 
@@ -128,14 +128,14 @@ func (a *Adapter) adaptToolCall(tc *GeminiToolCall, sourceAgentUUID, sessionID s
 	}
 
 	// If status is error, try to extract error message
-	if status == v2.ToolResultStatusError {
+	if status == session.ToolResultStatusError {
 		if tc.ResultDisplay != "" {
 			errMsg = &tc.ResultDisplay
 		}
 	}
 
-	return &v2.ToolExecution{
-		TreeNodeMeta: v2.TreeNodeMeta{
+	return &session.ToolExecution{
+		TreeNodeMeta: session.TreeNodeMeta{
 			UUID:      tc.ID,
 			SessionID: sessionID,
 			Timestamp: tc.Timestamp,
@@ -144,7 +144,7 @@ func (a *Adapter) adaptToolCall(tc *GeminiToolCall, sourceAgentUUID, sessionID s
 		ToolName:        tc.Name,
 		Input:           tc.Args,
 		SourceAgentUUID: sourceAgentUUID,
-		Result: &v2.ToolResult{
+		Result: &session.ToolResult{
 			Status:  status,
 			Content: resultContent,
 			Error:   errMsg,
@@ -153,12 +153,12 @@ func (a *Adapter) adaptToolCall(tc *GeminiToolCall, sourceAgentUUID, sessionID s
 }
 
 // convertThoughts converts Gemini thoughts to agent content blocks.
-func (a *Adapter) convertThoughts(thoughts []*GeminiThought) []*v2.AgentContentBlock {
+func (a *Adapter) convertThoughts(thoughts []*GeminiThought) []*session.AgentContentBlock {
 	if len(thoughts) == 0 {
 		return nil
 	}
 
-	var blocks []*v2.AgentContentBlock
+	var blocks []*session.AgentContentBlock
 	for _, thought := range thoughts {
 		// Combine subject and description into thinking content
 		content := thought.Subject
@@ -166,9 +166,9 @@ func (a *Adapter) convertThoughts(thoughts []*GeminiThought) []*v2.AgentContentB
 			content += "\n\n" + thought.Description
 		}
 
-		blocks = append(blocks, &v2.AgentContentBlock{
-			Type: v2.AgentContentBlockTypeThinking,
-			Thinking: &v2.ThinkingBlock{
+		blocks = append(blocks, &session.AgentContentBlock{
+			Type: session.AgentContentBlockTypeThinking,
+			Thinking: &session.ThinkingBlock{
 				Content: content,
 			},
 		})
@@ -178,12 +178,12 @@ func (a *Adapter) convertThoughts(thoughts []*GeminiThought) []*v2.AgentContentB
 }
 
 // convertTokens converts Gemini token usage to v2 TokenUsage.
-func (a *Adapter) convertTokens(tokens *GeminiTokens) *v2.TokenUsage {
+func (a *Adapter) convertTokens(tokens *GeminiTokens) *session.TokenUsage {
 	if tokens == nil {
 		return nil
 	}
 
-	return &v2.TokenUsage{
+	return &session.TokenUsage{
 		InputTokens:  tokens.Input,
 		OutputTokens: tokens.Output,
 		// Gemini's "cached" maps to cache read tokens
@@ -192,15 +192,15 @@ func (a *Adapter) convertTokens(tokens *GeminiTokens) *v2.TokenUsage {
 }
 
 // convertToolStatus converts Gemini tool status to v2 ToolResultStatus.
-func convertToolStatus(status string) v2.ToolResultStatus {
+func convertToolStatus(status string) session.ToolResultStatus {
 	switch status {
 	case "success":
-		return v2.ToolResultStatusSuccess
+		return session.ToolResultStatusSuccess
 	case "error":
-		return v2.ToolResultStatusError
+		return session.ToolResultStatusError
 	case "cancelled":
-		return v2.ToolResultStatusSkipped
+		return session.ToolResultStatusSkipped
 	default:
-		return v2.ToolResultStatusSuccess
+		return session.ToolResultStatusSuccess
 	}
 }

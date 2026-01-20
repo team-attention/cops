@@ -1,4 +1,4 @@
-package v2
+package session
 
 // AgentContentBlockType represents the type of content block in an agent message.
 type AgentContentBlockType string

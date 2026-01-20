@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { Button } from '@/gen/shadcn/ui/button'
 import { LandingHeader } from '@/shared/component/landing-header'
 import { useAuth } from '@/shared/hook/use-auth'
+import { APP_VERSION } from '@/shared/config/version'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -81,7 +82,7 @@ function LandingPage() {
         <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-2 text-zinc-700">
           <div className="h-px flex-1 max-w-[100px] bg-gradient-to-r from-transparent to-zinc-800" />
           <span className="font-mono text-[10px] uppercase tracking-widest">
-            C-Ops v0.1.0
+            C-Ops v{APP_VERSION}
           </span>
           <div className="h-px flex-1 max-w-[100px] bg-gradient-to-l from-transparent to-zinc-800" />
         </div>

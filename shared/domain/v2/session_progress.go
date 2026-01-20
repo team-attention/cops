@@ -1,4 +1,4 @@
-package v2
+package session
 
 // ProgressType represents the type of progress update.
 type ProgressType string

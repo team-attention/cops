@@ -1,4 +1,4 @@
-package v2
+package session
 
 // HumanContentBlockType represents the type of content block in a human message.
 type HumanContentBlockType string

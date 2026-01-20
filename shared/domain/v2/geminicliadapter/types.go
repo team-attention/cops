@@ -1,4 +1,4 @@
-// Package geminicliadapter provides conversion from Gemini CLI session logs to v2 transcript format.
+// Package geminicliadapter provides conversion from Gemini CLI session logs to v2 session format.
 //
 // # Gemini CLI Log Location
 //
@@ -8,7 +8,7 @@
 //
 // # Type Mapping: Gemini → v2
 //
-// The following table shows how Gemini CLI types map to v2 transcript types:
+// The following table shows how Gemini CLI types map to v2 session types:
 //
 //	| Gemini Field/Type       | v2 Type                              | Notes                                    |
 //	|-------------------------|--------------------------------------|------------------------------------------|
@@ -37,8 +37,8 @@ import (
 // GeminiSession represents the root structure of a Gemini CLI session log.
 //
 // v2 Mapping:
-//   - SessionID → TreeNodeMeta.SessionID (propagated to all transcripts)
-//   - Messages  → []Transcript (each message produces one or more transcripts)
+//   - SessionID → TreeNodeMeta.SessionID (propagated to all sessions)
+//   - Messages  → []Session (each message produces one or more sessions)
 type GeminiSession struct {
 	SessionID   string           `json:"sessionId"`
 	ProjectHash string           `json:"projectHash"`

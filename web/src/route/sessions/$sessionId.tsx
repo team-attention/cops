@@ -14,6 +14,7 @@ import {
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { useUserStore } from '@/shared/store/user-store'
 import { useAuthStore } from '@/shared/store/auth-store'
+import { APP_VERSION } from '@/shared/config/version'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   beforeLoad: ({ location }) => {
@@ -201,7 +202,7 @@ function SessionDetailPage() {
         <div className="mt-12 flex items-center justify-center gap-2 text-zinc-700">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-zinc-800" />
           <span className="font-mono text-[10px] uppercase tracking-widest">
-            C-Ops v0.1.0
+            C-Ops v{APP_VERSION}
           </span>
           <div className="h-px flex-1 bg-gradient-to-l from-transparent to-zinc-800" />
         </div>

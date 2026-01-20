@@ -1,4 +1,4 @@
-package v2
+package session
 
 import "time"
 

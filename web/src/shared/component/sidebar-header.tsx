@@ -1,4 +1,5 @@
 import { SidebarHeader as ShadcnSidebarHeader } from '@/gen/shadcn/ui/sidebar'
+import { APP_VERSION } from '@/shared/config/version'
 
 export const SidebarHeader = () => {
   return (
@@ -32,7 +33,7 @@ export const SidebarHeader = () => {
               C-Ops
             </span>
             <span className="rounded border border-cyan-500/20 bg-cyan-500/5 px-1.5 py-0.5 font-mono text-[9px] font-medium text-cyan-400/70">
-              v0.1.0
+              v{APP_VERSION}
             </span>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">

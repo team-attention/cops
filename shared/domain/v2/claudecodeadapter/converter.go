@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/team-attention/cops/shared/domain"
-	v2 "github.com/team-attention/cops/shared/domain/v2"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
 // adaptUser converts UserTranscript to HumanMessage and/or ToolExecution.
@@ -13,30 +13,30 @@ import (
 // - text/image content -> HumanMessage
 // - tool_result content -> ToolExecution (result part)
 //
-// If it has both, returns multiple transcripts.
-func (a *Adapter) adaptUser(u *domain.UserTranscript) ([]*v2.Transcript, error) {
-	var results []*v2.Transcript
+// If it has both, returns multiple sessions.
+func (a *Adapter) adaptUser(u *domain.UserTranscript) ([]*session.Session, error) {
+	var results []*session.Session
 
 	humanContent, toolResults := a.splitUserContent(u)
 
 	// Create HumanMessage if there's text/image content
 	if len(humanContent) > 0 {
-		human := &v2.HumanMessage{
+		human := &session.HumanMessage{
 			TreeNodeMeta: convertTreeNodeMeta(&u.TreeNodeMeta),
 			Content:      humanContent,
 			IsMeta:       u.IsMeta,
 			Todos:        convertTodos(u.Todos),
 		}
-		results = append(results, &v2.Transcript{
-			Type: v2.TranscriptTypeHuman,
+		results = append(results, &session.Session{
+			Type: session.SessionTypeHuman,
 			Data: human,
 		})
 	}
 
 	// Create ToolExecution for each tool_result
 	for _, tr := range toolResults {
-		results = append(results, &v2.Transcript{
-			Type: v2.TranscriptTypeToolExecution,
+		results = append(results, &session.Session{
+			Type: session.SessionTypeToolExecution,
 			Data: tr,
 		})
 	}
@@ -45,14 +45,14 @@ func (a *Adapter) adaptUser(u *domain.UserTranscript) ([]*v2.Transcript, error) 
 }
 
 // splitUserContent separates user content into human content and tool results.
-func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*v2.HumanContentBlock, []*v2.ToolExecution) {
-	var humanBlocks []*v2.HumanContentBlock
-	var toolExecs []*v2.ToolExecution
+func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*session.HumanContentBlock, []*session.ToolExecution) {
+	var humanBlocks []*session.HumanContentBlock
+	var toolExecs []*session.ToolExecution
 
 	// Handle string content (simple text message)
 	if text, ok := u.Message.Content.(string); ok {
-		humanBlocks = append(humanBlocks, &v2.HumanContentBlock{
-			Type: v2.HumanContentBlockTypeText,
+		humanBlocks = append(humanBlocks, &session.HumanContentBlock{
+			Type: session.HumanContentBlockTypeText,
 			Text: &text,
 		})
 		return humanBlocks, toolExecs
@@ -75,8 +75,8 @@ func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*v2.HumanContent
 		switch blockType {
 		case "text":
 			text, _ := blockMap["text"].(string)
-			humanBlocks = append(humanBlocks, &v2.HumanContentBlock{
-				Type: v2.HumanContentBlockTypeText,
+			humanBlocks = append(humanBlocks, &session.HumanContentBlock{
+				Type: session.HumanContentBlockTypeText,
 				Text: &text,
 			})
 
@@ -84,9 +84,9 @@ func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*v2.HumanContent
 			if source, ok := blockMap["source"].(map[string]any); ok {
 				mediaType, _ := source["media_type"].(string)
 				data, _ := source["data"].(string)
-				humanBlocks = append(humanBlocks, &v2.HumanContentBlock{
-					Type: v2.HumanContentBlockTypeImage,
-					Image: &v2.ImageData{
+				humanBlocks = append(humanBlocks, &session.HumanContentBlock{
+					Type: session.HumanContentBlockTypeImage,
+					Image: &session.ImageData{
 						MediaType: mediaType,
 						Data:      data,
 					},
@@ -98,10 +98,10 @@ func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*v2.HumanContent
 			content := blockMap["content"]
 
 			// Determine result status
-			status := v2.ToolResultStatusSuccess
+			status := session.ToolResultStatusSuccess
 			var errMsg *string
 			if isError, ok := blockMap["is_error"].(bool); ok && isError {
-				status = v2.ToolResultStatusError
+				status = session.ToolResultStatusError
 				if errStr, ok := content.(string); ok {
 					errMsg = &errStr
 				}
@@ -112,13 +112,13 @@ func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*v2.HumanContent
 				sourceAgentUUID = *u.SourceToolAssistantUUID
 			}
 
-			toolExec := &v2.ToolExecution{
+			toolExec := &session.ToolExecution{
 				TreeNodeMeta:    convertTreeNodeMeta(&u.TreeNodeMeta),
 				ID:              toolUseID,
 				ToolName:        "", // Will be filled from assistant message when correlating
 				Input:           nil,
 				SourceAgentUUID: sourceAgentUUID,
-				Result: &v2.ToolResult{
+				Result: &session.ToolResult{
 					Status:  status,
 					Content: content,
 					Error:   errMsg,
@@ -136,26 +136,26 @@ func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*v2.HumanContent
 // v1 AssistantTranscript contains:
 // - text/thinking content -> AgentMessage
 // - tool_use content -> ToolExecution (call part)
-func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*v2.Transcript, error) {
-	var results []*v2.Transcript
-	var agentContent []*v2.AgentContentBlock
-	var toolExecs []*v2.ToolExecution
+func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*session.Session, error) {
+	var results []*session.Session
+	var agentContent []*session.AgentContentBlock
+	var toolExecs []*session.ToolExecution
 
 	for _, block := range ast.Message.Content {
 		switch block.Type {
 		case "text":
 			if block.Text != nil {
-				agentContent = append(agentContent, &v2.AgentContentBlock{
-					Type: v2.AgentContentBlockTypeText,
+				agentContent = append(agentContent, &session.AgentContentBlock{
+					Type: session.AgentContentBlockTypeText,
 					Text: block.Text,
 				})
 			}
 
 		case "thinking":
 			if block.Thinking != nil {
-				agentContent = append(agentContent, &v2.AgentContentBlock{
-					Type: v2.AgentContentBlockTypeThinking,
-					Thinking: &v2.ThinkingBlock{
+				agentContent = append(agentContent, &session.AgentContentBlock{
+					Type: session.AgentContentBlockTypeThinking,
+					Thinking: &session.ThinkingBlock{
 						Content:   *block.Thinking,
 						Signature: block.Signature,
 					},
@@ -173,16 +173,16 @@ func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*v2.Transcr
 			}
 
 			// Add reference in agent content
-			agentContent = append(agentContent, &v2.AgentContentBlock{
-				Type: v2.AgentContentBlockTypeToolCallRef,
-				ToolCallRef: &v2.ToolCallReference{
+			agentContent = append(agentContent, &session.AgentContentBlock{
+				Type: session.AgentContentBlockTypeToolCallRef,
+				ToolCallRef: &session.ToolCallReference{
 					ToolExecutionID: toolUseID,
 					ToolName:        toolName,
 				},
 			})
 
 			// Create ToolExecution (call part only, result comes from user message)
-			toolExec := &v2.ToolExecution{
+			toolExec := &session.ToolExecution{
 				TreeNodeMeta:    convertTreeNodeMeta(&ast.TreeNodeMeta),
 				ID:              toolUseID,
 				ToolName:        toolName,
@@ -195,7 +195,7 @@ func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*v2.Transcr
 	}
 
 	// Create AgentMessage
-	agent := &v2.AgentMessage{
+	agent := &session.AgentMessage{
 		TreeNodeMeta: convertTreeNodeMeta(&ast.TreeNodeMeta),
 		Provider:     "anthropic", // Claude Code uses Anthropic
 		Model:        ast.Message.Model,
@@ -204,15 +204,15 @@ func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*v2.Transcr
 		StopReason:   ast.Message.StopReason,
 		Usage:        convertUsage(ast.Message.Usage),
 	}
-	results = append(results, &v2.Transcript{
-		Type: v2.TranscriptTypeAgent,
+	results = append(results, &session.Session{
+		Type: session.SessionTypeAgent,
 		Data: agent,
 	})
 
 	// Add ToolExecutions
 	for _, toolExec := range toolExecs {
-		results = append(results, &v2.Transcript{
-			Type: v2.TranscriptTypeToolExecution,
+		results = append(results, &session.Session{
+			Type: session.SessionTypeToolExecution,
 			Data: toolExec,
 		})
 	}
@@ -221,60 +221,60 @@ func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*v2.Transcr
 }
 
 // adaptSystem converts SystemTranscript to SystemMessage.
-func (a *Adapter) adaptSystem(s *domain.SystemTranscript) ([]*v2.Transcript, error) {
-	sys := &v2.SystemMessage{
+func (a *Adapter) adaptSystem(s *domain.SystemTranscript) ([]*session.Session, error) {
+	sys := &session.SystemMessage{
 		TreeNodeMeta: convertTreeNodeMeta(&s.TreeNodeMeta),
-		Subtype:      v2.SystemMessageSubtypeTurnDuration,
+		Subtype:      session.SystemMessageSubtypeTurnDuration,
 		IsMeta:       s.IsMeta,
-		TurnDuration: &v2.TurnDurationData{
+		TurnDuration: &session.TurnDurationData{
 			DurationMs: s.DurationMs,
 		},
 	}
 
-	return []*v2.Transcript{{
-		Type: v2.TranscriptTypeSystem,
+	return []*session.Session{{
+		Type: session.SessionTypeSystem,
 		Data: sys,
 	}}, nil
 }
 
 // adaptSummary converts SummaryTranscript to SystemMessage.
-func (a *Adapter) adaptSummary(s *domain.SummaryTranscript) ([]*v2.Transcript, error) {
-	sys := &v2.SystemMessage{
-		TreeNodeMeta: v2.TreeNodeMeta{
+func (a *Adapter) adaptSummary(s *domain.SummaryTranscript) ([]*session.Session, error) {
+	sys := &session.SystemMessage{
+		TreeNodeMeta: session.TreeNodeMeta{
 			UUID:      s.LeafUUID + "-summary",
 			Timestamp: time.Now(),
 		},
-		Subtype: v2.SystemMessageSubtypeSummary,
-		Summary: &v2.SummaryData{
+		Subtype: session.SystemMessageSubtypeSummary,
+		Summary: &session.SummaryData{
 			Summary:  s.Summary,
 			LeafUUID: s.LeafUUID,
 		},
 	}
 
-	return []*v2.Transcript{{
-		Type: v2.TranscriptTypeSystem,
+	return []*session.Session{{
+		Type: session.SessionTypeSystem,
 		Data: sys,
 	}}, nil
 }
 
 // adaptFileSnapshot converts FileHistorySnapshotTranscript to SystemMessage.
-func (a *Adapter) adaptFileSnapshot(f *domain.FileHistorySnapshotTranscript) ([]*v2.Transcript, error) {
-	backups := make(map[string]*v2.FileBackup)
+func (a *Adapter) adaptFileSnapshot(f *domain.FileHistorySnapshotTranscript) ([]*session.Session, error) {
+	backups := make(map[string]*session.FileBackup)
 	for path, backup := range f.Snapshot.TrackedFileBackups {
-		backups[path] = &v2.FileBackup{
+		backups[path] = &session.FileBackup{
 			BackupFileName: backup.BackupFileName,
 			Version:        backup.Version,
 			BackupTime:     backup.BackupTime,
 		}
 	}
 
-	sys := &v2.SystemMessage{
-		TreeNodeMeta: v2.TreeNodeMeta{
+	sys := &session.SystemMessage{
+		TreeNodeMeta: session.TreeNodeMeta{
 			UUID:      f.MessageID + "-snapshot",
 			Timestamp: f.Snapshot.Timestamp,
 		},
-		Subtype: v2.SystemMessageSubtypeFileSnapshot,
-		FileSnapshot: &v2.FileSnapshotData{
+		Subtype: session.SystemMessageSubtypeFileSnapshot,
+		FileSnapshot: &session.FileSnapshotData{
 			MessageID:          f.MessageID,
 			TrackedFileBackups: backups,
 			SnapshotTimestamp:  f.Snapshot.Timestamp,
@@ -282,14 +282,14 @@ func (a *Adapter) adaptFileSnapshot(f *domain.FileHistorySnapshotTranscript) ([]
 		},
 	}
 
-	return []*v2.Transcript{{
-		Type: v2.TranscriptTypeSystem,
+	return []*session.Session{{
+		Type: session.SessionTypeSystem,
 		Data: sys,
 	}}, nil
 }
 
 // adaptProgress converts ProgressTranscript to Progress.
-func (a *Adapter) adaptProgress(p *domain.ProgressTranscript) ([]*v2.Transcript, error) {
+func (a *Adapter) adaptProgress(p *domain.ProgressTranscript) ([]*session.Session, error) {
 	toolExecID := ""
 	if p.ToolUseID != nil {
 		toolExecID = *p.ToolUseID
@@ -299,12 +299,12 @@ func (a *Adapter) adaptProgress(p *domain.ProgressTranscript) ([]*v2.Transcript,
 		parentToolExecID = *p.ParentToolUseID
 	}
 
-	progress := &v2.Progress{
+	progress := &session.Progress{
 		TreeNodeMeta:          convertTreeNodeMeta(&p.TreeNodeMeta),
 		ToolExecutionID:       toolExecID,
 		ParentToolExecutionID: parentToolExecID,
-		Data: v2.ProgressData{
-			Type:               v2.ProgressType(p.Data.Type),
+		Data: session.ProgressData{
+			Type:               session.ProgressType(p.Data.Type),
 			Message:            p.Data.Message,
 			NormalizedMessages: p.Data.NormalizedMessages,
 			Prompt:             p.Data.Prompt,
@@ -312,15 +312,15 @@ func (a *Adapter) adaptProgress(p *domain.ProgressTranscript) ([]*v2.Transcript,
 		},
 	}
 
-	return []*v2.Transcript{{
-		Type: v2.TranscriptTypeProgress,
+	return []*session.Session{{
+		Type: session.SessionTypeProgress,
 		Data: progress,
 	}}, nil
 }
 
-// convertTreeNodeMeta converts v1 TreeNodeMeta to v2.
-func convertTreeNodeMeta(m *domain.TreeNodeMeta) v2.TreeNodeMeta {
-	return v2.TreeNodeMeta{
+// convertTreeNodeMeta converts v1 TreeNodeMeta to session.
+func convertTreeNodeMeta(m *domain.TreeNodeMeta) session.TreeNodeMeta {
+	return session.TreeNodeMeta{
 		ParentUUID:  m.ParentUUID,
 		UUID:        m.UUID,
 		SessionID:   m.SessionID,
@@ -334,12 +334,12 @@ func convertTreeNodeMeta(m *domain.TreeNodeMeta) v2.TreeNodeMeta {
 	}
 }
 
-// convertUsage converts v1 AssistantUsage to v2 TokenUsage.
-func convertUsage(u *domain.AssistantUsage) *v2.TokenUsage {
+// convertUsage converts v1 AssistantUsage to session TokenUsage.
+func convertUsage(u *domain.AssistantUsage) *session.TokenUsage {
 	if u == nil {
 		return nil
 	}
-	return &v2.TokenUsage{
+	return &session.TokenUsage{
 		InputTokens:             u.InputTokens,
 		OutputTokens:            u.OutputTokens,
 		CacheCreationInputTokens: u.CacheCreationInputTokens,
@@ -348,14 +348,14 @@ func convertUsage(u *domain.AssistantUsage) *v2.TokenUsage {
 	}
 }
 
-// convertTodos converts v1 Todo slice to v2.
-func convertTodos(todos []*domain.Todo) []*v2.Todo {
+// convertTodos converts v1 Todo slice to session.
+func convertTodos(todos []*domain.Todo) []*session.Todo {
 	if todos == nil {
 		return nil
 	}
-	result := make([]*v2.Todo, len(todos))
+	result := make([]*session.Todo, len(todos))
 	for i, t := range todos {
-		result[i] = &v2.Todo{
+		result[i] = &session.Todo{
 			Content:    t.Content,
 			Status:     t.Status,
 			ActiveForm: t.ActiveForm,

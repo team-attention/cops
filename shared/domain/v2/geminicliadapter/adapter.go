@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"os"
 
-	v2 "github.com/team-attention/cops/shared/domain/v2"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
-// Adapter converts Gemini CLI session logs to v2 transcript format.
+// Adapter converts Gemini CLI session logs to v2 session format.
 type Adapter struct{}
 
 // NewAdapter creates a new Gemini CLI adapter.
@@ -15,25 +15,25 @@ func NewAdapter() *Adapter {
 	return &Adapter{}
 }
 
-// AdaptSession converts an entire Gemini session to v2 transcripts.
-// Returns multiple transcripts (one or more per message).
-func (a *Adapter) AdaptSession(session *GeminiSession) ([]*v2.Transcript, error) {
-	var results []*v2.Transcript
+// AdaptSession converts an entire Gemini session to v2 sessions.
+// Returns multiple sessions (one or more per message).
+func (a *Adapter) AdaptSession(sess *GeminiSession) ([]*session.Session, error) {
+	var results []*session.Session
 
-	for _, msg := range session.Messages {
-		transcripts, err := a.AdaptMessage(msg, session.SessionID)
+	for _, msg := range sess.Messages {
+		sessions, err := a.AdaptMessage(msg, sess.SessionID)
 		if err != nil {
 			return nil, err
 		}
-		results = append(results, transcripts...)
+		results = append(results, sessions...)
 	}
 
 	return results, nil
 }
 
-// AdaptMessage converts a single Gemini message to v2 transcripts.
-// May return multiple transcripts (e.g., AgentMessage + ToolExecutions).
-func (a *Adapter) AdaptMessage(msg *GeminiMessage, sessionID string) ([]*v2.Transcript, error) {
+// AdaptMessage converts a single Gemini message to v2 sessions.
+// May return multiple sessions (e.g., AgentMessage + ToolExecutions).
+func (a *Adapter) AdaptMessage(msg *GeminiMessage, sessionID string) ([]*session.Session, error) {
 	switch msg.Type {
 	case "user":
 		return a.adaptUserMessage(msg, sessionID), nil
