@@ -102,12 +102,12 @@ npm run dev
 
 ## Project Structure and Documentation
 
-Detailed documentation for each component is available in the `doc/` directory.
+Detailed documentation for each component is available in the `docs/` directory.
 
-- **[Get Started](doc/get-started.md)**: Installation and first-use guide
-- **[CLI Guide](doc/cli.md)**: `cops` command usage patterns
-- **[Daemon Guide](doc/daemon.md)**: Background service role and operation
-- **[API Server Guide](doc/api.md)**: Data collection and dashboard API structure
+- **[Quick Start](docs/docs/getting-started/quick-start.md)**: Installation and first-use guide
+- **[CLI Reference](docs/docs/getting-started/cli-reference.md)**: `cops` command usage patterns
+- **[Daemon Guide](docs/docs/architecture/daemon.md)**: Background service role and operation
+- **[API Server Guide](docs/docs/architecture/api.md)**: Data collection and dashboard API structure
 
 ```
 cops/
@@ -117,7 +117,7 @@ cops/
 ├── web/          # Frontend dashboard
 ├── shared/       # Shared Go libraries and Protobuf definitions
 ├── idl/          # Proto files
-└── doc/          # Documentation
+└── docs/         # Documentation
 ```
 
 ## License
