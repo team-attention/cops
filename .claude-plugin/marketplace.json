@@ -1,8 +1,12 @@
 {
   "name": "cops",
   "description": "C-Ops (Claude Code Ops) - Session tracking and visualization for Claude Code",
+  "owner": {
+    "name": "team-attention"
+  },
   "plugins": [
     {
+      "name": "cops",
       "source": "./plugins/cops"
     }
   ]
