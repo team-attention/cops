@@ -9,6 +9,8 @@ import (
 	"github.com/team-attention/cops/api/internal/platform/outbound/email"
 	"github.com/team-attention/cops/api/internal/platform/outbound/email/resend"
 	"github.com/team-attention/cops/api/internal/platform/outbound/email/smtp"
+	"github.com/team-attention/cops/api/internal/platform/outbound/transcriptsaver"
+	transcriptsavermongo "github.com/team-attention/cops/api/internal/platform/outbound/transcriptsaver/mongodb"
 	"github.com/team-attention/cops/api/internal/platform/outbound/txmanager"
 	mongotx "github.com/team-attention/cops/api/internal/platform/outbound/txmanager/mongodb"
 	"github.com/team-attention/cops/api/internal/platform/setup/config"
@@ -40,6 +42,14 @@ func newPlatformModule() fx.Option {
 
 		// Fiber app (depends on config, logger)
 		fx.Provide(server.InitFiber),
+
+		// Transcript Saver (depends on logger, mongodb)
+		fx.Provide(
+			fx.Annotate(
+				transcriptsavermongo.NewMongoTranscriptSaver,
+				fx.As(new(transcriptsaver.TranscriptSaverPort)),
+			),
+		),
 
 		// Email services with factory pattern
 		fx.Provide(

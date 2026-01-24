@@ -6,12 +6,11 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	"github.com/bytedance/sonic"
+	"github.com/google/uuid"
 
 	"github.com/team-attention/cops/api/internal/platform/util/errutil"
 	"github.com/team-attention/cops/api/internal/service/core/rbac"
 	"github.com/team-attention/cops/api/internal/service/event/outbound/repository"
-	shareddomain "github.com/team-attention/cops/shared/domain"
 )
 
 // Service handles event collection operations.
@@ -32,141 +31,31 @@ func NewService(l *slog.Logger, repo repository.EventRepositoryPort, rbacSvc *rb
 
 // CollectLogsResult contains the result of log collection.
 type CollectLogsResult struct {
-	Success        bool
-	ProcessedCount int32
-	ErrorMessage   string
+	Success      bool
+	StoredCount  int32
+	ErrorMessage string
 }
 
-// ParseAndCollectLogs parses raw JSONL lines and saves them to events collection.
-// Returns parse errors (for logging) and collection result.
-func (s *Service) ParseAndCollectLogs(ctx context.Context, userID string, lines []string, projectID, organizationID string) (parseErrors []error, result *CollectLogsResult, err error) {
+// ParseAndCollectLogs stores raw JSONL lines as Event records for async processing.
+// Empty lines are filtered out. Each non-empty line is stored with status "pending".
+// Returns the count of events stored (not processed).
+func (s *Service) ParseAndCollectLogs(ctx context.Context, userID string, lines []string, projectID, organizationID string) (*CollectLogsResult, error) {
+	// 1. Validate organizationID is not empty.
 	if organizationID == "" {
-		return nil, nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("organization_id is required"))
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("organization_id is required"))
 	}
 
+	// 2. Validate userID is not empty.
 	if userID == "" {
-		return nil, nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
+		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
 	}
 
+	// 3. Check RBAC: call s.rbacSvc.CanAccessOrganization(ctx, userID, organizationID).
 	canAccess, err := s.rbacSvc.CanAccessOrganization(ctx, userID, organizationID)
 	if err != nil {
 		s.logger.Error("failed to check access",
 			slog.String("userID", userID),
 			slog.String("organizationID", organizationID),
-			slog.Any("error", err),
-		)
-		return nil, nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to check access"))
-	}
-
-	if !canAccess {
-		s.logger.Info("access denied to organization",
-			slog.String("userID", userID),
-			slog.String("organizationID", organizationID),
-		)
-		return nil, nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("access denied to organization"))
-	}
-
-	// Parse JSONL lines into Transcript objects
-	transcripts, parseErrors := s.parseJSONLLines(lines)
-
-	// Log parse errors at ERROR level (Fire & Forget)
-	if len(parseErrors) > 0 {
-		s.logger.Error("failed to parse some JSONL lines",
-			slog.String("projectId", projectID),
-			slog.String("organizationId", organizationID),
-			slog.Int("failedCount", len(parseErrors)),
-			slog.Int("totalCount", len(lines)),
-			slog.String("sampleError", parseErrors[0].Error()),
-		)
-	}
-
-	if len(transcripts) == 0 {
-		return parseErrors, &CollectLogsResult{
-			Success:        true,
-			ProcessedCount: 0,
-		}, nil
-	}
-
-	batch := &repository.LogBatch{
-		Transcripts:    transcripts,
-		ProjectID:      projectID,
-		OrganizationID: organizationID,
-		UserID:         userID,
-	}
-
-	s.logger.Info("collecting log batch",
-		slog.String("projectId", projectID),
-		slog.String("organizationId", organizationID),
-		slog.Int("transcriptCount", len(transcripts)),
-	)
-
-	if err := s.repo.SaveLogBatch(ctx, batch); err != nil {
-		if errutil.IsNotFound(err) {
-			s.logger.Warn("project not found in organization",
-				slog.String("projectId", projectID),
-				slog.String("organizationId", organizationID),
-			)
-			return parseErrors, &CollectLogsResult{
-				Success:      false,
-				ErrorMessage: "project not found in organization",
-			}, nil
-		}
-
-		s.logger.Error("failed to save log batch",
-			slog.String("projectId", projectID),
-			slog.String("organizationId", organizationID),
-			slog.Any("error", err),
-		)
-		return parseErrors, &CollectLogsResult{
-			Success:      false,
-			ErrorMessage: err.Error(),
-		}, nil
-	}
-
-	return parseErrors, &CollectLogsResult{
-		Success:        true,
-		ProcessedCount: int32(len(transcripts)),
-	}, nil
-}
-
-// parseJSONLLines parses raw JSONL lines into Transcript domain objects.
-// Returns the parsed transcripts and any parse errors encountered.
-func (s *Service) parseJSONLLines(lines []string) ([]*shareddomain.Transcript, []error) {
-	var transcripts []*shareddomain.Transcript
-	var parseErrors []error
-
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		var transcript shareddomain.Transcript
-		if err := sonic.Unmarshal([]byte(line), &transcript); err != nil {
-			parseErrors = append(parseErrors, fmt.Errorf("parse error: %s (line: %.100s...)", err.Error(), line))
-			continue
-		}
-
-		transcripts = append(transcripts, &transcript)
-	}
-
-	return transcripts, parseErrors
-}
-
-// CollectLogs processes a batch of log transcripts and saves them to events collection.
-func (s *Service) CollectLogs(ctx context.Context, userID string, batch *repository.LogBatch) (*CollectLogsResult, error) {
-	if batch.OrganizationID == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("organization_id is required"))
-	}
-
-	if userID == "" {
-		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("user not authenticated"))
-	}
-
-	canAccess, err := s.rbacSvc.CanAccessOrganization(ctx, userID, batch.OrganizationID)
-	if err != nil {
-		s.logger.Error("failed to check access",
-			slog.String("userID", userID),
-			slog.String("organizationID", batch.OrganizationID),
 			slog.Any("error", err),
 		)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to check access"))
@@ -175,32 +64,40 @@ func (s *Service) CollectLogs(ctx context.Context, userID string, batch *reposit
 	if !canAccess {
 		s.logger.Info("access denied to organization",
 			slog.String("userID", userID),
-			slog.String("organizationID", batch.OrganizationID),
+			slog.String("organizationID", organizationID),
 		)
 		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("access denied to organization"))
 	}
 
-	if len(batch.Transcripts) == 0 {
-		return &CollectLogsResult{
-			Success:        true,
-			ProcessedCount: 0,
-		}, nil
+	// 4. Generate batchID using uuid.NewString().
+	batchID := uuid.NewString()
+
+	// 5. Create EventBatch with lines, projectID, organizationID, userID, batchID.
+	batch := &repository.EventBatch{
+		DataLines:      lines,
+		ProjectID:      projectID,
+		OrganizationID: organizationID,
+		UserID:         userID,
+		BatchID:        batchID,
 	}
 
-	// Set UserID on batch for storage
-	batch.UserID = userID
-
-	s.logger.Info("collecting log batch",
-		slog.String("projectId", batch.ProjectID),
-		slog.String("organizationId", batch.OrganizationID),
-		slog.Int("transcriptCount", len(batch.Transcripts)),
+	// 6. Log info: "storing events" with projectId, organizationId, batchId, lineCount.
+	s.logger.Info("storing events",
+		slog.String("projectId", projectID),
+		slog.String("organizationId", organizationID),
+		slog.String("batchId", batchID),
+		slog.Int("lineCount", len(lines)),
 	)
 
-	if err := s.repo.SaveLogBatch(ctx, batch); err != nil {
+	// 7. Call storedCount, err := s.repo.SaveEventBatch(ctx, batch).
+	storedCount, err := s.repo.SaveEventBatch(ctx, batch)
+
+	// 8. Handle repository errors.
+	if err != nil {
 		if errutil.IsNotFound(err) {
 			s.logger.Warn("project not found in organization",
-				slog.String("projectId", batch.ProjectID),
-				slog.String("organizationId", batch.OrganizationID),
+				slog.String("projectId", projectID),
+				slog.String("organizationId", organizationID),
 			)
 			return &CollectLogsResult{
 				Success:      false,
@@ -208,9 +105,10 @@ func (s *Service) CollectLogs(ctx context.Context, userID string, batch *reposit
 			}, nil
 		}
 
-		s.logger.Error("failed to save log batch",
-			slog.String("projectId", batch.ProjectID),
-			slog.String("organizationId", batch.OrganizationID),
+		s.logger.Error("failed to save events",
+			slog.String("projectId", projectID),
+			slog.String("organizationId", organizationID),
+			slog.String("batchId", batchID),
 			slog.Any("error", err),
 		)
 		return &CollectLogsResult{
@@ -219,8 +117,9 @@ func (s *Service) CollectLogs(ctx context.Context, userID string, batch *reposit
 		}, nil
 	}
 
+	// 9. Return CollectLogsResult with success=true and storedCount.
 	return &CollectLogsResult{
-		Success:        true,
-		ProcessedCount: int32(len(batch.Transcripts)),
+		Success:     true,
+		StoredCount: int32(storedCount),
 	}, nil
 }
