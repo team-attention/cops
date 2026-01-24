@@ -1,0 +1,6 @@
+{
+  "name": "cops",
+  "version": "0.0.0",
+  "description": "C-Ops (Claude Code Ops) plugin for session tracking CLI installation",
+  "skills": "./skills/"
+}

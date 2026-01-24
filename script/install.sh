@@ -77,6 +77,16 @@ is_upgrade() {
     [ -f "$INSTALL_DIR/cops" ] || [ -f "$INSTALL_DIR/cops-daemon" ]
 }
 
+# Fetch latest version from GitHub API (unconditionally)
+fetch_latest_version() {
+    local ver
+    ver=$(curl -fsSL "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if [ -z "$ver" ]; then
+        error "Failed to fetch latest version from GitHub"
+    fi
+    echo "$ver"
+}
+
 # Download and extract archive
 download_and_extract() {
     local version=$1
@@ -89,8 +99,22 @@ download_and_extract() {
 
     info "Downloading $archive_name..."
     if ! curl -fsSL "$download_url" -o "$tmp_dir/$archive_name"; then
-        rm -rf "$tmp_dir"
-        error "Failed to download $download_url"
+        if [ -n "${COPS_VERSION:-}" ]; then
+            warn "Version $version not found. Falling back to latest release..."
+            rm -rf "$tmp_dir"
+            version=$(fetch_latest_version)
+            info "Using latest version: $version"
+            archive_name="${REPO_NAME}_${version#v}_${os}_${arch}.tar.gz"
+            download_url="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$version/$archive_name"
+            tmp_dir=$(mktemp -d)
+            if ! curl -fsSL "$download_url" -o "$tmp_dir/$archive_name"; then
+                rm -rf "$tmp_dir"
+                error "Failed to download $download_url"
+            fi
+        else
+            rm -rf "$tmp_dir"
+            error "Failed to download $download_url"
+        fi
     fi
 
     info "Extracting archive..."
@@ -110,6 +134,9 @@ download_and_extract() {
 
     # Cleanup
     rm -rf "$tmp_dir"
+
+    # Output the actual version used (for fallback case)
+    echo "$version"
 }
 
 # Detect shell and config file
@@ -203,8 +230,8 @@ main() {
     local version=$(get_latest_version)
     info "Installing version: $version"
 
-    # Download and install
-    download_and_extract "$version" "$os" "$arch"
+    # Download and install (captures actual version used after potential fallback)
+    version=$(download_and_extract "$version" "$os" "$arch")
 
     # Update PATH (only for fresh install)
     if [ "$is_upgrade_install" = false ]; then
