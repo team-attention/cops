@@ -1,0 +1,9 @@
+{
+  "name": "cops",
+  "description": "C-Ops (Claude Code Ops) - Session tracking and visualization for Claude Code",
+  "plugins": [
+    {
+      "source": "./plugins/cops"
+    }
+  ]
+}
