@@ -30,8 +30,10 @@ enum SystemMessageSubtype {
 enum ProgressType {
   PROGRESS_TYPE_UNSPECIFIED = 0;
   PROGRESS_TYPE_AGENT = 1;
-  PROGRESS_TYPE_SKILL = 2;
+  // PROGRESS_TYPE_SKILL = 2 removed - unused
   PROGRESS_TYPE_HOOK = 3;
+  PROGRESS_TYPE_BASH = 4;
+  PROGRESS_TYPE_MCP = 5;
 }
 
 // ToolResultStatus represents the execution status of a tool call.

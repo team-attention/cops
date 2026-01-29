@@ -30,6 +30,22 @@ const formatTokens = (value: number | undefined): string => {
   return value.toString()
 }
 
+// Progress type to label mapping
+const getProgressLabel = (type: string | undefined) => {
+  switch (type) {
+    case 'agent':
+      return 'Agent'
+    case 'hook':
+      return 'Hook'
+    case 'bash':
+      return 'Bash'
+    case 'mcp':
+      return 'MCP'
+    default:
+      return 'Unknown'
+  }
+}
+
 // Tool name to icon mapping
 const getToolIcon = (toolName: string) => {
   const name = toolName.toLowerCase()
@@ -186,7 +202,7 @@ export const MessageBubble = ({
                   : isToolResult
                     ? message.toolName || 'Tool Result'
                     : isProgress
-                      ? `${message.progressType === 'agent' ? 'Agent' : 'Skill'} Progress`
+                      ? `${getProgressLabel(message.progressType)} Progress`
                       : 'Assistant'}
           </span>
 

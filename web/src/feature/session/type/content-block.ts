@@ -42,7 +42,7 @@ export interface ParsedMessage {
   // For user messages with toolUseResult field
   isToolUseResult?: boolean
   // For progress messages
-  progressType?: 'agent' | 'skill'
+  progressType?: 'agent' | 'hook' | 'bash' | 'mcp' | 'unknown'
   prompt?: string
   agentId?: string
 }

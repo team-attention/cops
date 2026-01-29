@@ -433,8 +433,12 @@ func toProtoProgressData(d session.ProgressData) *sessionv1.ProgressData {
 	switch d.Type {
 	case session.ProgressTypeAgent:
 		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_AGENT
-	case session.ProgressTypeSkill:
-		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_SKILL
+	case session.ProgressTypeHook:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_HOOK
+	case session.ProgressTypeBash:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_BASH
+	case session.ProgressTypeMcp:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_MCP
 	default:
 		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_UNSPECIFIED
 	}
@@ -459,6 +463,17 @@ func toProtoProgressData(d session.ProgressData) *sessionv1.ProgressData {
 
 	if d.AgentID != nil {
 		proto.AgentId = *d.AgentID
+	}
+
+	// Hook progress fields
+	if d.HookEvent != nil {
+		proto.HookEvent = *d.HookEvent
+	}
+	if d.HookName != nil {
+		proto.HookName = *d.HookName
+	}
+	if d.Command != nil {
+		proto.Command = *d.Command
 	}
 
 	return proto

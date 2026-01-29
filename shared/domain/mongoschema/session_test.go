@@ -80,7 +80,7 @@ func TestSession_MarshalUnmarshalBSON_Progress(t *testing.T) {
 			},
 		},
 		{
-			name: "skill_progress with prompt",
+			name: "bash_progress with prompt",
 			progress: &domain.Progress{
 				TreeNodeMeta: domain.TreeNodeMeta{
 					UUID:      "test-uuid-3",
@@ -89,13 +89,13 @@ func TestSession_MarshalUnmarshalBSON_Progress(t *testing.T) {
 					Provider:  "claude_code",
 				},
 				Data: domain.ProgressData{
-					Type:   domain.ProgressTypeSkill,
+					Type:   domain.ProgressTypeBash,
 					Prompt: &prompt,
 				},
 			},
 			verify: func(t *testing.T, p *domain.Progress) {
-				if p.Data.Type != domain.ProgressTypeSkill {
-					t.Errorf("Data.Type = %v, expected %v", p.Data.Type, domain.ProgressTypeSkill)
+				if p.Data.Type != domain.ProgressTypeBash {
+					t.Errorf("Data.Type = %v, expected %v", p.Data.Type, domain.ProgressTypeBash)
 				}
 				if p.Data.Prompt == nil || *p.Data.Prompt != prompt {
 					t.Errorf("Data.Prompt = %v, expected %v", p.Data.Prompt, &prompt)

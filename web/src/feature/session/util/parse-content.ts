@@ -5,6 +5,7 @@ import type {
   ToolExecution,
   HumanContentBlock as ProtoHumanContentBlock,
   AgentContentBlock as ProtoAgentContentBlock,
+  ProgressData,
 } from '@/gen/grpcstub/session/v1/session_pb'
 import {
   SessionType,
@@ -20,6 +21,75 @@ import type {
   ToolResultContentBlock,
   ToolUseContentBlock,
 } from '../type/content-block'
+
+// Helper to extract displayable text from ProgressData
+const extractProgressText = (data: ProgressData | undefined): string => {
+  if (!data) return ''
+
+  // 1. Agent progress: prefer prompt, fallback to messageJson
+  if (data.type === ProgressType.AGENT) {
+    if (data.prompt) return data.prompt
+    if (data.messageJson) {
+      try {
+        const msg = JSON.parse(data.messageJson)
+        // Extract text from message structure
+        const content = msg?.message?.content
+        if (Array.isArray(content)) {
+          return content
+            .filter((c: { type: string }) => c.type === 'text')
+            .map((c: { text: string }) => c.text)
+            .join('\n')
+        }
+      } catch {
+        /* continue */
+      }
+    }
+    return ''
+  }
+
+  // 2. Hook progress: combine hook info
+  if (data.type === ProgressType.HOOK) {
+    const parts: string[] = []
+    if (data.hookEvent) parts.push(`Event: ${data.hookEvent}`)
+    if (data.hookName) parts.push(`Hook: ${data.hookName}`)
+    if (data.command) parts.push(`Command: ${data.command}`)
+    return parts.join('\n')
+  }
+
+  // 3. Bash/MCP progress: parse messageJson
+  if (data.type === ProgressType.BASH || data.type === ProgressType.MCP) {
+    if (data.messageJson) {
+      try {
+        const msg = JSON.parse(data.messageJson)
+        return JSON.stringify(msg, null, 2)
+      } catch {
+        /* continue */
+      }
+    }
+    return ''
+  }
+
+  // 4. Fallback to prompt
+  return data.prompt || ''
+}
+
+// Helper to map ProgressType enum to display string
+const getProgressTypeName = (
+  type: ProgressType | undefined,
+): 'agent' | 'hook' | 'bash' | 'mcp' | 'unknown' => {
+  switch (type) {
+    case ProgressType.AGENT:
+      return 'agent'
+    case ProgressType.HOOK:
+      return 'hook'
+    case ProgressType.BASH:
+      return 'bash'
+    case ProgressType.MCP:
+      return 'mcp'
+    default:
+      return 'unknown'
+  }
+}
 
 // Helper to convert HumanContentBlock[] to ContentBlock[]
 const convertHumanContent = (
@@ -163,13 +233,22 @@ export const parseMessageContent = (session: Session): ParsedMessage => {
     const systemData = session.data.value
     const metadata = systemData.metadata
 
+    // Extract content based on subtype
+    const content: Array<ContentBlock> = []
+    if (
+      systemData.subtype === SystemMessageSubtype.SUMMARY &&
+      systemData.summary?.summary
+    ) {
+      content.push({ type: 'text', text: systemData.summary.summary })
+    }
+
     return {
       uuid: metadata?.uuid || '',
       type: 'system',
       timestamp: metadata?.timestamp,
       isMeta: systemData.isMeta,
       isSidechain: metadata?.isSidechain || false,
-      content: [],
+      content,
     }
   }
 
@@ -182,19 +261,16 @@ export const parseMessageContent = (session: Session): ParsedMessage => {
     const metadata = progress.metadata
     const data = progress.data
 
+    const textContent = extractProgressText(data)
+
     return {
       uuid: metadata?.uuid || '',
       type: 'progress',
       timestamp: metadata?.timestamp,
       isMeta: false,
       isSidechain: metadata?.isSidechain || false,
-      content: [
-        {
-          type: 'text',
-          text: data?.prompt || '',
-        },
-      ],
-      progressType: data?.type === ProgressType.AGENT ? 'agent' : 'skill',
+      content: textContent ? [{ type: 'text', text: textContent }] : [],
+      progressType: getProgressTypeName(data?.type),
       prompt: data?.prompt,
       agentId: data?.agentId,
     }
@@ -281,13 +357,16 @@ export const filterSessionsForChat = (
   sessions: Array<Session>,
 ): Array<Session> => {
   return sessions.filter((session) => {
-    // Filter out FILE_SNAPSHOT system messages
+    // Filter out FILE_SNAPSHOT and TURN_DURATION system messages
     if (
       session.type === SessionType.SYSTEM &&
       session.data.case === 'systemData'
     ) {
       const systemData = session.data.value
-      return systemData.subtype !== SystemMessageSubtype.FILE_SNAPSHOT
+      return (
+        systemData.subtype !== SystemMessageSubtype.FILE_SNAPSHOT &&
+        systemData.subtype !== SystemMessageSubtype.TURN_DURATION
+      )
     }
     return true
   })

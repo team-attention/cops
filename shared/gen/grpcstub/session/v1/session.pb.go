@@ -144,8 +144,10 @@ type ProgressType int32
 const (
 	ProgressType_PROGRESS_TYPE_UNSPECIFIED ProgressType = 0
 	ProgressType_PROGRESS_TYPE_AGENT       ProgressType = 1
-	ProgressType_PROGRESS_TYPE_SKILL       ProgressType = 2
-	ProgressType_PROGRESS_TYPE_HOOK        ProgressType = 3
+	// PROGRESS_TYPE_SKILL = 2 removed - unused
+	ProgressType_PROGRESS_TYPE_HOOK ProgressType = 3
+	ProgressType_PROGRESS_TYPE_BASH ProgressType = 4
+	ProgressType_PROGRESS_TYPE_MCP  ProgressType = 5
 )
 
 // Enum value maps for ProgressType.
@@ -153,14 +155,16 @@ var (
 	ProgressType_name = map[int32]string{
 		0: "PROGRESS_TYPE_UNSPECIFIED",
 		1: "PROGRESS_TYPE_AGENT",
-		2: "PROGRESS_TYPE_SKILL",
 		3: "PROGRESS_TYPE_HOOK",
+		4: "PROGRESS_TYPE_BASH",
+		5: "PROGRESS_TYPE_MCP",
 	}
 	ProgressType_value = map[string]int32{
 		"PROGRESS_TYPE_UNSPECIFIED": 0,
 		"PROGRESS_TYPE_AGENT":       1,
-		"PROGRESS_TYPE_SKILL":       2,
 		"PROGRESS_TYPE_HOOK":        3,
+		"PROGRESS_TYPE_BASH":        4,
+		"PROGRESS_TYPE_MCP":         5,
 	}
 )
 
@@ -2094,12 +2098,13 @@ const file_session_v1_session_proto_rawDesc = "" +
 	"$SYSTEM_MESSAGE_SUBTYPE_TURN_DURATION\x10\x01\x12\"\n" +
 	"\x1eSYSTEM_MESSAGE_SUBTYPE_SUMMARY\x10\x02\x12(\n" +
 	"$SYSTEM_MESSAGE_SUBTYPE_FILE_SNAPSHOT\x10\x03\x12\x1f\n" +
-	"\x1bSYSTEM_MESSAGE_SUBTYPE_INFO\x10\x04*w\n" +
+	"\x1bSYSTEM_MESSAGE_SUBTYPE_INFO\x10\x04*\x8d\x01\n" +
 	"\fProgressType\x12\x1d\n" +
 	"\x19PROGRESS_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
-	"\x13PROGRESS_TYPE_AGENT\x10\x01\x12\x17\n" +
-	"\x13PROGRESS_TYPE_SKILL\x10\x02\x12\x16\n" +
-	"\x12PROGRESS_TYPE_HOOK\x10\x03*\xb4\x01\n" +
+	"\x13PROGRESS_TYPE_AGENT\x10\x01\x12\x16\n" +
+	"\x12PROGRESS_TYPE_HOOK\x10\x03\x12\x16\n" +
+	"\x12PROGRESS_TYPE_BASH\x10\x04\x12\x15\n" +
+	"\x11PROGRESS_TYPE_MCP\x10\x05*\xb4\x01\n" +
 	"\x10ToolResultStatus\x12\"\n" +
 	"\x1eTOOL_RESULT_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aTOOL_RESULT_STATUS_SUCCESS\x10\x01\x12\x1c\n" +

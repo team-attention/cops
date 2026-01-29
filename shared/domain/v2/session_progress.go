@@ -5,8 +5,9 @@ type ProgressType string
 
 const (
 	ProgressTypeAgent ProgressType = "agent_progress"
-	ProgressTypeSkill ProgressType = "skill_progress"
 	ProgressTypeHook  ProgressType = "hook_progress"
+	ProgressTypeBash  ProgressType = "bash_progress"
+	ProgressTypeMcp   ProgressType = "mcp_progress"
 )
 
 // Progress represents real-time progress updates during tool execution.
