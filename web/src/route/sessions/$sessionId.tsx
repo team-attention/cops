@@ -4,6 +4,8 @@ import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
 import { useGetSession } from '@/feature/session/hook/use-get-session'
 import { SessionHeader } from '@/feature/session/component/session-header'
 import { ChatView } from '@/feature/session/component/chat-view'
+import { SessionGraphView } from '@/feature/session/component/session-graph-view'
+import { ViewToggle } from '@/feature/session/component/view-toggle'
 import { MessageDetailSheet } from '@/feature/session/component/message-detail-sheet'
 import {
   enrichToolResultMessages,
@@ -15,6 +17,7 @@ import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { useUserStore } from '@/shared/store/user-store'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { APP_VERSION } from '@/shared/config/version'
+import type { ViewMode } from '@/feature/session/type/graph'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   beforeLoad: ({ location }) => {
@@ -44,6 +47,7 @@ function SessionDetailPage() {
   const { sessionId } = Route.useParams()
   const { selectedOrganizationId } = useUserStore()
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
+  const [viewMode, setViewMode] = useState<ViewMode>('chat')
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -168,25 +172,37 @@ function SessionDetailPage() {
             {/* Session Header */}
             <SessionHeader session={session} totalMessageCount={totalMessageCount} />
 
-            {/* Full-width Conversation List */}
-            <ChatView
-              sessions={session.sessions ?? []}
-              toolCalls={toolCalls}
-              parsedMessages={parsedMessages}
-              selectedMessageId={selectedMessageId}
-              onSelectMessage={setSelectedMessageId}
-              onToolClick={handleToolClick}
-            />
-
-            {/* Load more trigger for infinite scroll */}
-            <div ref={loadMoreRef} className="flex h-10 items-center justify-center">
-              {isFetchingNextPage && (
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="font-mono text-xs">Loading more...</span>
-                </div>
-              )}
+            {/* View Toggle */}
+            <div className="flex justify-end">
+              <ViewToggle value={viewMode} onChange={setViewMode} />
             </div>
+
+            {/* Conditional View Rendering */}
+            {viewMode === 'chat' ? (
+              <>
+                {/* Full-width Conversation List */}
+                <ChatView
+                  sessions={session.sessions ?? []}
+                  toolCalls={toolCalls}
+                  parsedMessages={parsedMessages}
+                  selectedMessageId={selectedMessageId}
+                  onSelectMessage={setSelectedMessageId}
+                  onToolClick={handleToolClick}
+                />
+
+                {/* Load more trigger for infinite scroll */}
+                <div ref={loadMoreRef} className="flex h-10 items-center justify-center">
+                  {isFetchingNextPage && (
+                    <div className="flex items-center gap-2 text-zinc-500">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="font-mono text-xs">Loading more...</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <SessionGraphView sessions={session.sessions ?? []} />
+            )}
 
             {/* Message Detail Sheet */}
             <MessageDetailSheet
