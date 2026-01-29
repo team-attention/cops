@@ -18,6 +18,19 @@ type Config struct {
 	DeviceCode DeviceCodeConfig
 	SMTP       SMTPConfig
 	Resend     ResendConfig
+	Retry      RetryConfig
+}
+
+// RetryConfig contains settings for the retry worker.
+type RetryConfig struct {
+	// Enabled controls whether the retry worker runs.
+	Enabled bool `env:"RETRY_WORKER_ENABLED" envDefault:"true"`
+	// Interval is the polling interval between retry batches.
+	Interval time.Duration `env:"RETRY_WORKER_INTERVAL" envDefault:"30s"`
+	// MaxRetries is the maximum number of retry attempts before marking permanently failed.
+	MaxRetries int `env:"RETRY_WORKER_MAX_RETRIES" envDefault:"3"`
+	// BatchSize is the number of events to process per batch.
+	BatchSize int `env:"RETRY_WORKER_BATCH_SIZE" envDefault:"100"`
 }
 
 // ResendConfig holds Resend email service configuration.
@@ -42,6 +55,7 @@ type AppConfig struct {
 	Name    string `env:"APP_NAME" envDefault:"cops-api"`
 	Version string `env:"APP_VERSION" envDefault:"dev"`
 	Env     string `env:"APP_ENV" envDefault:"development"`
+	Debug   bool   `env:"APP_DEBUG" envDefault:"false"`
 }
 
 // HTTPConfig holds HTTP server and CORS settings.

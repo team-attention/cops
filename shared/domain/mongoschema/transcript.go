@@ -177,6 +177,9 @@ const (
 	ProgressDataNormalizedMessagesField = "normalizedMessages"
 	ProgressDataPromptField             = "prompt"
 	ProgressDataAgentIDField            = "agentId"
+	ProgressDataHookEventField          = "hookEvent"
+	ProgressDataHookNameField           = "hookName"
+	ProgressDataCommandField            = "command"
 )
 
 // Composite field paths for MongoDB queries (dot notation for nested fields)
@@ -715,6 +718,10 @@ type ProgressData struct {
 	NormalizedMessages []map[string]any        `bson:"normalizedMessages,omitempty"`
 	Prompt             *string                 `bson:"prompt,omitempty"`
 	AgentID            *string                 `bson:"agentId,omitempty"`
+	// Hook progress fields
+	HookEvent *string `bson:"hookEvent,omitempty"`
+	HookName  *string `bson:"hookName,omitempty"`
+	Command   *string `bson:"command,omitempty"`
 }
 
 // ToDomain converts mongoschema.ProgressTranscript to domain.ProgressTranscript.
@@ -735,5 +742,8 @@ func (d *ProgressData) ToDomain() domain.ProgressData {
 		NormalizedMessages: d.NormalizedMessages,
 		Prompt:             d.Prompt,
 		AgentID:            d.AgentID,
+		HookEvent:          d.HookEvent,
+		HookName:           d.HookName,
+		Command:            d.Command,
 	}
 }

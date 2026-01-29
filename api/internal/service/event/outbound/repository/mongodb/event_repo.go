@@ -2,8 +2,8 @@ package mongodb
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -31,31 +31,29 @@ func NewMongoEventRepository(l *slog.Logger, db *mongo.Database) *MongoEventRepo
 	}
 }
 
-// SaveLogBatch saves a batch of JSONL transcripts to events collection.
-// Validates project belongs to organization before saving.
-func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *repository.LogBatch) error {
-	if len(batch.Transcripts) == 0 {
-		return nil
+// SaveEventBatch saves a batch of event data to the events collection.
+func (r *MongoEventRepository) SaveEventBatch(ctx context.Context, batch *repository.EventBatch) (int, error) {
+	if len(batch.DataLines) == 0 {
+		return 0, nil
 	}
 
 	if batch.UserID == "" {
-		return errors.New("userID is required")
+		return 0, errors.New("userID is required")
 	}
 
-	// Convert projectID, organizationID, and userID to ObjectID
 	projectObjID, err := bson.ObjectIDFromHex(batch.ProjectID)
 	if err != nil {
-		return errutil.BadRequest("invalid project ID")
+		return 0, errutil.BadRequest("invalid project ID")
 	}
 
 	orgObjID, err := bson.ObjectIDFromHex(batch.OrganizationID)
 	if err != nil {
-		return errutil.BadRequest("invalid organization ID")
+		return 0, errutil.BadRequest("invalid organization ID")
 	}
 
 	userObjID, err := bson.ObjectIDFromHex(batch.UserID)
 	if err != nil {
-		return errutil.BadRequest("invalid user ID")
+		return 0, errutil.BadRequest("invalid user ID")
 	}
 
 	// Validate project belongs to organization
@@ -68,68 +66,72 @@ func (r *MongoEventRepository) SaveLogBatch(ctx context.Context, batch *reposito
 	err = r.projectsColl.FindOne(ctx, filter).Decode(&project)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return errutil.NotFound("project not found in organization")
+			return 0, errutil.NotFound("project not found in organization")
 		}
 		r.logger.Error("failed to verify project ownership",
 			slog.String("projectId", batch.ProjectID),
 			slog.String("organizationId", batch.OrganizationID),
 			slog.Any("error", err),
 		)
-		return errutil.Internal("failed to verify project ownership")
+		return 0, errutil.Internal("failed to verify project ownership")
 	}
 
-	// Prepare documents for insertion
-	docs := make([]any, len(batch.Transcripts))
-	for i, transcript := range batch.Transcripts {
-		doc, err := transcriptToDocument(transcript, projectObjID, userObjID)
-		if err != nil {
-			r.logger.Error("failed to convert transcript to document",
-				slog.Int("index", i),
-				slog.String("type", string(transcript.Type)),
+	// Parse and filter non-empty lines
+	var docs []any
+	for _, line := range batch.DataLines {
+		if line == "" {
+			continue
+		}
+
+		// Parse JSON line to any
+		var data any
+		if err := json.Unmarshal([]byte(line), &data); err != nil {
+			r.logger.Warn("failed to parse JSON line, skipping",
+				slog.String("batchId", batch.BatchID),
 				slog.Any("error", err),
 			)
-			return fmt.Errorf("failed to convert transcript at index %d: %w", i, err)
+			continue
 		}
-		docs[i] = doc
+
+		doc := bson.M{
+			"_id":            bson.NewObjectID(),
+			"data":           data,
+			"version":        batch.Version,
+			"provider":       batch.Provider,
+			"projectId":      projectObjID,
+			"organizationId": orgObjID,
+			"userId":         userObjID,
+			"batchId":        batch.BatchID,
+			"retryCount":     0,
+			"status":         domain.EventStatusPending,
+		}
+		docs = append(docs, doc)
+	}
+
+	if len(docs) == 0 {
+		return 0, nil
 	}
 
 	result, err := r.eventsColl.InsertMany(ctx, docs)
 	if err != nil {
-		r.logger.Error("failed to insert log transcripts",
+		r.logger.Error("failed to insert events",
 			slog.String("projectId", batch.ProjectID),
 			slog.String("organizationId", batch.OrganizationID),
-			slog.Int("count", len(batch.Transcripts)),
+			slog.String("batchId", batch.BatchID),
+			slog.Int("count", len(docs)),
 			slog.Any("error", err),
 		)
-		return fmt.Errorf("failed to insert log transcripts: %w", err)
+		return 0, errutil.Internal("failed to insert events")
 	}
 
-	r.logger.Debug("inserted log transcripts to events collection",
+	r.logger.Debug("inserted events to events collection",
 		slog.String("projectId", batch.ProjectID),
 		slog.String("organizationId", batch.OrganizationID),
+		slog.String("batchId", batch.BatchID),
 		slog.Int("count", len(result.InsertedIDs)),
 	)
 
-	return nil
-}
-
-// transcriptToDocument converts a Transcript to a BSON document using mongoschema.Transcript.
-func transcriptToDocument(transcript *domain.Transcript, projectObjID, userObjID bson.ObjectID) (bson.M, error) {
-	var schema mongoschema.Transcript
-	schema.FromDomain(projectObjID, userObjID, transcript)
-
-	// Use bson.Marshal which calls MarshalBSON
-	data, err := bson.Marshal(&schema)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal transcript: %w", err)
-	}
-
-	var doc bson.M
-	if err := bson.Unmarshal(data, &doc); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal transcript to bson.M: %w", err)
-	}
-
-	return doc, nil
+	return len(result.InsertedIDs), nil
 }
 
 // Interface verification

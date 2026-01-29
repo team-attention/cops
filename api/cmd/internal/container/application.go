@@ -21,6 +21,8 @@ func Run() {
 		newInvitationModule(),
 		newAPIKeyModule(),
 		newEventModule(),
+		newRetryModule(),
+		newSessionModule(),
 
 		// Registrations (invoked for side effects)
 		fx.Invoke(registerConnectRPCServer),

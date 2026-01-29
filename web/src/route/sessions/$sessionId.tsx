@@ -8,7 +8,7 @@ import { MessageDetailSheet } from '@/feature/session/component/message-detail-s
 import {
   enrichToolResultMessages,
   extractToolCalls,
-  filterTranscriptsForChat,
+  filterSessionsForChat,
   parseMessageContent,
 } from '@/feature/session/util/parse-content'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
@@ -65,12 +65,12 @@ function SessionDetailPage() {
     if (!data?.pages?.length) return null
     const firstPage = data.pages[0]
     if (!firstPage.session) return null
-    const allTranscripts = data.pages.flatMap(
-      (page) => page.session?.transcripts ?? [],
+    const allSessions = data.pages.flatMap(
+      (page) => page.session?.sessions ?? [],
     )
     return {
       ...firstPage.session,
-      transcripts: allTranscripts,
+      sessions: allSessions,
     }
   }, [data])
 
@@ -98,19 +98,19 @@ function SessionDetailPage() {
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  // Extract tool calls from session transcripts
+  // Extract tool calls from session entries
   const toolCalls = useMemo(() => {
-    if (!session?.transcripts) return []
-    return extractToolCalls(session.transcripts)
-  }, [session?.transcripts])
+    if (!session?.sessions) return []
+    return extractToolCalls(session.sessions)
+  }, [session?.sessions])
 
   // Calculate parsed messages at page level for Sheet usage
   const parsedMessages = useMemo(() => {
-    if (!session?.transcripts) return []
-    const filtered = filterTranscriptsForChat(session.transcripts)
+    if (!session?.sessions) return []
+    const filtered = filterSessionsForChat(session.sessions)
     const parsed = filtered.map(parseMessageContent)
     return enrichToolResultMessages(parsed, toolCalls)
-  }, [session?.transcripts, toolCalls])
+  }, [session?.sessions, toolCalls])
 
   // Sheet state
   const isSheetOpen = selectedMessageId !== undefined
@@ -170,7 +170,7 @@ function SessionDetailPage() {
 
             {/* Full-width Conversation List */}
             <ChatView
-              transcripts={session.transcripts ?? []}
+              sessions={session.sessions ?? []}
               toolCalls={toolCalls}
               parsedMessages={parsedMessages}
               selectedMessageId={selectedMessageId}

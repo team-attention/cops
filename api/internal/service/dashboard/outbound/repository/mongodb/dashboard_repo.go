@@ -15,6 +15,7 @@ import (
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
 	shareddomain "github.com/team-attention/cops/shared/domain"
 	"github.com/team-attention/cops/shared/domain/mongoschema"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
 // Aggregation output field name constants.
@@ -33,17 +34,17 @@ const (
 
 // MongoDashboardRepository implements DashboardRepositoryPort using MongoDB.
 type MongoDashboardRepository struct {
-	logger             *slog.Logger
-	projectsColl       *mongo.Collection
-	eventsColl *mongo.Collection
+	logger       *slog.Logger
+	projectsColl *mongo.Collection
+	sessionsColl *mongo.Collection
 }
 
 // NewMongoDashboardRepository creates a new MongoDB dashboard repository adapter.
 func NewMongoDashboardRepository(l *slog.Logger, db *mongo.Database) *MongoDashboardRepository {
 	return &MongoDashboardRepository{
-		logger:             l.With(slog.String("name", "dashboard.repository.mongodb")),
-		projectsColl:       db.Collection(mongoschema.ProjectCollectionName),
-		eventsColl: db.Collection(mongoschema.EventCollectionName),
+		logger:       l.With(slog.String("name", "dashboard.repository.mongodb")),
+		projectsColl: db.Collection(mongoschema.ProjectCollectionName),
+		sessionsColl: db.Collection(mongoschema.SessionsCollectionName),
 	}
 }
 
@@ -73,16 +74,17 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context, organiz
 
 	// Get total usage from session records for projects in this organization
 	usagePipeline := bson.A{
-		bson.M{"$match": bson.M{mongoschema.EventProjectIDField: bson.M{"$in": projectIDs}}},
+		bson.M{"$match": bson.M{mongoschema.SessionProjectIDField: bson.M{"$in": projectIDs}}},
 		bson.M{"$group": bson.M{
-			"_id":                  nil,
-			"totalInputTokens":     bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-			"totalOutputTokens":    bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-			"totalCacheReadTokens": bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+			"_id":                      nil,
+			"totalInputTokens":         bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+			"totalOutputTokens":        bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+			"totalCacheCreationTokens": bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+			"totalCacheReadTokens":     bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 		}},
 	}
 
-	usageCursor, err := r.eventsColl.Aggregate(ctx, usagePipeline)
+	usageCursor, err := r.sessionsColl.Aggregate(ctx, usagePipeline)
 	if err != nil {
 		r.logger.Error("failed to aggregate total usage", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to aggregate total usage: %w", err)
@@ -91,15 +93,17 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context, organiz
 
 	if usageCursor.Next(ctx) {
 		var result struct {
-			TotalInputTokens     int64 `bson:"totalInputTokens"`
-			TotalOutputTokens    int64 `bson:"totalOutputTokens"`
-			TotalCacheReadTokens int64 `bson:"totalCacheReadTokens"`
+			TotalInputTokens         int64 `bson:"totalInputTokens"`
+			TotalOutputTokens        int64 `bson:"totalOutputTokens"`
+			TotalCacheCreationTokens int64 `bson:"totalCacheCreationTokens"`
+			TotalCacheReadTokens     int64 `bson:"totalCacheReadTokens"`
 		}
 		if err := usageCursor.Decode(&result); err == nil {
 			stats.TotalUsage = repository.TokenUsageSummary{
-				TotalInputTokens:     result.TotalInputTokens,
-				TotalOutputTokens:    result.TotalOutputTokens,
-				TotalCacheReadTokens: result.TotalCacheReadTokens,
+				TotalInputTokens:         result.TotalInputTokens,
+				TotalOutputTokens:        result.TotalOutputTokens,
+				TotalCacheCreationTokens: result.TotalCacheCreationTokens,
+				TotalCacheReadTokens:     result.TotalCacheReadTokens,
 			}
 		}
 	}
@@ -117,12 +121,12 @@ func (r *MongoDashboardRepository) GetOverviewStats(ctx context.Context, organiz
 
 	// Get session count (distinct session_ids) for projects in this organization
 	sessionPipeline := bson.A{
-		bson.M{"$match": bson.M{mongoschema.EventProjectIDField: bson.M{"$in": projectIDs}}},
-		bson.M{"$group": bson.M{"_id": "$" + mongoschema.TreeNodeSessionIDField}},
+		bson.M{"$match": bson.M{mongoschema.SessionProjectIDField: bson.M{"$in": projectIDs}}},
+		bson.M{"$group": bson.M{"_id": "$" + mongoschema.SessionSessionIDField}},
 		bson.M{"$count": "count"},
 	}
 
-	sessionCursor, err := r.eventsColl.Aggregate(ctx, sessionPipeline)
+	sessionCursor, err := r.sessionsColl.Aggregate(ctx, sessionPipeline)
 	if err != nil {
 		r.logger.Error("failed to count sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count sessions: %w", err)
@@ -178,27 +182,29 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 
 		// Stage 1: Lookup session records with sub-pipeline for aggregation
 		bson.M{"$lookup": bson.M{
-			"from": mongoschema.EventCollectionName,
+			"from": mongoschema.SessionsCollectionName,
 			"let":  bson.M{"projectId": "$_id"},
 			"pipeline": bson.A{
 				bson.M{"$match": bson.M{
-					"$expr": bson.M{"$eq": bson.A{"$" + mongoschema.EventProjectIDField, "$$projectId"}},
+					"$expr": bson.M{"$eq": bson.A{"$" + mongoschema.SessionProjectIDField, "$$projectId"}},
 				}},
 				bson.M{"$group": bson.M{
-					"_id":                   nil,
-					"sessionIds":            bson.M{"$addToSet": "$" + mongoschema.TreeNodeSessionIDField},
-					"lastActivity":          bson.M{"$max": "$" + mongoschema.TreeNodeTimestampField},
-					aggInputTokensField:     bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-					aggOutputTokensField:    bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-					aggCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+					"_id":                       nil,
+					"sessionIds":                bson.M{"$addToSet": "$" + mongoschema.SessionSessionIDField},
+					"lastActivity":              bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+					aggInputTokensField:         bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+					aggOutputTokensField:        bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+					aggCacheCreationTokensField: bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+					aggCacheReadTokensField:     bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 				}},
 				bson.M{"$project": bson.M{
-					"_id":                   0,
-					"sessionCount":          bson.M{"$size": "$sessionIds"},
-					"lastActivity":          1,
-					aggInputTokensField:     1,
-					aggOutputTokensField:    1,
-					aggCacheReadTokensField: 1,
+					"_id":                       0,
+					"sessionCount":              bson.M{"$size": "$sessionIds"},
+					"lastActivity":              1,
+					aggInputTokensField:         1,
+					aggOutputTokensField:        1,
+					aggCacheCreationTokensField: 1,
+					aggCacheReadTokensField:     1,
 				}},
 			},
 			"as": "stats",
@@ -220,6 +226,7 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 			"lastActivity":                    bson.M{"$ifNull": bson.A{"$stats.lastActivity", nil}},
 			aggInputTokensField:               bson.M{"$ifNull": bson.A{"$stats." + aggInputTokensField, 0}},
 			aggOutputTokensField:              bson.M{"$ifNull": bson.A{"$stats." + aggOutputTokensField, 0}},
+			aggCacheCreationTokensField:       bson.M{"$ifNull": bson.A{"$stats." + aggCacheCreationTokensField, 0}},
 			aggCacheReadTokensField:           bson.M{"$ifNull": bson.A{"$stats." + aggCacheReadTokensField, 0}},
 		}},
 
@@ -282,9 +289,10 @@ func (r *MongoDashboardRepository) ListProjects(ctx context.Context, params repo
 				SessionCount: mongoutil.Get[int32](doc, "sessionCount"),
 				LastActivity: mongoutil.Get[time.Time](doc, "lastActivity"),
 				Usage: repository.TokenUsageSummary{
-					TotalInputTokens:     mongoutil.Get[int64](doc, aggInputTokensField),
-					TotalOutputTokens:    mongoutil.Get[int64](doc, aggOutputTokensField),
-					TotalCacheReadTokens: mongoutil.Get[int64](doc, aggCacheReadTokensField),
+					TotalInputTokens:         mongoutil.Get[int64](doc, aggInputTokensField),
+					TotalOutputTokens:        mongoutil.Get[int64](doc, aggOutputTokensField),
+					TotalCacheCreationTokens: mongoutil.Get[int64](doc, aggCacheCreationTokensField),
+					TotalCacheReadTokens:     mongoutil.Get[int64](doc, aggCacheReadTokensField),
 				},
 			},
 		}
@@ -382,19 +390,19 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 			// Project not in organization, return empty result
 			return structure.NewPaginatedResult([]repository.SessionSummary{}, params.Page, params.PageSize, 0), nil
 		}
-		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.EventProjectIDField: projectOID}})
+		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.SessionProjectIDField: projectOID}})
 	} else {
 		// All projects in organization
 		if len(projectIDs) == 0 {
 			return structure.NewPaginatedResult([]repository.SessionSummary{}, params.Page, params.PageSize, 0), nil
 		}
-		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.EventProjectIDField: bson.M{"$in": projectIDs}}})
+		pipeline = append(pipeline, bson.M{"$match": bson.M{mongoschema.SessionProjectIDField: bson.M{"$in": projectIDs}}})
 	}
 
 	// Filter out metadata types (summary, file-history-snapshot) that don't have sessionId.
 	// These types are design-specific and should not be included in session aggregation.
 	pipeline = append(pipeline, bson.M{"$match": bson.M{
-		mongoschema.TreeNodeSessionIDField: bson.M{
+		mongoschema.SessionSessionIDField: bson.M{
 			"$exists": true,
 			"$ne":     "",
 		},
@@ -402,21 +410,35 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 
 	// Add group stage
 	pipeline = append(pipeline, bson.M{"$group": bson.M{
-		"_id":                            "$" + mongoschema.TreeNodeSessionIDField,
-		"messageCount":                   bson.M{"$sum": 1},
-		"startedAt":                      bson.M{"$min": "$" + mongoschema.TreeNodeTimestampField},
-		"endedAt":                        bson.M{"$max": "$" + mongoschema.TreeNodeTimestampField},
-		mongoschema.EventProjectIDField: bson.M{"$first": "$" + mongoschema.EventProjectIDField},
-		mongoschema.TreeNodeGitBranchField: bson.M{"$first": "$" + mongoschema.TreeNodeGitBranchField},
-		aggInputTokensField:              bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-		aggOutputTokensField:             bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-		aggCacheReadTokensField:          bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+		"_id":                             "$" + mongoschema.SessionSessionIDField,
+		"messageCount":                    bson.M{"$sum": 1},
+		"startedAt":                       bson.M{"$min": "$" + mongoschema.SessionTimestampField},
+		"endedAt":                         bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+		mongoschema.SessionProjectIDField: bson.M{"$first": "$" + mongoschema.SessionProjectIDField},
+		mongoschema.SessionGitBranchField: bson.M{"$first": "$" + mongoschema.SessionGitBranchField},
+		aggInputTokensField:               bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+		aggOutputTokensField:              bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+		aggCacheCreationTokensField:       bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+		aggCacheReadTokensField:           bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
+		"totalTokens": bson.M{"$sum": bson.M{"$add": bson.A{
+			"$" + mongoschema.SessionUsageInputTokensPath,
+			"$" + mongoschema.SessionUsageOutputTokensPath,
+		}}},
 	}})
 
+	// Sort field mapping (API snake_case -> MongoDB camelCase aggregation fields)
+	sortFieldMap := map[string]string{
+		"started_at":    "endedAt",      // Sort by last activity for better UX
+		"message_count": "messageCount",
+		"usage":         "totalTokens",
+	}
+
 	// Add sort
-	sortField := "startedAt"
+	sortField := "endedAt" // Default: sort by last activity
 	if params.Query.SortBy != "" {
-		sortField = params.Query.SortBy
+		if mapped, ok := sortFieldMap[params.Query.SortBy]; ok {
+			sortField = mapped
+		}
 	}
 	sortOrder := -1
 	if !params.Query.SortDesc {
@@ -426,7 +448,7 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 
 	// Get total count first
 	countPipeline := append(pipeline, bson.M{"$count": "count"})
-	countCursor, err := r.eventsColl.Aggregate(ctx, countPipeline)
+	countCursor, err := r.sessionsColl.Aggregate(ctx, countPipeline)
 	if err != nil {
 		r.logger.Error("failed to count sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count sessions: %w", err)
@@ -449,7 +471,7 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 		bson.M{"$limit": int64(params.PageSize)},
 	)
 
-	cursor, err := r.eventsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.sessionsColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		r.logger.Error("failed to aggregate sessions", slog.Any("error", err))
 		return nil, fmt.Errorf("failed to aggregate sessions: %w", err)
@@ -466,16 +488,17 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 		session := repository.SessionSummary{
 			SessionBase: repository.SessionBase{
 				ID:        mongoutil.Get[string](doc, "_id"),
-				ProjectID: doc[mongoschema.EventProjectIDField].(bson.ObjectID).Hex(),
-				GitBranch: mongoutil.Get[string](doc, mongoschema.TreeNodeGitBranchField),
+				ProjectID: doc[mongoschema.SessionProjectIDField].(bson.ObjectID).Hex(),
+				GitBranch: mongoutil.Get[string](doc, mongoschema.SessionGitBranchField),
 				StartedAt: mongoutil.Get[time.Time](doc, "startedAt"),
 				EndedAt:   mongoutil.Get[time.Time](doc, "endedAt"),
 			},
 			MessageCount: mongoutil.Get[int32](doc, "messageCount"),
 			Usage: repository.TokenUsageSummary{
-				TotalInputTokens:     mongoutil.Get[int64](doc, aggInputTokensField),
-				TotalOutputTokens:    mongoutil.Get[int64](doc, aggOutputTokensField),
-				TotalCacheReadTokens: mongoutil.Get[int64](doc, aggCacheReadTokensField),
+				TotalInputTokens:         mongoutil.Get[int64](doc, aggInputTokensField),
+				TotalOutputTokens:        mongoutil.Get[int64](doc, aggOutputTokensField),
+				TotalCacheCreationTokens: mongoutil.Get[int64](doc, aggCacheCreationTokensField),
+				TotalCacheReadTokens:     mongoutil.Get[int64](doc, aggCacheReadTokensField),
 			},
 		}
 
@@ -499,22 +522,22 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 
 	// Step 1: Get session metadata (version, usage, timestamps) using aggregation
 	metaPipeline := bson.A{
-		bson.M{"$match": bson.M{mongoschema.TreeNodeSessionIDField: sessionID}},
+		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
 		bson.M{"$group": bson.M{
-			"_id":                            "$" + mongoschema.TreeNodeSessionIDField,
-			mongoschema.EventProjectIDField: bson.M{"$first": "$" + mongoschema.EventProjectIDField},
-			mongoschema.TreeNodeVersionField:   bson.M{"$first": "$" + mongoschema.TreeNodeVersionField},
-			mongoschema.TreeNodeGitBranchField: bson.M{"$first": "$" + mongoschema.TreeNodeGitBranchField},
-			"startedAt":                      bson.M{"$min": "$" + mongoschema.TreeNodeTimestampField},
-			"endedAt":                        bson.M{"$max": "$" + mongoschema.TreeNodeTimestampField},
-			aggInputTokensField:              bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-			aggOutputTokensField:             bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-			aggCacheCreationTokensField:      bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheCreationInputTokensPath},
-			aggCacheReadTokensField:          bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+			"_id":                            "$" + mongoschema.SessionSessionIDField,
+			mongoschema.SessionProjectIDField: bson.M{"$first": "$" + mongoschema.SessionProjectIDField},
+			mongoschema.SessionVersionField:   bson.M{"$first": "$" + mongoschema.SessionVersionField},
+			mongoschema.SessionGitBranchField: bson.M{"$first": "$" + mongoschema.SessionGitBranchField},
+			"startedAt":                      bson.M{"$min": "$" + mongoschema.SessionTimestampField},
+			"endedAt":                        bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+			aggInputTokensField:              bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+			aggOutputTokensField:             bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+			aggCacheCreationTokensField:      bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+			aggCacheReadTokensField:          bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 		}},
 	}
 
-	metaCursor, err := r.eventsColl.Aggregate(ctx, metaPipeline)
+	metaCursor, err := r.sessionsColl.Aggregate(ctx, metaPipeline)
 	if err != nil {
 		r.logger.Error("failed to aggregate session metadata", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to aggregate session metadata: %w", err)
@@ -531,7 +554,7 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 		return nil, fmt.Errorf("failed to decode session metadata: %w", err)
 	}
 
-	projectOID, ok := metaDoc[mongoschema.EventProjectIDField].(bson.ObjectID)
+	projectOID, ok := metaDoc[mongoschema.SessionProjectIDField].(bson.ObjectID)
 	if !ok {
 		return nil, fmt.Errorf("session not found")
 	}
@@ -549,53 +572,38 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 		return nil, fmt.Errorf("session not found")
 	}
 
-	// Step 2: Get total transcript count
-	totalCount, err := r.eventsColl.CountDocuments(ctx, bson.M{mongoschema.TreeNodeSessionIDField: sessionID})
+	// Step 2: Get total session entry count
+	totalCount, err := r.sessionsColl.CountDocuments(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID})
 	if err != nil {
-		r.logger.Error("failed to count session transcripts", slog.String("sessionID", sessionID), slog.Any("error", err))
-		return nil, fmt.Errorf("failed to count session transcripts: %w", err)
+		r.logger.Error("failed to count session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to count session entries: %w", err)
 	}
 
-	// Step 3: Get paginated transcripts
+	// Step 3: Get paginated session entries
 	findOpts := options.Find().
-		SetSort(bson.M{mongoschema.TreeNodeTimestampField: 1}).
+		SetSort(bson.M{mongoschema.SessionTimestampField: 1}).
 		SetSkip(params.Skip()).
 		SetLimit(int64(params.PageSize))
 
-	cursor, err := r.eventsColl.Find(ctx, bson.M{mongoschema.TreeNodeSessionIDField: sessionID}, findOpts)
+	cursor, err := r.sessionsColl.Find(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID}, findOpts)
 	if err != nil {
-		r.logger.Error("failed to find session transcripts", slog.String("sessionID", sessionID), slog.Any("error", err))
-		return nil, fmt.Errorf("failed to find session transcripts: %w", err)
+		r.logger.Error("failed to find session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to find session entries: %w", err)
 	}
 	defer cursor.Close(ctx)
 
-	var transcripts []shareddomain.Transcript
+	var sessions []*session.Session
 	for cursor.Next(ctx) {
 		var doc bson.M
 		if err := cursor.Decode(&doc); err != nil {
 			continue
 		}
 
-		// Convert bson.M to BSON bytes for mongoschema unmarshal
-		docBytes, err := bson.Marshal(doc)
-		if err != nil {
-			r.logger.Error("failed to marshal document to BSON",
-				slog.String("sessionID", sessionID),
-				slog.Any("error", err))
-			continue
+		// Unmarshal session document based on type discriminator
+		s := unmarshalSession(doc)
+		if s != nil {
+			sessions = append(sessions, s)
 		}
-
-		// Unmarshal BSON into mongoschema.Transcript (uses custom UnmarshalBSON)
-		var schemaTranscript mongoschema.Transcript
-		if err := bson.Unmarshal(docBytes, &schemaTranscript); err != nil {
-			r.logger.Error("failed to unmarshal transcript",
-				slog.String("sessionID", sessionID),
-				slog.String("type", mongoutil.Get[string](doc, mongoschema.TranscriptTypeField)),
-				slog.Any("error", err))
-			continue
-		}
-
-		transcripts = append(transcripts, *schemaTranscript.ToDomain())
 	}
 
 	// Build result
@@ -604,18 +612,18 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 			SessionBase: repository.SessionBase{
 				ID:        sessionID,
 				ProjectID: projectOID.Hex(),
-				GitBranch: mongoutil.Get[string](metaDoc, mongoschema.TreeNodeGitBranchField),
+				GitBranch: mongoutil.Get[string](metaDoc, mongoschema.SessionGitBranchField),
 				StartedAt: mongoutil.Get[time.Time](metaDoc, "startedAt"),
 				EndedAt:   mongoutil.Get[time.Time](metaDoc, "endedAt"),
 			},
-			Version: mongoutil.Get[string](metaDoc, mongoschema.TreeNodeVersionField),
+			Version: mongoutil.Get[string](metaDoc, mongoschema.SessionVersionField),
 			Usage: repository.TokenUsageSummary{
 				TotalInputTokens:         mongoutil.Get[int64](metaDoc, aggInputTokensField),
 				TotalOutputTokens:        mongoutil.Get[int64](metaDoc, aggOutputTokensField),
 				TotalCacheCreationTokens: mongoutil.Get[int64](metaDoc, aggCacheCreationTokensField),
 				TotalCacheReadTokens:     mongoutil.Get[int64](metaDoc, aggCacheReadTokensField),
 			},
-			Transcripts: transcripts,
+			Sessions: sessions,
 		},
 		PaginationMeta: structure.NewPaginationMeta(params.Page, params.PageSize, totalCount),
 	}
@@ -655,27 +663,29 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, orgOID
 
 		// Stage 1: Lookup with sub-pipeline to aggregate stats (avoids loading all events)
 		bson.M{"$lookup": bson.M{
-			"from": mongoschema.EventCollectionName,
+			"from": mongoschema.SessionsCollectionName,
 			"let":  bson.M{"projectId": "$_id"},
 			"pipeline": bson.A{
 				bson.M{"$match": bson.M{
-					"$expr": bson.M{"$eq": bson.A{"$" + mongoschema.EventProjectIDField, "$$projectId"}},
+					"$expr": bson.M{"$eq": bson.A{"$" + mongoschema.SessionProjectIDField, "$$projectId"}},
 				}},
 				bson.M{"$group": bson.M{
-					"_id":                   nil,
-					"sessionIds":            bson.M{"$addToSet": "$" + mongoschema.TreeNodeSessionIDField},
-					"lastActivity":          bson.M{"$max": "$" + mongoschema.TreeNodeTimestampField},
-					aggInputTokensField:     bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-					aggOutputTokensField:    bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-					aggCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+					"_id":                       nil,
+					"sessionIds":                bson.M{"$addToSet": "$" + mongoschema.SessionSessionIDField},
+					"lastActivity":              bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+					aggInputTokensField:         bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+					aggOutputTokensField:        bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+					aggCacheCreationTokensField: bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+					aggCacheReadTokensField:     bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 				}},
 				bson.M{"$project": bson.M{
-					"_id":                   0,
-					"sessionCount":          bson.M{"$size": "$sessionIds"},
-					"lastActivity":          1,
-					aggInputTokensField:     1,
-					aggOutputTokensField:    1,
-					aggCacheReadTokensField: 1,
+					"_id":                       0,
+					"sessionCount":              bson.M{"$size": "$sessionIds"},
+					"lastActivity":              1,
+					aggInputTokensField:         1,
+					aggOutputTokensField:        1,
+					aggCacheCreationTokensField: 1,
+					aggCacheReadTokensField:     1,
 				}},
 			},
 			"as": "stats",
@@ -697,6 +707,7 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, orgOID
 			"lastActivity":                    bson.M{"$ifNull": bson.A{"$stats.lastActivity", nil}},
 			aggInputTokensField:               bson.M{"$ifNull": bson.A{"$stats." + aggInputTokensField, 0}},
 			aggOutputTokensField:              bson.M{"$ifNull": bson.A{"$stats." + aggOutputTokensField, 0}},
+			aggCacheCreationTokensField:       bson.M{"$ifNull": bson.A{"$stats." + aggCacheCreationTokensField, 0}},
 			aggCacheReadTokensField:           bson.M{"$ifNull": bson.A{"$stats." + aggCacheReadTokensField, 0}},
 		}},
 
@@ -731,9 +742,10 @@ func (r *MongoDashboardRepository) getRecentProjects(ctx context.Context, orgOID
 				SessionCount: mongoutil.Get[int32](doc, "sessionCount"),
 				LastActivity: mongoutil.Get[time.Time](doc, "lastActivity"),
 				Usage: repository.TokenUsageSummary{
-					TotalInputTokens:     mongoutil.Get[int64](doc, aggInputTokensField),
-					TotalOutputTokens:    mongoutil.Get[int64](doc, aggOutputTokensField),
-					TotalCacheReadTokens: mongoutil.Get[int64](doc, aggCacheReadTokensField),
+					TotalInputTokens:         mongoutil.Get[int64](doc, aggInputTokensField),
+					TotalOutputTokens:        mongoutil.Get[int64](doc, aggOutputTokensField),
+					TotalCacheCreationTokens: mongoutil.Get[int64](doc, aggCacheCreationTokensField),
+					TotalCacheReadTokens:     mongoutil.Get[int64](doc, aggCacheReadTokensField),
 				},
 			},
 		}
@@ -751,30 +763,31 @@ func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, projec
 
 	pipeline := bson.A{
 		// Match records for projects in the organization
-		bson.M{"$match": bson.M{mongoschema.EventProjectIDField: bson.M{"$in": projectIDs}}},
+		bson.M{"$match": bson.M{mongoschema.SessionProjectIDField: bson.M{"$in": projectIDs}}},
 		// Filter out metadata types (summary, file-history-snapshot) that don't have sessionId.
 		bson.M{"$match": bson.M{
-			mongoschema.TreeNodeSessionIDField: bson.M{
+			mongoschema.SessionSessionIDField: bson.M{
 				"$exists": true,
 				"$ne":     "",
 			},
 		}},
 		bson.M{"$group": bson.M{
-			"_id":                            "$" + mongoschema.TreeNodeSessionIDField,
-			"messageCount":                   bson.M{"$sum": 1},
-			"startedAt":                      bson.M{"$min": "$" + mongoschema.TreeNodeTimestampField},
-			"endedAt":                        bson.M{"$max": "$" + mongoschema.TreeNodeTimestampField},
-			mongoschema.EventProjectIDField: bson.M{"$first": "$" + mongoschema.EventProjectIDField},
-			mongoschema.TreeNodeGitBranchField: bson.M{"$first": "$" + mongoschema.TreeNodeGitBranchField},
-			aggInputTokensField:              bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-			aggOutputTokensField:             bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-			aggCacheReadTokensField:          bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+			"_id":                             "$" + mongoschema.SessionSessionIDField,
+			"messageCount":                    bson.M{"$sum": 1},
+			"startedAt":                       bson.M{"$min": "$" + mongoschema.SessionTimestampField},
+			"endedAt":                         bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+			mongoschema.SessionProjectIDField: bson.M{"$first": "$" + mongoschema.SessionProjectIDField},
+			mongoschema.SessionGitBranchField: bson.M{"$first": "$" + mongoschema.SessionGitBranchField},
+			aggInputTokensField:               bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+			aggOutputTokensField:              bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+			aggCacheCreationTokensField:       bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+			aggCacheReadTokensField:           bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 		}},
 		bson.M{"$sort": bson.M{"startedAt": -1}},
 		bson.M{"$limit": limit},
 	}
 
-	cursor, err := r.eventsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.sessionsColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -788,7 +801,7 @@ func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, projec
 		}
 
 		projectID := ""
-		if oid, ok := doc[mongoschema.EventProjectIDField].(bson.ObjectID); ok {
+		if oid, ok := doc[mongoschema.SessionProjectIDField].(bson.ObjectID); ok {
 			projectID = oid.Hex()
 		}
 
@@ -796,15 +809,16 @@ func (r *MongoDashboardRepository) getRecentSessions(ctx context.Context, projec
 			SessionBase: repository.SessionBase{
 				ID:        mongoutil.Get[string](doc, "_id"),
 				ProjectID: projectID,
-				GitBranch: mongoutil.Get[string](doc, mongoschema.TreeNodeGitBranchField),
+				GitBranch: mongoutil.Get[string](doc, mongoschema.SessionGitBranchField),
 				StartedAt: mongoutil.Get[time.Time](doc, "startedAt"),
 				EndedAt:   mongoutil.Get[time.Time](doc, "endedAt"),
 			},
 			MessageCount: mongoutil.Get[int32](doc, "messageCount"),
 			Usage: repository.TokenUsageSummary{
-				TotalInputTokens:     mongoutil.Get[int64](doc, aggInputTokensField),
-				TotalOutputTokens:    mongoutil.Get[int64](doc, aggOutputTokensField),
-				TotalCacheReadTokens: mongoutil.Get[int64](doc, aggCacheReadTokensField),
+				TotalInputTokens:         mongoutil.Get[int64](doc, aggInputTokensField),
+				TotalOutputTokens:        mongoutil.Get[int64](doc, aggOutputTokensField),
+				TotalCacheCreationTokens: mongoutil.Get[int64](doc, aggCacheCreationTokensField),
+				TotalCacheReadTokens:     mongoutil.Get[int64](doc, aggCacheReadTokensField),
 			},
 		}
 
@@ -821,25 +835,27 @@ func (r *MongoDashboardRepository) getProjectStats(ctx context.Context, projectI
 	}
 
 	pipeline := bson.A{
-		bson.M{"$match": bson.M{mongoschema.EventProjectIDField: projectOID}},
+		bson.M{"$match": bson.M{mongoschema.SessionProjectIDField: projectOID}},
 		bson.M{"$group": bson.M{
-			"_id":                   nil,
-			"sessionCount":          bson.M{"$addToSet": "$" + mongoschema.TreeNodeSessionIDField},
-			"lastActivity":          bson.M{"$max": "$" + mongoschema.TreeNodeTimestampField},
-			aggInputTokensField:     bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageInputTokensPath},
-			aggOutputTokensField:    bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageOutputTokensPath},
-			aggCacheReadTokensField: bson.M{"$sum": "$" + mongoschema.AssistantMessageUsageCacheReadInputTokensPath},
+			"_id":                       nil,
+			"sessionCount":              bson.M{"$addToSet": "$" + mongoschema.SessionSessionIDField},
+			"lastActivity":              bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+			aggInputTokensField:         bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+			aggOutputTokensField:        bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+			aggCacheCreationTokensField: bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+			aggCacheReadTokensField:     bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 		}},
 		bson.M{"$project": bson.M{
-			"sessionCount":          bson.M{"$size": "$sessionCount"},
-			"lastActivity":          1,
-			aggInputTokensField:     1,
-			aggOutputTokensField:    1,
-			aggCacheReadTokensField: 1,
+			"sessionCount":              bson.M{"$size": "$sessionCount"},
+			"lastActivity":              1,
+			aggInputTokensField:         1,
+			aggOutputTokensField:        1,
+			aggCacheCreationTokensField: 1,
+			aggCacheReadTokensField:     1,
 		}},
 	}
 
-	cursor, err := r.eventsColl.Aggregate(ctx, pipeline)
+	cursor, err := r.sessionsColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -859,12 +875,75 @@ func (r *MongoDashboardRepository) getProjectStats(ctx context.Context, projectI
 			SessionCount: mongoutil.Get[int32](doc, "sessionCount"),
 			LastActivity: mongoutil.Get[time.Time](doc, "lastActivity"),
 			Usage: repository.TokenUsageSummary{
-				TotalInputTokens:     mongoutil.Get[int64](doc, aggInputTokensField),
-				TotalOutputTokens:    mongoutil.Get[int64](doc, aggOutputTokensField),
-				TotalCacheReadTokens: mongoutil.Get[int64](doc, aggCacheReadTokensField),
+				TotalInputTokens:         mongoutil.Get[int64](doc, aggInputTokensField),
+				TotalOutputTokens:        mongoutil.Get[int64](doc, aggOutputTokensField),
+				TotalCacheCreationTokens: mongoutil.Get[int64](doc, aggCacheCreationTokensField),
+				TotalCacheReadTokens:     mongoutil.Get[int64](doc, aggCacheReadTokensField),
 			},
 		},
 	}, nil
+}
+
+// unmarshalSession converts a BSON document to a session.Session based on type discriminator.
+func unmarshalSession(doc bson.M) *session.Session {
+	// Extract type field
+	typeVal, ok := doc[mongoschema.SessionTypeField]
+	if !ok {
+		return nil
+	}
+
+	sessionType, ok := typeVal.(string)
+	if !ok {
+		return nil
+	}
+
+	// Re-marshal document to BSON bytes
+	docBytes, err := bson.Marshal(doc)
+	if err != nil {
+		return nil
+	}
+
+	// Create concrete type based on session type and unmarshal
+	var data any
+	switch session.SessionType(sessionType) {
+	case session.SessionTypeHuman:
+		var msg session.HumanMessage
+		if err := bson.Unmarshal(docBytes, &msg); err != nil {
+			return nil
+		}
+		data = &msg
+	case session.SessionTypeAgent:
+		var msg session.AgentMessage
+		if err := bson.Unmarshal(docBytes, &msg); err != nil {
+			return nil
+		}
+		data = &msg
+	case session.SessionTypeToolExecution:
+		var msg session.ToolExecution
+		if err := bson.Unmarshal(docBytes, &msg); err != nil {
+			return nil
+		}
+		data = &msg
+	case session.SessionTypeSystem:
+		var msg session.SystemMessage
+		if err := bson.Unmarshal(docBytes, &msg); err != nil {
+			return nil
+		}
+		data = &msg
+	case session.SessionTypeProgress:
+		var msg session.Progress
+		if err := bson.Unmarshal(docBytes, &msg); err != nil {
+			return nil
+		}
+		data = &msg
+	default:
+		return nil
+	}
+
+	return &session.Session{
+		Type: session.SessionType(sessionType),
+		Data: data,
+	}
 }
 
 // Compile-time interface verification.

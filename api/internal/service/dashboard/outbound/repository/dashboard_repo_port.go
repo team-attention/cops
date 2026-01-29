@@ -6,6 +6,7 @@ import (
 
 	"github.com/team-attention/cops/api/internal/platform/structure"
 	shareddomain "github.com/team-attention/cops/shared/domain"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
 // TokenUsageSummary aggregates token usage statistics.
@@ -57,13 +58,13 @@ type SessionSummary struct {
 	Usage        TokenUsageSummary
 }
 
-// SessionDetail contains full session information with transcripts.
+// SessionDetail contains full session information with session entries.
 // Embeds SessionBase for common identification.
 type SessionDetail struct {
 	SessionBase
-	Version     string
-	Usage       TokenUsageSummary
-	Transcripts []shareddomain.Transcript
+	Version  string
+	Usage    TokenUsageSummary
+	Sessions []*session.Session
 }
 
 // OverviewStats contains dashboard overview statistics.

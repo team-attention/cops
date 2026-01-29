@@ -29,7 +29,11 @@ type LogBatch struct {
 	// Project identifier
 	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// Raw JSONL lines
-	Jsonl         []string `protobuf:"bytes,3,rep,name=jsonl,proto3" json:"jsonl,omitempty"`
+	Jsonl []string `protobuf:"bytes,3,rep,name=jsonl,proto3" json:"jsonl,omitempty"`
+	// Event schema version (e.g., "v1")
+	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	// Source provider (e.g., "claude")
+	Provider      string `protobuf:"bytes,5,opt,name=provider,proto3" json:"provider,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -83,6 +87,20 @@ func (x *LogBatch) GetJsonl() []string {
 		return x.Jsonl
 	}
 	return nil
+}
+
+func (x *LogBatch) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *LogBatch) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
 }
 
 // SendLogsReq is the request message for SendLogs RPC.
@@ -199,12 +217,14 @@ var File_event_v1_event_proto protoreflect.FileDescriptor
 
 const file_event_v1_event_proto_rawDesc = "" +
 	"\n" +
-	"\x14event/v1/event.proto\x12\bevent.v1\"h\n" +
+	"\x14event/v1/event.proto\x12\bevent.v1\"\x9e\x01\n" +
 	"\bLogBatch\x12'\n" +
 	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x14\n" +
-	"\x05jsonl\x18\x03 \x03(\tR\x05jsonl\"7\n" +
+	"\x05jsonl\x18\x03 \x03(\tR\x05jsonl\x12\x18\n" +
+	"\aversion\x18\x04 \x01(\tR\aversion\x12\x1a\n" +
+	"\bprovider\x18\x05 \x01(\tR\bprovider\"7\n" +
 	"\vSendLogsReq\x12(\n" +
 	"\x05batch\x18\x01 \x01(\v2\x12.event.v1.LogBatchR\x05batch\"u\n" +
 	"\vSendLogsRes\x12\x18\n" +

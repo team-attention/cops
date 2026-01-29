@@ -309,6 +309,9 @@ func (a *Adapter) adaptProgress(p *domain.ProgressTranscript) ([]*session.Sessio
 			NormalizedMessages: p.Data.NormalizedMessages,
 			Prompt:             p.Data.Prompt,
 			AgentID:            p.Data.AgentID,
+			HookEvent:          p.Data.HookEvent,
+			HookName:           p.Data.HookName,
+			Command:            p.Data.Command,
 		},
 	}
 
@@ -325,11 +328,9 @@ func convertTreeNodeMeta(m *domain.TreeNodeMeta) session.TreeNodeMeta {
 		UUID:        m.UUID,
 		SessionID:   m.SessionID,
 		Timestamp:   m.Timestamp,
+		Provider:    "claude_code",
 		Version:     m.Version,
-		CWD:         m.CWD,
 		GitBranch:   m.GitBranch,
-		Slug:        m.Slug,
-		UserType:    m.UserType,
 		IsSidechain: m.IsSidechain,
 	}
 }

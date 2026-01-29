@@ -5,7 +5,9 @@ type ProgressType string
 
 const (
 	ProgressTypeAgent ProgressType = "agent_progress"
-	ProgressTypeSkill ProgressType = "skill_progress"
+	ProgressTypeHook  ProgressType = "hook_progress"
+	ProgressTypeBash  ProgressType = "bash_progress"
+	ProgressTypeMcp   ProgressType = "mcp_progress"
 )
 
 // Progress represents real-time progress updates during tool execution.
@@ -39,4 +41,9 @@ type ProgressData struct {
 
 	// AgentID is the subagent ID for agent progress.
 	AgentID *string `json:"agentId,omitempty" bson:"agentId,omitempty"`
+
+	// Hook progress fields
+	HookEvent *string `json:"hookEvent,omitempty" bson:"hookEvent,omitempty"`
+	HookName  *string `json:"hookName,omitempty" bson:"hookName,omitempty"`
+	Command   *string `json:"command,omitempty" bson:"command,omitempty"`
 }

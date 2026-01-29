@@ -40,4 +40,6 @@ type LogBatch struct {
 	Lines          []string        // Raw JSONL lines (unparsed)
 	ProjectID      shareddomain.ID // Project ID (for aggregation API)
 	OrganizationID string          // Organization ID (for aggregation API)
+	Version        string          // Event schema version (e.g., "v1")
+	Provider       string          // Source provider (e.g., "claude")
 }

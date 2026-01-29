@@ -49,6 +49,22 @@ const formatDate = (timestamp: Timestamp | undefined): string => {
   })
 }
 
+// Progress type to label mapping
+const getProgressLabel = (type: string | undefined) => {
+  switch (type) {
+    case 'agent':
+      return 'Agent'
+    case 'hook':
+      return 'Hook'
+    case 'bash':
+      return 'Bash'
+    case 'mcp':
+      return 'MCP'
+    default:
+      return 'Unknown'
+  }
+}
+
 export const MessageDetailSheet = ({
   open,
   onOpenChange,
@@ -88,7 +104,7 @@ export const MessageDetailSheet = ({
       }
     if (isProgress)
       return {
-        label: `${message.progressType === 'agent' ? 'Agent' : 'Skill'} Progress`,
+        label: `${getProgressLabel(message.progressType)} Progress`,
         icon: Play,
         color: 'emerald',
       }

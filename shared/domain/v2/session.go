@@ -72,18 +72,16 @@ type TreeNodeMeta struct {
 	UUID        string    `json:"uuid" bson:"uuid"`
 	SessionID   string    `json:"sessionId" bson:"sessionId"`
 	Timestamp   time.Time `json:"timestamp" bson:"timestamp"`
+	Provider    string    `json:"provider" bson:"provider"` // "claude_code" | "gemini_cli"
 	Version     string    `json:"version,omitempty" bson:"version,omitempty"`
-	CWD         string    `json:"cwd,omitempty" bson:"cwd,omitempty"`
 	GitBranch   string    `json:"gitBranch,omitempty" bson:"gitBranch,omitempty"`
-	Slug        string    `json:"slug,omitempty" bson:"slug,omitempty"`
-	UserType    string    `json:"userType,omitempty" bson:"userType,omitempty"`
 	IsSidechain bool      `json:"isSidechain,omitempty" bson:"isSidechain,omitempty"`
 }
 
 // Session represents a single entry with polymorphic data.
 type Session struct {
 	Type SessionType `json:"type" bson:"type"`
-	Data any         `bson:",inline"`
+	Data any         `bson:"-"` // Handled via mongoschema MarshalBSON/UnmarshalBSON
 }
 
 // sessionTypeFactory creates new instances of session data types.

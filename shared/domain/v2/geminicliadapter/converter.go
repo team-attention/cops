@@ -12,6 +12,7 @@ func (a *Adapter) adaptUserMessage(msg *GeminiMessage, sessionID string) []*sess
 			UUID:      msg.ID,
 			SessionID: sessionID,
 			Timestamp: msg.Timestamp,
+			Provider:  "gemini_cli",
 		},
 		Content: []*session.HumanContentBlock{
 			{
@@ -67,6 +68,7 @@ func (a *Adapter) adaptGeminiMessage(msg *GeminiMessage, sessionID string) []*se
 			UUID:      msg.ID,
 			SessionID: sessionID,
 			Timestamp: msg.Timestamp,
+			Provider:  "gemini_cli",
 		},
 		Provider: "google",
 		Model:    msg.Model,
@@ -98,6 +100,7 @@ func (a *Adapter) adaptInfoMessage(msg *GeminiMessage, sessionID string) []*sess
 			UUID:      msg.ID,
 			SessionID: sessionID,
 			Timestamp: msg.Timestamp,
+			Provider:  "gemini_cli",
 		},
 		Subtype: session.SystemMessageSubtypeInfo,
 	}
@@ -139,6 +142,7 @@ func (a *Adapter) adaptToolCall(tc *GeminiToolCall, sourceAgentUUID, sessionID s
 			UUID:      tc.ID,
 			SessionID: sessionID,
 			Timestamp: tc.Timestamp,
+			Provider:  "gemini_cli",
 		},
 		ID:              tc.ID,
 		ToolName:        tc.Name,

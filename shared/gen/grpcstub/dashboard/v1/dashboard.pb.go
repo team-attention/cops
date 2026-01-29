@@ -7,7 +7,7 @@
 package dashboardv1
 
 import (
-	v1 "github.com/team-attention/cops/shared/gen/grpcstub/transcript/v1"
+	v1 "github.com/team-attention/cops/shared/gen/grpcstub/session/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -532,8 +532,8 @@ type SessionDetail struct {
 	StartedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	// Session end timestamp
 	EndedAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	// All session transcripts
-	Transcripts   []*v1.Transcript `protobuf:"bytes,9,rep,name=transcripts,proto3" json:"transcripts,omitempty"`
+	// All session entries
+	Sessions      []*v1.Session `protobuf:"bytes,9,rep,name=sessions,proto3" json:"sessions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -617,9 +617,9 @@ func (x *SessionDetail) GetEndedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *SessionDetail) GetTranscripts() []*v1.Transcript {
+func (x *SessionDetail) GetSessions() []*v1.Session {
 	if x != nil {
-		return x.Transcripts
+		return x.Sessions
 	}
 	return nil
 }
@@ -1223,7 +1223,7 @@ var File_dashboard_v1_dashboard_proto protoreflect.FileDescriptor
 
 const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\n" +
-	"\x1cdashboard/v1/dashboard.proto\x12\fdashboard.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1etranscript/v1/transcript.proto\"\xe7\x01\n" +
+	"\x1cdashboard/v1/dashboard.proto\x12\fdashboard.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x18session/v1/session.proto\"\xe7\x01\n" +
 	"\x11TokenUsageSummary\x12,\n" +
 	"\x12total_input_tokens\x18\x01 \x01(\x03R\x10totalInputTokens\x12.\n" +
 	"\x13total_output_tokens\x18\x02 \x01(\x03R\x11totalOutputTokens\x12=\n" +
@@ -1265,7 +1265,7 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x05usage\x18\x05 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
 	"started_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xe8\x02\n" +
+	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xdc\x02\n" +
 	"\rSessionDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1276,8 +1276,8 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\x05usage\x18\x06 \x01(\v2\x1f.dashboard.v1.TokenUsageSummaryR\x05usage\x129\n" +
 	"\n" +
 	"started_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12;\n" +
-	"\vtranscripts\x18\t \x03(\v2\x19.transcript.v1.TranscriptR\vtranscriptsJ\x04\b\x04\x10\x05R\x03cwd\"9\n" +
+	"\bended_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12/\n" +
+	"\bsessions\x18\t \x03(\v2\x13.session.v1.SessionR\bsessionsJ\x04\b\x04\x10\x05R\x03cwd\"9\n" +
 	"\x0eGetOverviewReq\x12'\n" +
 	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\"\xaa\x02\n" +
 	"\x0eGetOverviewRes\x12@\n" +
@@ -1369,7 +1369,7 @@ var file_dashboard_v1_dashboard_proto_goTypes = []any{
 	(*GetSessionReq)(nil),         // 15: dashboard.v1.GetSessionReq
 	(*GetSessionRes)(nil),         // 16: dashboard.v1.GetSessionRes
 	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
-	(*v1.Transcript)(nil),         // 18: transcript.v1.Transcript
+	(*v1.Session)(nil),            // 18: session.v1.Session
 }
 var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 0: dashboard.v1.ProjectSummary.usage:type_name -> dashboard.v1.TokenUsageSummary
@@ -1383,7 +1383,7 @@ var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 8: dashboard.v1.SessionDetail.usage:type_name -> dashboard.v1.TokenUsageSummary
 	17, // 9: dashboard.v1.SessionDetail.started_at:type_name -> google.protobuf.Timestamp
 	17, // 10: dashboard.v1.SessionDetail.ended_at:type_name -> google.protobuf.Timestamp
-	18, // 11: dashboard.v1.SessionDetail.transcripts:type_name -> transcript.v1.Transcript
+	18, // 11: dashboard.v1.SessionDetail.sessions:type_name -> session.v1.Session
 	0,  // 12: dashboard.v1.GetOverviewRes.total_usage:type_name -> dashboard.v1.TokenUsageSummary
 	3,  // 13: dashboard.v1.GetOverviewRes.recent_projects:type_name -> dashboard.v1.ProjectSummary
 	5,  // 14: dashboard.v1.GetOverviewRes.recent_sessions:type_name -> dashboard.v1.SessionSummary

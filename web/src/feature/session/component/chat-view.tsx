@@ -2,18 +2,18 @@ import { useEffect, useMemo, useRef } from 'react'
 import { MessageSquare } from 'lucide-react'
 import {
   enrichToolResultMessages,
-  filterTranscriptsForChat,
+  filterSessionsForChat,
   parseMessageContent,
 } from '../util/parse-content'
 import { MessageBubble } from './message-bubble'
 import type { LinkedToolCall, ParsedMessage } from '../type/content-block'
-import type { Transcript } from '@/gen/grpcstub/transcript/v1/transcript_pb'
+import type { Session } from '@/gen/grpcstub/session/v1/session_pb'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
 import { Badge } from '@/gen/shadcn/ui/badge'
 
 interface ChatViewProps {
-  transcripts: Array<Transcript>
+  sessions: Array<Session>
   toolCalls?: Array<LinkedToolCall>
   parsedMessages?: Array<ParsedMessage>
   selectedMessageId?: string
@@ -22,7 +22,7 @@ interface ChatViewProps {
 }
 
 export const ChatView = ({
-  transcripts,
+  sessions,
   toolCalls = [],
   parsedMessages: externalParsedMessages,
   selectedMessageId,
@@ -31,13 +31,13 @@ export const ChatView = ({
 }: ChatViewProps) => {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Filter, parse, and enrich transcripts (use external if provided)
+  // Filter, parse, and enrich sessions (use external if provided)
   const internalParsedMessages = useMemo(() => {
     if (externalParsedMessages) return externalParsedMessages
-    const filtered = filterTranscriptsForChat(transcripts)
+    const filtered = filterSessionsForChat(sessions)
     const parsed = filtered.map(parseMessageContent)
     return enrichToolResultMessages(parsed, toolCalls)
-  }, [transcripts, toolCalls, externalParsedMessages])
+  }, [sessions, toolCalls, externalParsedMessages])
 
   const parsedMessages = internalParsedMessages
 

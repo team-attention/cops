@@ -132,7 +132,7 @@ export const SessionsTable = ({
             onSort={onSortChange}
             align="right"
           >
-            Started
+            Last Activity
           </SortableHeader>
         </TableRow>
       </TableHeader>
