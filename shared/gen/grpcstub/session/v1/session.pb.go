@@ -372,9 +372,13 @@ type TreeNodeMeta struct {
 	// Git branch name
 	GitBranch string `protobuf:"bytes,7,opt,name=git_branch,json=gitBranch,proto3" json:"git_branch,omitempty"`
 	// Whether this is a sidechain message
-	IsSidechain   bool `protobuf:"varint,8,opt,name=is_sidechain,json=isSidechain,proto3" json:"is_sidechain,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	IsSidechain bool `protobuf:"varint,8,opt,name=is_sidechain,json=isSidechain,proto3" json:"is_sidechain,omitempty"`
+	// SubAgent identifier (empty for Main session entries)
+	AgentId string `protobuf:"bytes,9,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	// Tool Use ID that spawned this SubAgent (for linking in Graph view)
+	SpawnedByToolUseId string `protobuf:"bytes,10,opt,name=spawned_by_tool_use_id,json=spawnedByToolUseId,proto3" json:"spawned_by_tool_use_id,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *TreeNodeMeta) Reset() {
@@ -461,6 +465,20 @@ func (x *TreeNodeMeta) GetIsSidechain() bool {
 		return x.IsSidechain
 	}
 	return false
+}
+
+func (x *TreeNodeMeta) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
+	}
+	return ""
+}
+
+func (x *TreeNodeMeta) GetSpawnedByToolUseId() string {
+	if x != nil {
+		return x.SpawnedByToolUseId
+	}
+	return ""
 }
 
 // ImageData represents image content with base64-encoded data.
@@ -1949,7 +1967,7 @@ var File_session_v1_session_proto protoreflect.FileDescriptor
 const file_session_v1_session_proto_rawDesc = "" +
 	"\n" +
 	"\x18session/v1/session.proto\x12\n" +
-	"session.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x94\x02\n" +
+	"session.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe3\x02\n" +
 	"\fTreeNodeMeta\x12\x1f\n" +
 	"\vparent_uuid\x18\x01 \x01(\tR\n" +
 	"parentUuid\x12\x12\n" +
@@ -1961,7 +1979,10 @@ const file_session_v1_session_proto_rawDesc = "" +
 	"\aversion\x18\x06 \x01(\tR\aversion\x12\x1d\n" +
 	"\n" +
 	"git_branch\x18\a \x01(\tR\tgitBranch\x12!\n" +
-	"\fis_sidechain\x18\b \x01(\bR\visSidechain\">\n" +
+	"\fis_sidechain\x18\b \x01(\bR\visSidechain\x12\x19\n" +
+	"\bagent_id\x18\t \x01(\tR\aagentId\x122\n" +
+	"\x16spawned_by_tool_use_id\x18\n" +
+	" \x01(\tR\x12spawnedByToolUseId\">\n" +
 	"\tImageData\x12\x1d\n" +
 	"\n" +
 	"media_type\x18\x01 \x01(\tR\tmediaType\x12\x12\n" +

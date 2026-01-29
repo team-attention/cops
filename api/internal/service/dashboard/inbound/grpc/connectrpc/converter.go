@@ -480,6 +480,7 @@ func toProtoProgressData(d session.ProgressData) *sessionv1.ProgressData {
 }
 
 // toProtoTreeNodeMeta converts domain TreeNodeMeta to protobuf.
+// Includes AgentId and SpawnedByToolUseId for SubAgent support.
 func toProtoTreeNodeMeta(m session.TreeNodeMeta) *sessionv1.TreeNodeMeta {
 	proto := &sessionv1.TreeNodeMeta{
 		Uuid:        m.UUID,
@@ -493,6 +494,16 @@ func toProtoTreeNodeMeta(m session.TreeNodeMeta) *sessionv1.TreeNodeMeta {
 
 	if m.ParentUUID != nil {
 		proto.ParentUuid = *m.ParentUUID
+	}
+
+	// Convert AgentID if set (for SubAgent entries)
+	if m.AgentID != nil {
+		proto.AgentId = *m.AgentID
+	}
+
+	// Convert SpawnedByToolUseID if set (links to tool use that spawned this SubAgent)
+	if m.SpawnedByToolUseID != nil {
+		proto.SpawnedByToolUseId = *m.SpawnedByToolUseID
 	}
 
 	return proto

@@ -312,6 +312,10 @@ export const SessionSummarySchema: GenMessage<SessionSummary> = /*@__PURE__*/
 
 /**
  * SessionDetail contains full session information with records.
+ * Sessions array contains ALL entries - both Main session and SubAgent entries.
+ * SubAgent entries are identified by:
+ *   - agent_id: The SubAgent's identifier (empty for Main session)
+ *   - spawned_by_tool_use_id: Links to the tool use that spawned this SubAgent
  *
  * @generated from message dashboard.v1.SessionDetail
  */
@@ -345,7 +349,7 @@ export type SessionDetail = Message<"dashboard.v1.SessionDetail"> & {
   version: string;
 
   /**
-   * Session token usage
+   * Session token usage (aggregated across Main + all SubAgents)
    *
    * @generated from field: dashboard.v1.TokenUsageSummary usage = 6;
    */
@@ -366,7 +370,10 @@ export type SessionDetail = Message<"dashboard.v1.SessionDetail"> & {
   endedAt?: Timestamp;
 
   /**
-   * All session entries
+   * All session entries (Main + SubAgent combined)
+   * Use agent_id field in TreeNodeMeta to distinguish:
+   * - agent_id empty: Main session entry
+   * - agent_id set: SubAgent entry (use spawned_by_tool_use_id for Graph linking)
    *
    * @generated from field: repeated session.v1.Session sessions = 9;
    */
