@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/team-attention/cops/shared/domain/mongoschema"
+	"github.com/team-attention/cops/shared/domain"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -40,13 +40,13 @@ type EventQueryPort interface {
 
 	// FindByBatchID retrieves all events with the given batchID.
 	// Used to process events in batch groups.
-	FindByBatchID(ctx context.Context, batchID string) ([]*mongoschema.Event, error)
+	FindByBatchID(ctx context.Context, batchID string) ([]*domain.Event, error)
 
 	// DeleteByIDs removes events with the given IDs.
 	// Called after successful conversion to Session records.
-	DeleteByIDs(ctx context.Context, ids []bson.ObjectID) error
+	DeleteByIDs(ctx context.Context, ids []domain.ID) error
 
 	// IncrementRetryCount increments retryCount for a single event.
 	// Called when event processing fails.
-	IncrementRetryCount(ctx context.Context, id bson.ObjectID) error
+	IncrementRetryCount(ctx context.Context, id domain.ID) error
 }

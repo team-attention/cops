@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/team-attention/cops/api/internal/platform/interceptor"
+	"github.com/team-attention/cops/api/internal/service/event"
 	eventv1 "github.com/team-attention/cops/shared/gen/grpcstub/event/v1"
 )
 
@@ -28,14 +29,15 @@ func (h *EventGRPCHandler) SendLogs(
 		}), nil
 	}
 
-	// 4. Call result, err := h.svc.ParseAndCollectLogs(ctx, userID, pbBatch.GetJsonl(), pbBatch.GetProjectId(), pbBatch.GetOrganizationId()).
-	result, err := h.svc.ParseAndCollectLogs(
-		ctx,
-		userID,
-		pbBatch.GetJsonl(),
-		pbBatch.GetProjectId(),
-		pbBatch.GetOrganizationId(),
-	)
+	// 4. Call service with all batch fields including version and provider.
+	result, err := h.svc.ParseAndCollectLogs(ctx, event.ParseAndCollectLogsParams{
+		UserID:         userID,
+		Lines:          pbBatch.GetJsonl(),
+		ProjectID:      pbBatch.GetProjectId(),
+		OrganizationID: pbBatch.GetOrganizationId(),
+		Version:        pbBatch.GetVersion(),
+		Provider:       pbBatch.GetProvider(),
+	})
 
 	// 5. If error, return nil, err.
 	if err != nil {

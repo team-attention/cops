@@ -64,6 +64,7 @@ func (s *Event) ToDomain() *domain.Event {
 	s.Event.ProjectID = domain.ID(s.ProjectID.Hex())
 	s.Event.OrganizationID = domain.ID(s.OrganizationID.Hex())
 	s.Event.UserID = domain.ID(s.UserID.Hex())
+	s.Event.Data = ConvertBsonToMap(s.Event.Data)
 
 	return &s.Event
 }

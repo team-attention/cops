@@ -375,6 +375,8 @@ func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.
 			Lines:          currentBatch,
 			ProjectID:      projectID,
 			OrganizationID: orgID,
+			Version:        "v1",
+			Provider:       "claude",
 		}
 
 		s.logger.Debug("attempting batch",

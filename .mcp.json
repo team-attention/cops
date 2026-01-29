@@ -1,41 +1,46 @@
 {
-    "mcpServers": {
-        "linear": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@team-attention/mcproxy",
-                "--",
-                "npx",
-                "-y",
-                "mcp-remote",
-                "https://mcp.linear.app/mcp",
-                "--header",
-                "Authorization: Bearer ${LINEAR_API_KEY}"
-            ],
-            "env": {
-                "LINEAR_API_KEY": "${LINEAR_API_KEY}"
-            }
-        },
-        "tavily": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "mcp-remote",
-                "https://mcp.tavily.com/mcp/?${TAVILY_API_KEY}"
-            ],
-            "env": {
-                "TAVILY_API_KEY": "${TAVILY_API_KEY}"
-            }
-        },
-        "context7": {
-            "type": "stdio",
-            "command": "npx",
-            "args": [
-                "-y",
-                "@upstash/context7-mcp"
-            ],
-            "env": {}
-        }
+  "mcpServers": {
+    "mongodb": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server@latest", "--readOnly"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb://localhost:27017/?directConnection=true"
+      }
+    },
+    "linear": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@team-attention/mcproxy",
+        "--",
+        "npx",
+        "-y",
+        "mcp-remote",
+        "https://mcp.linear.app/mcp",
+        "--header",
+        "Authorization: Bearer ${LINEAR_API_KEY}"
+      ],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      }
+    },
+    "tavily": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.tavily.com/mcp/?${TAVILY_API_KEY}"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      }
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {}
     }
+  }
 }

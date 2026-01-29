@@ -3,10 +3,9 @@ package connectrpc
 import (
 	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
-	shareddomain "github.com/team-attention/cops/shared/domain"
+	session "github.com/team-attention/cops/shared/domain/v2"
 	dashboardv1 "github.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1"
-	transcriptv1 "github.com/team-attention/cops/shared/gen/grpcstub/transcript/v1"
-	"google.golang.org/protobuf/types/known/structpb"
+	sessionv1 "github.com/team-attention/cops/shared/gen/grpcstub/session/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -60,150 +59,107 @@ func toProtoSessionSummary(s repository.SessionSummary) *dashboardv1.SessionSumm
 
 // toProtoSessionDetail converts repository session detail to protobuf.
 func toProtoSessionDetail(s *repository.SessionDetail) *dashboardv1.SessionDetail {
-	transcripts := toProtoTranscripts(s.Transcripts)
+	sessions := toProtoSessions(s.Sessions)
 
 	return &dashboardv1.SessionDetail{
-		Id:          s.SessionBase.ID,
-		ProjectId:   s.SessionBase.ProjectID,
-		GitBranch:   s.SessionBase.GitBranch,
-		Version:     s.Version,
-		Usage:       toProtoTokenUsageSummary(s.Usage),
-		StartedAt:   timestamppb.New(s.SessionBase.StartedAt),
-		EndedAt:     timestamppb.New(s.SessionBase.EndedAt),
-		Transcripts: transcripts,
+		Id:        s.SessionBase.ID,
+		ProjectId: s.SessionBase.ProjectID,
+		GitBranch: s.SessionBase.GitBranch,
+		Version:   s.Version,
+		Usage:     toProtoTokenUsageSummary(s.Usage),
+		StartedAt: timestamppb.New(s.SessionBase.StartedAt),
+		EndedAt:   timestamppb.New(s.SessionBase.EndedAt),
+		Sessions:  sessions,
 	}
 }
 
-// toProtoTranscripts converts domain Transcripts to protobuf Transcripts.
-func toProtoTranscripts(transcripts []shareddomain.Transcript) []*transcriptv1.Transcript {
-	result := make([]*transcriptv1.Transcript, 0, len(transcripts))
-	for _, transcript := range transcripts {
-		protoTranscript := toProtoTranscript(transcript)
-		if protoTranscript != nil {
-			result = append(result, protoTranscript)
+// toProtoSessions converts domain Sessions to protobuf Sessions.
+func toProtoSessions(sessions []*session.Session) []*sessionv1.Session {
+	result := make([]*sessionv1.Session, 0, len(sessions))
+	for _, s := range sessions {
+		protoSession := toProtoSession(s)
+		if protoSession != nil {
+			result = append(result, protoSession)
 		}
 	}
 	return result
 }
 
-// toProtoTranscript converts a single domain Transcript to protobuf Transcript.
-func toProtoTranscript(t shareddomain.Transcript) *transcriptv1.Transcript {
-	proto := &transcriptv1.Transcript{}
+// toProtoSession converts a single domain Session to protobuf Session.
+func toProtoSession(s *session.Session) *sessionv1.Session {
+	if s == nil {
+		return nil
+	}
 
-	// Set Type based on t.Type using type switch on Data
-	switch data := t.Data.(type) {
-	case *shareddomain.UserTranscript:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_USER
-		proto.Data = &transcriptv1.Transcript_UserData{
-			UserData: toProtoUserTranscriptData(data),
+	proto := &sessionv1.Session{}
+
+	switch s.Type {
+	case session.SessionTypeHuman:
+		proto.Type = sessionv1.SessionType_SESSION_TYPE_HUMAN
+		if data, ok := s.Data.(*session.HumanMessage); ok {
+			proto.Data = &sessionv1.Session_HumanData{
+				HumanData: toProtoHumanMessage(data),
+			}
 		}
-	case *shareddomain.AssistantTranscript:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_ASSISTANT
-		proto.Data = &transcriptv1.Transcript_AssistantData{
-			AssistantData: toProtoAssistantTranscriptData(data),
+	case session.SessionTypeAgent:
+		proto.Type = sessionv1.SessionType_SESSION_TYPE_AGENT
+		if data, ok := s.Data.(*session.AgentMessage); ok {
+			proto.Data = &sessionv1.Session_AgentData{
+				AgentData: toProtoAgentMessage(data),
+			}
 		}
-	case *shareddomain.FileHistorySnapshotTranscript:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_FILE_HISTORY_SNAPSHOT
-		proto.Data = &transcriptv1.Transcript_FileHistorySnapshotData{
-			FileHistorySnapshotData: toProtoFileHistorySnapshotTranscriptData(data),
+	case session.SessionTypeToolExecution:
+		proto.Type = sessionv1.SessionType_SESSION_TYPE_TOOL_EXECUTION
+		if data, ok := s.Data.(*session.ToolExecution); ok {
+			proto.Data = &sessionv1.Session_ToolExecutionData{
+				ToolExecutionData: toProtoToolExecution(data),
+			}
 		}
-	case *shareddomain.SystemTranscript:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_SYSTEM
-		proto.Data = &transcriptv1.Transcript_SystemData{
-			SystemData: toProtoSystemTranscriptData(data),
+	case session.SessionTypeSystem:
+		proto.Type = sessionv1.SessionType_SESSION_TYPE_SYSTEM
+		if data, ok := s.Data.(*session.SystemMessage); ok {
+			proto.Data = &sessionv1.Session_SystemData{
+				SystemData: toProtoSystemMessage(data),
+			}
 		}
-	case *shareddomain.SummaryTranscript:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_SUMMARY
-		proto.Data = &transcriptv1.Transcript_SummaryData{
-			SummaryData: toProtoSummaryTranscriptData(data),
-		}
-	case *shareddomain.ProgressTranscript:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_PROGRESS
-		proto.Data = &transcriptv1.Transcript_ProgressData{
-			ProgressData: toProtoProgressTranscriptData(data),
+	case session.SessionTypeProgress:
+		proto.Type = sessionv1.SessionType_SESSION_TYPE_PROGRESS
+		if data, ok := s.Data.(*session.Progress); ok {
+			proto.Data = &sessionv1.Session_ProgressData{
+				ProgressData: toProtoProgress(data),
+			}
 		}
 	default:
-		proto.Type = transcriptv1.TranscriptType_TRANSCRIPT_TYPE_UNSPECIFIED
+		proto.Type = sessionv1.SessionType_SESSION_TYPE_UNSPECIFIED
 	}
 
 	return proto
 }
 
-// toProtoUserTranscriptData converts UserTranscript to proto UserTranscriptData.
-func toProtoUserTranscriptData(u *shareddomain.UserTranscript) *transcriptv1.UserTranscriptData {
-	// 1. Create base UserTranscriptData with metadata and other fields.
-	data := &transcriptv1.UserTranscriptData{
-		Metadata: toProtoTreeNodeMeta(u.TreeNodeMeta),
-		Message: &transcriptv1.UserMessage{
-			Role: u.Message.Role,
-		},
-		IsMeta: u.IsMeta,
+// toProtoHumanMessage converts domain HumanMessage to protobuf.
+func toProtoHumanMessage(h *session.HumanMessage) *sessionv1.HumanMessage {
+	if h == nil {
+		return nil
 	}
 
-	// 2. Convert Content based on its type (string or []*UserMessageBlock).
-	if u.Message.Content != nil {
-		switch content := u.Message.Content.(type) {
-		case string:
-			// a. If string: Set Message.Content to UserMessage_Text.
-			data.Message.Content = &transcriptv1.UserMessage_Text{
-				Text: content,
-			}
-		case []*shareddomain.UserMessageBlock:
-			// b. If []*UserMessageBlock: Convert to protobuf blocks.
-			protoBlocks := make([]*transcriptv1.UserMessageBlock, len(content))
-			for i, block := range content {
-				protoBlocks[i] = toProtoUserMessageBlock(block)
-			}
-			// Set Message.Content to UserMessage_Blocks.
-			data.Message.Content = &transcriptv1.UserMessage_Blocks{
-				Blocks: &transcriptv1.UserMessageBlockList{
-					Blocks: protoBlocks,
-				},
-			}
-		case []interface{}:
-			// c. If []interface{} (JSON unmarshal result): Convert to protobuf blocks.
-			protoBlocks := make([]*transcriptv1.UserMessageBlock, 0, len(content))
-			for _, item := range content {
-				if blockMap, ok := item.(map[string]interface{}); ok {
-					protoBlock := convertMapToUserMessageBlock(blockMap)
-					if protoBlock != nil {
-						protoBlocks = append(protoBlocks, protoBlock)
-					}
-				}
-			}
-			if len(protoBlocks) > 0 {
-				data.Message.Content = &transcriptv1.UserMessage_Blocks{
-					Blocks: &transcriptv1.UserMessageBlockList{
-						Blocks: protoBlocks,
-					},
-				}
-			}
+	proto := &sessionv1.HumanMessage{
+		Metadata: toProtoTreeNodeMeta(h.TreeNodeMeta),
+		IsMeta:   h.IsMeta,
+	}
+
+	// Convert content blocks
+	if len(h.Content) > 0 {
+		proto.Content = make([]*sessionv1.HumanContentBlock, len(h.Content))
+		for i, block := range h.Content {
+			proto.Content[i] = toProtoHumanContentBlock(block)
 		}
 	}
 
-	// 3. Convert ThinkingMetadata if present.
-	if u.ThinkingMetadata != nil {
-		data.ThinkingMetadata = &transcriptv1.ThinkingMetadata{
-			Level:    u.ThinkingMetadata.Level,
-			Disabled: u.ThinkingMetadata.Disabled,
-		}
-		if len(u.ThinkingMetadata.Triggers) > 0 {
-			data.ThinkingMetadata.Triggers = make([]*transcriptv1.ThinkingTrigger, len(u.ThinkingMetadata.Triggers))
-			for i, trigger := range u.ThinkingMetadata.Triggers {
-				data.ThinkingMetadata.Triggers[i] = &transcriptv1.ThinkingTrigger{
-					Start: int32(trigger.Start),
-					End:   int32(trigger.End),
-					Text:  trigger.Text,
-				}
-			}
-		}
-	}
-
-	// 4. Convert Todos if present.
-	if len(u.Todos) > 0 {
-		data.Todos = make([]*transcriptv1.Todo, len(u.Todos))
-		for i, todo := range u.Todos {
-			data.Todos[i] = &transcriptv1.Todo{
+	// Convert todos
+	if len(h.Todos) > 0 {
+		proto.Todos = make([]*sessionv1.Todo, len(h.Todos))
+		for i, todo := range h.Todos {
+			proto.Todos[i] = &sessionv1.Todo{
 				Content:    todo.Content,
 				Status:     todo.Status,
 				ActiveForm: todo.ActiveForm,
@@ -211,217 +167,315 @@ func toProtoUserTranscriptData(u *shareddomain.UserTranscript) *transcriptv1.Use
 		}
 	}
 
-	// 5. Convert ToolUseResult if present.
-	if u.ToolUseResult != nil {
-		if val, err := structpb.NewValue(u.ToolUseResult); err == nil {
-			data.ToolUseResult = val
-		}
-	}
-
-	// 6. Set SourceToolAssistantUuid if present.
-	if u.SourceToolAssistantUUID != nil {
-		data.SourceToolAssistantUuid = *u.SourceToolAssistantUUID
-	}
-
-	// 7. Return the fully constructed data.
-	return data
+	return proto
 }
 
-// toProtoUserMessageBlock converts a single domain UserMessageBlock to protobuf.
-func toProtoUserMessageBlock(block *shareddomain.UserMessageBlock) *transcriptv1.UserMessageBlock {
-	// 1. Create base protobuf block with type field.
-	protoBlock := &transcriptv1.UserMessageBlock{
-		Type: block.Type,
+// toProtoHumanContentBlock converts domain HumanContentBlock to protobuf.
+func toProtoHumanContentBlock(block *session.HumanContentBlock) *sessionv1.HumanContentBlock {
+	if block == nil {
+		return nil
 	}
 
-	// 2. If Text is set, copy to proto.
-	if block.Text != nil {
-		protoBlock.Text = *block.Text
-	}
+	proto := &sessionv1.HumanContentBlock{}
 
-	// 3. If Source is set (image block), convert to proto.
-	if block.Source != nil {
-		protoBlock.Source = &transcriptv1.ImageSource{
-			Type:      block.Source.Type,
-			MediaType: block.Source.MediaType,
-			Data:      block.Source.Data,
+	switch block.Type {
+	case session.HumanContentBlockTypeText:
+		proto.Type = sessionv1.HumanContentBlockType_HUMAN_CONTENT_BLOCK_TYPE_TEXT
+		if block.Text != nil {
+			proto.Text = *block.Text
 		}
-	}
-
-	// 4. If ToolUseID is set (tool_result block), convert to proto.
-	if block.ToolUseID != nil {
-		// Convert Content to string (may be string or other type).
-		contentStr := ""
-		if block.Content != nil {
-			switch c := block.Content.(type) {
-			case string:
-				contentStr = c
-			default:
-				// Marshal non-string content to JSON.
-				if jsonBytes, err := sonic.Marshal(c); err == nil {
-					contentStr = string(jsonBytes)
-				}
+	case session.HumanContentBlockTypeImage:
+		proto.Type = sessionv1.HumanContentBlockType_HUMAN_CONTENT_BLOCK_TYPE_IMAGE
+		if block.Image != nil {
+			proto.Image = &sessionv1.ImageData{
+				MediaType: block.Image.MediaType,
+				Data:      block.Image.Data,
 			}
 		}
-		protoBlock.ToolResult = &transcriptv1.ToolResultContent{
-			ToolUseId: *block.ToolUseID,
-			Content:   contentStr,
-		}
+	default:
+		proto.Type = sessionv1.HumanContentBlockType_HUMAN_CONTENT_BLOCK_TYPE_UNSPECIFIED
 	}
 
-	// 5. Return the converted block.
-	return protoBlock
+	return proto
 }
 
-// toProtoAssistantTranscriptData converts AssistantTranscript to proto AssistantTranscriptData.
-func toProtoAssistantTranscriptData(a *shareddomain.AssistantTranscript) *transcriptv1.AssistantTranscriptData {
-	data := &transcriptv1.AssistantTranscriptData{
+// toProtoAgentMessage converts domain AgentMessage to protobuf.
+func toProtoAgentMessage(a *session.AgentMessage) *sessionv1.AgentMessage {
+	if a == nil {
+		return nil
+	}
+
+	proto := &sessionv1.AgentMessage{
 		Metadata:  toProtoTreeNodeMeta(a.TreeNodeMeta),
+		Provider:  a.Provider,
+		Model:     a.Model,
 		RequestId: a.RequestID,
-		Message: &transcriptv1.AssistantMessage{
-			Model: a.Message.Model,
-			Id:    a.Message.ID,
-			Type:  a.Message.Type,
-			Role:  a.Message.Role,
-		},
 	}
 
-	// Set usage if present
-	if a.Message.Usage != nil {
-		data.Message.Usage = &transcriptv1.AssistantUsage{
-			InputTokens:              int32(a.Message.Usage.InputTokens),
-			OutputTokens:             int32(a.Message.Usage.OutputTokens),
-			CacheCreationInputTokens: int32(a.Message.Usage.CacheCreationInputTokens),
-			CacheReadInputTokens:     int32(a.Message.Usage.CacheReadInputTokens),
-			ServiceTier:              a.Message.Usage.ServiceTier,
+	if a.StopReason != nil {
+		proto.StopReason = *a.StopReason
+	}
+
+	// Convert usage
+	if a.Usage != nil {
+		proto.Usage = &sessionv1.TokenUsage{
+			InputTokens:             int32(a.Usage.InputTokens),
+			OutputTokens:            int32(a.Usage.OutputTokens),
+			CacheCreationInputTokens: int32(a.Usage.CacheCreationInputTokens),
+			CacheReadInputTokens:    int32(a.Usage.CacheReadInputTokens),
+			ServiceTier:             a.Usage.ServiceTier,
 		}
-		// Set cache creation if present
-		if a.Message.Usage.CacheCreation != nil {
-			data.Message.Usage.CacheCreation = &transcriptv1.CacheCreation{
-				Ephemeral_5MInputTokens: int32(a.Message.Usage.CacheCreation.Ephemeral5mInputTokens),
-				Ephemeral_1HInputTokens: int32(a.Message.Usage.CacheCreation.Ephemeral1hInputTokens),
-			}
-		}
-	}
-
-	if a.Message.StopReason != nil {
-		data.Message.StopReason = *a.Message.StopReason
-	}
-
-	if a.Message.StopSequence != nil {
-		data.Message.StopSequence = *a.Message.StopSequence
 	}
 
 	// Convert content blocks
-	if len(a.Message.Content) > 0 {
-		data.Message.Content = make([]*transcriptv1.AssistantContentBlock, len(a.Message.Content))
-		for i, content := range a.Message.Content {
-			protoContent := &transcriptv1.AssistantContentBlock{
-				Type: content.Type,
-			}
-
-			switch content.Type {
-			case "text":
-				if content.Text != nil {
-					protoContent.Text = *content.Text
-				}
-			case "thinking":
-				if content.Thinking != nil {
-					protoContent.Thinking = *content.Thinking
-				}
-				if content.Signature != nil {
-					protoContent.Signature = *content.Signature
-				}
-			case "tool_use":
-				if content.ID != nil {
-					protoContent.Id = *content.ID
-				}
-				if content.Name != nil {
-					protoContent.Name = *content.Name
-				}
-				if content.Input != nil {
-					if inputBytes, err := sonic.Marshal(content.Input); err == nil {
-						protoContent.InputJson = string(inputBytes)
-					}
-				}
-			}
-
-			data.Message.Content[i] = protoContent
+	if len(a.Content) > 0 {
+		proto.Content = make([]*sessionv1.AgentContentBlock, len(a.Content))
+		for i, block := range a.Content {
+			proto.Content[i] = toProtoAgentContentBlock(block)
 		}
 	}
 
-	return data
+	return proto
 }
 
-// toProtoFileHistorySnapshotTranscriptData converts FileHistorySnapshotTranscript to proto.
-func toProtoFileHistorySnapshotTranscriptData(f *shareddomain.FileHistorySnapshotTranscript) *transcriptv1.FileHistorySnapshotTranscriptData {
-	data := &transcriptv1.FileHistorySnapshotTranscriptData{
-		MessageId:        f.MessageID,
-		IsSnapshotUpdate: f.IsSnapshotUpdate,
-		Snapshot: &transcriptv1.FileSnapshot{
-			MessageId:          f.Snapshot.MessageID,
-			TrackedFileBackups: make(map[string]*transcriptv1.FileBackup),
-			Timestamp:          timestamppb.New(f.Snapshot.Timestamp),
-		},
+// toProtoAgentContentBlock converts domain AgentContentBlock to protobuf.
+func toProtoAgentContentBlock(block *session.AgentContentBlock) *sessionv1.AgentContentBlock {
+	if block == nil {
+		return nil
 	}
 
-	for path, backup := range f.Snapshot.TrackedFileBackups {
-		backupFileName := ""
-		if backup.BackupFileName != nil {
-			backupFileName = *backup.BackupFileName
+	proto := &sessionv1.AgentContentBlock{}
+
+	switch block.Type {
+	case session.AgentContentBlockTypeText:
+		proto.Type = sessionv1.AgentContentBlockType_AGENT_CONTENT_BLOCK_TYPE_TEXT
+		if block.Text != nil {
+			proto.Text = *block.Text
 		}
-		data.Snapshot.TrackedFileBackups[path] = &transcriptv1.FileBackup{
-			BackupFileName: backupFileName,
-			Version:        int32(backup.Version),
-			BackupTime:     timestamppb.New(backup.BackupTime),
+	case session.AgentContentBlockTypeThinking:
+		proto.Type = sessionv1.AgentContentBlockType_AGENT_CONTENT_BLOCK_TYPE_THINKING
+		if block.Thinking != nil {
+			proto.Thinking = &sessionv1.ThinkingBlock{
+				Content: block.Thinking.Content,
+			}
+			if block.Thinking.Signature != nil {
+				proto.Thinking.Signature = *block.Thinking.Signature
+			}
 		}
-	}
-
-	return data
-}
-
-// toProtoSystemTranscriptData converts SystemTranscript to proto SystemTranscriptData.
-func toProtoSystemTranscriptData(s *shareddomain.SystemTranscript) *transcriptv1.SystemTranscriptData {
-	data := &transcriptv1.SystemTranscriptData{
-		Metadata:   toProtoTreeNodeMeta(s.TreeNodeMeta),
-		DurationMs: int32(s.DurationMs),
-		IsMeta:     s.IsMeta,
-	}
-
-	// Map subtype string to enum
-	switch s.Subtype {
-	case shareddomain.SystemTranscriptSubtypeTurnDuration:
-		data.Subtype = transcriptv1.SystemTranscriptSubtype_SYSTEM_TRANSCRIPT_SUBTYPE_TURN_DURATION
+	case session.AgentContentBlockTypeToolCallRef:
+		proto.Type = sessionv1.AgentContentBlockType_AGENT_CONTENT_BLOCK_TYPE_TOOL_CALL_REF
+		if block.ToolCallRef != nil {
+			proto.ToolCallRef = &sessionv1.ToolCallReference{
+				ToolExecutionId: block.ToolCallRef.ToolExecutionID,
+				ToolName:        block.ToolCallRef.ToolName,
+			}
+		}
 	default:
-		data.Subtype = transcriptv1.SystemTranscriptSubtype_SYSTEM_TRANSCRIPT_SUBTYPE_UNSPECIFIED
+		proto.Type = sessionv1.AgentContentBlockType_AGENT_CONTENT_BLOCK_TYPE_UNSPECIFIED
 	}
 
-	return data
+	return proto
 }
 
-// toProtoSummaryTranscriptData converts SummaryTranscript to proto SummaryTranscriptData.
-func toProtoSummaryTranscriptData(s *shareddomain.SummaryTranscript) *transcriptv1.SummaryTranscriptData {
-	return &transcriptv1.SummaryTranscriptData{
-		Summary:  s.Summary,
-		LeafUuid: s.LeafUUID,
+// toProtoToolExecution converts domain ToolExecution to protobuf.
+func toProtoToolExecution(t *session.ToolExecution) *sessionv1.ToolExecution {
+	if t == nil {
+		return nil
+	}
+
+	proto := &sessionv1.ToolExecution{
+		Metadata:       toProtoTreeNodeMeta(t.TreeNodeMeta),
+		Id:             t.ID,
+		ToolName:       t.ToolName,
+		SourceAgentUuid: t.SourceAgentUUID,
+	}
+
+	// Convert input to JSON
+	if t.Input != nil {
+		if inputBytes, err := sonic.Marshal(t.Input); err == nil {
+			proto.InputJson = string(inputBytes)
+		}
+	}
+
+	// Convert result
+	if t.Result != nil {
+		proto.Result = &sessionv1.ToolResult{
+			Status: toProtoToolResultStatus(t.Result.Status),
+		}
+
+		// Convert content to string
+		if t.Result.Content != nil {
+			switch c := t.Result.Content.(type) {
+			case string:
+				proto.Result.Content = c
+			default:
+				if contentBytes, err := sonic.Marshal(c); err == nil {
+					proto.Result.Content = string(contentBytes)
+				}
+			}
+		}
+
+		if t.Result.Error != nil {
+			proto.Result.Error = *t.Result.Error
+		}
+	}
+
+	// Convert metadata
+	if t.Metadata != nil {
+		proto.ExecMetadata = &sessionv1.ToolExecutionMetadata{
+			ApprovalMode: t.Metadata.ApprovalMode,
+			IsSubagent:   t.Metadata.IsSubagent,
+			SubagentId:   t.Metadata.SubagentID,
+		}
+		if t.Metadata.DurationMs != nil {
+			proto.ExecMetadata.DurationMs = int32(*t.Metadata.DurationMs)
+		}
+		if t.Metadata.ExecutedAt != nil {
+			proto.ExecMetadata.ExecutedAt = timestamppb.New(*t.Metadata.ExecutedAt)
+		}
+	}
+
+	return proto
+}
+
+// toProtoToolResultStatus converts domain ToolResultStatus to protobuf.
+func toProtoToolResultStatus(status session.ToolResultStatus) sessionv1.ToolResultStatus {
+	switch status {
+	case session.ToolResultStatusSuccess:
+		return sessionv1.ToolResultStatus_TOOL_RESULT_STATUS_SUCCESS
+	case session.ToolResultStatusError:
+		return sessionv1.ToolResultStatus_TOOL_RESULT_STATUS_ERROR
+	case session.ToolResultStatusTimeout:
+		return sessionv1.ToolResultStatus_TOOL_RESULT_STATUS_TIMEOUT
+	case session.ToolResultStatusSkipped:
+		return sessionv1.ToolResultStatus_TOOL_RESULT_STATUS_SKIPPED
+	default:
+		return sessionv1.ToolResultStatus_TOOL_RESULT_STATUS_UNSPECIFIED
 	}
 }
 
-// toProtoTreeNodeMeta converts domain TreeNodeMeta to proto TreeNodeMeta.
-func toProtoTreeNodeMeta(m shareddomain.TreeNodeMeta) *transcriptv1.TreeNodeMeta {
-	proto := &transcriptv1.TreeNodeMeta{
+// toProtoSystemMessage converts domain SystemMessage to protobuf.
+func toProtoSystemMessage(s *session.SystemMessage) *sessionv1.SystemMessage {
+	if s == nil {
+		return nil
+	}
+
+	proto := &sessionv1.SystemMessage{
+		Metadata: toProtoTreeNodeMeta(s.TreeNodeMeta),
+		IsMeta:   s.IsMeta,
+	}
+
+	switch s.Subtype {
+	case session.SystemMessageSubtypeTurnDuration:
+		proto.Subtype = sessionv1.SystemMessageSubtype_SYSTEM_MESSAGE_SUBTYPE_TURN_DURATION
+		if s.TurnDuration != nil {
+			proto.TurnDuration = &sessionv1.TurnDurationData{
+				DurationMs: int32(s.TurnDuration.DurationMs),
+			}
+		}
+	case session.SystemMessageSubtypeSummary:
+		proto.Subtype = sessionv1.SystemMessageSubtype_SYSTEM_MESSAGE_SUBTYPE_SUMMARY
+		if s.Summary != nil {
+			proto.Summary = &sessionv1.SummaryData{
+				Summary:  s.Summary.Summary,
+				LeafUuid: s.Summary.LeafUUID,
+			}
+		}
+	case session.SystemMessageSubtypeFileSnapshot:
+		proto.Subtype = sessionv1.SystemMessageSubtype_SYSTEM_MESSAGE_SUBTYPE_FILE_SNAPSHOT
+		if s.FileSnapshot != nil {
+			proto.FileSnapshot = &sessionv1.FileSnapshotData{
+				MessageId:          s.FileSnapshot.MessageID,
+				IsSnapshotUpdate:   s.FileSnapshot.IsSnapshotUpdate,
+				SnapshotTimestamp:  timestamppb.New(s.FileSnapshot.SnapshotTimestamp),
+				TrackedFileBackups: make(map[string]*sessionv1.FileBackup),
+			}
+			for path, backup := range s.FileSnapshot.TrackedFileBackups {
+				protoBackup := &sessionv1.FileBackup{
+					Version:    int32(backup.Version),
+					BackupTime: timestamppb.New(backup.BackupTime),
+				}
+				if backup.BackupFileName != nil {
+					protoBackup.BackupFileName = *backup.BackupFileName
+				}
+				proto.FileSnapshot.TrackedFileBackups[path] = protoBackup
+			}
+		}
+	case session.SystemMessageSubtypeInfo:
+		proto.Subtype = sessionv1.SystemMessageSubtype_SYSTEM_MESSAGE_SUBTYPE_INFO
+	default:
+		proto.Subtype = sessionv1.SystemMessageSubtype_SYSTEM_MESSAGE_SUBTYPE_UNSPECIFIED
+	}
+
+	return proto
+}
+
+// toProtoProgress converts domain Progress to protobuf.
+func toProtoProgress(p *session.Progress) *sessionv1.Progress {
+	if p == nil {
+		return nil
+	}
+
+	proto := &sessionv1.Progress{
+		Metadata:              toProtoTreeNodeMeta(p.TreeNodeMeta),
+		ToolExecutionId:       p.ToolExecutionID,
+		ParentToolExecutionId: p.ParentToolExecutionID,
+		Data:                  toProtoProgressData(p.Data),
+	}
+
+	return proto
+}
+
+// toProtoProgressData converts domain ProgressData to protobuf.
+func toProtoProgressData(d session.ProgressData) *sessionv1.ProgressData {
+	proto := &sessionv1.ProgressData{}
+
+	switch d.Type {
+	case session.ProgressTypeAgent:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_AGENT
+	case session.ProgressTypeSkill:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_SKILL
+	default:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_UNSPECIFIED
+	}
+
+	// Serialize Message to JSON
+	if d.Message != nil {
+		if jsonBytes, err := sonic.Marshal(d.Message); err == nil {
+			proto.MessageJson = string(jsonBytes)
+		}
+	}
+
+	// Serialize NormalizedMessages to JSON
+	if len(d.NormalizedMessages) > 0 {
+		if jsonBytes, err := sonic.Marshal(d.NormalizedMessages); err == nil {
+			proto.NormalizedMessagesJson = string(jsonBytes)
+		}
+	}
+
+	if d.Prompt != nil {
+		proto.Prompt = *d.Prompt
+	}
+
+	if d.AgentID != nil {
+		proto.AgentId = *d.AgentID
+	}
+
+	return proto
+}
+
+// toProtoTreeNodeMeta converts domain TreeNodeMeta to protobuf.
+func toProtoTreeNodeMeta(m session.TreeNodeMeta) *sessionv1.TreeNodeMeta {
+	proto := &sessionv1.TreeNodeMeta{
 		Uuid:        m.UUID,
 		SessionId:   m.SessionID,
 		Timestamp:   timestamppb.New(m.Timestamp),
+		Provider:    m.Provider,
 		Version:     m.Version,
-		Cwd:         m.CWD,
 		GitBranch:   m.GitBranch,
-		Slug:        m.Slug,
-		UserType:    m.UserType,
 		IsSidechain: m.IsSidechain,
 	}
 
-	// Set ParentUuid if present
 	if m.ParentUUID != nil {
 		proto.ParentUuid = *m.ParentUUID
 	}
@@ -437,114 +491,4 @@ func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64
 		TotalPages:  totalPages,
 		TotalCount:  totalCount,
 	}
-}
-
-// toProtoProgressTranscriptData converts ProgressTranscript to proto ProgressTranscriptData.
-func toProtoProgressTranscriptData(p *shareddomain.ProgressTranscript) *transcriptv1.ProgressTranscriptData {
-	data := &transcriptv1.ProgressTranscriptData{
-		Metadata: toProtoTreeNodeMeta(p.TreeNodeMeta),
-		Data:     toProtoProgressData(p.Data),
-	}
-
-	if p.ToolUseID != nil {
-		data.ToolUseId = *p.ToolUseID
-	}
-
-	if p.ParentToolUseID != nil {
-		data.ParentToolUseId = *p.ParentToolUseID
-	}
-
-	return data
-}
-
-// toProtoProgressData converts domain.ProgressData to proto ProgressData.
-func toProtoProgressData(d shareddomain.ProgressData) *transcriptv1.ProgressData {
-	data := &transcriptv1.ProgressData{}
-
-	// Map ProgressDataType enum
-	switch d.Type {
-	case shareddomain.ProgressDataTypeAgent:
-		data.Type = transcriptv1.ProgressDataType_PROGRESS_DATA_TYPE_AGENT
-	case shareddomain.ProgressDataTypeSkill:
-		data.Type = transcriptv1.ProgressDataType_PROGRESS_DATA_TYPE_SKILL
-	default:
-		data.Type = transcriptv1.ProgressDataType_PROGRESS_DATA_TYPE_UNSPECIFIED
-	}
-
-	// Serialize Message to JSON
-	if d.Message != nil {
-		if jsonBytes, err := sonic.Marshal(d.Message); err == nil {
-			data.MessageJson = string(jsonBytes)
-		}
-	}
-
-	// Serialize NormalizedMessages to JSON
-	if len(d.NormalizedMessages) > 0 {
-		if jsonBytes, err := sonic.Marshal(d.NormalizedMessages); err == nil {
-			data.NormalizedMessagesJson = string(jsonBytes)
-		}
-	}
-
-	if d.Prompt != nil {
-		data.Prompt = *d.Prompt
-	}
-
-	if d.AgentID != nil {
-		data.AgentId = *d.AgentID
-	}
-
-	return data
-}
-
-// convertMapToUserMessageBlock converts map[string]interface{} to UserMessageBlock proto.
-func convertMapToUserMessageBlock(m map[string]interface{}) *transcriptv1.UserMessageBlock {
-	blockType, _ := m["type"].(string)
-	if blockType == "" {
-		return nil
-	}
-
-	protoBlock := &transcriptv1.UserMessageBlock{
-		Type: blockType,
-	}
-
-	// Handle text field.
-	if text, ok := m["text"].(string); ok {
-		protoBlock.Text = text
-	}
-
-	// Handle tool_result fields.
-	if toolUseID, ok := m["tool_use_id"].(string); ok {
-		contentStr := ""
-		if content, ok := m["content"].(string); ok {
-			contentStr = content
-		} else if m["content"] != nil {
-			// Marshal non-string content to JSON.
-			if jsonBytes, err := sonic.Marshal(m["content"]); err == nil {
-				contentStr = string(jsonBytes)
-			}
-		}
-		protoBlock.ToolResult = &transcriptv1.ToolResultContent{
-			ToolUseId: toolUseID,
-			Content:   contentStr,
-		}
-	}
-
-	// Handle image source.
-	if source, ok := m["source"].(map[string]interface{}); ok {
-		protoBlock.Source = &transcriptv1.ImageSource{
-			Type:      getStringFromMap(source, "type"),
-			MediaType: getStringFromMap(source, "media_type"),
-			Data:      getStringFromMap(source, "data"),
-		}
-	}
-
-	return protoBlock
-}
-
-// getStringFromMap safely extracts a string value from map.
-func getStringFromMap(m map[string]interface{}, key string) string {
-	if v, ok := m[key].(string); ok {
-		return v
-	}
-	return ""
 }

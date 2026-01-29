@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package session.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/team-attention/cops/shared/gen/grpcstub/session/v1;sessionv1";
+
+// SessionType represents the type discriminator for session entries.
+enum SessionType {
+  SESSION_TYPE_UNSPECIFIED = 0;
+  SESSION_TYPE_HUMAN = 1;
+  SESSION_TYPE_AGENT = 2;
+  SESSION_TYPE_TOOL_EXECUTION = 3;
+  SESSION_TYPE_SYSTEM = 4;
+  SESSION_TYPE_PROGRESS = 5;
+}
+
+// SystemMessageSubtype represents the subtype of a system message.
+enum SystemMessageSubtype {
+  SYSTEM_MESSAGE_SUBTYPE_UNSPECIFIED = 0;
+  SYSTEM_MESSAGE_SUBTYPE_TURN_DURATION = 1;
+  SYSTEM_MESSAGE_SUBTYPE_SUMMARY = 2;
+  SYSTEM_MESSAGE_SUBTYPE_FILE_SNAPSHOT = 3;
+  SYSTEM_MESSAGE_SUBTYPE_INFO = 4;
+}
+
+// ProgressType represents the type of progress update.
+enum ProgressType {
+  PROGRESS_TYPE_UNSPECIFIED = 0;
+  PROGRESS_TYPE_AGENT = 1;
+  PROGRESS_TYPE_SKILL = 2;
+  PROGRESS_TYPE_HOOK = 3;
+}
+
+// ToolResultStatus represents the execution status of a tool call.
+enum ToolResultStatus {
+  TOOL_RESULT_STATUS_UNSPECIFIED = 0;
+  TOOL_RESULT_STATUS_SUCCESS = 1;
+  TOOL_RESULT_STATUS_ERROR = 2;
+  TOOL_RESULT_STATUS_TIMEOUT = 3;
+  TOOL_RESULT_STATUS_SKIPPED = 4;
+}
+
+// TreeNodeMeta contains common metadata for conversation tree nodes.
+message TreeNodeMeta {
+  // Parent node UUID (empty for root nodes)
+  string parent_uuid = 1;
+  // Node UUID
+  string uuid = 2;
+  // Session identifier
+  string session_id = 3;
+  // Entry timestamp
+  google.protobuf.Timestamp timestamp = 4;
+  // Provider identifier (e.g., "claude_code", "gemini_cli")
+  string provider = 5;
+  // CLI version
+  string version = 6;
+  // Git branch name
+  string git_branch = 7;
+  // Whether this is a sidechain message
+  bool is_sidechain = 8;
+}
+
+// =============================================================================
+// HumanMessage (SessionType = HUMAN)
+// =============================================================================
+
+// HumanContentBlockType represents the type of content block in a human message.
+enum HumanContentBlockType {
+  HUMAN_CONTENT_BLOCK_TYPE_UNSPECIFIED = 0;
+  HUMAN_CONTENT_BLOCK_TYPE_TEXT = 1;
+  HUMAN_CONTENT_BLOCK_TYPE_IMAGE = 2;
+}
+
+// ImageData represents image content with base64-encoded data.
+message ImageData {
+  // Media type (e.g., "image/png", "image/jpeg")
+  string media_type = 1;
+  // Base64-encoded image data
+  string data = 2;
+}
+
+// HumanContentBlock represents a content block in a human message.
+message HumanContentBlock {
+  HumanContentBlockType type = 1;
+  // For type=TEXT
+  string text = 2;
+  // For type=IMAGE
+  ImageData image = 3;
+}
+
+// Todo represents a task item tracked during agent execution.
+message Todo {
+  string content = 1;
+  // Status: "pending", "in_progress", "completed"
+  string status = 2;
+  string active_form = 3;
+}
+
+// HumanMessage represents user input in the conversation tree.
+message HumanMessage {
+  TreeNodeMeta metadata = 1;
+  repeated HumanContentBlock content = 2;
+  bool is_meta = 3;
+  repeated Todo todos = 4;
+}
+
+// =============================================================================
+// AgentMessage (SessionType = AGENT)
+// =============================================================================
+
+// AgentContentBlockType represents the type of content block in an agent message.
+enum AgentContentBlockType {
+  AGENT_CONTENT_BLOCK_TYPE_UNSPECIFIED = 0;
+  AGENT_CONTENT_BLOCK_TYPE_TEXT = 1;
+  AGENT_CONTENT_BLOCK_TYPE_THINKING = 2;
+  AGENT_CONTENT_BLOCK_TYPE_TOOL_CALL_REF = 3;
+}
+
+// ThinkingBlock represents extended thinking content from the agent.
+message ThinkingBlock {
+  string content = 1;
+  // Signature for verification (optional)
+  string signature = 2;
+}
+
+// ToolCallReference is a reference to a ToolExecution entry.
+message ToolCallReference {
+  // References ToolExecution.ID
+  string tool_execution_id = 1;
+  // Tool name for quick display
+  string tool_name = 2;
+}
+
+// AgentContentBlock represents a content block in an agent response.
+message AgentContentBlock {
+  AgentContentBlockType type = 1;
+  // For type=TEXT
+  string text = 2;
+  // For type=THINKING
+  ThinkingBlock thinking = 3;
+  // For type=TOOL_CALL_REF
+  ToolCallReference tool_call_ref = 4;
+}
+
+// TokenUsage represents provider-agnostic token usage statistics.
+message TokenUsage {
+  int32 input_tokens = 1;
+  int32 output_tokens = 2;
+  int32 cache_creation_input_tokens = 3;
+  int32 cache_read_input_tokens = 4;
+  string service_tier = 5;
+}
+
+// AgentMessage represents an AI agent response in the conversation tree.
+message AgentMessage {
+  TreeNodeMeta metadata = 1;
+  // Provider (e.g., "anthropic", "openai")
+  string provider = 2;
+  // Model (e.g., "claude-sonnet-4-20250514")
+  string model = 3;
+  // Provider's response ID
+  string request_id = 4;
+  // Content blocks
+  repeated AgentContentBlock content = 5;
+  string stop_reason = 6;
+  TokenUsage usage = 7;
+}
+
+// =============================================================================
+// ToolExecution (SessionType = TOOL_EXECUTION)
+// =============================================================================
+
+// ToolResult represents the result of a tool execution.
+message ToolResult {
+  ToolResultStatus status = 1;
+  // Result content (JSON string for complex types)
+  string content = 2;
+  // Error message if status is error or timeout
+  string error = 3;
+}
+
+// ToolExecutionMetadata contains additional metadata about tool execution.
+message ToolExecutionMetadata {
+  // Execution time in milliseconds
+  int32 duration_ms = 1;
+  // Approval mode (e.g., "auto", "manual")
+  string approval_mode = 2;
+  // When the tool was executed
+  google.protobuf.Timestamp executed_at = 3;
+  // Whether called by a subagent
+  bool is_subagent = 4;
+  // Subagent ID if applicable
+  string subagent_id = 5;
+}
+
+// ToolExecution represents a tool call with its result.
+message ToolExecution {
+  TreeNodeMeta metadata = 1;
+  // Unique identifier (corresponds to tool_use_id)
+  string id = 2;
+  // Tool name (e.g., "Bash", "Read", "Write")
+  string tool_name = 3;
+  // Tool parameters as JSON
+  string input_json = 4;
+  // Execution result (nil if pending)
+  ToolResult result = 5;
+  // Execution metadata
+  ToolExecutionMetadata exec_metadata = 6;
+  // Reference to the agent message that initiated this call
+  string source_agent_uuid = 7;
+}
+
+// =============================================================================
+// SystemMessage (SessionType = SYSTEM)
+// =============================================================================
+
+// TurnDurationData contains turn duration metrics.
+message TurnDurationData {
+  int32 duration_ms = 1;
+}
+
+// SummaryData contains conversation branch summary.
+message SummaryData {
+  string summary = 1;
+  string leaf_uuid = 2;
+}
+
+// FileBackup represents backup info for a single file.
+message FileBackup {
+  string backup_file_name = 1;
+  int32 version = 2;
+  google.protobuf.Timestamp backup_time = 3;
+}
+
+// FileSnapshotData contains file change tracking information.
+message FileSnapshotData {
+  string message_id = 1;
+  map<string, FileBackup> tracked_file_backups = 2;
+  google.protobuf.Timestamp snapshot_timestamp = 3;
+  bool is_snapshot_update = 4;
+}
+
+// SystemMessage represents system-level metadata in the conversation.
+message SystemMessage {
+  TreeNodeMeta metadata = 1;
+  SystemMessageSubtype subtype = 2;
+  bool is_meta = 3;
+  // For subtype=TURN_DURATION
+  TurnDurationData turn_duration = 4;
+  // For subtype=SUMMARY
+  SummaryData summary = 5;
+  // For subtype=FILE_SNAPSHOT
+  FileSnapshotData file_snapshot = 6;
+}
+
+// =============================================================================
+// Progress (SessionType = PROGRESS)
+// =============================================================================
+
+// ProgressData contains the progress payload.
+message ProgressData {
+  ProgressType type = 1;
+  // Provider-specific progress message (JSON)
+  string message_json = 2;
+  // Normalized progress messages (JSON array)
+  string normalized_messages_json = 3;
+  // User prompt for subagent progress
+  string prompt = 4;
+  // Subagent ID for agent progress
+  string agent_id = 5;
+  // Hook progress fields
+  string hook_event = 6;
+  string hook_name = 7;
+  string command = 8;
+}
+
+// Progress represents real-time progress updates during tool execution.
+message Progress {
+  TreeNodeMeta metadata = 1;
+  // Reference to the ToolExecution this progress is for
+  string tool_execution_id = 2;
+  // Parent tool execution ID for nested operations
+  string parent_tool_execution_id = 3;
+  // Progress payload
+  ProgressData data = 4;
+}
+
+// =============================================================================
+// Session (Discriminated Union)
+// =============================================================================
+
+// Session represents a single entry with polymorphic data.
+message Session {
+  SessionType type = 1;
+  oneof data {
+    HumanMessage human_data = 2;
+    AgentMessage agent_data = 3;
+    ToolExecution tool_execution_data = 4;
+    SystemMessage system_data = 5;
+    Progress progress_data = 6;
+  }
+}

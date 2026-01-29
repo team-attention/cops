@@ -7,6 +7,7 @@ import (
 
 	"github.com/team-attention/cops/api/internal/platform/util/errutil"
 	"github.com/team-attention/cops/api/internal/service/session/outbound/repository"
+	"github.com/team-attention/cops/shared/domain"
 	"github.com/team-attention/cops/shared/domain/mongoschema"
 	session "github.com/team-attention/cops/shared/domain/v2"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -28,14 +29,17 @@ func NewMongoSessionRepository(l *slog.Logger, db *mongo.Database) *MongoSession
 }
 
 // SaveBatch saves multiple Session records to the sessions collection.
-func (r *MongoSessionRepository) SaveBatch(ctx context.Context, projectID, userID bson.ObjectID, sessions []*session.Session) error {
+func (r *MongoSessionRepository) SaveBatch(ctx context.Context, projectID, userID domain.ID, sessions []*session.Session) error {
 	if len(sessions) == 0 {
 		return errutil.BadRequest("sessions cannot be empty")
 	}
 
+	projectObjID, _ := bson.ObjectIDFromHex(string(projectID))
+	userObjID, _ := bson.ObjectIDFromHex(string(userID))
+
 	documents := make([]any, 0, len(sessions))
 	for _, s := range sessions {
-		doc, err := sessionToDocument(s, projectID, userID)
+		doc, err := sessionToDocument(s, projectObjID, userObjID)
 		if err != nil {
 			return errutil.Wrap(errutil.ErrorTypeInternal, "failed to convert session", err)
 		}
@@ -55,10 +59,15 @@ func (r *MongoSessionRepository) SaveBatch(ctx context.Context, projectID, userI
 }
 
 // sessionToDocument converts a Session to a BSON document with project/user IDs.
-// This follows the same pattern as Transcript.MarshalBSON in transcript.go:
-// marshal to bytes, unmarshal to bson.M, add additional fields.
 func sessionToDocument(s *session.Session, projectID, userID bson.ObjectID) (bson.M, error) {
-	data, err := bson.Marshal(s)
+	// Use mongoschema.Session wrapper for proper BSON marshaling
+	wrapper := mongoschema.Session{
+		Session:   s,
+		ProjectID: projectID,
+		UserID:    userID,
+	}
+
+	data, err := bson.Marshal(wrapper)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal session: %w", err)
 	}
@@ -67,9 +76,6 @@ func sessionToDocument(s *session.Session, projectID, userID bson.ObjectID) (bso
 	if err := bson.Unmarshal(data, &doc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal session to bson.M: %w", err)
 	}
-
-	doc[mongoschema.SessionProjectIDField] = projectID
-	doc[mongoschema.SessionUserIDField] = userID
 
 	return doc, nil
 }

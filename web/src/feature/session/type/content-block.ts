@@ -1,5 +1,5 @@
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
-import type { AssistantUsage } from '@/gen/grpcstub/transcript/v1/transcript_pb'
+import type { TokenUsage } from '@/gen/grpcstub/session/v1/session_pb'
 
 // Content block types for assistant messages
 export interface TextContentBlock {
@@ -34,7 +34,7 @@ export interface ParsedMessage {
   timestamp?: Timestamp
   isMeta: boolean
   isSidechain: boolean
-  usage?: AssistantUsage
+  usage?: TokenUsage
   content: Array<ContentBlock>
   // For tool_result messages
   toolName?: string

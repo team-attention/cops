@@ -41,6 +41,8 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 			OrganizationId: batch.OrganizationID,
 			ProjectId:      batch.ProjectID.String(),
 			Jsonl:          batch.Lines,
+			Version:        batch.Version,
+			Provider:       batch.Provider,
 		},
 	}
 

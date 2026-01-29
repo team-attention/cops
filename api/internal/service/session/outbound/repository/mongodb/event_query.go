@@ -6,6 +6,7 @@ import (
 
 	"github.com/team-attention/cops/api/internal/platform/util/errutil"
 	"github.com/team-attention/cops/api/internal/service/session/outbound/repository"
+	"github.com/team-attention/cops/shared/domain"
 	"github.com/team-attention/cops/shared/domain/mongoschema"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -84,7 +85,7 @@ func (q *MongoEventQuery) WatchInserts(ctx context.Context, resumeToken bson.Raw
 }
 
 // FindByBatchID retrieves all events with the given batchID.
-func (q *MongoEventQuery) FindByBatchID(ctx context.Context, batchID string) ([]*mongoschema.Event, error) {
+func (q *MongoEventQuery) FindByBatchID(ctx context.Context, batchID string) ([]*domain.Event, error) {
 	filter := bson.M{mongoschema.EventBatchIDField: batchID}
 
 	cursor, err := q.eventsColl.Find(ctx, filter)
@@ -93,21 +94,31 @@ func (q *MongoEventQuery) FindByBatchID(ctx context.Context, batchID string) ([]
 	}
 	defer cursor.Close(ctx)
 
-	var events []*mongoschema.Event
-	if err := cursor.All(ctx, &events); err != nil {
+	var mongoEvents []*mongoschema.Event
+	if err := cursor.All(ctx, &mongoEvents); err != nil {
 		return nil, errutil.Wrap(errutil.ErrorTypeInternal, "failed to decode events", err)
+	}
+
+	events := make([]*domain.Event, len(mongoEvents))
+	for i, e := range mongoEvents {
+		events[i] = e.ToDomain()
 	}
 
 	return events, nil
 }
 
 // DeleteByIDs removes events with the given IDs.
-func (q *MongoEventQuery) DeleteByIDs(ctx context.Context, ids []bson.ObjectID) error {
+func (q *MongoEventQuery) DeleteByIDs(ctx context.Context, ids []domain.ID) error {
 	if len(ids) == 0 {
 		return nil
 	}
 
-	filter := bson.M{mongoschema.EventIDField: bson.M{"$in": ids}}
+	objectIDs := make([]bson.ObjectID, len(ids))
+	for i, id := range ids {
+		objectIDs[i], _ = bson.ObjectIDFromHex(string(id))
+	}
+
+	filter := bson.M{mongoschema.EventIDField: bson.M{"$in": objectIDs}}
 
 	result, err := q.eventsColl.DeleteMany(ctx, filter)
 	if err != nil {
@@ -120,8 +131,9 @@ func (q *MongoEventQuery) DeleteByIDs(ctx context.Context, ids []bson.ObjectID) 
 }
 
 // IncrementRetryCount increments retryCount for a single event.
-func (q *MongoEventQuery) IncrementRetryCount(ctx context.Context, id bson.ObjectID) error {
-	filter := bson.M{mongoschema.EventIDField: id}
+func (q *MongoEventQuery) IncrementRetryCount(ctx context.Context, id domain.ID) error {
+	objectID, _ := bson.ObjectIDFromHex(string(id))
+	filter := bson.M{mongoschema.EventIDField: objectID}
 
 	update := bson.M{
 		"$inc": bson.M{mongoschema.EventRetryCountField: 1},

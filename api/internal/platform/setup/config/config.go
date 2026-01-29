@@ -55,6 +55,7 @@ type AppConfig struct {
 	Name    string `env:"APP_NAME" envDefault:"cops-api"`
 	Version string `env:"APP_VERSION" envDefault:"dev"`
 	Env     string `env:"APP_ENV" envDefault:"development"`
+	Debug   bool   `env:"APP_DEBUG" envDefault:"false"`
 }
 
 // HTTPConfig holds HTTP server and CORS settings.

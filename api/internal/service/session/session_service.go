@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/bytedance/sonic"
+	"github.com/team-attention/cops/api/internal/platform/setup/config"
 	"github.com/team-attention/cops/api/internal/service/session/outbound/repository"
 	"github.com/team-attention/cops/shared/domain"
 	"github.com/team-attention/cops/shared/domain/mongoschema"
@@ -19,6 +20,7 @@ import (
 // Service handles event processing and session conversion.
 type Service struct {
 	logger          *slog.Logger
+	cfg             *config.Config
 	eventQuery      repository.EventQueryPort
 	sessionRepo     repository.SessionRepositoryPort
 	resumeTokenRepo repository.ResumeTokenRepositoryPort
@@ -35,12 +37,14 @@ type Service struct {
 // Adapters are created inline since they have no dependencies (per go-container.md).
 func NewService(
 	l *slog.Logger,
+	cfg *config.Config,
 	eventQuery repository.EventQueryPort,
 	sessionRepo repository.SessionRepositoryPort,
 	resumeTokenRepo repository.ResumeTokenRepositoryPort,
 ) *Service {
 	return &Service{
 		logger:          l.With(slog.String("name", "session.service")),
+		cfg:             cfg,
 		eventQuery:      eventQuery,
 		sessionRepo:     sessionRepo,
 		resumeTokenRepo: resumeTokenRepo,
@@ -52,7 +56,9 @@ func NewService(
 // Start begins watching the events collection for new inserts.
 // Called by fx lifecycle OnStart hook.
 func (s *Service) Start(ctx context.Context) error {
-	cancelCtx, cancel := context.WithCancel(ctx)
+	// Use context.Background() for the long-running goroutine.
+	// The fx OnStart ctx may be cancelled after hook completion.
+	cancelCtx, cancel := context.WithCancel(context.Background())
 	s.cancelFunc = cancel
 
 	token, err := s.resumeTokenRepo.GetResumeToken(ctx, repository.ResumeTokenKey)
@@ -150,8 +156,6 @@ func (s *Service) processChangeStream(ctx context.Context, it repository.ChangeE
 
 // processBatch processes all events with the given batchID.
 func (s *Service) processBatch(ctx context.Context, batchID string) error {
-	s.logger.Debug("processing batch", slog.String("batchID", batchID))
-
 	events, err := s.eventQuery.FindByBatchID(ctx, batchID)
 	if err != nil {
 		return fmt.Errorf("failed to find events: %w", err)
@@ -164,29 +168,29 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 
 	// Group events by (projectID, userID) key
 	type groupKey struct {
-		ProjectID bson.ObjectID
-		UserID    bson.ObjectID
+		ProjectID domain.ID
+		UserID    domain.ID
 	}
-	groups := make(map[groupKey][]*mongoschema.Event)
+	groups := make(map[groupKey][]*domain.Event)
 	for _, event := range events {
 		key := groupKey{ProjectID: event.ProjectID, UserID: event.UserID}
 		groups[key] = append(groups[key], event)
 	}
 
-	var successfulIDs []bson.ObjectID
+	var successfulIDs []domain.ID
 
 	for key, groupEvents := range groups {
 		sessions, failedIDs, err := s.convertEventsToSessions(groupEvents)
 		if err != nil {
 			s.logger.Error("failed to convert events",
 				slog.String("batchID", batchID),
-				slog.String("projectID", key.ProjectID.Hex()),
+				slog.String("projectID", string(key.ProjectID)),
 				slog.Any("error", err),
 			)
 			for _, failedID := range failedIDs {
 				if incErr := s.eventQuery.IncrementRetryCount(ctx, failedID); incErr != nil {
 					s.logger.Warn("failed to increment retry count",
-						slog.String("eventID", failedID.Hex()),
+						slog.String("eventID", string(failedID)),
 						slog.Any("error", incErr),
 					)
 				}
@@ -198,7 +202,7 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 		for _, failedID := range failedIDs {
 			if incErr := s.eventQuery.IncrementRetryCount(ctx, failedID); incErr != nil {
 				s.logger.Warn("failed to increment retry count",
-					slog.String("eventID", failedID.Hex()),
+					slog.String("eventID", string(failedID)),
 					slog.Any("error", incErr),
 				)
 			}
@@ -208,7 +212,7 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 			if saveErr := s.sessionRepo.SaveBatch(ctx, key.ProjectID, key.UserID, sessions); saveErr != nil {
 				s.logger.Error("failed to save sessions",
 					slog.String("batchID", batchID),
-					slog.String("projectID", key.ProjectID.Hex()),
+					slog.String("projectID", string(key.ProjectID)),
 					slog.Any("error", saveErr),
 				)
 				continue
@@ -216,7 +220,7 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 		}
 
 		// Collect successfully processed event IDs (excluding failed ones)
-		failedSet := make(map[bson.ObjectID]bool)
+		failedSet := make(map[domain.ID]bool)
 		for _, id := range failedIDs {
 			failedSet[id] = true
 		}
@@ -228,8 +232,14 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 	}
 
 	if len(successfulIDs) > 0 {
-		if deleteErr := s.eventQuery.DeleteByIDs(ctx, successfulIDs); deleteErr != nil {
-			s.logger.Warn("failed to delete processed events", slog.Any("error", deleteErr))
+		if s.cfg.App.Debug {
+			s.logger.Debug("skipping event deletion in debug mode",
+				slog.Int("count", len(successfulIDs)),
+			)
+		} else {
+			if deleteErr := s.eventQuery.DeleteByIDs(ctx, successfulIDs); deleteErr != nil {
+				s.logger.Warn("failed to delete processed events", slog.Any("error", deleteErr))
+			}
 		}
 	}
 
@@ -243,9 +253,9 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 }
 
 // convertEventsToSessions converts event data to Session records.
-func (s *Service) convertEventsToSessions(events []*mongoschema.Event) ([]*session.Session, []bson.ObjectID, error) {
+func (s *Service) convertEventsToSessions(events []*domain.Event) ([]*session.Session, []domain.ID, error) {
 	var sessions []*session.Session
-	var failedIDs []bson.ObjectID
+	var failedIDs []domain.ID
 
 	for _, event := range events {
 		provider := DetectProvider(event.Data)
@@ -255,7 +265,7 @@ func (s *Service) convertEventsToSessions(events []*mongoschema.Event) ([]*sessi
 			converted, err := s.convertClaudeCodeEvent(event.Data)
 			if err != nil {
 				s.logger.Warn("failed to convert Claude Code event",
-					slog.String("eventID", event.ID.Hex()),
+					slog.String("eventID", string(event.ID)),
 					slog.Any("error", err),
 				)
 				failedIDs = append(failedIDs, event.ID)
@@ -267,7 +277,7 @@ func (s *Service) convertEventsToSessions(events []*mongoschema.Event) ([]*sessi
 			converted, err := s.convertGeminiCLIEvent(event.Data)
 			if err != nil {
 				s.logger.Warn("failed to convert Gemini CLI event",
-					slog.String("eventID", event.ID.Hex()),
+					slog.String("eventID", string(event.ID)),
 					slog.Any("error", err),
 				)
 				failedIDs = append(failedIDs, event.ID)
@@ -276,7 +286,7 @@ func (s *Service) convertEventsToSessions(events []*mongoschema.Event) ([]*sessi
 			sessions = append(sessions, converted...)
 
 		case ProviderUnknown:
-			s.logger.Warn("unknown provider for event", slog.String("eventID", event.ID.Hex()))
+			s.logger.Warn("unknown provider for event", slog.String("eventID", string(event.ID)))
 			failedIDs = append(failedIDs, event.ID)
 		}
 	}
