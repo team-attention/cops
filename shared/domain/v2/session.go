@@ -68,14 +68,16 @@ const (
 // TreeNodeMeta contains common fields for conversation tree nodes.
 // These types form a tree structure linked by ParentUUID.
 type TreeNodeMeta struct {
-	ParentUUID  *string   `json:"parentUuid,omitempty" bson:"parentUuid,omitempty"`
-	UUID        string    `json:"uuid" bson:"uuid"`
-	SessionID   string    `json:"sessionId" bson:"sessionId"`
-	Timestamp   time.Time `json:"timestamp" bson:"timestamp"`
-	Provider    string    `json:"provider" bson:"provider"` // "claude_code" | "gemini_cli"
-	Version     string    `json:"version,omitempty" bson:"version,omitempty"`
-	GitBranch   string    `json:"gitBranch,omitempty" bson:"gitBranch,omitempty"`
-	IsSidechain bool      `json:"isSidechain,omitempty" bson:"isSidechain,omitempty"`
+	ParentUUID         *string   `json:"parentUuid,omitempty" bson:"parentUuid,omitempty"`
+	UUID               string    `json:"uuid" bson:"uuid"`
+	SessionID          string    `json:"sessionId" bson:"sessionId"`
+	AgentID            *string   `json:"agentId,omitempty" bson:"agentId,omitempty"`                     // SubAgent identifier (nil for Main session)
+	SpawnedByToolUseID *string   `json:"spawnedByToolUseId,omitempty" bson:"spawnedByToolUseId,omitempty"` // Tool Use ID that spawned this SubAgent
+	Timestamp          time.Time `json:"timestamp" bson:"timestamp"`
+	Provider           string    `json:"provider" bson:"provider"` // "claude_code" | "gemini_cli"
+	Version            string    `json:"version,omitempty" bson:"version,omitempty"`
+	GitBranch          string    `json:"gitBranch,omitempty" bson:"gitBranch,omitempty"`
+	IsSidechain        bool      `json:"isSidechain,omitempty" bson:"isSidechain,omitempty"`
 }
 
 // Session represents a single entry with polymorphic data.

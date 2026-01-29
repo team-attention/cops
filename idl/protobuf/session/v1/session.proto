@@ -63,6 +63,10 @@ message TreeNodeMeta {
   string git_branch = 7;
   // Whether this is a sidechain message
   bool is_sidechain = 8;
+  // SubAgent identifier (empty for Main session entries)
+  string agent_id = 9;
+  // Tool Use ID that spawned this SubAgent (for linking in Graph view)
+  string spawned_by_tool_use_id = 10;
 }
 
 // =============================================================================

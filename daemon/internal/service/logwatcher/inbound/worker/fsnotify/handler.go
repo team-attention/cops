@@ -252,6 +252,42 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 	h.processFileFromOffset(event.Name, offset)
 }
 
+// isSubAgentLogFile checks if the file path is a SubAgent log file.
+// Returns (isSubAgent, sessionId, agentId).
+// SubAgent log files are located at: {claudeDir}/{sessionId}/subagents/agent-{agentId}.jsonl
+func isSubAgentLogFile(filePath string) (bool, string, string) {
+	// Check if path contains "/subagents/" directory
+	if !strings.Contains(filePath, "/subagents/") {
+		return false, "", ""
+	}
+
+	// Get the filename
+	filename := filepath.Base(filePath)
+	// Check if filename matches "agent-*.jsonl" pattern
+	if !strings.HasPrefix(filename, "agent-") || !strings.HasSuffix(filename, ".jsonl") {
+		return false, "", ""
+	}
+
+	// Extract agentId from filename: "agent-{agentId}.jsonl" -> {agentId}
+	agentID := strings.TrimPrefix(filename, "agent-")
+	agentID = strings.TrimSuffix(agentID, ".jsonl")
+	if agentID == "" {
+		return false, "", ""
+	}
+
+	// Extract sessionId from path: {claudeDir}/{sessionId}/subagents/agent-{agentId}.jsonl
+	// sessionId is the directory two levels up from the file (parent's parent)
+	subagentsDir := filepath.Dir(filePath) // {claudeDir}/{sessionId}/subagents
+	sessionDir := filepath.Dir(subagentsDir) // {claudeDir}/{sessionId}
+	sessionID := filepath.Base(sessionDir)
+
+	if sessionID == "" || sessionID == "." {
+		return false, "", ""
+	}
+
+	return true, sessionID, agentID
+}
+
 // processFileFromOffset reads and processes a single file from the given offset.
 // This is a shared helper used by both initial scan and fsnotify event handling.
 func (h *LogFsnotifyHandler) processFileFromOffset(filePath string, offset int64) {
@@ -268,9 +304,31 @@ func (h *LogFsnotifyHandler) processFileFromOffset(filePath string, offset int64
 		return
 	}
 
-	// Extract ClaudeDir from file path (parent directory)
-	claudeDir := filepath.Dir(filePath)
-	h.svc.AddLinesForClaudeDir(claudeDir, lines)
+	// Check if this is a SubAgent log file
+	isSubAgent, sessionID, agentID := isSubAgentLogFile(filePath)
+
+	var claudeDir string
+	if isSubAgent {
+		// For SubAgent files: {claudeDir}/{sessionId}/subagents/agent-{agentId}.jsonl
+		// The claudeDir is 3 levels up from the file
+		subagentsDir := filepath.Dir(filePath)  // .../subagents
+		sessionDir := filepath.Dir(subagentsDir) // .../{sessionId}
+		claudeDir = filepath.Dir(sessionDir)     // .../{claudeDir}
+
+		h.logger.Debug("processing SubAgent log file",
+			slog.String("path", filePath),
+			slog.String("sessionId", sessionID),
+			slog.String("agentId", agentID),
+			slog.String("claudeDir", claudeDir),
+		)
+
+		h.svc.AddLinesForClaudeDirWithAgent(claudeDir, lines, agentID)
+	} else {
+		// Extract ClaudeDir from file path (parent directory)
+		claudeDir = filepath.Dir(filePath)
+		h.svc.AddLinesForClaudeDir(claudeDir, lines)
+	}
+
 	h.filePositions[filePath] = newOffset
 
 	// Save position to SQLite

@@ -44,6 +44,7 @@ type TreeNodeMeta struct {
 	ParentUUID  *string   `json:"parentUuid" bson:"parentUuid"`
 	UUID        string    `json:"uuid" bson:"uuid"`
 	SessionID   string    `json:"sessionId" bson:"sessionId"`
+	AgentID     *string   `json:"agentId,omitempty" bson:"agentId,omitempty"` // SubAgent identifier (nil for Main session)
 	Timestamp   time.Time `json:"timestamp" bson:"timestamp"`
 	Version     string    `json:"version" bson:"version"`
 	CWD         string    `json:"cwd,omitempty" bson:"cwd,omitempty"`

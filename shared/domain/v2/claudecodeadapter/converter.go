@@ -327,6 +327,7 @@ func convertTreeNodeMeta(m *domain.TreeNodeMeta) session.TreeNodeMeta {
 		ParentUUID:  m.ParentUUID,
 		UUID:        m.UUID,
 		SessionID:   m.SessionID,
+		AgentID:     m.AgentID,
 		Timestamp:   m.Timestamp,
 		Provider:    "claude_code",
 		Version:     m.Version,

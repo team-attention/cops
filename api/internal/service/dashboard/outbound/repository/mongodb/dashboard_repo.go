@@ -508,7 +508,7 @@ func (r *MongoDashboardRepository) ListSessions(ctx context.Context, params repo
 	return structure.NewPaginatedResult(sessions, params.Page, params.PageSize, totalCount), nil
 }
 
-// GetSession retrieves detailed session information with paginated transcripts.
+// GetSession retrieves detailed session information with all entries (Main + SubAgent).
 // Returns nil, error if session not found or its project does not belong to organization.
 func (r *MongoDashboardRepository) GetSession(ctx context.Context, params repository.GetSessionParams) (*repository.PaginatedSessionDetail, error) {
 	organizationID := params.Query.OrganizationID
@@ -524,16 +524,16 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 	metaPipeline := bson.A{
 		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
 		bson.M{"$group": bson.M{
-			"_id":                            "$" + mongoschema.SessionSessionIDField,
+			"_id":                             "$" + mongoschema.SessionSessionIDField,
 			mongoschema.SessionProjectIDField: bson.M{"$first": "$" + mongoschema.SessionProjectIDField},
 			mongoschema.SessionVersionField:   bson.M{"$first": "$" + mongoschema.SessionVersionField},
 			mongoschema.SessionGitBranchField: bson.M{"$first": "$" + mongoschema.SessionGitBranchField},
-			"startedAt":                      bson.M{"$min": "$" + mongoschema.SessionTimestampField},
-			"endedAt":                        bson.M{"$max": "$" + mongoschema.SessionTimestampField},
-			aggInputTokensField:              bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
-			aggOutputTokensField:             bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
-			aggCacheCreationTokensField:      bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
-			aggCacheReadTokensField:          bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
+			"startedAt":                       bson.M{"$min": "$" + mongoschema.SessionTimestampField},
+			"endedAt":                         bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+			aggInputTokensField:               bson.M{"$sum": "$" + mongoschema.SessionUsageInputTokensPath},
+			aggOutputTokensField:              bson.M{"$sum": "$" + mongoschema.SessionUsageOutputTokensPath},
+			aggCacheCreationTokensField:       bson.M{"$sum": "$" + mongoschema.SessionUsageCacheCreationInputTokensPath},
+			aggCacheReadTokensField:           bson.M{"$sum": "$" + mongoschema.SessionUsageCacheReadInputTokensPath},
 		}},
 	}
 
@@ -572,14 +572,14 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 		return nil, fmt.Errorf("session not found")
 	}
 
-	// Step 2: Get total session entry count
+	// Step 2: Get total session entry count for ALL entries (Main + SubAgent)
 	totalCount, err := r.sessionsColl.CountDocuments(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID})
 	if err != nil {
 		r.logger.Error("failed to count session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count session entries: %w", err)
 	}
 
-	// Step 3: Get paginated session entries
+	// Step 3: Get paginated session entries for ALL entries (Main + SubAgent)
 	findOpts := options.Find().
 		SetSort(bson.M{mongoschema.SessionTimestampField: 1}).
 		SetSkip(params.Skip()).
@@ -606,6 +606,12 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 		}
 	}
 
+	// Step 4: Populate SpawnedByToolUseID for SubAgent entries
+	if err := r.populateSpawnedByToolUseID(ctx, sessions, sessionID); err != nil {
+		r.logger.Warn("failed to populate spawnedByToolUseId", slog.String("sessionID", sessionID), slog.Any("error", err))
+		// Continue without spawnedByToolUseId - not a fatal error
+	}
+
 	// Build result
 	result := &repository.PaginatedSessionDetail{
 		SessionDetail: repository.SessionDetail{
@@ -629,6 +635,97 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 	}
 
 	return result, nil
+}
+
+// populateSpawnedByToolUseID enriches SubAgent entries with spawnedByToolUseId.
+// Finds the Progress entry in Main session that spawned each SubAgent.
+func (r *MongoDashboardRepository) populateSpawnedByToolUseID(ctx context.Context, sessions []*session.Session, mainSessionID string) error {
+	// Step 1: Collect unique agentIds from sessions where agentId is not nil
+	agentIDSet := make(map[string]struct{})
+	for _, s := range sessions {
+		meta := getTreeNodeMeta(s)
+		if meta != nil && meta.AgentID != nil && *meta.AgentID != "" {
+			agentIDSet[*meta.AgentID] = struct{}{}
+		}
+	}
+
+	// Step 2: If no agentIds found, return early (no SubAgents)
+	if len(agentIDSet) == 0 {
+		return nil
+	}
+
+	agentIDs := make([]string, 0, len(agentIDSet))
+	for agentID := range agentIDSet {
+		agentIDs = append(agentIDs, agentID)
+	}
+
+	// Step 3: Query Progress entries that link to these agentIds
+	// Progress entries with type="progress", data.type="agent", data.agentId in agentIds, and agentId=null (Main session)
+	progressCursor, err := r.sessionsColl.Find(ctx, bson.M{
+		mongoschema.SessionSessionIDField: mainSessionID,
+		mongoschema.SessionTypeField:      string(session.SessionTypeProgress),
+		"data.type":                       string(session.ProgressTypeAgent),
+		"data.agentId":                    bson.M{"$in": agentIDs},
+		mongoschema.SessionAgentIDField:   nil, // Main session's Progress entries
+	})
+	if err != nil {
+		return fmt.Errorf("failed to query progress entries: %w", err)
+	}
+	defer progressCursor.Close(ctx)
+
+	// Step 4: Build map: agentId -> toolExecutionId from Progress entries
+	agentIDToToolUseID := make(map[string]string)
+	for progressCursor.Next(ctx) {
+		var doc bson.M
+		if err := progressCursor.Decode(&doc); err != nil {
+			continue
+		}
+
+		toolExecutionID := mongoutil.Get[string](doc, "toolExecutionId")
+		dataDoc, ok := doc["data"].(bson.M)
+		if !ok {
+			continue
+		}
+		agentID := mongoutil.Get[string](dataDoc, "agentId")
+		if agentID != "" && toolExecutionID != "" {
+			agentIDToToolUseID[agentID] = toolExecutionID
+		}
+	}
+
+	// Step 5: Iterate sessions and set SpawnedByToolUseID for entries with matching agentId
+	for _, s := range sessions {
+		meta := getTreeNodeMeta(s)
+		if meta != nil && meta.AgentID != nil && *meta.AgentID != "" {
+			if toolUseID, found := agentIDToToolUseID[*meta.AgentID]; found {
+				meta.SpawnedByToolUseID = &toolUseID
+			}
+		}
+	}
+
+	return nil
+}
+
+// getTreeNodeMeta extracts TreeNodeMeta from a Session's Data field.
+// Returns nil if the session data doesn't contain TreeNodeMeta.
+func getTreeNodeMeta(s *session.Session) *session.TreeNodeMeta {
+	if s == nil || s.Data == nil {
+		return nil
+	}
+
+	switch data := s.Data.(type) {
+	case *session.HumanMessage:
+		return &data.TreeNodeMeta
+	case *session.AgentMessage:
+		return &data.TreeNodeMeta
+	case *session.ToolExecution:
+		return &data.TreeNodeMeta
+	case *session.SystemMessage:
+		return &data.TreeNodeMeta
+	case *session.Progress:
+		return &data.TreeNodeMeta
+	default:
+		return nil
+	}
 }
 
 // Helper methods

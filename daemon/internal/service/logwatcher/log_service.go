@@ -3,6 +3,7 @@ package logwatcher
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -251,6 +252,73 @@ func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
 	}
 
 	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], lines...)
+}
+
+// AddLinesForClaudeDirWithAgent adds raw JSONL lines with SubAgent context.
+// If agentID is non-empty, the agentId field is injected into each JSON line.
+func (s *Service) AddLinesForClaudeDirWithAgent(claudeDir string, lines []string, agentID string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Try exact match first
+	projectID, ok := s.claudeDirToProject[claudeDir]
+	if !ok {
+		// No exact match, use prefix matching (unlocked version to avoid deadlock)
+		projectID = s.getProjectIDForClaudeDirUnlocked(claudeDir)
+	}
+
+	if projectID == "" {
+		s.logger.Debug("no project found for claude dir, skipping SubAgent lines",
+			slog.String("claudeDir", claudeDir),
+			slog.String("agentId", agentID),
+			slog.Int("lineCount", len(lines)),
+		)
+		return
+	}
+
+	// Inject agentId into each JSON line
+	injectedLines := make([]string, 0, len(lines))
+	for _, line := range lines {
+		injectedLine, err := injectAgentIDToLine(line, agentID)
+		if err != nil {
+			s.logger.Debug("failed to inject agentId to line, using original",
+				slog.String("agentId", agentID),
+				slog.Any("error", err),
+			)
+			injectedLines = append(injectedLines, line)
+			continue
+		}
+		injectedLines = append(injectedLines, injectedLine)
+	}
+
+	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], injectedLines...)
+
+	s.logger.Debug("added SubAgent lines to buffer",
+		slog.String("projectId", projectID.String()),
+		slog.String("agentId", agentID),
+		slog.Int("lineCount", len(injectedLines)),
+	)
+}
+
+// injectAgentIDToLine injects the agentId field into a JSON line.
+// Returns the modified JSON line string.
+func injectAgentIDToLine(line string, agentID string) (string, error) {
+	// Parse JSON into a map to preserve all fields
+	var data map[string]any
+	if err := json.Unmarshal([]byte(line), &data); err != nil {
+		return "", fmt.Errorf("failed to parse JSON: %w", err)
+	}
+
+	// Inject agentId field
+	data["agentId"] = agentID
+
+	// Re-serialize to JSON
+	result, err := json.Marshal(data)
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize JSON: %w", err)
+	}
+
+	return string(result), nil
 }
 
 // getProjectIDForClaudeDirUnlocked is the unlocked version of GetProjectIDForClaudeDir.

@@ -516,6 +516,10 @@ func (x *SessionSummary) GetEndedAt() *timestamppb.Timestamp {
 }
 
 // SessionDetail contains full session information with records.
+// Sessions array contains ALL entries - both Main session and SubAgent entries.
+// SubAgent entries are identified by:
+//   - agent_id: The SubAgent's identifier (empty for Main session)
+//   - spawned_by_tool_use_id: Links to the tool use that spawned this SubAgent
 type SessionDetail struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Session unique identifier
@@ -526,13 +530,16 @@ type SessionDetail struct {
 	GitBranch string `protobuf:"bytes,3,opt,name=git_branch,json=gitBranch,proto3" json:"git_branch,omitempty"`
 	// Claude Code version
 	Version string `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
-	// Session token usage
+	// Session token usage (aggregated across Main + all SubAgents)
 	Usage *TokenUsageSummary `protobuf:"bytes,6,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Session start timestamp
 	StartedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	// Session end timestamp
 	EndedAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	// All session entries
+	// All session entries (Main + SubAgent combined)
+	// Use agent_id field in TreeNodeMeta to distinguish:
+	// - agent_id empty: Main session entry
+	// - agent_id set: SubAgent entry (use spawned_by_tool_use_id for Graph linking)
 	Sessions      []*v1.Session `protobuf:"bytes,9,rep,name=sessions,proto3" json:"sessions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
