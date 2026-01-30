@@ -118,6 +118,7 @@ func (a *Adapter) splitUserContent(u *domain.UserTranscript) ([]*session.HumanCo
 				ToolName:        "", // Will be filled from assistant message when correlating
 				Input:           nil,
 				SourceAgentUUID: sourceAgentUUID,
+				Metadata:        buildToolExecutionMetadata(u.TreeNodeMeta.AgentID),
 				Result: &session.ToolResult{
 					Status:  status,
 					Content: content,
@@ -188,6 +189,7 @@ func (a *Adapter) adaptAssistant(ast *domain.AssistantTranscript) ([]*session.Se
 				ToolName:        toolName,
 				Input:           block.Input,
 				SourceAgentUUID: ast.UUID,
+				Metadata:        buildToolExecutionMetadata(ast.TreeNodeMeta.AgentID),
 				// Result will be nil until correlated with user message tool_result
 			}
 			toolExecs = append(toolExecs, toolExec)
@@ -364,4 +366,19 @@ func convertTodos(todos []*domain.Todo) []*session.Todo {
 		}
 	}
 	return result
+}
+
+// buildToolExecutionMetadata creates ToolExecutionMetadata for SubAgent entries.
+// Returns nil if agentID is nil or empty (Main session).
+func buildToolExecutionMetadata(agentID *string) *session.ToolExecutionMetadata {
+	if agentID == nil {
+		return nil
+	}
+	if *agentID == "" {
+		return nil
+	}
+	return &session.ToolExecutionMetadata{
+		IsSubagent: true,
+		SubagentID: *agentID,
+	}
 }
