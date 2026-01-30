@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import {
   ReactFlow,
   Background,
@@ -13,10 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { Badge } from '@/gen/shadcn/ui/badge'
 import { Network } from 'lucide-react'
 import { SessionNode } from './session-node'
-import { MessagePopover } from './message-popover'
 import { buildGraphElements } from '../util/graph-data'
 import type { Session } from '@/gen/grpcstub/session/v1/session_pb'
-import type { SessionNode as SessionNodeType, AppNode } from '../type/graph'
+import type {
+  SessionNode as SessionNodeType,
+  AppNode,
+  GraphPopupState,
+} from '../type/graph'
 
 // nodeTypes registers custom node components
 const nodeTypes: NodeTypes = {
@@ -32,10 +35,16 @@ const defaultEdgeOptions = {
 interface SessionGraphViewProps {
   // All session entries (Main + SubAgent combined)
   sessions: Session[]
+  // Callback when a node is selected for popup display
+  onNodeSelect: (state: GraphPopupState) => void
 }
 
 // SessionGraphView renders an interactive graph of Main and SubAgent sessions.
-export const SessionGraphView = ({ sessions }: SessionGraphViewProps) => {
+// Popup rendering is delegated to parent component to avoid container clipping.
+export const SessionGraphView = ({
+  sessions,
+  onNodeSelect,
+}: SessionGraphViewProps) => {
   // Build graph elements from sessions
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
     () => buildGraphElements(sessions),
@@ -46,48 +55,26 @@ export const SessionGraphView = ({ sessions }: SessionGraphViewProps) => {
   const [nodes, , onNodesChange] = useNodesState<AppNode>(initialNodes)
   const [edges, , onEdgesChange] = useEdgesState(initialEdges)
 
-  // State for selected node and popover
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-  const [popoverPosition, setPopoverPosition] = useState<{
-    x: number
-    y: number
-  } | null>(null)
-
-  // Handle node click
-  const onNodeClick: NodeMouseHandler = useCallback((event, node) => {
-    setSelectedNodeId(node.id)
-    setPopoverPosition({
-      x: event.clientX,
-      y: event.clientY,
-    })
-  }, [])
-
-  // Handle popover close
-  const handlePopoverClose = useCallback(() => {
-    setSelectedNodeId(null)
-    setPopoverPosition(null)
-  }, [])
-
   // Helper to check if node is a session node
   const isSessionNode = (node: AppNode): node is SessionNodeType => {
     return node.type === 'sessionNode'
   }
 
-  // Get selected node's sessions for popover
-  const selectedNodeSessions = useMemo(() => {
-    if (!selectedNodeId) return []
-    const node = nodes.find((n) => n.id === selectedNodeId)
-    if (!node || !isSessionNode(node)) return []
-    return node.data.sessions
-  }, [nodes, selectedNodeId])
-
-  // Get selected node's label for popover
-  const selectedNodeLabel = useMemo(() => {
-    if (!selectedNodeId) return ''
-    const node = nodes.find((n) => n.id === selectedNodeId)
-    if (!node || !isSessionNode(node)) return ''
-    return node.data.label
-  }, [nodes, selectedNodeId])
+  // Handle node click - notify parent for external popup rendering
+  const onNodeClick: NodeMouseHandler = useCallback(
+    (event, node) => {
+      const clickedNode = nodes.find((n) => n.id === node.id)
+      if (clickedNode && isSessionNode(clickedNode)) {
+        onNodeSelect({
+          selectedNodeId: node.id,
+          position: { x: event.clientX, y: event.clientY },
+          sessions: clickedNode.data.sessions,
+          nodeLabel: clickedNode.data.label,
+        })
+      }
+    },
+    [nodes, onNodeSelect],
+  )
 
   // Count SubAgent nodes
   const subAgentCount = nodes.filter((n) => {
@@ -159,16 +146,6 @@ export const SessionGraphView = ({ sessions }: SessionGraphViewProps) => {
             />
           </ReactFlow>
         </div>
-
-        {/* Message Popover when node is selected */}
-        {selectedNodeId && popoverPosition && (
-          <MessagePopover
-            sessions={selectedNodeSessions}
-            nodeLabel={selectedNodeLabel}
-            position={popoverPosition}
-            onClose={handlePopoverClose}
-          />
-        )}
       </CardContent>
 
       {/* Bottom accent */}

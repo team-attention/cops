@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
 import { useGetSession } from '@/feature/session/hook/use-get-session'
@@ -7,6 +7,7 @@ import { ChatView } from '@/feature/session/component/chat-view'
 import { SessionGraphView } from '@/feature/session/component/session-graph-view'
 import { ViewToggle } from '@/feature/session/component/view-toggle'
 import { MessageDetailSheet } from '@/feature/session/component/message-detail-sheet'
+import { MessagePopover } from '@/feature/session/component/message-popover'
 import {
   enrichToolResultMessages,
   extractToolCalls,
@@ -17,7 +18,7 @@ import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { useUserStore } from '@/shared/store/user-store'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { APP_VERSION } from '@/shared/config/version'
-import type { ViewMode } from '@/feature/session/type/graph'
+import type { ViewMode, GraphPopupState } from '@/feature/session/type/graph'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   beforeLoad: ({ location }) => {
@@ -43,12 +44,31 @@ const LoadingSkeleton = () => (
   </div>
 )
 
+// Initial popup state (closed)
+const initialPopupState: GraphPopupState = {
+  selectedNodeId: null,
+  position: null,
+  sessions: [],
+  nodeLabel: '',
+}
+
 function SessionDetailPage() {
   const { sessionId } = Route.useParams()
   const { selectedOrganizationId } = useUserStore()
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
   const [viewMode, setViewMode] = useState<ViewMode>('chat')
   const loadMoreRef = useRef<HTMLDivElement>(null)
+  const [popupState, setPopupState] = useState<GraphPopupState>(initialPopupState)
+
+  // Handle node selection from SessionGraphView
+  const handleNodeSelect = useCallback((state: GraphPopupState) => {
+    setPopupState(state)
+  }, [])
+
+  // Handle popup close
+  const handlePopupClose = useCallback(() => {
+    setPopupState(initialPopupState)
+  }, [])
 
   const {
     data,
@@ -201,7 +221,20 @@ function SessionDetailPage() {
                 </div>
               </>
             ) : (
-              <SessionGraphView sessions={session.sessions ?? []} />
+              <>
+                <SessionGraphView
+                  sessions={session.sessions ?? []}
+                  onNodeSelect={handleNodeSelect}
+                />
+                {popupState.selectedNodeId && popupState.position && (
+                  <MessagePopover
+                    sessions={popupState.sessions}
+                    nodeLabel={popupState.nodeLabel}
+                    position={popupState.position}
+                    onClose={handlePopupClose}
+                  />
+                )}
+              </>
             )}
 
             {/* Message Detail Sheet */}

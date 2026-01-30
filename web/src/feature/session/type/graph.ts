@@ -51,3 +51,16 @@ export interface SubAgentInfo {
   // Timestamp when SubAgent was spawned
   timestamp?: Timestamp
 }
+
+// GraphPopupState represents the state needed to render MessagePopover externally.
+// When selectedNodeId is null, the popup is closed.
+export interface GraphPopupState {
+  // ID of the selected node ('main' or agentId)
+  selectedNodeId: string | null
+  // Viewport position for popup placement
+  position: { x: number; y: number } | null
+  // Sessions for the selected node
+  sessions: Session[]
+  // Label for the selected node
+  nodeLabel: string
+}
