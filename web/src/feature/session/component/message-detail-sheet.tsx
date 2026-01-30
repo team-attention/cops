@@ -54,6 +54,8 @@ const getProgressLabel = (type: string | undefined) => {
   switch (type) {
     case 'agent':
       return 'Agent'
+    case 'skill':
+      return 'Skill'
     case 'hook':
       return 'Hook'
     case 'bash':

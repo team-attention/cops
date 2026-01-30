@@ -433,6 +433,8 @@ func toProtoProgressData(d session.ProgressData) *sessionv1.ProgressData {
 	switch d.Type {
 	case session.ProgressTypeAgent:
 		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_AGENT
+	case session.ProgressTypeSkill:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_SKILL
 	case session.ProgressTypeHook:
 		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_HOOK
 	case session.ProgressTypeBash:
