@@ -5,6 +5,8 @@ dist
 
 settings.local.json
 .worktree
+.mcproxy.json
+.agent/cache/
 
 # Project binaries
 /cops
