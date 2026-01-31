@@ -203,5 +203,30 @@ func (h *DashboardGRPCHandler) GetSession(
 	return connect.NewResponse(res), nil
 }
 
+// GetSessionSegments returns lightweight segment summaries for timeline display.
+func (h *DashboardGRPCHandler) GetSessionSegments(
+	ctx context.Context,
+	req *connect.Request[dashboardv1.GetSessionSegmentsReq],
+) (*connect.Response[dashboardv1.GetSessionSegmentsRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+
+	// Parse request
+	params := repository.GetSessionSegmentsParams{
+		OrganizationID: req.Msg.GetOrganizationId(),
+		SessionID:      req.Msg.GetSessionId(),
+	}
+
+	// Call service
+	result, err := h.svc.GetSessionSegments(ctx, userID, params)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build response
+	res := toProtoSessionSegmentsRes(result)
+
+	return connect.NewResponse(res), nil
+}
+
 // Compile-time interface verification.
 var _ dashboardv1connect.DashboardServiceHandler = (*DashboardGRPCHandler)(nil)

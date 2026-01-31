@@ -520,3 +520,24 @@ func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64
 		TotalCount:  totalCount,
 	}
 }
+
+// toProtoSessionSegmentsRes converts repository SessionSegmentsResult to protobuf.
+func toProtoSessionSegmentsRes(result *repository.SessionSegmentsResult) *dashboardv1.GetSessionSegmentsRes {
+	segments := make([]*dashboardv1.SessionSegment, len(result.Segments))
+	for i, seg := range result.Segments {
+		segments[i] = &dashboardv1.SessionSegment{
+			Id:           seg.ID,
+			Label:        seg.Label,
+			StartTime:    timestamppb.New(seg.StartTime),
+			EndTime:      timestamppb.New(seg.EndTime),
+			MessageCount: seg.MessageCount,
+		}
+	}
+
+	return &dashboardv1.GetSessionSegmentsRes{
+		Segments:             segments,
+		StartTime:            timestamppb.New(result.StartTime),
+		EndTime:              timestamppb.New(result.EndTime),
+		TotalDurationSeconds: result.TotalDurationS,
+	}
+}

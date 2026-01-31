@@ -2,23 +2,25 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
 import { useGetSession } from '@/feature/session/hook/use-get-session'
+import { useGetSessionSegments } from '@/feature/session/hook/use-get-session-segments'
 import { SessionHeader } from '@/feature/session/component/session-header'
 import { ChatView } from '@/feature/session/component/chat-view'
-import { SessionGraphView } from '@/feature/session/component/session-graph-view'
+import { SessionTimelineView } from '@/feature/session/component/session-timeline-view'
+import { SessionDetailPanel } from '@/feature/session/component/session-detail-panel'
 import { ViewToggle } from '@/feature/session/component/view-toggle'
 import { MessageDetailSheet } from '@/feature/session/component/message-detail-sheet'
-import { MessagePopover } from '@/feature/session/component/message-popover'
 import {
   enrichToolResultMessages,
   extractToolCalls,
   filterSessionsForChat,
   parseMessageContent,
 } from '@/feature/session/util/parse-content'
+import { convertApiSegmentsToTimeline } from '@/feature/session/util/graph-data'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { useUserStore } from '@/shared/store/user-store'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { APP_VERSION } from '@/shared/config/version'
-import type { ViewMode, GraphPopupState } from '@/feature/session/type/graph'
+import type { ViewMode, TimelineSegment } from '@/feature/session/type/graph'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   beforeLoad: ({ location }) => {
@@ -44,30 +46,18 @@ const LoadingSkeleton = () => (
   </div>
 )
 
-// Initial popup state (closed)
-const initialPopupState: GraphPopupState = {
-  selectedNodeId: null,
-  position: null,
-  sessions: [],
-  nodeLabel: '',
-}
-
 function SessionDetailPage() {
   const { sessionId } = Route.useParams()
   const { selectedOrganizationId } = useUserStore()
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
+  const [selectedSegment, setSelectedSegment] =
+    useState<TimelineSegment | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('chat')
   const loadMoreRef = useRef<HTMLDivElement>(null)
-  const [popupState, setPopupState] = useState<GraphPopupState>(initialPopupState)
 
-  // Handle node selection from SessionGraphView
-  const handleNodeSelect = useCallback((state: GraphPopupState) => {
-    setPopupState(state)
-  }, [])
-
-  // Handle popup close
-  const handlePopupClose = useCallback(() => {
-    setPopupState(initialPopupState)
+  // Handle segment click - open detail panel for the segment
+  const handleSegmentClick = useCallback((segment: TimelineSegment) => {
+    setSelectedSegment(segment)
   }, [])
 
   const {
@@ -80,6 +70,12 @@ function SessionDetailPage() {
     hasNextPage,
     isFetchingNextPage,
   } = useGetSession({
+    organizationId: selectedOrganizationId,
+    sessionId,
+  })
+
+  // Fetch lightweight segments for timeline view
+  const { data: segmentsData } = useGetSessionSegments({
     organizationId: selectedOrganizationId,
     sessionId,
   })
@@ -104,6 +100,17 @@ function SessionDetailPage() {
     if (!firstPage?.transcriptPagination?.totalCount) return undefined
     return Number(firstPage.transcriptPagination.totalCount)
   }, [data])
+
+  // Convert API segments to timeline data for Graph view
+  const timelineData = useMemo(() => {
+    if (!segmentsData) return null
+    return convertApiSegmentsToTimeline(
+      segmentsData.segments,
+      segmentsData.startTime,
+      segmentsData.endTime,
+      segmentsData.totalDurationSeconds,
+    )
+  }, [segmentsData])
 
   // IntersectionObserver for infinite scroll
   useEffect(() => {
@@ -220,21 +227,29 @@ function SessionDetailPage() {
                   )}
                 </div>
               </>
-            ) : (
-              <>
-                <SessionGraphView
-                  sessions={session.sessions ?? []}
-                  onNodeSelect={handleNodeSelect}
-                />
-                {popupState.selectedNodeId && popupState.position && (
-                  <MessagePopover
-                    sessions={popupState.sessions}
-                    nodeLabel={popupState.nodeLabel}
-                    position={popupState.position}
-                    onClose={handlePopupClose}
+            ) : timelineData ? (
+              <div className="flex gap-4">
+                <div className="min-w-0 flex-1">
+                  <SessionTimelineView
+                    timelineData={timelineData}
+                    onSegmentClick={handleSegmentClick}
+                    selectedSegmentId={selectedSegment?.id}
+                  />
+                </div>
+                {selectedSegment && (
+                  <SessionDetailPanel
+                    segment={selectedSegment}
+                    sessions={session?.sessions ?? []}
+                    isLoading={isLoading}
+                    onClose={() => setSelectedSegment(null)}
+                    onToolClick={handleToolClick}
                   />
                 )}
-              </>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-zinc-500" />
+              </div>
             )}
 
             {/* Message Detail Sheet */}

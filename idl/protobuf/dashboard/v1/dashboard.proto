@@ -258,6 +258,46 @@ message GetSessionRes {
   PaginationRes transcript_pagination = 2;
 }
 
+// SessionSegment represents an agent's session span in the timeline.
+message SessionSegment {
+  // Agent identifier ('main' or agentId for SubAgents)
+  string id = 1;
+
+  // Display label for the segment
+  string label = 2;
+
+  // Start timestamp of the agent's first message
+  google.protobuf.Timestamp start_time = 3;
+
+  // End timestamp of the agent's last message
+  google.protobuf.Timestamp end_time = 4;
+
+  // Total number of messages in this segment
+  int32 message_count = 5;
+}
+
+// GetSessionSegmentsReq is the request for GetSessionSegments RPC.
+message GetSessionSegmentsReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+
+  // Session identifier
+  string session_id = 2;
+}
+
+// GetSessionSegmentsRes is the response for GetSessionSegments RPC.
+message GetSessionSegmentsRes {
+  // All segments (Main + SubAgents)
+  repeated SessionSegment segments = 1;
+
+  // Time range for X axis calculation
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+
+  // Total duration in seconds
+  int64 total_duration_seconds = 4;
+}
+
 // DashboardService provides dashboard data access.
 service DashboardService {
   // GetOverview returns dashboard summary statistics.
@@ -274,4 +314,7 @@ service DashboardService {
 
   // GetSession returns detailed session information with records.
   rpc GetSession(GetSessionReq) returns (GetSessionRes);
+
+  // GetSessionSegments returns lightweight segment summaries for timeline display.
+  rpc GetSessionSegments(GetSessionSegmentsReq) returns (GetSessionSegmentsRes);
 }

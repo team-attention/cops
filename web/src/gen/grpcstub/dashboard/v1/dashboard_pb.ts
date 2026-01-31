@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dashboard/v1/dashboard.proto.
  */
 export const file_dashboard_v1_dashboard: GenFile = /*@__PURE__*/
-  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKUAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJQoIc2Vzc2lvbnMYCSADKAsyEy5zZXNzaW9uLnYxLlNlc3Npb25KBAgEEAVSA2N3ZCIpCg5HZXRPdmVydmlld1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAki4gEKDkdldE92ZXJ2aWV3UmVzEjQKC3RvdGFsX3VzYWdlGAEgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5EhUKDXByb2plY3RfY291bnQYAiABKAUSFQoNc2Vzc2lvbl9jb3VudBgDIAEoBRI1Cg9yZWNlbnRfcHJvamVjdHMYBCADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSNQoPcmVjZW50X3Nlc3Npb25zGAUgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5IlsKD0xpc3RQcm9qZWN0c1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0UHJvamVjdFJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKTAQoPTGlzdFNlc3Npb25zUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAQgASgJEhEKCXNvcnRfZGVzYxgFIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIm0KDUdldFNlc3Npb25SZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEhIKCnNlc3Npb25faWQYAiABKAkSLwoKcGFnaW5hdGlvbhgDIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInkKDUdldFNlc3Npb25SZXMSLAoHc2Vzc2lvbhgBIAEoCzIbLmRhc2hib2FyZC52MS5TZXNzaW9uRGV0YWlsEjoKFXRyYW5zY3JpcHRfcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzMokDChBEYXNoYm9hcmRTZXJ2aWNlEkkKC0dldE92ZXJ2aWV3EhwuZGFzaGJvYXJkLnYxLkdldE92ZXJ2aWV3UmVxGhwuZGFzaGJvYXJkLnYxLkdldE92ZXJ2aWV3UmVzEkwKDExpc3RQcm9qZWN0cxIdLmRhc2hib2FyZC52MS5MaXN0UHJvamVjdHNSZXEaHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVzEkYKCkdldFByb2plY3QSGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcRobLmRhc2hib2FyZC52MS5HZXRQcm9qZWN0UmVzEkwKDExpc3RTZXNzaW9ucxIdLmRhc2hib2FyZC52MS5MaXN0U2Vzc2lvbnNSZXEaHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVzEkYKCkdldFNlc3Npb24SGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcRobLmRhc2hib2FyZC52MS5HZXRTZXNzaW9uUmVzQsABChBjb20uZGFzaGJvYXJkLnYxQg5EYXNoYm9hcmRQcm90b1ABWktnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9kYXNoYm9hcmQvdjE7ZGFzaGJvYXJkdjGiAgNEWFiqAgxEYXNoYm9hcmQuVjHKAgxEYXNoYm9hcmRcVjHiAhhEYXNoYm9hcmRcVjFcR1BCTWV0YWRhdGHqAg1EYXNoYm9hcmQ6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_session_v1_session]);
+  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKUAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJQoIc2Vzc2lvbnMYCSADKAsyEy5zZXNzaW9uLnYxLlNlc3Npb25KBAgEEAVSA2N3ZCIpCg5HZXRPdmVydmlld1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAki4gEKDkdldE92ZXJ2aWV3UmVzEjQKC3RvdGFsX3VzYWdlGAEgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5EhUKDXByb2plY3RfY291bnQYAiABKAUSFQoNc2Vzc2lvbl9jb3VudBgDIAEoBRI1Cg9yZWNlbnRfcHJvamVjdHMYBCADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSNQoPcmVjZW50X3Nlc3Npb25zGAUgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5IlsKD0xpc3RQcm9qZWN0c1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0UHJvamVjdFJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKTAQoPTGlzdFNlc3Npb25zUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAQgASgJEhEKCXNvcnRfZGVzYxgFIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIm0KDUdldFNlc3Npb25SZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEhIKCnNlc3Npb25faWQYAiABKAkSLwoKcGFnaW5hdGlvbhgDIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInkKDUdldFNlc3Npb25SZXMSLAoHc2Vzc2lvbhgBIAEoCzIbLmRhc2hib2FyZC52MS5TZXNzaW9uRGV0YWlsEjoKFXRyYW5zY3JpcHRfcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIqABCg5TZXNzaW9uU2VnbWVudBIKCgJpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFQoNbWVzc2FnZV9jb3VudBgFIAEoBSJEChVHZXRTZXNzaW9uU2VnbWVudHNSZXESFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEhIKCnNlc3Npb25faWQYAiABKAkixQEKFUdldFNlc3Npb25TZWdtZW50c1JlcxIuCghzZWdtZW50cxgBIAMoCzIcLmRhc2hib2FyZC52MS5TZXNzaW9uU2VnbWVudBIuCgpzdGFydF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASHgoWdG90YWxfZHVyYXRpb25fc2Vjb25kcxgEIAEoAzLpAwoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcxJeChJHZXRTZXNzaW9uU2VnbWVudHMSIy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblNlZ21lbnRzUmVxGiMuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25TZWdtZW50c1Jlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_session_v1_session]);
 
 /**
  * TokenUsageSummary aggregates token usage statistics.
@@ -703,6 +703,123 @@ export const GetSessionResSchema: GenMessage<GetSessionRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 16);
 
 /**
+ * SessionSegment represents an agent's session span in the timeline.
+ *
+ * @generated from message dashboard.v1.SessionSegment
+ */
+export type SessionSegment = Message<"dashboard.v1.SessionSegment"> & {
+  /**
+   * Agent identifier ('main' or agentId for SubAgents)
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * Display label for the segment
+   *
+   * @generated from field: string label = 2;
+   */
+  label: string;
+
+  /**
+   * Start timestamp of the agent's first message
+   *
+   * @generated from field: google.protobuf.Timestamp start_time = 3;
+   */
+  startTime?: Timestamp;
+
+  /**
+   * End timestamp of the agent's last message
+   *
+   * @generated from field: google.protobuf.Timestamp end_time = 4;
+   */
+  endTime?: Timestamp;
+
+  /**
+   * Total number of messages in this segment
+   *
+   * @generated from field: int32 message_count = 5;
+   */
+  messageCount: number;
+};
+
+/**
+ * Describes the message dashboard.v1.SessionSegment.
+ * Use `create(SessionSegmentSchema)` to create a new message.
+ */
+export const SessionSegmentSchema: GenMessage<SessionSegment> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 17);
+
+/**
+ * GetSessionSegmentsReq is the request for GetSessionSegments RPC.
+ *
+ * @generated from message dashboard.v1.GetSessionSegmentsReq
+ */
+export type GetSessionSegmentsReq = Message<"dashboard.v1.GetSessionSegmentsReq"> & {
+  /**
+   * Organization identifier (required)
+   *
+   * @generated from field: string organization_id = 1;
+   */
+  organizationId: string;
+
+  /**
+   * Session identifier
+   *
+   * @generated from field: string session_id = 2;
+   */
+  sessionId: string;
+};
+
+/**
+ * Describes the message dashboard.v1.GetSessionSegmentsReq.
+ * Use `create(GetSessionSegmentsReqSchema)` to create a new message.
+ */
+export const GetSessionSegmentsReqSchema: GenMessage<GetSessionSegmentsReq> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 18);
+
+/**
+ * GetSessionSegmentsRes is the response for GetSessionSegments RPC.
+ *
+ * @generated from message dashboard.v1.GetSessionSegmentsRes
+ */
+export type GetSessionSegmentsRes = Message<"dashboard.v1.GetSessionSegmentsRes"> & {
+  /**
+   * All segments (Main + SubAgents)
+   *
+   * @generated from field: repeated dashboard.v1.SessionSegment segments = 1;
+   */
+  segments: SessionSegment[];
+
+  /**
+   * Time range for X axis calculation
+   *
+   * @generated from field: google.protobuf.Timestamp start_time = 2;
+   */
+  startTime?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp end_time = 3;
+   */
+  endTime?: Timestamp;
+
+  /**
+   * Total duration in seconds
+   *
+   * @generated from field: int64 total_duration_seconds = 4;
+   */
+  totalDurationSeconds: bigint;
+};
+
+/**
+ * Describes the message dashboard.v1.GetSessionSegmentsRes.
+ * Use `create(GetSessionSegmentsResSchema)` to create a new message.
+ */
+export const GetSessionSegmentsResSchema: GenMessage<GetSessionSegmentsRes> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 19);
+
+/**
  * DashboardService provides dashboard data access.
  *
  * @generated from service dashboard.v1.DashboardService
@@ -757,6 +874,16 @@ export const DashboardService: GenService<{
     methodKind: "unary";
     input: typeof GetSessionReqSchema;
     output: typeof GetSessionResSchema;
+  },
+  /**
+   * GetSessionSegments returns lightweight segment summaries for timeline display.
+   *
+   * @generated from rpc dashboard.v1.DashboardService.GetSessionSegments
+   */
+  getSessionSegments: {
+    methodKind: "unary";
+    input: typeof GetSessionSegmentsReqSchema;
+    output: typeof GetSessionSegmentsResSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_dashboard_v1_dashboard, 0);

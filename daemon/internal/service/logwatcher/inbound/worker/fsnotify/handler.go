@@ -202,6 +202,9 @@ func (h *LogFsnotifyHandler) handleDirectoryCreate(path string) {
 				slog.Any("error", err),
 			)
 		}
+		// Recursively watch subdirectories and scan existing files
+		// This handles the race condition where files are created before the watch is added
+		h.scanDirectoryRecursive(path)
 		return
 	}
 
@@ -250,6 +253,58 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 	// Get stored offset (0 if not found for new files)
 	offset := h.filePositions[event.Name]
 	h.processFileFromOffset(event.Name, offset)
+}
+
+// scanDirectoryRecursive adds watches for a directory and all its subdirectories,
+// then scans for existing .jsonl files. This handles the race condition where
+// subdirectories and files are created before the parent directory watch is established.
+func (h *LogFsnotifyHandler) scanDirectoryRecursive(root string) {
+	// Walk all subdirectories and add watches
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil // Skip inaccessible directories
+		}
+		if d.IsDir() {
+			// Skip hidden directories
+			if len(d.Name()) > 0 && d.Name()[0] == '.' {
+				return filepath.SkipDir
+			}
+			// Add watch for this directory (skip root, already added)
+			if path != root {
+				if err := h.svc.AddWatchForClaudeSubdir(path); err != nil {
+					h.logger.Debug("failed to add watch during recursive scan",
+						slog.String("path", path),
+						slog.Any("error", err),
+					)
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		h.logger.Debug("failed to walk directory for watches",
+			slog.String("root", root),
+			slog.Any("error", err),
+		)
+	}
+
+	// Scan for .jsonl files in all directories
+	err = filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil // Skip inaccessible files
+		}
+		if !d.IsDir() && strings.HasSuffix(d.Name(), ".jsonl") {
+			offset := h.filePositions[path]
+			h.processFileFromOffset(path, offset)
+		}
+		return nil
+	})
+	if err != nil {
+		h.logger.Debug("failed to scan files in directory",
+			slog.String("root", root),
+			slog.Any("error", err),
+		)
+	}
 }
 
 // isSubAgentLogFile checks if the file path is a SubAgent log file.

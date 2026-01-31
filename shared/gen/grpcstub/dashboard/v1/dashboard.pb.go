@@ -1226,6 +1226,215 @@ func (x *GetSessionRes) GetTranscriptPagination() *PaginationRes {
 	return nil
 }
 
+// SessionSegment represents an agent's session span in the timeline.
+type SessionSegment struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Agent identifier ('main' or agentId for SubAgents)
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Display label for the segment
+	Label string `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	// Start timestamp of the agent's first message
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// End timestamp of the agent's last message
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// Total number of messages in this segment
+	MessageCount  int32 `protobuf:"varint,5,opt,name=message_count,json=messageCount,proto3" json:"message_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SessionSegment) Reset() {
+	*x = SessionSegment{}
+	mi := &file_dashboard_v1_dashboard_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionSegment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionSegment) ProtoMessage() {}
+
+func (x *SessionSegment) ProtoReflect() protoreflect.Message {
+	mi := &file_dashboard_v1_dashboard_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionSegment.ProtoReflect.Descriptor instead.
+func (*SessionSegment) Descriptor() ([]byte, []int) {
+	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *SessionSegment) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SessionSegment) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *SessionSegment) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *SessionSegment) GetEndTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+func (x *SessionSegment) GetMessageCount() int32 {
+	if x != nil {
+		return x.MessageCount
+	}
+	return 0
+}
+
+// GetSessionSegmentsReq is the request for GetSessionSegments RPC.
+type GetSessionSegmentsReq struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Organization identifier (required)
+	OrganizationId string `protobuf:"bytes,1,opt,name=organization_id,json=organizationId,proto3" json:"organization_id,omitempty"`
+	// Session identifier
+	SessionId     string `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSessionSegmentsReq) Reset() {
+	*x = GetSessionSegmentsReq{}
+	mi := &file_dashboard_v1_dashboard_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionSegmentsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionSegmentsReq) ProtoMessage() {}
+
+func (x *GetSessionSegmentsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_dashboard_v1_dashboard_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionSegmentsReq.ProtoReflect.Descriptor instead.
+func (*GetSessionSegmentsReq) Descriptor() ([]byte, []int) {
+	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetSessionSegmentsReq) GetOrganizationId() string {
+	if x != nil {
+		return x.OrganizationId
+	}
+	return ""
+}
+
+func (x *GetSessionSegmentsReq) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+// GetSessionSegmentsRes is the response for GetSessionSegments RPC.
+type GetSessionSegmentsRes struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// All segments (Main + SubAgents)
+	Segments []*SessionSegment `protobuf:"bytes,1,rep,name=segments,proto3" json:"segments,omitempty"`
+	// Time range for X axis calculation
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// Total duration in seconds
+	TotalDurationSeconds int64 `protobuf:"varint,4,opt,name=total_duration_seconds,json=totalDurationSeconds,proto3" json:"total_duration_seconds,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *GetSessionSegmentsRes) Reset() {
+	*x = GetSessionSegmentsRes{}
+	mi := &file_dashboard_v1_dashboard_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionSegmentsRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionSegmentsRes) ProtoMessage() {}
+
+func (x *GetSessionSegmentsRes) ProtoReflect() protoreflect.Message {
+	mi := &file_dashboard_v1_dashboard_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionSegmentsRes.ProtoReflect.Descriptor instead.
+func (*GetSessionSegmentsRes) Descriptor() ([]byte, []int) {
+	return file_dashboard_v1_dashboard_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetSessionSegmentsRes) GetSegments() []*SessionSegment {
+	if x != nil {
+		return x.Segments
+	}
+	return nil
+}
+
+func (x *GetSessionSegmentsRes) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *GetSessionSegmentsRes) GetEndTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+func (x *GetSessionSegmentsRes) GetTotalDurationSeconds() int64 {
+	if x != nil {
+		return x.TotalDurationSeconds
+	}
+	return 0
+}
+
 var File_dashboard_v1_dashboard_proto protoreflect.FileDescriptor
 
 const file_dashboard_v1_dashboard_proto_rawDesc = "" +
@@ -1333,7 +1542,24 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"pagination\"\x98\x01\n" +
 	"\rGetSessionRes\x125\n" +
 	"\asession\x18\x01 \x01(\v2\x1b.dashboard.v1.SessionDetailR\asession\x12P\n" +
-	"\x15transcript_pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\x14transcriptPagination2\x89\x03\n" +
+	"\x15transcript_pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\x14transcriptPagination\"\xcd\x01\n" +
+	"\x0eSessionSegment\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05label\x18\x02 \x01(\tR\x05label\x129\n" +
+	"\n" +
+	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
+	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12#\n" +
+	"\rmessage_count\x18\x05 \x01(\x05R\fmessageCount\"_\n" +
+	"\x15GetSessionSegmentsReq\x12'\n" +
+	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x02 \x01(\tR\tsessionId\"\xf9\x01\n" +
+	"\x15GetSessionSegmentsRes\x128\n" +
+	"\bsegments\x18\x01 \x03(\v2\x1c.dashboard.v1.SessionSegmentR\bsegments\x129\n" +
+	"\n" +
+	"start_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
+	"\bend_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x124\n" +
+	"\x16total_duration_seconds\x18\x04 \x01(\x03R\x14totalDurationSeconds2\xe9\x03\n" +
 	"\x10DashboardService\x12I\n" +
 	"\vGetOverview\x12\x1c.dashboard.v1.GetOverviewReq\x1a\x1c.dashboard.v1.GetOverviewRes\x12L\n" +
 	"\fListProjects\x12\x1d.dashboard.v1.ListProjectsReq\x1a\x1d.dashboard.v1.ListProjectsRes\x12F\n" +
@@ -1341,7 +1567,8 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"GetProject\x12\x1b.dashboard.v1.GetProjectReq\x1a\x1b.dashboard.v1.GetProjectRes\x12L\n" +
 	"\fListSessions\x12\x1d.dashboard.v1.ListSessionsReq\x1a\x1d.dashboard.v1.ListSessionsRes\x12F\n" +
 	"\n" +
-	"GetSession\x12\x1b.dashboard.v1.GetSessionReq\x1a\x1b.dashboard.v1.GetSessionResB\xc0\x01\n" +
+	"GetSession\x12\x1b.dashboard.v1.GetSessionReq\x1a\x1b.dashboard.v1.GetSessionRes\x12^\n" +
+	"\x12GetSessionSegments\x12#.dashboard.v1.GetSessionSegmentsReq\x1a#.dashboard.v1.GetSessionSegmentsResB\xc0\x01\n" +
 	"\x10com.dashboard.v1B\x0eDashboardProtoP\x01ZKgithub.com/team-attention/cops/shared/gen/grpcstub/dashboard/v1;dashboardv1\xa2\x02\x03DXX\xaa\x02\fDashboard.V1\xca\x02\fDashboard\\V1\xe2\x02\x18Dashboard\\V1\\GPBMetadata\xea\x02\rDashboard::V1b\x06proto3"
 
 var (
@@ -1356,7 +1583,7 @@ func file_dashboard_v1_dashboard_proto_rawDescGZIP() []byte {
 	return file_dashboard_v1_dashboard_proto_rawDescData
 }
 
-var file_dashboard_v1_dashboard_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_dashboard_v1_dashboard_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_dashboard_v1_dashboard_proto_goTypes = []any{
 	(*TokenUsageSummary)(nil),     // 0: dashboard.v1.TokenUsageSummary
 	(*PaginationReq)(nil),         // 1: dashboard.v1.PaginationReq
@@ -1375,22 +1602,25 @@ var file_dashboard_v1_dashboard_proto_goTypes = []any{
 	(*ListSessionsRes)(nil),       // 14: dashboard.v1.ListSessionsRes
 	(*GetSessionReq)(nil),         // 15: dashboard.v1.GetSessionReq
 	(*GetSessionRes)(nil),         // 16: dashboard.v1.GetSessionRes
-	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
-	(*v1.Session)(nil),            // 18: session.v1.Session
+	(*SessionSegment)(nil),        // 17: dashboard.v1.SessionSegment
+	(*GetSessionSegmentsReq)(nil), // 18: dashboard.v1.GetSessionSegmentsReq
+	(*GetSessionSegmentsRes)(nil), // 19: dashboard.v1.GetSessionSegmentsRes
+	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
+	(*v1.Session)(nil),            // 21: session.v1.Session
 }
 var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	0,  // 0: dashboard.v1.ProjectSummary.usage:type_name -> dashboard.v1.TokenUsageSummary
-	17, // 1: dashboard.v1.ProjectSummary.last_activity:type_name -> google.protobuf.Timestamp
+	20, // 1: dashboard.v1.ProjectSummary.last_activity:type_name -> google.protobuf.Timestamp
 	0,  // 2: dashboard.v1.ProjectDetail.usage:type_name -> dashboard.v1.TokenUsageSummary
-	17, // 3: dashboard.v1.ProjectDetail.created_at:type_name -> google.protobuf.Timestamp
-	17, // 4: dashboard.v1.ProjectDetail.last_activity:type_name -> google.protobuf.Timestamp
+	20, // 3: dashboard.v1.ProjectDetail.created_at:type_name -> google.protobuf.Timestamp
+	20, // 4: dashboard.v1.ProjectDetail.last_activity:type_name -> google.protobuf.Timestamp
 	0,  // 5: dashboard.v1.SessionSummary.usage:type_name -> dashboard.v1.TokenUsageSummary
-	17, // 6: dashboard.v1.SessionSummary.started_at:type_name -> google.protobuf.Timestamp
-	17, // 7: dashboard.v1.SessionSummary.ended_at:type_name -> google.protobuf.Timestamp
+	20, // 6: dashboard.v1.SessionSummary.started_at:type_name -> google.protobuf.Timestamp
+	20, // 7: dashboard.v1.SessionSummary.ended_at:type_name -> google.protobuf.Timestamp
 	0,  // 8: dashboard.v1.SessionDetail.usage:type_name -> dashboard.v1.TokenUsageSummary
-	17, // 9: dashboard.v1.SessionDetail.started_at:type_name -> google.protobuf.Timestamp
-	17, // 10: dashboard.v1.SessionDetail.ended_at:type_name -> google.protobuf.Timestamp
-	18, // 11: dashboard.v1.SessionDetail.sessions:type_name -> session.v1.Session
+	20, // 9: dashboard.v1.SessionDetail.started_at:type_name -> google.protobuf.Timestamp
+	20, // 10: dashboard.v1.SessionDetail.ended_at:type_name -> google.protobuf.Timestamp
+	21, // 11: dashboard.v1.SessionDetail.sessions:type_name -> session.v1.Session
 	0,  // 12: dashboard.v1.GetOverviewRes.total_usage:type_name -> dashboard.v1.TokenUsageSummary
 	3,  // 13: dashboard.v1.GetOverviewRes.recent_projects:type_name -> dashboard.v1.ProjectSummary
 	5,  // 14: dashboard.v1.GetOverviewRes.recent_sessions:type_name -> dashboard.v1.SessionSummary
@@ -1404,21 +1634,28 @@ var file_dashboard_v1_dashboard_proto_depIdxs = []int32{
 	1,  // 22: dashboard.v1.GetSessionReq.pagination:type_name -> dashboard.v1.PaginationReq
 	6,  // 23: dashboard.v1.GetSessionRes.session:type_name -> dashboard.v1.SessionDetail
 	2,  // 24: dashboard.v1.GetSessionRes.transcript_pagination:type_name -> dashboard.v1.PaginationRes
-	7,  // 25: dashboard.v1.DashboardService.GetOverview:input_type -> dashboard.v1.GetOverviewReq
-	9,  // 26: dashboard.v1.DashboardService.ListProjects:input_type -> dashboard.v1.ListProjectsReq
-	11, // 27: dashboard.v1.DashboardService.GetProject:input_type -> dashboard.v1.GetProjectReq
-	13, // 28: dashboard.v1.DashboardService.ListSessions:input_type -> dashboard.v1.ListSessionsReq
-	15, // 29: dashboard.v1.DashboardService.GetSession:input_type -> dashboard.v1.GetSessionReq
-	8,  // 30: dashboard.v1.DashboardService.GetOverview:output_type -> dashboard.v1.GetOverviewRes
-	10, // 31: dashboard.v1.DashboardService.ListProjects:output_type -> dashboard.v1.ListProjectsRes
-	12, // 32: dashboard.v1.DashboardService.GetProject:output_type -> dashboard.v1.GetProjectRes
-	14, // 33: dashboard.v1.DashboardService.ListSessions:output_type -> dashboard.v1.ListSessionsRes
-	16, // 34: dashboard.v1.DashboardService.GetSession:output_type -> dashboard.v1.GetSessionRes
-	30, // [30:35] is the sub-list for method output_type
-	25, // [25:30] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	20, // 25: dashboard.v1.SessionSegment.start_time:type_name -> google.protobuf.Timestamp
+	20, // 26: dashboard.v1.SessionSegment.end_time:type_name -> google.protobuf.Timestamp
+	17, // 27: dashboard.v1.GetSessionSegmentsRes.segments:type_name -> dashboard.v1.SessionSegment
+	20, // 28: dashboard.v1.GetSessionSegmentsRes.start_time:type_name -> google.protobuf.Timestamp
+	20, // 29: dashboard.v1.GetSessionSegmentsRes.end_time:type_name -> google.protobuf.Timestamp
+	7,  // 30: dashboard.v1.DashboardService.GetOverview:input_type -> dashboard.v1.GetOverviewReq
+	9,  // 31: dashboard.v1.DashboardService.ListProjects:input_type -> dashboard.v1.ListProjectsReq
+	11, // 32: dashboard.v1.DashboardService.GetProject:input_type -> dashboard.v1.GetProjectReq
+	13, // 33: dashboard.v1.DashboardService.ListSessions:input_type -> dashboard.v1.ListSessionsReq
+	15, // 34: dashboard.v1.DashboardService.GetSession:input_type -> dashboard.v1.GetSessionReq
+	18, // 35: dashboard.v1.DashboardService.GetSessionSegments:input_type -> dashboard.v1.GetSessionSegmentsReq
+	8,  // 36: dashboard.v1.DashboardService.GetOverview:output_type -> dashboard.v1.GetOverviewRes
+	10, // 37: dashboard.v1.DashboardService.ListProjects:output_type -> dashboard.v1.ListProjectsRes
+	12, // 38: dashboard.v1.DashboardService.GetProject:output_type -> dashboard.v1.GetProjectRes
+	14, // 39: dashboard.v1.DashboardService.ListSessions:output_type -> dashboard.v1.ListSessionsRes
+	16, // 40: dashboard.v1.DashboardService.GetSession:output_type -> dashboard.v1.GetSessionRes
+	19, // 41: dashboard.v1.DashboardService.GetSessionSegments:output_type -> dashboard.v1.GetSessionSegmentsRes
+	36, // [36:42] is the sub-list for method output_type
+	30, // [30:36] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_dashboard_v1_dashboard_proto_init() }
@@ -1432,7 +1669,7 @@ func file_dashboard_v1_dashboard_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_dashboard_v1_dashboard_proto_rawDesc), len(file_dashboard_v1_dashboard_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -38,3 +38,10 @@ export const listSessions = DashboardService.method.listSessions;
  * @generated from rpc dashboard.v1.DashboardService.GetSession
  */
 export const getSession = DashboardService.method.getSession;
+
+/**
+ * GetSessionSegments returns lightweight segment summaries for timeline display.
+ *
+ * @generated from rpc dashboard.v1.DashboardService.GetSessionSegments
+ */
+export const getSessionSegments = DashboardService.method.getSessionSegments;

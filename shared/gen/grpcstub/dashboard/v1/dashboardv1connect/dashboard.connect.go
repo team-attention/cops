@@ -48,6 +48,9 @@ const (
 	// DashboardServiceGetSessionProcedure is the fully-qualified name of the DashboardService's
 	// GetSession RPC.
 	DashboardServiceGetSessionProcedure = "/dashboard.v1.DashboardService/GetSession"
+	// DashboardServiceGetSessionSegmentsProcedure is the fully-qualified name of the DashboardService's
+	// GetSessionSegments RPC.
+	DashboardServiceGetSessionSegmentsProcedure = "/dashboard.v1.DashboardService/GetSessionSegments"
 )
 
 // DashboardServiceClient is a client for the dashboard.v1.DashboardService service.
@@ -62,6 +65,8 @@ type DashboardServiceClient interface {
 	ListSessions(context.Context, *connect.Request[v1.ListSessionsReq]) (*connect.Response[v1.ListSessionsRes], error)
 	// GetSession returns detailed session information with records.
 	GetSession(context.Context, *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error)
+	// GetSessionSegments returns lightweight segment summaries for timeline display.
+	GetSessionSegments(context.Context, *connect.Request[v1.GetSessionSegmentsReq]) (*connect.Response[v1.GetSessionSegmentsRes], error)
 }
 
 // NewDashboardServiceClient constructs a client for the dashboard.v1.DashboardService service. By
@@ -105,16 +110,23 @@ func NewDashboardServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(dashboardServiceMethods.ByName("GetSession")),
 			connect.WithClientOptions(opts...),
 		),
+		getSessionSegments: connect.NewClient[v1.GetSessionSegmentsReq, v1.GetSessionSegmentsRes](
+			httpClient,
+			baseURL+DashboardServiceGetSessionSegmentsProcedure,
+			connect.WithSchema(dashboardServiceMethods.ByName("GetSessionSegments")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // dashboardServiceClient implements DashboardServiceClient.
 type dashboardServiceClient struct {
-	getOverview  *connect.Client[v1.GetOverviewReq, v1.GetOverviewRes]
-	listProjects *connect.Client[v1.ListProjectsReq, v1.ListProjectsRes]
-	getProject   *connect.Client[v1.GetProjectReq, v1.GetProjectRes]
-	listSessions *connect.Client[v1.ListSessionsReq, v1.ListSessionsRes]
-	getSession   *connect.Client[v1.GetSessionReq, v1.GetSessionRes]
+	getOverview        *connect.Client[v1.GetOverviewReq, v1.GetOverviewRes]
+	listProjects       *connect.Client[v1.ListProjectsReq, v1.ListProjectsRes]
+	getProject         *connect.Client[v1.GetProjectReq, v1.GetProjectRes]
+	listSessions       *connect.Client[v1.ListSessionsReq, v1.ListSessionsRes]
+	getSession         *connect.Client[v1.GetSessionReq, v1.GetSessionRes]
+	getSessionSegments *connect.Client[v1.GetSessionSegmentsReq, v1.GetSessionSegmentsRes]
 }
 
 // GetOverview calls dashboard.v1.DashboardService.GetOverview.
@@ -142,6 +154,11 @@ func (c *dashboardServiceClient) GetSession(ctx context.Context, req *connect.Re
 	return c.getSession.CallUnary(ctx, req)
 }
 
+// GetSessionSegments calls dashboard.v1.DashboardService.GetSessionSegments.
+func (c *dashboardServiceClient) GetSessionSegments(ctx context.Context, req *connect.Request[v1.GetSessionSegmentsReq]) (*connect.Response[v1.GetSessionSegmentsRes], error) {
+	return c.getSessionSegments.CallUnary(ctx, req)
+}
+
 // DashboardServiceHandler is an implementation of the dashboard.v1.DashboardService service.
 type DashboardServiceHandler interface {
 	// GetOverview returns dashboard summary statistics.
@@ -154,6 +171,8 @@ type DashboardServiceHandler interface {
 	ListSessions(context.Context, *connect.Request[v1.ListSessionsReq]) (*connect.Response[v1.ListSessionsRes], error)
 	// GetSession returns detailed session information with records.
 	GetSession(context.Context, *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error)
+	// GetSessionSegments returns lightweight segment summaries for timeline display.
+	GetSessionSegments(context.Context, *connect.Request[v1.GetSessionSegmentsReq]) (*connect.Response[v1.GetSessionSegmentsRes], error)
 }
 
 // NewDashboardServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -193,6 +212,12 @@ func NewDashboardServiceHandler(svc DashboardServiceHandler, opts ...connect.Han
 		connect.WithSchema(dashboardServiceMethods.ByName("GetSession")),
 		connect.WithHandlerOptions(opts...),
 	)
+	dashboardServiceGetSessionSegmentsHandler := connect.NewUnaryHandler(
+		DashboardServiceGetSessionSegmentsProcedure,
+		svc.GetSessionSegments,
+		connect.WithSchema(dashboardServiceMethods.ByName("GetSessionSegments")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/dashboard.v1.DashboardService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DashboardServiceGetOverviewProcedure:
@@ -205,6 +230,8 @@ func NewDashboardServiceHandler(svc DashboardServiceHandler, opts ...connect.Han
 			dashboardServiceListSessionsHandler.ServeHTTP(w, r)
 		case DashboardServiceGetSessionProcedure:
 			dashboardServiceGetSessionHandler.ServeHTTP(w, r)
+		case DashboardServiceGetSessionSegmentsProcedure:
+			dashboardServiceGetSessionSegmentsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -232,4 +259,8 @@ func (UnimplementedDashboardServiceHandler) ListSessions(context.Context, *conne
 
 func (UnimplementedDashboardServiceHandler) GetSession(context.Context, *connect.Request[v1.GetSessionReq]) (*connect.Response[v1.GetSessionRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.GetSession is not implemented"))
+}
+
+func (UnimplementedDashboardServiceHandler) GetSessionSegments(context.Context, *connect.Request[v1.GetSessionSegmentsReq]) (*connect.Response[v1.GetSessionSegmentsRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.GetSessionSegments is not implemented"))
 }

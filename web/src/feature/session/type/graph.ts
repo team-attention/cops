@@ -1,66 +1,57 @@
-import type { Node, Edge, BuiltInNode } from '@xyflow/react'
-import type { Session, TokenUsage } from '@/gen/grpcstub/session/v1/session_pb'
+import type { Session } from '@/gen/grpcstub/session/v1/session_pb'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 
 // ViewMode for switching between Chat and Graph views
 export type ViewMode = 'chat' | 'graph'
 
-// SessionNodeData holds data for each node in the graph.
-// Main vs SubAgent is determined at runtime by checking if agentId is present:
-// - Main: agentId is undefined/empty, id is 'main'
-// - SubAgent: agentId is present, id equals agentId
-export interface SessionNodeData extends Record<string, unknown> {
-  // Node identifier: 'main' for Main session, agentId for SubAgent
+// AgentSegment represents an agent's session span in the timeline (with sessions data)
+export interface AgentSegment {
+  // 'main' or agentId
   id: string
-  // SubAgent identifier (undefined/empty for Main session)
-  agentId?: string
-  // Display label for the node
+  // Display label for the segment
   label: string
-  // Sessions belonging to this node (filtered by agentId)
+  // Start timestamp of the agent's first session
+  startTime: Timestamp
+  // End timestamp of the agent's last session
+  endTime: Timestamp
+  // All sessions belonging to this agent
   sessions: Session[]
-  // Token usage aggregated for this node
-  usage?: TokenUsage
-  // First message timestamp
-  startedAt?: Timestamp
-  // Last message timestamp
-  endedAt?: Timestamp
-  // Message count for display
+  // Calculated Y position for rendering
+  yPosition: number
+  // Total number of messages in this segment
   messageCount: number
 }
 
-// Helper arrow function to check if node is Main session
-export const isMainNode = (data: SessionNodeData): boolean => !data.agentId
+// TimelineSegment represents lightweight segment info from API (without sessions)
+export interface TimelineSegment {
+  // 'main' or agentId
+  id: string
+  // Display label for the segment
+  label: string
+  // Start timestamp of the agent's first message
+  startTime: Timestamp
+  // End timestamp of the agent's last message
+  endTime: Timestamp
+  // Calculated Y position for rendering
+  yPosition: number
+  // Total number of messages in this segment
+  messageCount: number
+}
 
-// Type alias for React Flow Node with SessionNodeData
-export type SessionNode = Node<SessionNodeData, 'sessionNode'>
+// SegmentTimelineData contains all data needed to render the segment-based timeline
+export interface SegmentTimelineData {
+  // All segments (Main + SubAgents)
+  segments: AgentSegment[]
+  // Time range in seconds for X axis calculation
+  timeRange: { start: number; end: number }
+  // Total duration in seconds
+  totalDuration: number
+}
 
-// Type alias for React Flow Edge
-export type SessionEdge = Edge
-
-// Combined AppNode type for React Flow
-export type AppNode = SessionNode | BuiltInNode
-
-// SubAgentInfo extracted from Progress entries
+// SubAgentInfo extracted from session metadata
 export interface SubAgentInfo {
   // SubAgent's unique identifier
   agentId: string
-  // Tool execution ID that spawned this SubAgent
-  spawnedByToolUseId: string
-  // User prompt for SubAgent
-  prompt?: string
-  // Timestamp when SubAgent was spawned
+  // First timestamp from SubAgent's sessions
   timestamp?: Timestamp
-}
-
-// GraphPopupState represents the state needed to render MessagePopover externally.
-// When selectedNodeId is null, the popup is closed.
-export interface GraphPopupState {
-  // ID of the selected node ('main' or agentId)
-  selectedNodeId: string | null
-  // Viewport position for popup placement
-  position: { x: number; y: number } | null
-  // Sessions for the selected node
-  sessions: Session[]
-  // Label for the selected node
-  nodeLabel: string
 }

@@ -1,23 +1,15 @@
-import type {
-  Session,
-  TokenUsage,
-} from '@/gen/grpcstub/session/v1/session_pb'
-import { SessionType, ProgressType } from '@/gen/grpcstub/session/v1/session_pb'
-import { create } from '@bufbuild/protobuf'
-import { TokenUsageSchema } from '@/gen/grpcstub/session/v1/session_pb'
-import { Position } from '@xyflow/react'
-import type {
-  SessionNode,
-  SessionEdge,
-  SubAgentInfo,
-  SessionNodeData,
-} from '../type/graph'
+import type { Session } from '@/gen/grpcstub/session/v1/session_pb'
+import type { SessionSegment } from '@/gen/grpcstub/dashboard/v1/dashboard_pb'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import type {
+  AgentSegment,
+  SegmentTimelineData,
+  SubAgentInfo,
+  TimelineSegment,
+} from '../type/graph'
 
-// NODE_SPACING defines the horizontal gap between nodes
-const NODE_SPACING_X = 300
-// NODE_SPACING_Y defines the vertical gap for parallel nodes
-const NODE_SPACING_Y = 150
+// LANE_SPACING defines the vertical gap between lanes
+const LANE_SPACING = 60
 
 // Helper to get metadata from a session
 const getSessionMetadata = (session: Session) => {
@@ -37,104 +29,6 @@ const getSessionMetadata = (session: Session) => {
   }
 }
 
-// extractSubAgentInfo extracts SubAgent spawn information from Progress entries.
-// Looks for PROGRESS_TYPE_AGENT entries in the Main session (no agentId).
-const extractSubAgentInfo = (sessions: Session[]): SubAgentInfo[] => {
-  const subAgents: SubAgentInfo[] = []
-
-  for (const session of sessions) {
-    // Only look at Progress entries
-    if (
-      session.type !== SessionType.PROGRESS ||
-      session.data.case !== 'progressData'
-    ) {
-      continue
-    }
-
-    const progress = session.data.value
-    const data = progress.data
-    const metadata = progress.metadata
-
-    // Only PROGRESS_TYPE_AGENT entries
-    if (data?.type !== ProgressType.AGENT) {
-      continue
-    }
-
-    // Only Main session entries (no agentId in metadata)
-    if (metadata?.agentId) {
-      continue
-    }
-
-    // Extract SubAgent info
-    const agentId = data.agentId
-    if (!agentId) {
-      continue
-    }
-
-    subAgents.push({
-      agentId,
-      spawnedByToolUseId: progress.toolExecutionId,
-      prompt: data.prompt,
-      timestamp: metadata?.timestamp,
-    })
-  }
-
-  return subAgents
-}
-
-// groupSessionsByAgent groups sessions by their agentId.
-// Main session entries (agentId undefined/empty) go to 'main' key.
-const groupSessionsByAgent = (sessions: Session[]): Map<string, Session[]> => {
-  const grouped = new Map<string, Session[]>()
-
-  for (const session of sessions) {
-    const metadata = getSessionMetadata(session)
-    const agentId = metadata?.agentId || 'main'
-
-    const existing = grouped.get(agentId) || []
-    existing.push(session)
-    grouped.set(agentId, existing)
-  }
-
-  return grouped
-}
-
-// aggregateTokenUsage aggregates token usage across sessions.
-const aggregateTokenUsage = (sessions: Session[]): TokenUsage | undefined => {
-  let inputTokens = 0
-  let outputTokens = 0
-  let cacheCreationInputTokens = 0
-  let cacheReadInputTokens = 0
-  let hasUsage = false
-
-  for (const session of sessions) {
-    if (
-      session.type === SessionType.AGENT &&
-      session.data.case === 'agentData'
-    ) {
-      const usage = session.data.value.usage
-      if (usage) {
-        hasUsage = true
-        inputTokens += usage.inputTokens ?? 0
-        outputTokens += usage.outputTokens ?? 0
-        cacheCreationInputTokens += usage.cacheCreationInputTokens ?? 0
-        cacheReadInputTokens += usage.cacheReadInputTokens ?? 0
-      }
-    }
-  }
-
-  if (!hasUsage) {
-    return undefined
-  }
-
-  return create(TokenUsageSchema, {
-    inputTokens,
-    outputTokens,
-    cacheCreationInputTokens,
-    cacheReadInputTokens,
-  })
-}
-
 // getFirstTimestamp returns the earliest timestamp from sessions
 const getFirstTimestamp = (sessions: Session[]): Timestamp | undefined => {
   let earliest: Timestamp | undefined
@@ -152,121 +46,250 @@ const getFirstTimestamp = (sessions: Session[]): Timestamp | undefined => {
   return earliest
 }
 
-// getLastTimestamp returns the latest timestamp from sessions
-const getLastTimestamp = (sessions: Session[]): Timestamp | undefined => {
-  let latest: Timestamp | undefined
+// extractSubAgentInfo extracts SubAgent information from grouped sessions
+const extractSubAgentInfo = (
+  groupedSessions: Map<string, Session[]>,
+): SubAgentInfo[] => {
+  const subAgents: SubAgentInfo[] = []
+
+  for (const [agentId, sessions] of groupedSessions) {
+    if (agentId === 'main') {
+      continue
+    }
+
+    const timestamp = getFirstTimestamp(sessions)
+    subAgents.push({
+      agentId,
+      timestamp,
+    })
+  }
+
+  // Sort by timestamp for consistent ordering
+  subAgents.sort((a, b) => {
+    if (!a.timestamp || !b.timestamp) {
+      return 0
+    }
+    return Number(a.timestamp.seconds) - Number(b.timestamp.seconds)
+  })
+
+  return subAgents
+}
+
+// groupSessionsByAgent groups sessions by their agentId
+const groupSessionsByAgent = (sessions: Session[]): Map<string, Session[]> => {
+  const grouped = new Map<string, Session[]>()
+
+  for (const session of sessions) {
+    const metadata = getSessionMetadata(session)
+    const agentId = metadata?.agentId || 'main'
+
+    const existing = grouped.get(agentId) || []
+    existing.push(session)
+    grouped.set(agentId, existing)
+  }
+
+  return grouped
+}
+
+// getTimeRange calculates min and max timestamps from sessions
+const getTimeRange = (
+  sessions: Session[],
+): { minTime: Timestamp | undefined; maxTime: Timestamp | undefined } => {
+  let minTime: Timestamp | undefined
+  let maxTime: Timestamp | undefined
 
   for (const session of sessions) {
     const metadata = getSessionMetadata(session)
     const ts = metadata?.timestamp
     if (ts) {
-      if (!latest || Number(ts.seconds) > Number(latest.seconds)) {
-        latest = ts
+      if (!minTime || Number(ts.seconds) < Number(minTime.seconds)) {
+        minTime = ts
+      }
+      if (!maxTime || Number(ts.seconds) > Number(maxTime.seconds)) {
+        maxTime = ts
       }
     }
   }
 
-  return latest
+  return { minTime, maxTime }
 }
 
-// buildGraphElements builds React Flow nodes and edges from session data.
-// Returns nodes positioned in left-to-right layout with parallel SubAgents vertically stacked.
-// Node IDs: 'main' for Main session, agentId for SubAgent nodes.
-export const buildGraphElements = (
-  sessions: Session[],
-): { nodes: SessionNode[]; edges: SessionEdge[] } => {
-  const nodes: SessionNode[] = []
-  const edges: SessionEdge[] = []
-
-  // Extract SubAgentInfo
-  const subAgentInfos = extractSubAgentInfo(sessions)
-
-  // Group sessions by agent
+// buildSegmentData converts sessions into SegmentTimelineData for visualization
+export const buildSegmentData = (sessions: Session[]): SegmentTimelineData => {
   const groupedSessions = groupSessionsByAgent(sessions)
+  const subAgentInfos = extractSubAgentInfo(groupedSessions)
 
-  // Create Main node
+  // Calculate overall time range
+  let minTimeSeconds = Number.MAX_SAFE_INTEGER
+  let maxTimeSeconds = 0
+
+  for (const session of sessions) {
+    const metadata = getSessionMetadata(session)
+    const ts = metadata?.timestamp
+    if (ts) {
+      const seconds = Number(ts.seconds)
+      if (seconds < minTimeSeconds) minTimeSeconds = seconds
+      if (seconds > maxTimeSeconds) maxTimeSeconds = seconds
+    }
+  }
+
+  // Handle edge case with no timestamps
+  if (minTimeSeconds === Number.MAX_SAFE_INTEGER) {
+    minTimeSeconds = 0
+    maxTimeSeconds = 0
+  }
+
+  const timeRange = { start: minTimeSeconds, end: maxTimeSeconds }
+  const totalDuration = maxTimeSeconds - minTimeSeconds
+
+  // Build segments
+  const segments: AgentSegment[] = []
+
+  // Main segment (center position, y = 0)
   const mainSessions = groupedSessions.get('main') || []
-  const mainNodeData: SessionNodeData = {
-    id: 'main',
-    agentId: undefined,
-    label: 'Main Session',
-    sessions: mainSessions,
-    usage: aggregateTokenUsage(mainSessions),
-    startedAt: getFirstTimestamp(mainSessions),
-    endedAt: getLastTimestamp(mainSessions),
-    messageCount: mainSessions.length,
-  }
+  const mainSessionsWithTimestamp = mainSessions.filter((session) => {
+    const metadata = getSessionMetadata(session)
+    return metadata?.timestamp !== undefined
+  })
 
-  nodes.push({
-    id: 'main',
-    type: 'sessionNode',
-    position: { x: 0, y: 0 },
-    data: mainNodeData,
-    sourcePosition: Position.Right,
-    targetPosition: Position.Left,
-  } satisfies SessionNode)
-
-  // Group SubAgents by timestamp to identify parallel spawns
-  // Use toolExecutionId for grouping since parallel calls happen in same batch
-  const subAgentsBySpawnTime = new Map<string, SubAgentInfo[]>()
-  for (const info of subAgentInfos) {
-    const key = info.timestamp ? String(info.timestamp.seconds) : 'unknown'
-    const existing = subAgentsBySpawnTime.get(key) || []
-    existing.push(info)
-    subAgentsBySpawnTime.set(key, existing)
-  }
-
-  // Sort spawn times for sequential positioning
-  const sortedSpawnTimes = Array.from(subAgentsBySpawnTime.keys()).sort(
-    (a, b) => Number(a) - Number(b),
-  )
-
-  // Create SubAgent nodes
-  let xIndex = 1
-  for (const spawnTime of sortedSpawnTimes) {
-    const batch = subAgentsBySpawnTime.get(spawnTime) || []
-    const batchSize = batch.length
-
-    // Calculate y positions for parallel agents (vertically centered around y=0)
-    const startY = -((batchSize - 1) * NODE_SPACING_Y) / 2
-
-    batch.forEach((info, idx) => {
-      const agentSessions = groupedSessions.get(info.agentId) || []
-      const nodeData: SessionNodeData = {
-        id: info.agentId,
-        agentId: info.agentId,
-        label: info.prompt
-          ? info.prompt.slice(0, 30) + (info.prompt.length > 30 ? '...' : '')
-          : `SubAgent`,
-        sessions: agentSessions,
-        usage: aggregateTokenUsage(agentSessions),
-        startedAt: getFirstTimestamp(agentSessions),
-        endedAt: getLastTimestamp(agentSessions),
-        messageCount: agentSessions.length,
-      }
-
-      const yPosition = startY + idx * NODE_SPACING_Y
-
-      nodes.push({
-        id: info.agentId,
-        type: 'sessionNode',
-        position: { x: xIndex * NODE_SPACING_X, y: yPosition },
-        data: nodeData,
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-      } satisfies SessionNode)
-
-      // Create edge from Main to SubAgent
-      edges.push({
-        id: `e-main-${info.agentId}`,
-        source: 'main',
-        target: info.agentId,
-        animated: false,
+  if (mainSessionsWithTimestamp.length > 0) {
+    const { minTime, maxTime } = getTimeRange(mainSessionsWithTimestamp)
+    if (minTime && maxTime) {
+      segments.push({
+        id: 'main',
+        label: 'Main',
+        startTime: minTime,
+        endTime: maxTime,
+        sessions: mainSessionsWithTimestamp,
+        yPosition: 0,
+        messageCount: mainSessionsWithTimestamp.length,
       })
+    }
+  }
+
+  // SubAgent segments (alternating above/below main)
+  subAgentInfos.forEach((info, index) => {
+    const agentSessions = groupedSessions.get(info.agentId) || []
+    const agentSessionsWithTimestamp = agentSessions.filter((session) => {
+      const metadata = getSessionMetadata(session)
+      return metadata?.timestamp !== undefined
     })
 
-    xIndex++
+    if (agentSessionsWithTimestamp.length > 0) {
+      const { minTime, maxTime } = getTimeRange(agentSessionsWithTimestamp)
+      if (minTime && maxTime) {
+        // Alternate above/below main lane
+        const direction = index % 2 === 0 ? 1 : -1
+        const offset = Math.floor(index / 2) + 1
+        const yPosition = direction * offset * LANE_SPACING
+
+        segments.push({
+          id: info.agentId,
+          label: `SubAgent ${index + 1}`,
+          startTime: minTime,
+          endTime: maxTime,
+          sessions: agentSessionsWithTimestamp,
+          yPosition,
+          messageCount: agentSessionsWithTimestamp.length,
+        })
+      }
+    }
+  })
+
+  return { segments, timeRange, totalDuration }
+}
+
+// timestampToX converts a timestamp to X coordinate
+export const timestampToX = (
+  timestamp: Timestamp,
+  timeRange: { start: number; end: number },
+  width: number,
+  padding = 40,
+): number => {
+  const seconds = Number(timestamp.seconds)
+  const duration = timeRange.end - timeRange.start
+
+  if (duration === 0) {
+    return padding + (width - 2 * padding) / 2
   }
 
-  return { nodes, edges }
+  const ratio = (seconds - timeRange.start) / duration
+  return padding + ratio * (width - 2 * padding)
+}
+
+// Helper to get the message UUID from a session for navigation
+export const getSessionMessageId = (session: Session): string | undefined => {
+  const metadata = getSessionMetadata(session)
+  return metadata?.uuid
+}
+
+// TimelineData contains processed segment data for timeline rendering
+export interface TimelineData {
+  // All segments with calculated yPosition
+  segments: TimelineSegment[]
+  // Time range in seconds for X axis calculation
+  timeRange: { start: number; end: number }
+  // Total duration in seconds
+  totalDuration: number
+}
+
+// convertApiSegmentsToTimeline converts API SessionSegment array to TimelineData
+export const convertApiSegmentsToTimeline = (
+  apiSegments: SessionSegment[],
+  startTime: Timestamp | undefined,
+  endTime: Timestamp | undefined,
+  totalDurationSeconds: bigint,
+): TimelineData => {
+  // Calculate time range
+  const startSeconds = startTime ? Number(startTime.seconds) : 0
+  const endSeconds = endTime ? Number(endTime.seconds) : 0
+  const timeRange = { start: startSeconds, end: endSeconds }
+  const totalDuration = Number(totalDurationSeconds)
+
+  // Separate main and subagent segments
+  const mainSegment = apiSegments.find((s) => s.id === 'main')
+  const subAgentSegments = apiSegments.filter((s) => s.id !== 'main')
+
+  // Sort subagents by start time for consistent positioning
+  subAgentSegments.sort((a, b) => {
+    const aStart = a.startTime ? Number(a.startTime.seconds) : 0
+    const bStart = b.startTime ? Number(b.startTime.seconds) : 0
+    return aStart - bStart
+  })
+
+  // Build timeline segments with y positions
+  const segments: TimelineSegment[] = []
+
+  // Main segment at center (y = 0)
+  if (mainSegment && mainSegment.startTime && mainSegment.endTime) {
+    segments.push({
+      id: mainSegment.id,
+      label: mainSegment.label,
+      startTime: mainSegment.startTime,
+      endTime: mainSegment.endTime,
+      yPosition: 0,
+      messageCount: mainSegment.messageCount,
+    })
+  }
+
+  // SubAgent segments (alternating above/below main)
+  subAgentSegments.forEach((apiSeg, index) => {
+    if (!apiSeg.startTime || !apiSeg.endTime) return
+
+    // Alternate above/below main lane
+    const direction = index % 2 === 0 ? 1 : -1
+    const offset = Math.floor(index / 2) + 1
+    const yPosition = direction * offset * LANE_SPACING
+
+    segments.push({
+      id: apiSeg.id,
+      label: apiSeg.label,
+      startTime: apiSeg.startTime,
+      endTime: apiSeg.endTime,
+      yPosition,
+      messageCount: apiSeg.messageCount,
+    })
+  })
+
+  return { segments, timeRange, totalDuration }
 }

@@ -1043,5 +1043,132 @@ func unmarshalSession(doc bson.M) *session.Session {
 	}
 }
 
+// GetSessionSegments retrieves lightweight segment summaries for timeline display.
+// Groups session entries by agentId and calculates min/max timestamps and message counts.
+func (r *MongoDashboardRepository) GetSessionSegments(ctx context.Context, params repository.GetSessionSegmentsParams) (*repository.SessionSegmentsResult, error) {
+	organizationID := params.OrganizationID
+	sessionID := params.SessionID
+
+	// Convert organizationID to ObjectID
+	orgOID, err := bson.ObjectIDFromHex(organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid organization ID: %w", err)
+	}
+
+	// Step 1: Verify session exists and belongs to organization
+	metaPipeline := bson.A{
+		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
+		bson.M{"$group": bson.M{
+			"_id":                             "$" + mongoschema.SessionSessionIDField,
+			mongoschema.SessionProjectIDField: bson.M{"$first": "$" + mongoschema.SessionProjectIDField},
+		}},
+	}
+
+	metaCursor, err := r.sessionsColl.Aggregate(ctx, metaPipeline)
+	if err != nil {
+		r.logger.Error("failed to aggregate session metadata", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to aggregate session metadata: %w", err)
+	}
+	defer metaCursor.Close(ctx)
+
+	if !metaCursor.Next(ctx) {
+		return nil, fmt.Errorf("session not found")
+	}
+
+	var metaDoc bson.M
+	if err := metaCursor.Decode(&metaDoc); err != nil {
+		return nil, fmt.Errorf("failed to decode session metadata: %w", err)
+	}
+
+	projectOID, ok := metaDoc[mongoschema.SessionProjectIDField].(bson.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("session not found")
+	}
+
+	// Verify project belongs to organization
+	projectCount, err := r.projectsColl.CountDocuments(ctx, bson.M{
+		"_id":                                  projectOID,
+		mongoschema.ProjectOrganizationIDField: orgOID,
+	})
+	if err != nil {
+		r.logger.Error("failed to verify project organization", slog.Any("error", err))
+		return nil, fmt.Errorf("failed to verify project: %w", err)
+	}
+	if projectCount == 0 {
+		return nil, fmt.Errorf("session not found")
+	}
+
+	// Step 2: Aggregate segments by agentId
+	// Main session has agentId = null, SubAgents have agentId set
+	segmentsPipeline := bson.A{
+		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
+		bson.M{"$group": bson.M{
+			"_id":          bson.M{"$ifNull": bson.A{"$" + mongoschema.SessionAgentIDField, "main"}},
+			"startTime":    bson.M{"$min": "$" + mongoschema.SessionTimestampField},
+			"endTime":      bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+			"messageCount": bson.M{"$sum": 1},
+		}},
+		bson.M{"$sort": bson.M{"startTime": 1}},
+	}
+
+	segmentsCursor, err := r.sessionsColl.Aggregate(ctx, segmentsPipeline)
+	if err != nil {
+		r.logger.Error("failed to aggregate segments", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to aggregate segments: %w", err)
+	}
+	defer segmentsCursor.Close(ctx)
+
+	var segments []*repository.SessionSegmentInfo
+	var overallStartTime, overallEndTime time.Time
+
+	for segmentsCursor.Next(ctx) {
+		var doc bson.M
+		if err := segmentsCursor.Decode(&doc); err != nil {
+			continue
+		}
+
+		id := mongoutil.Get[string](doc, "_id")
+		startTime := mongoutil.Get[time.Time](doc, "startTime")
+		endTime := mongoutil.Get[time.Time](doc, "endTime")
+		messageCount := mongoutil.Get[int32](doc, "messageCount")
+
+		// Generate label
+		label := "Main"
+		if id != "main" {
+			label = "SubAgent"
+		}
+
+		segment := &repository.SessionSegmentInfo{
+			ID:           id,
+			Label:        label,
+			StartTime:    startTime,
+			EndTime:      endTime,
+			MessageCount: messageCount,
+		}
+		segments = append(segments, segment)
+
+		// Track overall time range
+		if overallStartTime.IsZero() || startTime.Before(overallStartTime) {
+			overallStartTime = startTime
+		}
+		if overallEndTime.IsZero() || endTime.After(overallEndTime) {
+			overallEndTime = endTime
+		}
+	}
+
+	// Calculate total duration
+	var totalDurationS int64
+	if !overallStartTime.IsZero() && !overallEndTime.IsZero() {
+		totalDurationS = int64(overallEndTime.Sub(overallStartTime).Seconds())
+	}
+
+	return &repository.SessionSegmentsResult{
+		Segments:       segments,
+		StartTime:      overallStartTime,
+		EndTime:        overallEndTime,
+		TotalDurationS: totalDurationS,
+	}, nil
+}
+
 // Compile-time interface verification.
 var _ repository.DashboardRepositoryPort = (*MongoDashboardRepository)(nil)

@@ -174,3 +174,23 @@ func (s *Service) GetSession(ctx context.Context, userID string, params reposito
 
 	return session, nil
 }
+
+// GetSessionSegments retrieves lightweight segment summaries for timeline display.
+// Validates RBAC and session's project belongs to organization.
+func (s *Service) GetSessionSegments(ctx context.Context, userID string, params repository.GetSessionSegmentsParams) (*repository.SessionSegmentsResult, error) {
+	if err := s.checkRBAC(ctx, userID, params.OrganizationID); err != nil {
+		return nil, err
+	}
+
+	result, err := s.repo.GetSessionSegments(ctx, params)
+	if err != nil {
+		s.logger.Error("failed to get session segments",
+			slog.String("organizationID", params.OrganizationID),
+			slog.String("sessionID", params.SessionID),
+			slog.Any("error", err),
+		)
+		return nil, err
+	}
+
+	return result, nil
+}

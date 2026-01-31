@@ -95,6 +95,29 @@ type GetSessionQuery struct {
 	SessionID      string
 }
 
+// GetSessionSegmentsParams contains filter conditions for retrieving session segments.
+type GetSessionSegmentsParams struct {
+	OrganizationID string
+	SessionID      string
+}
+
+// SessionSegmentInfo contains segment summary information.
+type SessionSegmentInfo struct {
+	ID           string
+	Label        string
+	StartTime    time.Time
+	EndTime      time.Time
+	MessageCount int32
+}
+
+// SessionSegmentsResult contains all segments and time range for a session.
+type SessionSegmentsResult struct {
+	Segments       []*SessionSegmentInfo
+	StartTime      time.Time
+	EndTime        time.Time
+	TotalDurationS int64
+}
+
 // ListProjectsParams is a type alias for paginated project queries.
 type ListProjectsParams = structure.PaginationParams[ListProjectsQuery]
 
@@ -135,4 +158,8 @@ type DashboardRepositoryPort interface {
 	// GetSession retrieves detailed session information with paginated transcripts.
 	// Returns nil, errutil.NotFound if session not found or its project does not belong to organization.
 	GetSession(ctx context.Context, params GetSessionParams) (*PaginatedSessionDetail, error)
+
+	// GetSessionSegments retrieves lightweight segment summaries for timeline display.
+	// Returns nil, errutil.NotFound if session not found or its project does not belong to organization.
+	GetSessionSegments(ctx context.Context, params GetSessionSegmentsParams) (*SessionSegmentsResult, error)
 }
