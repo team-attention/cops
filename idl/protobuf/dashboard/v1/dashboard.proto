@@ -301,6 +301,24 @@ message GetSessionSegmentsRes {
   int64 total_duration_seconds = 4;
 }
 
+// GetMessageReq is the request for GetMessage RPC.
+message GetMessageReq {
+  // Organization identifier (required)
+  string organization_id = 1;
+
+  // Session identifier
+  string session_id = 2;
+
+  // Message UUID
+  string message_id = 3;
+}
+
+// GetMessageRes is the response for GetMessage RPC.
+message GetMessageRes {
+  // The message
+  session.v1.Session message = 1;
+}
+
 // DashboardService provides dashboard data access.
 service DashboardService {
   // GetOverview returns dashboard summary statistics.
@@ -320,4 +338,7 @@ service DashboardService {
 
   // GetSessionSegments returns lightweight segment summaries for timeline display.
   rpc GetSessionSegments(GetSessionSegmentsReq) returns (GetSessionSegmentsRes);
+
+  // GetMessage returns a single message by UUID.
+  rpc GetMessage(GetMessageReq) returns (GetMessageRes);
 }

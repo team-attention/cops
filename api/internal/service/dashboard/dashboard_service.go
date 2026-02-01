@@ -9,6 +9,7 @@ import (
 
 	"github.com/team-attention/cops/api/internal/service/core/rbac"
 	"github.com/team-attention/cops/api/internal/service/dashboard/outbound/repository"
+	session "github.com/team-attention/cops/shared/domain/v2"
 )
 
 // Service implements dashboard business logic.
@@ -193,4 +194,25 @@ func (s *Service) GetSessionSegments(ctx context.Context, userID string, params 
 	}
 
 	return result, nil
+}
+
+// GetMessage retrieves a single message by UUID.
+// Validates RBAC and message's project belongs to organization.
+func (s *Service) GetMessage(ctx context.Context, userID string, params repository.GetMessageParams) (*session.Session, error) {
+	if err := s.checkRBAC(ctx, userID, params.OrganizationID); err != nil {
+		return nil, err
+	}
+
+	msg, err := s.repo.GetMessage(ctx, params)
+	if err != nil {
+		s.logger.Error("failed to get message",
+			slog.String("organizationID", params.OrganizationID),
+			slog.String("sessionID", params.SessionID),
+			slog.String("messageID", params.MessageID),
+			slog.Any("error", err),
+		)
+		return nil, err
+	}
+
+	return msg, nil
 }

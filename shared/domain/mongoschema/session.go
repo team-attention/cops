@@ -11,18 +11,19 @@ const SessionsCollectionName = "sessions"
 // Session collection field names.
 // Naming pattern: Session<FieldName>Field
 const (
-	SessionIDField               = "_id"
-	SessionProjectIDField        = "projectId"
-	SessionUserIDField           = "userId"
-	SessionSessionIDField        = "sessionId"
-	SessionAgentIDField          = "agentId"
+	SessionIDField                 = "_id"
+	SessionProjectIDField          = "projectId"
+	SessionUserIDField             = "userId"
+	SessionSessionIDField          = "sessionId"
+	SessionAgentIDField            = "agentId"
 	SessionSpawnedByToolUseIDField = "spawnedByToolUseId"
-	SessionTypeField             = "type"
-	SessionTimestampField        = "timestamp"
-	SessionProviderField         = "provider"
-	SessionVersionField          = "version"
-	SessionGitBranchField        = "gitBranch"
-	SessionIsSidechainField      = "isSidechain"
+	SessionTypeField               = "type"
+	SessionTimestampField          = "timestamp"
+	SessionProviderField           = "provider"
+	SessionVersionField            = "version"
+	SessionGitBranchField          = "gitBranch"
+	SessionIsSidechainField        = "isSidechain"
+	SessionUUIDField               = "uuid"
 )
 
 // AgentMessage token usage field paths (for sessions collection).

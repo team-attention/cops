@@ -1,16 +1,22 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   AlertCircle,
   Bot,
   Check,
   Copy,
+  Loader2,
   Play,
   User,
   Wrench,
 } from 'lucide-react'
 import { ContentPanel } from './content-panel'
 import { ToolCallItem } from './tool-call-item'
-import type { LinkedToolCall, ParsedMessage } from '../type/content-block'
+import { useGetMessage } from '../hook/use-get-message'
+import {
+  enrichToolResultMessages,
+  extractToolCalls,
+  parseMessageContent,
+} from '../util/parse-content'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 import {
   Sheet,
@@ -25,8 +31,9 @@ import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
 interface MessageDetailSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  message: ParsedMessage | null
-  relatedToolCalls: Array<LinkedToolCall>
+  organizationId: string | null
+  sessionId: string
+  messageId: string | null
 }
 
 const formatTime = (timestamp: Timestamp | undefined): string => {
@@ -70,10 +77,47 @@ const getProgressLabel = (type: string | undefined) => {
 export const MessageDetailSheet = ({
   open,
   onOpenChange,
-  message,
-  relatedToolCalls,
+  organizationId,
+  sessionId,
+  messageId,
 }: MessageDetailSheetProps) => {
   const [copied, setCopied] = useState(false)
+
+  // Fetch message data
+  const { data, isLoading } = useGetMessage({
+    organizationId,
+    sessionId,
+    messageId,
+  })
+
+  // Parse message from API response
+  const { message, toolCalls } = useMemo(() => {
+    if (!data?.message) return { message: null, toolCalls: [] }
+    const parsed = parseMessageContent(data.message)
+    const calls = extractToolCalls([data.message])
+    return {
+      message: enrichToolResultMessages([parsed], calls)[0],
+      toolCalls: calls,
+    }
+  }, [data])
+
+  if (!messageId) return null
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+        <SheetContent
+          side="right"
+          className="w-full border-zinc-800 bg-zinc-900/95 backdrop-blur-sm sm:max-w-lg lg:max-w-xl"
+        >
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+          </div>
+        </SheetContent>
+      </Sheet>
+    )
+  }
 
   if (!message) return null
 
@@ -212,7 +256,7 @@ export const MessageDetailSheet = ({
             )}
 
             {/* Tool Calls Section */}
-            {relatedToolCalls.length > 0 && (
+            {toolCalls.length > 0 && (
               <div>
                 <div className="mb-3 flex items-center gap-2">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">
@@ -222,11 +266,11 @@ export const MessageDetailSheet = ({
                     variant="outline"
                     className="border-zinc-700 bg-zinc-800/50 font-mono text-[10px] text-zinc-400"
                   >
-                    {relatedToolCalls.length}
+                    {toolCalls.length}
                   </Badge>
                 </div>
                 <div className="space-y-2">
-                  {relatedToolCalls.map((toolCall) => (
+                  {toolCalls.map((toolCall) => (
                     <ToolCallItem
                       key={toolCall.toolUse.id}
                       toolCall={toolCall}
@@ -238,7 +282,7 @@ export const MessageDetailSheet = ({
             )}
 
             {/* Empty state */}
-            {!textContent && relatedToolCalls.length === 0 && (
+            {!textContent && toolCalls.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
                 <AlertCircle className="mb-3 h-8 w-8 opacity-30" />
                 <p className="font-mono text-sm">No content available</p>

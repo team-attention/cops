@@ -1203,5 +1203,48 @@ func (r *MongoDashboardRepository) GetSessionSegments(ctx context.Context, param
 	}, nil
 }
 
+// GetMessage retrieves a single message by UUID.
+// Returns nil, errutil.NotFound if message not found or its project does not belong to organization.
+func (r *MongoDashboardRepository) GetMessage(ctx context.Context, params repository.GetMessageParams) (*session.Session, error) {
+	organizationID := params.OrganizationID
+	sessionID := params.SessionID
+	messageID := params.MessageID
+
+	// Convert organizationID to ObjectID
+	orgOID, err := bson.ObjectIDFromHex(organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid organization ID: %w", err)
+	}
+
+	// Get project IDs for this organization (RBAC)
+	projectIDs, err := r.getProjectIDsForOrganization(ctx, orgOID)
+	if err != nil {
+		r.logger.Error("failed to get project IDs for organization", slog.Any("error", err))
+		return nil, fmt.Errorf("failed to get project IDs: %w", err)
+	}
+	if len(projectIDs) == 0 {
+		return nil, fmt.Errorf("message not found")
+	}
+
+	// Query by UUID with project and session filter
+	filter := bson.M{
+		mongoschema.SessionUUIDField:      messageID,
+		mongoschema.SessionSessionIDField: sessionID,
+		mongoschema.SessionProjectIDField: bson.M{"$in": projectIDs},
+	}
+
+	var doc bson.M
+	err = r.sessionsColl.FindOne(ctx, filter).Decode(&doc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("message not found")
+		}
+		r.logger.Error("failed to find message", slog.String("messageID", messageID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to find message: %w", err)
+	}
+
+	return unmarshalSession(doc), nil
+}
+
 // Compile-time interface verification.
 var _ repository.DashboardRepositoryPort = (*MongoDashboardRepository)(nil)

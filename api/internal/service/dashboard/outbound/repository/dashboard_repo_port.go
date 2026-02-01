@@ -102,6 +102,13 @@ type GetSessionSegmentsParams struct {
 	SessionID      string
 }
 
+// GetMessageParams contains filter conditions for retrieving a single message.
+type GetMessageParams struct {
+	OrganizationID string
+	SessionID      string
+	MessageID      string // UUID
+}
+
 // SessionSegmentInfo contains segment summary information.
 type SessionSegmentInfo struct {
 	ID           string
@@ -163,4 +170,8 @@ type DashboardRepositoryPort interface {
 	// GetSessionSegments retrieves lightweight segment summaries for timeline display.
 	// Returns nil, errutil.NotFound if session not found or its project does not belong to organization.
 	GetSessionSegments(ctx context.Context, params GetSessionSegmentsParams) (*SessionSegmentsResult, error)
+
+	// GetMessage retrieves a single message by UUID.
+	// Returns nil, errutil.NotFound if message not found or its project does not belong to organization.
+	GetMessage(ctx context.Context, params GetMessageParams) (*session.Session, error)
 }

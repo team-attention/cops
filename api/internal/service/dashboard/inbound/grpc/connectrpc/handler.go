@@ -229,5 +229,33 @@ func (h *DashboardGRPCHandler) GetSessionSegments(
 	return connect.NewResponse(res), nil
 }
 
+// GetMessage returns a single message by UUID.
+func (h *DashboardGRPCHandler) GetMessage(
+	ctx context.Context,
+	req *connect.Request[dashboardv1.GetMessageReq],
+) (*connect.Response[dashboardv1.GetMessageRes], error) {
+	userID := interceptor.UserIDFromContext(ctx)
+
+	// Parse request
+	params := repository.GetMessageParams{
+		OrganizationID: req.Msg.GetOrganizationId(),
+		SessionID:      req.Msg.GetSessionId(),
+		MessageID:      req.Msg.GetMessageId(),
+	}
+
+	// Call service
+	result, err := h.svc.GetMessage(ctx, userID, params)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build response
+	res := &dashboardv1.GetMessageRes{
+		Message: toProtoSession(result),
+	}
+
+	return connect.NewResponse(res), nil
+}
+
 // Compile-time interface verification.
 var _ dashboardv1connect.DashboardServiceHandler = (*DashboardGRPCHandler)(nil)

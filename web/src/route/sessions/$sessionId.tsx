@@ -7,12 +7,7 @@ import { SessionHeader } from '@/feature/session/component/session-header'
 import { SessionTimelineView } from '@/feature/session/component/session-timeline-view'
 import { SessionDetailPanel } from '@/feature/session/component/session-detail-panel'
 import { MessageDetailSheet } from '@/feature/session/component/message-detail-sheet'
-import {
-  enrichToolResultMessages,
-  extractToolCalls,
-  filterSessionsForChat,
-  parseMessageContent,
-} from '@/feature/session/util/parse-content'
+import { extractToolCalls } from '@/feature/session/util/parse-content'
 import { convertApiSegmentsToTimeline } from '@/feature/session/util/graph-data'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { Card } from '@/gen/shadcn/ui/card'
@@ -106,32 +101,14 @@ function SessionDetailPage() {
     )
   }, [segmentsData])
 
-  // Extract tool calls from session entries
+  // Extract tool calls from session entries (for handleToolClick)
   const toolCalls = useMemo(() => {
     if (!session?.sessions) return []
     return extractToolCalls(session.sessions)
   }, [session?.sessions])
 
-  // Calculate parsed messages at page level for Sheet usage
-  const parsedMessages = useMemo(() => {
-    if (!session?.sessions) return []
-    const filtered = filterSessionsForChat(session.sessions)
-    const parsed = filtered.map(parseMessageContent)
-    return enrichToolResultMessages(parsed, toolCalls)
-  }, [session?.sessions, toolCalls])
-
   // Sheet state
   const isSheetOpen = selectedMessageId !== undefined
-
-  const selectedMessage = useMemo(() => {
-    if (!selectedMessageId) return null
-    return parsedMessages.find((m) => m.uuid === selectedMessageId) ?? null
-  }, [parsedMessages, selectedMessageId])
-
-  const selectedMessageToolCalls = useMemo(() => {
-    if (!selectedMessageId) return []
-    return toolCalls.filter((tc) => tc.sourceMessageUuid === selectedMessageId)
-  }, [toolCalls, selectedMessageId])
 
   const handleSheetClose = () => setSelectedMessageId(undefined)
 
@@ -216,8 +193,9 @@ function SessionDetailPage() {
             <MessageDetailSheet
               open={isSheetOpen}
               onOpenChange={(open) => !open && handleSheetClose()}
-              message={selectedMessage}
-              relatedToolCalls={selectedMessageToolCalls}
+              organizationId={selectedOrganizationId}
+              sessionId={sessionId}
+              messageId={selectedMessageId ?? null}
             />
           </div>
         )}

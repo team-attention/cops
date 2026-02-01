@@ -45,3 +45,10 @@ export const getSession = DashboardService.method.getSession;
  * @generated from rpc dashboard.v1.DashboardService.GetSessionSegments
  */
 export const getSessionSegments = DashboardService.method.getSessionSegments;
+
+/**
+ * GetMessage returns a single message by UUID.
+ *
+ * @generated from rpc dashboard.v1.DashboardService.GetMessage
+ */
+export const getMessage = DashboardService.method.getMessage;
