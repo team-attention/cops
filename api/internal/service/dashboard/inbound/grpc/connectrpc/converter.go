@@ -433,6 +433,8 @@ func toProtoProgressData(d session.ProgressData) *sessionv1.ProgressData {
 	switch d.Type {
 	case session.ProgressTypeAgent:
 		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_AGENT
+	case session.ProgressTypeSkill:
+		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_SKILL
 	case session.ProgressTypeHook:
 		proto.Type = sessionv1.ProgressType_PROGRESS_TYPE_HOOK
 	case session.ProgressTypeBash:
@@ -516,5 +518,26 @@ func toProtoPagination(currentPage, pageSize, totalPages int32, totalCount int64
 		PageSize:    pageSize,
 		TotalPages:  totalPages,
 		TotalCount:  totalCount,
+	}
+}
+
+// toProtoSessionSegmentsRes converts repository SessionSegmentsResult to protobuf.
+func toProtoSessionSegmentsRes(result *repository.SessionSegmentsResult) *dashboardv1.GetSessionSegmentsRes {
+	segments := make([]*dashboardv1.SessionSegment, len(result.Segments))
+	for i, seg := range result.Segments {
+		segments[i] = &dashboardv1.SessionSegment{
+			Id:           seg.ID,
+			Label:        seg.Label,
+			StartTime:    timestamppb.New(seg.StartTime),
+			EndTime:      timestamppb.New(seg.EndTime),
+			MessageCount: seg.MessageCount,
+		}
+	}
+
+	return &dashboardv1.GetSessionSegmentsRes{
+		Segments:             segments,
+		StartTime:            timestamppb.New(result.StartTime),
+		EndTime:              timestamppb.New(result.EndTime),
+		TotalDurationSeconds: result.TotalDurationS,
 	}
 }

@@ -572,20 +572,37 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 		return nil, fmt.Errorf("session not found")
 	}
 
-	// Step 2: Get total session entry count for ALL entries (Main + SubAgent)
-	totalCount, err := r.sessionsColl.CountDocuments(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID})
+	// Build filter with optional agentId
+	filter := bson.M{mongoschema.SessionSessionIDField: sessionID}
+	if params.Query.AgentID != nil {
+		agentID := *params.Query.AgentID
+		if agentID == "main" {
+			// Main session: agentId is null or empty
+			filter["$or"] = bson.A{
+				bson.M{mongoschema.SessionAgentIDField: nil},
+				bson.M{mongoschema.SessionAgentIDField: ""},
+				bson.M{mongoschema.SessionAgentIDField: bson.M{"$exists": false}},
+			}
+		} else {
+			// SubAgent: match specific agentId
+			filter[mongoschema.SessionAgentIDField] = agentID
+		}
+	}
+
+	// Step 2: Get total session entry count (filtered by agentId if specified)
+	totalCount, err := r.sessionsColl.CountDocuments(ctx, filter)
 	if err != nil {
 		r.logger.Error("failed to count session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count session entries: %w", err)
 	}
 
-	// Step 3: Get paginated session entries for ALL entries (Main + SubAgent)
+	// Step 3: Get paginated session entries (filtered by agentId if specified)
 	findOpts := options.Find().
 		SetSort(bson.M{mongoschema.SessionTimestampField: 1}).
 		SetSkip(params.Skip()).
 		SetLimit(int64(params.PageSize))
 
-	cursor, err := r.sessionsColl.Find(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID}, findOpts)
+	cursor, err := r.sessionsColl.Find(ctx, filter, findOpts)
 	if err != nil {
 		r.logger.Error("failed to find session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to find session entries: %w", err)
@@ -1041,6 +1058,192 @@ func unmarshalSession(doc bson.M) *session.Session {
 		Type: session.SessionType(sessionType),
 		Data: data,
 	}
+}
+
+// GetSessionSegments retrieves lightweight segment summaries for timeline display.
+// Groups session entries by agentId and calculates min/max timestamps and message counts.
+func (r *MongoDashboardRepository) GetSessionSegments(ctx context.Context, params repository.GetSessionSegmentsParams) (*repository.SessionSegmentsResult, error) {
+	organizationID := params.OrganizationID
+	sessionID := params.SessionID
+
+	// Convert organizationID to ObjectID
+	orgOID, err := bson.ObjectIDFromHex(organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid organization ID: %w", err)
+	}
+
+	// Step 1: Verify session exists and belongs to organization
+	metaPipeline := bson.A{
+		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
+		bson.M{"$group": bson.M{
+			"_id":                             "$" + mongoschema.SessionSessionIDField,
+			mongoschema.SessionProjectIDField: bson.M{"$first": "$" + mongoschema.SessionProjectIDField},
+		}},
+	}
+
+	metaCursor, err := r.sessionsColl.Aggregate(ctx, metaPipeline)
+	if err != nil {
+		r.logger.Error("failed to aggregate session metadata", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to aggregate session metadata: %w", err)
+	}
+	defer metaCursor.Close(ctx)
+
+	if !metaCursor.Next(ctx) {
+		return nil, fmt.Errorf("session not found")
+	}
+
+	var metaDoc bson.M
+	if err := metaCursor.Decode(&metaDoc); err != nil {
+		return nil, fmt.Errorf("failed to decode session metadata: %w", err)
+	}
+
+	projectOID, ok := metaDoc[mongoschema.SessionProjectIDField].(bson.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("session not found")
+	}
+
+	// Verify project belongs to organization
+	projectCount, err := r.projectsColl.CountDocuments(ctx, bson.M{
+		"_id":                                  projectOID,
+		mongoschema.ProjectOrganizationIDField: orgOID,
+	})
+	if err != nil {
+		r.logger.Error("failed to verify project organization", slog.Any("error", err))
+		return nil, fmt.Errorf("failed to verify project: %w", err)
+	}
+	if projectCount == 0 {
+		return nil, fmt.Errorf("session not found")
+	}
+
+	// Step 2: Aggregate segments by agentId
+	// Main session has agentId = null or empty string, SubAgents have agentId set
+	segmentsPipeline := bson.A{
+		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
+		bson.M{"$group": bson.M{
+			"_id": bson.M{
+				"$cond": bson.M{
+					"if": bson.M{
+						"$or": bson.A{
+							bson.M{"$eq": bson.A{"$" + mongoschema.SessionAgentIDField, nil}},
+							bson.M{"$eq": bson.A{"$" + mongoschema.SessionAgentIDField, ""}},
+							bson.M{"$eq": bson.A{bson.M{"$type": "$" + mongoschema.SessionAgentIDField}, "missing"}},
+						},
+					},
+					"then": "main",
+					"else": "$" + mongoschema.SessionAgentIDField,
+				},
+			},
+			"startTime":    bson.M{"$min": "$" + mongoschema.SessionTimestampField},
+			"endTime":      bson.M{"$max": "$" + mongoschema.SessionTimestampField},
+			"messageCount": bson.M{"$sum": 1},
+		}},
+		bson.M{"$sort": bson.M{"startTime": 1}},
+	}
+
+	segmentsCursor, err := r.sessionsColl.Aggregate(ctx, segmentsPipeline)
+	if err != nil {
+		r.logger.Error("failed to aggregate segments", slog.String("sessionID", sessionID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to aggregate segments: %w", err)
+	}
+	defer segmentsCursor.Close(ctx)
+
+	var segments []*repository.SessionSegmentInfo
+	var overallStartTime, overallEndTime time.Time
+
+	for segmentsCursor.Next(ctx) {
+		var doc bson.M
+		if err := segmentsCursor.Decode(&doc); err != nil {
+			continue
+		}
+
+		id := mongoutil.Get[string](doc, "_id")
+		startTime := mongoutil.Get[time.Time](doc, "startTime")
+		endTime := mongoutil.Get[time.Time](doc, "endTime")
+		messageCount := mongoutil.Get[int32](doc, "messageCount")
+
+		// Generate label with short ID for SubAgents
+		label := "Main"
+		if id != "main" {
+			shortID := id
+			if len(id) > 5 {
+				shortID = id[:5]
+			}
+			label = fmt.Sprintf("Agent %s", shortID)
+		}
+
+		segment := &repository.SessionSegmentInfo{
+			ID:           id,
+			Label:        label,
+			StartTime:    startTime,
+			EndTime:      endTime,
+			MessageCount: messageCount,
+		}
+		segments = append(segments, segment)
+
+		// Track overall time range
+		if overallStartTime.IsZero() || startTime.Before(overallStartTime) {
+			overallStartTime = startTime
+		}
+		if overallEndTime.IsZero() || endTime.After(overallEndTime) {
+			overallEndTime = endTime
+		}
+	}
+
+	// Calculate total duration
+	var totalDurationS int64
+	if !overallStartTime.IsZero() && !overallEndTime.IsZero() {
+		totalDurationS = int64(overallEndTime.Sub(overallStartTime).Seconds())
+	}
+
+	return &repository.SessionSegmentsResult{
+		Segments:       segments,
+		StartTime:      overallStartTime,
+		EndTime:        overallEndTime,
+		TotalDurationS: totalDurationS,
+	}, nil
+}
+
+// GetMessage retrieves a single message by UUID.
+// Returns nil, errutil.NotFound if message not found or its project does not belong to organization.
+func (r *MongoDashboardRepository) GetMessage(ctx context.Context, params repository.GetMessageParams) (*session.Session, error) {
+	organizationID := params.OrganizationID
+	sessionID := params.SessionID
+	messageID := params.MessageID
+
+	// Convert organizationID to ObjectID
+	orgOID, err := bson.ObjectIDFromHex(organizationID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid organization ID: %w", err)
+	}
+
+	// Get project IDs for this organization (RBAC)
+	projectIDs, err := r.getProjectIDsForOrganization(ctx, orgOID)
+	if err != nil {
+		r.logger.Error("failed to get project IDs for organization", slog.Any("error", err))
+		return nil, fmt.Errorf("failed to get project IDs: %w", err)
+	}
+	if len(projectIDs) == 0 {
+		return nil, fmt.Errorf("message not found")
+	}
+
+	// Query by UUID with project and session filter
+	filter := bson.M{
+		mongoschema.SessionUUIDField:      messageID,
+		mongoschema.SessionSessionIDField: sessionID,
+		mongoschema.SessionProjectIDField: bson.M{"$in": projectIDs},
+	}
+
+	var doc bson.M
+	err = r.sessionsColl.FindOne(ctx, filter).Decode(&doc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("message not found")
+		}
+		r.logger.Error("failed to find message", slog.String("messageID", messageID), slog.Any("error", err))
+		return nil, fmt.Errorf("failed to find message: %w", err)
+	}
+
+	return unmarshalSession(doc), nil
 }
 
 // Compile-time interface verification.

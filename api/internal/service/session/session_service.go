@@ -156,7 +156,7 @@ func (s *Service) processChangeStream(ctx context.Context, it repository.ChangeE
 
 // processBatch processes all events with the given batchID.
 func (s *Service) processBatch(ctx context.Context, batchID string) error {
-	events, err := s.eventQuery.FindByBatchID(ctx, batchID)
+	events, err := s.eventQuery.FindByBatchID(ctx, batchID, s.cfg.Retry.MaxRetries)
 	if err != nil {
 		return fmt.Errorf("failed to find events: %w", err)
 	}

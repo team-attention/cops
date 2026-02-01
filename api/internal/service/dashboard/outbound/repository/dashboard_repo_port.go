@@ -93,6 +93,37 @@ type ListSessionsQuery struct {
 type GetSessionQuery struct {
 	OrganizationID string
 	SessionID      string
+	AgentID        *string // nil = all agents, "main" = Main session only, other = specific SubAgent
+}
+
+// GetSessionSegmentsParams contains filter conditions for retrieving session segments.
+type GetSessionSegmentsParams struct {
+	OrganizationID string
+	SessionID      string
+}
+
+// GetMessageParams contains filter conditions for retrieving a single message.
+type GetMessageParams struct {
+	OrganizationID string
+	SessionID      string
+	MessageID      string // UUID
+}
+
+// SessionSegmentInfo contains segment summary information.
+type SessionSegmentInfo struct {
+	ID           string
+	Label        string
+	StartTime    time.Time
+	EndTime      time.Time
+	MessageCount int32
+}
+
+// SessionSegmentsResult contains all segments and time range for a session.
+type SessionSegmentsResult struct {
+	Segments       []*SessionSegmentInfo
+	StartTime      time.Time
+	EndTime        time.Time
+	TotalDurationS int64
 }
 
 // ListProjectsParams is a type alias for paginated project queries.
@@ -135,4 +166,12 @@ type DashboardRepositoryPort interface {
 	// GetSession retrieves detailed session information with paginated transcripts.
 	// Returns nil, errutil.NotFound if session not found or its project does not belong to organization.
 	GetSession(ctx context.Context, params GetSessionParams) (*PaginatedSessionDetail, error)
+
+	// GetSessionSegments retrieves lightweight segment summaries for timeline display.
+	// Returns nil, errutil.NotFound if session not found or its project does not belong to organization.
+	GetSessionSegments(ctx context.Context, params GetSessionSegmentsParams) (*SessionSegmentsResult, error)
+
+	// GetMessage retrieves a single message by UUID.
+	// Returns nil, errutil.NotFound if message not found or its project does not belong to organization.
+	GetMessage(ctx context.Context, params GetMessageParams) (*session.Session, error)
 }

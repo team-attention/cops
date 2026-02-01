@@ -84,9 +84,12 @@ func (q *MongoEventQuery) WatchInserts(ctx context.Context, resumeToken bson.Raw
 	return &mongoChangeStreamIterator{cs: cs}, nil
 }
 
-// FindByBatchID retrieves all events with the given batchID.
-func (q *MongoEventQuery) FindByBatchID(ctx context.Context, batchID string) ([]*domain.Event, error) {
-	filter := bson.M{mongoschema.EventBatchIDField: batchID}
+// FindByBatchID retrieves all events with the given batchID that have not exceeded max retries.
+func (q *MongoEventQuery) FindByBatchID(ctx context.Context, batchID string, maxRetries int) ([]*domain.Event, error) {
+	filter := bson.M{
+		mongoschema.EventBatchIDField:    batchID,
+		mongoschema.EventRetryCountField: bson.M{"$lt": maxRetries},
+	}
 
 	cursor, err := q.eventsColl.Find(ctx, filter)
 	if err != nil {

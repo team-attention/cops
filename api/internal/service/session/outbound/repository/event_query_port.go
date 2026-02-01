@@ -38,9 +38,10 @@ type EventQueryPort interface {
 	// Accepts optional resume token to resume from previous position.
 	WatchInserts(ctx context.Context, resumeToken bson.Raw) (ChangeEventIterator, error)
 
-	// FindByBatchID retrieves all events with the given batchID.
+	// FindByBatchID retrieves all events with the given batchID that have not exceeded max retries.
+	// Events where retryCount >= maxRetries are excluded from results.
 	// Used to process events in batch groups.
-	FindByBatchID(ctx context.Context, batchID string) ([]*domain.Event, error)
+	FindByBatchID(ctx context.Context, batchID string, maxRetries int) ([]*domain.Event, error)
 
 	// DeleteByIDs removes events with the given IDs.
 	// Called after successful conversion to Session records.

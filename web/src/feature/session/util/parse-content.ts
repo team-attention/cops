@@ -1,26 +1,49 @@
 import type {
-  Session,
-  HumanMessage,
-  AgentMessage,
-  ToolExecution,
-  HumanContentBlock as ProtoHumanContentBlock,
-  AgentContentBlock as ProtoAgentContentBlock,
-  ProgressData,
-} from '@/gen/grpcstub/session/v1/session_pb'
-import {
-  SessionType,
-  ProgressType,
-  AgentContentBlockType,
-  HumanContentBlockType,
-  SystemMessageSubtype,
-} from '@/gen/grpcstub/session/v1/session_pb'
-import type {
   ContentBlock,
   LinkedToolCall,
   ParsedMessage,
   ToolResultContentBlock,
   ToolUseContentBlock,
 } from '../type/content-block'
+import type {
+  AgentContentBlock as ProtoAgentContentBlock,
+  AgentMessage,
+  HumanContentBlock as ProtoHumanContentBlock,
+  HumanMessage,
+  ProgressData,
+  Session,
+  ToolExecution,
+} from '@/gen/grpcstub/session/v1/session_pb'
+import {
+  AgentContentBlockType,
+  HumanContentBlockType,
+  ProgressType,
+  SessionType,
+  SystemMessageSubtype,
+} from '@/gen/grpcstub/session/v1/session_pb'
+
+// Type guard for HumanMessage data
+function isHumanData(
+  session: Session,
+): session is Session & { data: { case: 'humanData'; value: HumanMessage } } {
+  return session.data.case === 'humanData'
+}
+
+// Type guard for AgentMessage data
+function isAgentData(
+  session: Session,
+): session is Session & { data: { case: 'agentData'; value: AgentMessage } } {
+  return session.data.case === 'agentData'
+}
+
+// Type guard for ToolExecution data
+function isToolExecutionData(
+  session: Session,
+): session is Session & {
+  data: { case: 'toolExecutionData'; value: ToolExecution }
+} {
+  return session.data.case === 'toolExecutionData'
+}
 
 // Helper to extract displayable text from ProgressData
 const extractProgressText = (data: ProgressData | undefined): string => {
@@ -76,10 +99,12 @@ const extractProgressText = (data: ProgressData | undefined): string => {
 // Helper to map ProgressType enum to display string
 const getProgressTypeName = (
   type: ProgressType | undefined,
-): 'agent' | 'hook' | 'bash' | 'mcp' | 'unknown' => {
+): 'agent' | 'skill' | 'hook' | 'bash' | 'mcp' | 'unknown' => {
   switch (type) {
     case ProgressType.AGENT:
       return 'agent'
+    case ProgressType.SKILL:
+      return 'skill'
     case ProgressType.HOOK:
       return 'hook'
     case ProgressType.BASH:
@@ -148,11 +173,8 @@ const convertAgentContent = (
 // Parse a single Session entry into a renderable ParsedMessage
 export const parseMessageContent = (session: Session): ParsedMessage => {
   // Handle HUMAN type
-  if (
-    session.type === SessionType.HUMAN &&
-    session.data.case === 'humanData'
-  ) {
-    const human = session.data.value as HumanMessage
+  if (session.type === SessionType.HUMAN && isHumanData(session)) {
+    const human = session.data.value
     const metadata = human.metadata
 
     return {
@@ -166,11 +188,8 @@ export const parseMessageContent = (session: Session): ParsedMessage => {
   }
 
   // Handle AGENT type
-  if (
-    session.type === SessionType.AGENT &&
-    session.data.case === 'agentData'
-  ) {
-    const agent = session.data.value as AgentMessage
+  if (session.type === SessionType.AGENT && isAgentData(session)) {
+    const agent = session.data.value
     const metadata = agent.metadata
 
     return {
@@ -187,9 +206,9 @@ export const parseMessageContent = (session: Session): ParsedMessage => {
   // Handle TOOL_EXECUTION type
   if (
     session.type === SessionType.TOOL_EXECUTION &&
-    session.data.case === 'toolExecutionData'
+    isToolExecutionData(session)
   ) {
-    const toolExec = session.data.value as ToolExecution
+    const toolExec = session.data.value
     const metadata = toolExec.metadata
     const result = toolExec.result
 
@@ -304,9 +323,9 @@ export const extractToolCalls = (
   for (const session of sessions) {
     if (
       session.type === SessionType.TOOL_EXECUTION &&
-      session.data.case === 'toolExecutionData'
+      isToolExecutionData(session)
     ) {
-      const toolExec = session.data.value as ToolExecution
+      const toolExec = session.data.value
       const metadata = toolExec.metadata
 
       let input: globalThis.Record<string, unknown> = {}
