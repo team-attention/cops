@@ -1,19 +1,19 @@
-import { useMemo, useRef, useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Network, ZoomIn, ZoomOut } from 'lucide-react'
+import { timestampToX } from '../util/graph-data'
+import type { TimelineSegment } from '../type/graph'
+import type { TimelineData } from '../util/graph-data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
 import { Badge } from '@/gen/shadcn/ui/badge'
 import { Button } from '@/gen/shadcn/ui/button'
 import { Slider } from '@/gen/shadcn/ui/slider'
-import { Network, ZoomIn, ZoomOut } from 'lucide-react'
-import type { TimelineSegment } from '../type/graph'
-import type { TimelineData } from '../util/graph-data'
-import { timestampToX } from '../util/graph-data'
 
 // Constants for layout
 const LANE_HEIGHT = 60
 const PADDING_Y = 80
 const SEGMENT_LINE_WIDTH = 4
 const ENDPOINT_RADIUS = 6
-const MIN_SVG_WIDTH = 400
+const LABEL_WIDTH = 96 // w-24 = 96px
 
 // Zoom scale range (duration that fits in viewport)
 const MIN_DURATION_FIT = 30 // Zoom in max: 30 seconds fits in viewport
@@ -78,18 +78,17 @@ export const SessionTimelineView = ({
     // Width based on zoom level
     // zoomLevel 1.0 → containerWidth (session fits in viewport)
     // zoomLevel 2.0 → containerWidth * 2 (scroll needed)
-    const contentWidth = (containerWidth - 80) * zoomLevel
-    const width = Math.max(MIN_SVG_WIDTH, contentWidth + 80)
+    // Graph area width = containerWidth - LABEL_WIDTH (label area is separate)
+    const graphAreaWidth = containerWidth - LABEL_WIDTH
+    const contentWidth = graphAreaWidth * zoomLevel
+    const width = Math.max(graphAreaWidth, contentWidth)
 
-    // Height based on number of segments
-    const maxY = Math.max(
-      ...segmentData.segments.map((s) => Math.abs(s.yPosition)),
-      0,
-    )
-    const height = maxY * 2 + PADDING_Y * 2 + LANE_HEIGHT
+    // Height based on number of segments (Main at top, SubAgents below)
+    const maxY = Math.max(...segmentData.segments.map((s) => s.yPosition), 0)
+    const height = maxY + PADDING_Y * 2 + LANE_HEIGHT
 
-    // Center Y position (where main lane sits)
-    const center = height / 2
+    // Main lane Y position (fixed at top with padding)
+    const center = PADDING_Y + LANE_HEIGHT / 2
 
     return { svgWidth: width, svgHeight: height, centerY: center }
   }, [segmentData, containerWidth, zoomLevel])
@@ -252,9 +251,40 @@ export const SessionTimelineView = ({
       <CardContent className="relative flex-1 overflow-hidden p-0">
         <div
           ref={containerRef}
-          className="max-h-[500px] overflow-auto"
+          className="flex max-h-[500px] overflow-auto"
         >
-          <svg width={svgWidth} height={svgHeight} className="bg-zinc-900">
+          {/* Label Area - sticky left, syncs with vertical scroll */}
+          <div
+            className="sticky left-0 z-10 flex-shrink-0 bg-zinc-900"
+            style={{ width: LABEL_WIDTH }}
+          >
+            <div className="relative" style={{ height: svgHeight }}>
+              {segmentData.segments.map((segment) => {
+                const y = centerY + segment.yPosition
+                return (
+                  <div
+                    key={`label-${segment.id}`}
+                    className="absolute left-3 font-mono text-[11px]"
+                    style={{
+                      top: y - 6,
+                      color: segment.id === 'main' ? '#a1a1aa' : '#71717a',
+                      fontWeight: segment.id === 'main' ? 600 : 400,
+                    }}
+                  >
+                    {segment.label}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Graph Area - scrollable */}
+          <svg
+            width={svgWidth}
+            height={svgHeight}
+            className="flex-shrink-0 bg-zinc-900"
+            style={{ minWidth: svgWidth }}
+          >
             {/* Grid background */}
             <defs>
               <pattern
@@ -273,7 +303,7 @@ export const SessionTimelineView = ({
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
 
-            {/* Lane backgrounds and labels */}
+            {/* Lane backgrounds (no labels - they're in the separate label area) */}
             {segmentData.segments.map((segment) => {
               const y = centerY + segment.yPosition
               return (
@@ -287,20 +317,9 @@ export const SessionTimelineView = ({
                     fill={segment.id === 'main' ? '#18181b' : '#1f1f23'}
                     opacity={0.5}
                   />
-                  {/* Lane label */}
-                  <text
-                    x={12}
-                    y={y + 4}
-                    fill={segment.id === 'main' ? '#a1a1aa' : '#71717a'}
-                    fontSize={11}
-                    fontFamily="monospace"
-                    fontWeight={segment.id === 'main' ? 600 : 400}
-                  >
-                    {segment.label}
-                  </text>
-                  {/* Lane centerline (dashed for sub-agents) */}
+                  {/* Lane centerline (dashed for sub-agents) - starts from 0 now */}
                   <line
-                    x1={80}
+                    x1={0}
                     y1={y}
                     x2={svgWidth - 20}
                     y2={y}

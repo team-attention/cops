@@ -167,7 +167,7 @@ export const buildSegmentData = (sessions: Session[]): SegmentTimelineData => {
     }
   }
 
-  // SubAgent segments (alternating above/below main)
+  // SubAgent segments (all below main, in order of first activity)
   subAgentInfos.forEach((info, index) => {
     const agentSessions = groupedSessions.get(info.agentId) || []
     const agentSessionsWithTimestamp = agentSessions.filter((session) => {
@@ -178,10 +178,8 @@ export const buildSegmentData = (sessions: Session[]): SegmentTimelineData => {
     if (agentSessionsWithTimestamp.length > 0) {
       const { minTime, maxTime } = getTimeRange(agentSessionsWithTimestamp)
       if (minTime && maxTime) {
-        // Alternate above/below main lane
-        const direction = index % 2 === 0 ? 1 : -1
-        const offset = Math.floor(index / 2) + 1
-        const yPosition = direction * offset * LANE_SPACING
+        // All SubAgents below main, in sequential order
+        const yPosition = (index + 1) * LANE_SPACING
 
         segments.push({
           id: info.agentId,
@@ -272,14 +270,12 @@ export const convertApiSegmentsToTimeline = (
     })
   }
 
-  // SubAgent segments (alternating above/below main)
+  // SubAgent segments (all below main, in order of start time)
   subAgentSegments.forEach((apiSeg, index) => {
     if (!apiSeg.startTime || !apiSeg.endTime) return
 
-    // Alternate above/below main lane
-    const direction = index % 2 === 0 ? 1 : -1
-    const offset = Math.floor(index / 2) + 1
-    const yPosition = direction * offset * LANE_SPACING
+    // All SubAgents below main, in sequential order
+    const yPosition = (index + 1) * LANE_SPACING
 
     segments.push({
       id: apiSeg.id,

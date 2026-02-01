@@ -7,6 +7,8 @@ interface UseGetSessionOptions {
   organizationId: string | null
   // sessionId is the session's unique identifier (required for API call)
   sessionId: string
+  // agentId is the optional filter ('main' for main session, agentId for SubAgents)
+  agentId?: string
   // pageSize is the number of transcripts per page
   pageSize?: number
 }
@@ -17,6 +19,7 @@ interface UseGetSessionOptions {
 export const useGetSession = ({
   organizationId,
   sessionId,
+  agentId,
   pageSize = 50,
 }: UseGetSessionOptions) => {
   return useInfiniteQuery(
@@ -24,6 +27,7 @@ export const useGetSession = ({
     {
       organizationId: organizationId || '',
       sessionId,
+      agentId,
       pagination: { page: 1, pageSize },
     },
     {

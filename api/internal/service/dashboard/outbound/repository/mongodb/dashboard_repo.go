@@ -572,20 +572,37 @@ func (r *MongoDashboardRepository) GetSession(ctx context.Context, params reposi
 		return nil, fmt.Errorf("session not found")
 	}
 
-	// Step 2: Get total session entry count for ALL entries (Main + SubAgent)
-	totalCount, err := r.sessionsColl.CountDocuments(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID})
+	// Build filter with optional agentId
+	filter := bson.M{mongoschema.SessionSessionIDField: sessionID}
+	if params.Query.AgentID != nil {
+		agentID := *params.Query.AgentID
+		if agentID == "main" {
+			// Main session: agentId is null or empty
+			filter["$or"] = bson.A{
+				bson.M{mongoschema.SessionAgentIDField: nil},
+				bson.M{mongoschema.SessionAgentIDField: ""},
+				bson.M{mongoschema.SessionAgentIDField: bson.M{"$exists": false}},
+			}
+		} else {
+			// SubAgent: match specific agentId
+			filter[mongoschema.SessionAgentIDField] = agentID
+		}
+	}
+
+	// Step 2: Get total session entry count (filtered by agentId if specified)
+	totalCount, err := r.sessionsColl.CountDocuments(ctx, filter)
 	if err != nil {
 		r.logger.Error("failed to count session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to count session entries: %w", err)
 	}
 
-	// Step 3: Get paginated session entries for ALL entries (Main + SubAgent)
+	// Step 3: Get paginated session entries (filtered by agentId if specified)
 	findOpts := options.Find().
 		SetSort(bson.M{mongoschema.SessionTimestampField: 1}).
 		SetSkip(params.Skip()).
 		SetLimit(int64(params.PageSize))
 
-	cursor, err := r.sessionsColl.Find(ctx, bson.M{mongoschema.SessionSessionIDField: sessionID}, findOpts)
+	cursor, err := r.sessionsColl.Find(ctx, filter, findOpts)
 	if err != nil {
 		r.logger.Error("failed to find session entries", slog.String("sessionID", sessionID), slog.Any("error", err))
 		return nil, fmt.Errorf("failed to find session entries: %w", err)
@@ -1099,11 +1116,23 @@ func (r *MongoDashboardRepository) GetSessionSegments(ctx context.Context, param
 	}
 
 	// Step 2: Aggregate segments by agentId
-	// Main session has agentId = null, SubAgents have agentId set
+	// Main session has agentId = null or empty string, SubAgents have agentId set
 	segmentsPipeline := bson.A{
 		bson.M{"$match": bson.M{mongoschema.SessionSessionIDField: sessionID}},
 		bson.M{"$group": bson.M{
-			"_id":          bson.M{"$ifNull": bson.A{"$" + mongoschema.SessionAgentIDField, "main"}},
+			"_id": bson.M{
+				"$cond": bson.M{
+					"if": bson.M{
+						"$or": bson.A{
+							bson.M{"$eq": bson.A{"$" + mongoschema.SessionAgentIDField, nil}},
+							bson.M{"$eq": bson.A{"$" + mongoschema.SessionAgentIDField, ""}},
+							bson.M{"$eq": bson.A{bson.M{"$type": "$" + mongoschema.SessionAgentIDField}, "missing"}},
+						},
+					},
+					"then": "main",
+					"else": "$" + mongoschema.SessionAgentIDField,
+				},
+			},
 			"startTime":    bson.M{"$min": "$" + mongoschema.SessionTimestampField},
 			"endTime":      bson.M{"$max": "$" + mongoschema.SessionTimestampField},
 			"messageCount": bson.M{"$sum": 1},
@@ -1132,10 +1161,14 @@ func (r *MongoDashboardRepository) GetSessionSegments(ctx context.Context, param
 		endTime := mongoutil.Get[time.Time](doc, "endTime")
 		messageCount := mongoutil.Get[int32](doc, "messageCount")
 
-		// Generate label
+		// Generate label with short ID for SubAgents
 		label := "Main"
 		if id != "main" {
-			label = "SubAgent"
+			shortID := id
+			if len(id) > 5 {
+				shortID = id[:5]
+			}
+			label = fmt.Sprintf("Agent %s", shortID)
 		}
 
 		segment := &repository.SessionSegmentInfo{

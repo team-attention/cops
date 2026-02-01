@@ -247,6 +247,9 @@ message GetSessionReq {
 
   // Pagination parameters for transcripts
   PaginationReq pagination = 3;
+
+  // Optional agent identifier filter ('main' for main session, agentId for SubAgents)
+  optional string agent_id = 4;
 }
 
 // GetSessionRes is the response for GetSession RPC.

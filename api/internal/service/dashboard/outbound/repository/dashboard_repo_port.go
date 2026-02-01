@@ -93,6 +93,7 @@ type ListSessionsQuery struct {
 type GetSessionQuery struct {
 	OrganizationID string
 	SessionID      string
+	AgentID        *string // nil = all agents, "main" = Main session only, other = specific SubAgent
 }
 
 // GetSessionSegmentsParams contains filter conditions for retrieving session segments.

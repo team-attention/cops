@@ -1,9 +1,6 @@
 import type { Session } from '@/gen/grpcstub/session/v1/session_pb'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 
-// ViewMode for switching between Chat and Graph views
-export type ViewMode = 'chat' | 'graph'
-
 // AgentSegment represents an agent's session span in the timeline (with sessions data)
 export interface AgentSegment {
   // 'main' or agentId

@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
 import { useGetSession } from '@/feature/session/hook/use-get-session'
 import { useGetSessionSegments } from '@/feature/session/hook/use-get-session-segments'
 import { SessionHeader } from '@/feature/session/component/session-header'
-import { ChatView } from '@/feature/session/component/chat-view'
 import { SessionTimelineView } from '@/feature/session/component/session-timeline-view'
 import { SessionDetailPanel } from '@/feature/session/component/session-detail-panel'
-import { ViewToggle } from '@/feature/session/component/view-toggle'
 import { MessageDetailSheet } from '@/feature/session/component/message-detail-sheet'
 import {
   enrichToolResultMessages,
@@ -17,10 +15,11 @@ import {
 } from '@/feature/session/util/parse-content'
 import { convertApiSegmentsToTimeline } from '@/feature/session/util/graph-data'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
+import { Card } from '@/gen/shadcn/ui/card'
 import { useUserStore } from '@/shared/store/user-store'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { APP_VERSION } from '@/shared/config/version'
-import type { ViewMode, TimelineSegment } from '@/feature/session/type/graph'
+import type { TimelineSegment } from '@/feature/session/type/graph'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   beforeLoad: ({ location }) => {
@@ -52,8 +51,6 @@ function SessionDetailPage() {
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
   const [selectedSegment, setSelectedSegment] =
     useState<TimelineSegment | null>(null)
-  const [viewMode, setViewMode] = useState<ViewMode>('chat')
-  const loadMoreRef = useRef<HTMLDivElement>(null)
 
   // Handle segment click - open detail panel for the segment
   const handleSegmentClick = useCallback((segment: TimelineSegment) => {
@@ -66,9 +63,6 @@ function SessionDetailPage() {
     isError,
     refetch,
     isFetching,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
   } = useGetSession({
     organizationId: selectedOrganizationId,
     sessionId,
@@ -111,23 +105,6 @@ function SessionDetailPage() {
       segmentsData.totalDurationSeconds,
     )
   }, [segmentsData])
-
-  // IntersectionObserver for infinite scroll
-  useEffect(() => {
-    if (!loadMoreRef.current || !hasNextPage) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage()
-        }
-      },
-      { threshold: 0.1 },
-    )
-
-    observer.observe(loadMoreRef.current)
-    return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   // Extract tool calls from session entries
   const toolCalls = useMemo(() => {
@@ -199,52 +176,35 @@ function SessionDetailPage() {
             {/* Session Header */}
             <SessionHeader session={session} totalMessageCount={totalMessageCount} />
 
-            {/* View Toggle */}
-            <div className="flex justify-end">
-              <ViewToggle value={viewMode} onChange={setViewMode} />
-            </div>
-
-            {/* Conditional View Rendering */}
-            {viewMode === 'chat' ? (
-              <>
-                {/* Full-width Conversation List */}
-                <ChatView
-                  sessions={session.sessions ?? []}
-                  toolCalls={toolCalls}
-                  parsedMessages={parsedMessages}
-                  selectedMessageId={selectedMessageId}
-                  onSelectMessage={setSelectedMessageId}
-                  onToolClick={handleToolClick}
-                />
-
-                {/* Load more trigger for infinite scroll */}
-                <div ref={loadMoreRef} className="flex h-10 items-center justify-center">
-                  {isFetchingNextPage && (
-                    <div className="flex items-center gap-2 text-zinc-500">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="font-mono text-xs">Loading more...</span>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : timelineData ? (
-              <div className="flex gap-4">
-                <div className="min-w-0 flex-1">
+            {/* Timeline View */}
+            {timelineData ? (
+              <div className="flex gap-6">
+                <div className="min-w-0 w-1/2">
                   <SessionTimelineView
                     timelineData={timelineData}
                     onSegmentClick={handleSegmentClick}
                     selectedSegmentId={selectedSegment?.id}
                   />
                 </div>
-                {selectedSegment && (
-                  <SessionDetailPanel
-                    segment={selectedSegment}
-                    sessions={session?.sessions ?? []}
-                    isLoading={isLoading}
-                    onClose={() => setSelectedSegment(null)}
-                    onToolClick={handleToolClick}
-                  />
-                )}
+                <div className="min-w-0 w-1/2">
+                  {selectedSegment ? (
+                    <SessionDetailPanel
+                      organizationId={selectedOrganizationId || ''}
+                      sessionId={sessionId}
+                      segment={selectedSegment}
+                      onClose={() => setSelectedSegment(null)}
+                      onToolClick={handleToolClick}
+                      selectedMessageId={selectedMessageId}
+                      onSelectMessage={setSelectedMessageId}
+                    />
+                  ) : (
+                    <Card className="flex h-[600px] items-center justify-center border-zinc-800/50 bg-zinc-900/80">
+                      <p className="font-mono text-sm text-zinc-500">
+                        Select a segment to view messages
+                      </p>
+                    </Card>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center py-12">

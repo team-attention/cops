@@ -1115,7 +1115,9 @@ type GetSessionReq struct {
 	// Session identifier
 	SessionId string `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	// Pagination parameters for transcripts
-	Pagination    *PaginationReq `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *PaginationReq `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	// Optional agent identifier filter ('main' for main session, agentId for SubAgents)
+	AgentId       *string `protobuf:"bytes,4,opt,name=agent_id,json=agentId,proto3,oneof" json:"agent_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1169,6 +1171,13 @@ func (x *GetSessionReq) GetPagination() *PaginationReq {
 		return x.Pagination
 	}
 	return nil
+}
+
+func (x *GetSessionReq) GetAgentId() string {
+	if x != nil && x.AgentId != nil {
+		return *x.AgentId
+	}
+	return ""
 }
 
 // GetSessionRes is the response for GetSession RPC.
@@ -1532,14 +1541,16 @@ const file_dashboard_v1_dashboard_proto_rawDesc = "" +
 	"\bsessions\x18\x01 \x03(\v2\x1c.dashboard.v1.SessionSummaryR\bsessions\x12;\n" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\n" +
-	"pagination\"\x94\x01\n" +
+	"pagination\"\xc1\x01\n" +
 	"\rGetSessionReq\x12'\n" +
 	"\x0forganization_id\x18\x01 \x01(\tR\x0eorganizationId\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x02 \x01(\tR\tsessionId\x12;\n" +
 	"\n" +
 	"pagination\x18\x03 \x01(\v2\x1b.dashboard.v1.PaginationReqR\n" +
-	"pagination\"\x98\x01\n" +
+	"pagination\x12\x1e\n" +
+	"\bagent_id\x18\x04 \x01(\tH\x00R\aagentId\x88\x01\x01B\v\n" +
+	"\t_agent_id\"\x98\x01\n" +
 	"\rGetSessionRes\x125\n" +
 	"\asession\x18\x01 \x01(\v2\x1b.dashboard.v1.SessionDetailR\asession\x12P\n" +
 	"\x15transcript_pagination\x18\x02 \x01(\v2\x1b.dashboard.v1.PaginationResR\x14transcriptPagination\"\xcd\x01\n" +
@@ -1663,6 +1674,7 @@ func file_dashboard_v1_dashboard_proto_init() {
 	if File_dashboard_v1_dashboard_proto != nil {
 		return
 	}
+	file_dashboard_v1_dashboard_proto_msgTypes[15].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

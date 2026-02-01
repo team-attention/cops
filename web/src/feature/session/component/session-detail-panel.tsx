@@ -1,74 +1,61 @@
 import { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
-import { ScrollArea } from '@/gen/shadcn/ui/scroll-area'
-import { Badge } from '@/gen/shadcn/ui/badge'
-import { Button } from '@/gen/shadcn/ui/button'
 import { Loader2, MessageSquare, X } from 'lucide-react'
-import type { Session } from '@/gen/grpcstub/session/v1/session_pb'
-import type { TimelineSegment } from '../type/graph'
-import type { LinkedToolCall, ParsedMessage } from '../type/content-block'
-import { MessageBubble } from './message-bubble'
 import {
   enrichToolResultMessages,
   extractToolCalls,
   filterSessionsForChat,
   parseMessageContent,
 } from '../util/parse-content'
+import { useGetSession } from '../hook/use-get-session'
+import { MessageBubble } from './message-bubble'
+import type { TimelineSegment } from '../type/graph'
+import type { LinkedToolCall, ParsedMessage } from '../type/content-block'
+import { Card, CardContent, CardHeader, CardTitle } from '@/gen/shadcn/ui/card'
+import { Badge } from '@/gen/shadcn/ui/badge'
+import { Button } from '@/gen/shadcn/ui/button'
 
 interface SessionDetailPanelProps {
+  organizationId: string
+  sessionId: string
   segment: TimelineSegment
-  sessions: Session[]
-  isLoading?: boolean
   onClose: () => void
   onToolClick?: (toolUseId: string) => void
+  selectedMessageId?: string
+  onSelectMessage?: (messageId: string) => void
 }
 
 export const SessionDetailPanel = ({
+  organizationId,
+  sessionId,
   segment,
-  sessions,
-  isLoading = false,
   onClose,
   onToolClick,
+  selectedMessageId,
+  onSelectMessage,
 }: SessionDetailPanelProps) => {
-  // Filter sessions for this specific segment (by agentId)
-  const segmentSessions = useMemo(() => {
-    return sessions.filter((session) => {
-      // Get agentId from session metadata
-      let agentId: string | undefined
-      switch (session.data.case) {
-        case 'humanData':
-          agentId = session.data.value.metadata?.agentId
-          break
-        case 'agentData':
-          agentId = session.data.value.metadata?.agentId
-          break
-        case 'toolExecutionData':
-          agentId = session.data.value.metadata?.agentId
-          break
-        case 'systemData':
-          agentId = session.data.value.metadata?.agentId
-          break
-        case 'progressData':
-          agentId = session.data.value.metadata?.agentId
-          break
-      }
-      // Main segment has no agentId, SubAgents have agentId set
-      const sessionAgentId = agentId || 'main'
-      return sessionAgentId === segment.id
-    })
-  }, [sessions, segment.id])
+  // Fetch segment-specific messages using agentId filter
+  const { data, isLoading } = useGetSession({
+    organizationId,
+    sessionId,
+    agentId: segment.id,
+  })
+
+  // Merge all pages' session data
+  const sessions = useMemo(() => {
+    return data?.pages.flatMap((page) => page.session?.sessions ?? []) ?? []
+  }, [data])
 
   // Extract tool calls from segment sessions
-  const toolCalls: LinkedToolCall[] = useMemo(() => {
-    return extractToolCalls(segmentSessions)
-  }, [segmentSessions])
+  const toolCalls: Array<LinkedToolCall> = useMemo(() => {
+    return extractToolCalls(sessions)
+  }, [sessions])
 
   // Parse and enrich messages
-  const parsedMessages: ParsedMessage[] = useMemo(() => {
-    const filtered = filterSessionsForChat(segmentSessions)
+  const parsedMessages: Array<ParsedMessage> = useMemo(() => {
+    const filtered = filterSessionsForChat(sessions)
     const parsed = filtered.map(parseMessageContent)
     return enrichToolResultMessages(parsed, toolCalls)
-  }, [segmentSessions, toolCalls])
+  }, [sessions, toolCalls])
 
   // Use segment's message count from API
   const messageCount = segment.messageCount
@@ -77,16 +64,15 @@ export const SessionDetailPanel = ({
   const isMain = segment.id === 'main'
 
   return (
-    <Card className="flex h-[600px] w-[400px] flex-shrink-0 flex-col overflow-hidden border-zinc-800/50 bg-zinc-900/80 backdrop-blur-sm">
+    <Card className="flex h-[600px] w-full flex-col overflow-hidden border-zinc-800/50 bg-zinc-900/80 backdrop-blur-sm">
       <CardHeader className="flex-shrink-0 border-b border-zinc-800/50 pb-3 pt-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`rounded-lg border p-2 ${
-                isMain
-                  ? 'border-violet-500/20 bg-violet-500/10'
-                  : 'border-cyan-500/20 bg-cyan-500/10'
-              }`}
+              className={`rounded-lg border p-2 ${isMain
+                ? 'border-violet-500/20 bg-violet-500/10'
+                : 'border-cyan-500/20 bg-cyan-500/10'
+                }`}
             >
               <MessageSquare
                 className={`h-4 w-4 ${isMain ? 'text-violet-400' : 'text-cyan-400'}`}
@@ -104,11 +90,10 @@ export const SessionDetailPanel = ({
           <div className="flex items-center gap-2">
             <Badge
               variant="outline"
-              className={`font-mono text-xs ${
-                isMain
-                  ? 'border-violet-500/20 bg-violet-500/5 text-violet-400'
-                  : 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400'
-              }`}
+              className={`font-mono text-xs ${isMain
+                ? 'border-violet-500/20 bg-violet-500/5 text-violet-400'
+                : 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400'
+                }`}
             >
               {messageCount} msgs
             </Badge>
@@ -139,29 +124,28 @@ export const SessionDetailPanel = ({
             </p>
           </div>
         ) : (
-          <ScrollArea className="h-full">
+          <div className="h-full w-full overflow-y-auto">
             <div className="space-y-3 p-3">
               {parsedMessages.map((message) => (
                 <MessageBubble
                   key={message.uuid}
                   message={message}
-                  isSelected={false}
-                  onSelect={() => {}}
+                  isSelected={selectedMessageId === message.uuid}
+                  onSelect={() => onSelectMessage?.(message.uuid)}
                   onToolClick={onToolClick}
                 />
               ))}
             </div>
-          </ScrollArea>
+          </div>
         )}
       </CardContent>
 
       {/* Bottom accent */}
       <div
-        className={`h-[2px] w-full bg-gradient-to-r ${
-          isMain
-            ? 'from-violet-500 to-violet-600'
-            : 'from-cyan-500 to-cyan-600'
-        }`}
+        className={`h-[2px] w-full bg-gradient-to-r ${isMain
+          ? 'from-violet-500 to-violet-600'
+          : 'from-cyan-500 to-cyan-600'
+          }`}
       />
     </Card>
   )

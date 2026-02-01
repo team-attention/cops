@@ -185,6 +185,7 @@ func (h *DashboardGRPCHandler) GetSession(
 		Query: repository.GetSessionQuery{
 			OrganizationID: msg.GetOrganizationId(),
 			SessionID:      msg.GetSessionId(),
+			AgentID:        msg.AgentId,
 		},
 	}
 
