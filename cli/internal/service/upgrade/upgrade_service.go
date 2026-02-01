@@ -158,7 +158,7 @@ func (s *Service) Upgrade(ctx context.Context) (*UpgradeResult, error) {
 	}
 
 	// Find asset for current platform
-	asset := client.FindAssetForCurrentPlatform(release.Assets, binaryName)
+	asset := client.FindAssetForCurrentPlatform(release.Assets, binaryName, release.TagName)
 	if asset == nil {
 		return nil, fmt.Errorf("no release asset found for current platform")
 	}

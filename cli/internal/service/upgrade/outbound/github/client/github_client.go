@@ -98,16 +98,19 @@ func (c *GitHubClient) DownloadAsset(ctx context.Context, downloadURL string) ([
 }
 
 // FindAssetForCurrentPlatform finds the appropriate asset for the current OS/Arch.
-// It looks for assets matching the pattern: {name}_{os}_{arch}.tar.gz
-func FindAssetForCurrentPlatform(assets []*github.Asset, binaryName string) *github.Asset {
+// It looks for assets matching the pattern: {name}_{version}_{os}_{arch}.tar.gz
+func FindAssetForCurrentPlatform(assets []*github.Asset, binaryName, version string) *github.Asset {
 	goos := runtime.GOOS
 	goarch := runtime.GOARCH
 
+	// Strip 'v' prefix from version if present (v0.1.0 -> 0.1.0)
+	version = strings.TrimPrefix(version, "v")
+
 	// Expected patterns:
-	// - cops_darwin_amd64.tar.gz
-	// - cops_darwin_arm64.tar.gz
-	// - cops_linux_amd64.tar.gz
-	expectedPattern := fmt.Sprintf("%s_%s_%s", binaryName, goos, goarch)
+	// - cops_0.1.0_darwin_amd64.tar.gz
+	// - cops_0.1.0_darwin_arm64.tar.gz
+	// - cops_0.1.0_linux_amd64.tar.gz
+	expectedPattern := fmt.Sprintf("%s_%s_%s_%s", binaryName, version, goos, goarch)
 
 	for _, asset := range assets {
 		name := strings.ToLower(asset.Name)
