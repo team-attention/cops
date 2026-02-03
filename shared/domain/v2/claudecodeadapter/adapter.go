@@ -36,9 +36,11 @@ func (a *Adapter) Adapt(t *domain.Transcript) ([]*session.Session, error) {
 	case domain.TranscriptTypeSummary:
 		return a.adaptSummary(t.Data.(*domain.SummaryTranscript))
 	case domain.TranscriptTypeFileHistorySnapshot:
-		return a.adaptFileSnapshot(t.Data.(*domain.FileHistorySnapshotTranscript))
+		// Skip: file snapshots are internal backup state, not needed for dashboard
+		return nil, nil
 	case domain.TranscriptTypeProgress:
-		return a.adaptProgress(t.Data.(*domain.ProgressTranscript))
+		// Skip: progress events are transient UI state, not needed for dashboard
+		return nil, nil
 	default:
 		return nil, nil
 	}
