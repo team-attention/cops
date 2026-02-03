@@ -26,6 +26,25 @@ const (
 	minBatchSize = 1
 )
 
+// skipTransientTypes contains transcript types that should not be sent to API.
+// These are transient UI state or internal backup data, not needed for dashboard.
+var skipTransientTypes = map[string]bool{
+	"progress":              true,
+	"file_history_snapshot": true,
+}
+
+// shouldSkipLine checks if a JSONL line should be filtered out.
+// Returns true if the line's type is in skipTransientTypes.
+func shouldSkipLine(line string) bool {
+	var data struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal([]byte(line), &data); err != nil {
+		return false // Parse error, don't skip (let API handle it)
+	}
+	return skipTransientTypes[data.Type]
+}
+
 // WatchTargetPriority defines the priority order for project matching.
 // Lower value = higher priority.
 type WatchTargetPriority int
@@ -232,6 +251,7 @@ func (s *Service) HandleFileChange(path string, fromOffset int64) ([]string, int
 
 // AddLinesForClaudeDir adds raw JSONL lines to the buffer, associating them with the given ClaudeDir.
 // Uses priority-based matching to find the correct project when exact match is not found.
+// Lines with transient types (progress, file_history_snapshot) are filtered out.
 func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -251,74 +271,15 @@ func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
 		return
 	}
 
-	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], lines...)
-}
-
-// AddLinesForClaudeDirWithAgent adds raw JSONL lines with SubAgent context.
-// If agentID is non-empty, the agentId field is injected into each JSON line.
-func (s *Service) AddLinesForClaudeDirWithAgent(claudeDir string, lines []string, agentID string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// Try exact match first
-	projectID, ok := s.claudeDirToProject[claudeDir]
-	if !ok {
-		// No exact match, use prefix matching (unlocked version to avoid deadlock)
-		projectID = s.getProjectIDForClaudeDirUnlocked(claudeDir)
-	}
-
-	if projectID == "" {
-		s.logger.Debug("no project found for claude dir, skipping SubAgent lines",
-			slog.String("claudeDir", claudeDir),
-			slog.String("agentId", agentID),
-			slog.Int("lineCount", len(lines)),
-		)
-		return
-	}
-
-	// Inject agentId into each JSON line
-	injectedLines := make([]string, 0, len(lines))
+	// Filter out transient types
+	filtered := make([]string, 0, len(lines))
 	for _, line := range lines {
-		injectedLine, err := injectAgentIDToLine(line, agentID)
-		if err != nil {
-			s.logger.Debug("failed to inject agentId to line, using original",
-				slog.String("agentId", agentID),
-				slog.Any("error", err),
-			)
-			injectedLines = append(injectedLines, line)
-			continue
+		if !shouldSkipLine(line) {
+			filtered = append(filtered, line)
 		}
-		injectedLines = append(injectedLines, injectedLine)
 	}
 
-	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], injectedLines...)
-
-	s.logger.Debug("added SubAgent lines to buffer",
-		slog.String("projectId", projectID.String()),
-		slog.String("agentId", agentID),
-		slog.Int("lineCount", len(injectedLines)),
-	)
-}
-
-// injectAgentIDToLine injects the agentId field into a JSON line.
-// Returns the modified JSON line string.
-func injectAgentIDToLine(line string, agentID string) (string, error) {
-	// Parse JSON into a map to preserve all fields
-	var data map[string]any
-	if err := json.Unmarshal([]byte(line), &data); err != nil {
-		return "", fmt.Errorf("failed to parse JSON: %w", err)
-	}
-
-	// Inject agentId field
-	data["agentId"] = agentID
-
-	// Re-serialize to JSON
-	result, err := json.Marshal(data)
-	if err != nil {
-		return "", fmt.Errorf("failed to serialize JSON: %w", err)
-	}
-
-	return string(result), nil
+	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], filtered...)
 }
 
 // getProjectIDForClaudeDirUnlocked is the unlocked version of GetProjectIDForClaudeDir.
