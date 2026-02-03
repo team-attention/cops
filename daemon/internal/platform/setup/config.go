@@ -42,7 +42,7 @@ type APIConfig struct {
 type CopsConfig struct {
 	BaseDir        string        `env:"COPS_BASE_DIR" envDefault:"~/.cops"`
 	LocalConfigDir string        `env:"COPS_LOCAL_CONFIG_DIR" envDefault:".cops"`
-	FlushInterval  time.Duration `env:"COPS_FLUSH_INTERVAL" envDefault:"15s"`
+	FlushInterval  time.Duration `env:"COPS_FLUSH_INTERVAL" envDefault:"1m"`
 	MaxBatchSize   int           `env:"COPS_MAX_BATCH_SIZE" envDefault:"100"`
 }
 
