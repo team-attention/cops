@@ -121,4 +121,4 @@ cops/
 ```
 
 ## License
-Internal
+[MIT](LICENSE)
