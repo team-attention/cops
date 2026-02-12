@@ -3,6 +3,13 @@
 
 dist
 
+.claude
+.compound
+.cops
+.gemini
+.mcp.json
+.agent
+
 settings.local.json
 .worktree
 .mcproxy.json
