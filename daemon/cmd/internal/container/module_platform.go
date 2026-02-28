@@ -9,6 +9,7 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/outbound/authstate"
 	"github.com/team-attention/cops/daemon/internal/platform/outbound/authstate/filesystem"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 )
 
 func newPlatformModule() fx.Option {
@@ -42,6 +43,18 @@ func newPlatformModule() fx.Option {
 
 		// Log Watcher (shared fsnotify.Watcher)
 		fx.Provide(setup.InitLogWatcher),
+
+		// OpenCode DB (read-only, nil if not installed)
+		fx.Provide(fx.Annotate(
+			setup.InitOpenCodeDB,
+			fx.ResultTags(`name:"opencode_db"`),
+		)),
+
+		// OpenCode data dir (from pathutil, for DI into polling handler)
+		fx.Provide(fx.Annotate(
+			pathutil.GetOpenCodeDataDir,
+			fx.ResultTags(`name:"opencode_data_dir"`),
+		)),
 
 		// Invoke to wire interceptor to API client (side effect)
 		fx.Invoke(func(apiClient *setup.APIClient, authInterceptor *interceptor.AuthInterceptor) {

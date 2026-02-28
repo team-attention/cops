@@ -64,6 +64,12 @@ type projectMapping struct {
 	PathLength     int // For longest prefix match within same priority
 }
 
+// bufferEntry holds buffered lines with their provider tag.
+type bufferEntry struct {
+	Lines    []string
+	Provider domain.Provider
+}
+
 // Service contains pure business logic for log file watching and processing.
 // No goroutines, no event loops - just business logic.
 type Service struct {
@@ -76,7 +82,9 @@ type Service struct {
 	projectPathToID    map[string]shareddomain.ID  // ProjectPath -> ProjectID mapping for hierarchical matching
 	projectMappings    map[string]projectMapping   // ProjectPath -> mapping info with priority
 	projectIDToOrgID   map[shareddomain.ID]string  // ProjectID -> OrganizationID mapping
-	bufferByProject    map[shareddomain.ID][]string
+	dirToProvider      map[string]domain.Provider   // Watched dir -> provider mapping
+	logDirToProject    map[string]shareddomain.ID   // Non-Claude LogDir -> ProjectID mapping
+	bufferByProject    map[shareddomain.ID]*bufferEntry
 	mu                 sync.Mutex
 }
 
@@ -97,7 +105,9 @@ func NewService(
 		projectPathToID:    make(map[string]shareddomain.ID),
 		projectMappings:    make(map[string]projectMapping),
 		projectIDToOrgID:   make(map[shareddomain.ID]string),
-		bufferByProject:    make(map[shareddomain.ID][]string),
+		dirToProvider:      make(map[string]domain.Provider),
+		logDirToProject:    make(map[string]shareddomain.ID),
+		bufferByProject:    make(map[shareddomain.ID]*bufferEntry),
 	}
 }
 
@@ -113,12 +123,32 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	newProjectMappings := make(map[string]projectMapping)
 	newProjectIDToOrgID := make(map[shareddomain.ID]string)
 	newProjectPathToID := make(map[string]shareddomain.ID)
+	newDirToProvider := make(map[string]domain.Provider)
+	newLogDirToProject := make(map[string]shareddomain.ID)
 
 	for _, t := range targets {
-		newDirs[t.ClaudeDir] = true
-		newClaudeDirMapping[t.ClaudeDir] = t.ProjectID
-		newProjectIDToOrgID[t.ProjectID] = t.OrganizationID
-		newProjectPathToID[t.ProjectPath] = t.ProjectID
+		if t.Provider == domain.ProviderClaudeCode || t.Provider == "" {
+			// Claude Code: use ClaudeDir
+			newDirs[t.ClaudeDir] = true
+			newClaudeDirMapping[t.ClaudeDir] = t.ProjectID
+			newDirToProvider[t.ClaudeDir] = domain.ProviderClaudeCode
+		} else {
+			// Non-Claude providers: use LogDir
+			if t.LogDir != "" {
+				newDirs[t.LogDir] = true
+				newDirToProvider[t.LogDir] = t.Provider
+				if t.ProjectID != "" {
+					newLogDirToProject[t.LogDir] = t.ProjectID
+				}
+			}
+		}
+
+		if t.ProjectID != "" {
+			newProjectIDToOrgID[t.ProjectID] = t.OrganizationID
+		}
+		if t.ProjectPath != "" {
+			newProjectPathToID[t.ProjectPath] = t.ProjectID
+		}
 
 		// Determine priority based on WatchTargetType
 		var priority WatchTargetPriority
@@ -198,6 +228,8 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	s.projectMappings = newProjectMappings
 	s.projectIDToOrgID = newProjectIDToOrgID
 	s.projectPathToID = newProjectPathToID
+	s.dirToProvider = newDirToProvider
+	s.logDirToProject = newLogDirToProject
 
 	s.logger.Info("updated watch targets",
 		slog.Int("watching", len(s.watchedDirs)),
@@ -249,23 +281,29 @@ func (s *Service) HandleFileChange(path string, fromOffset int64) ([]string, int
 	return lines, newOffset, nil
 }
 
-// AddLinesForClaudeDir adds raw JSONL lines to the buffer, associating them with the given ClaudeDir.
-// Uses priority-based matching to find the correct project when exact match is not found.
-// Lines with transient types (progress, file_history_snapshot) are filtered out.
-func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
+// AddLinesForDir adds raw lines to the buffer for any provider directory.
+// This is the provider-agnostic entry point for buffering lines.
+func (s *Service) AddLinesForDir(dir string, lines []string, provider domain.Provider) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Try exact match first
-	projectID, ok := s.claudeDirToProject[claudeDir]
-	if !ok {
-		// No exact match, use prefix matching (unlocked version to avoid deadlock)
-		projectID = s.getProjectIDForClaudeDirUnlocked(claudeDir)
+	// Determine projectID based on provider
+	var projectID shareddomain.ID
+	if provider == domain.ProviderClaudeCode {
+		// Claude Code: use existing claudeDirToProject + prefix matching
+		projectID = s.claudeDirToProject[dir]
+		if projectID == "" {
+			projectID = s.getProjectIDForClaudeDirUnlocked(dir)
+		}
+	} else {
+		// Non-Claude providers: look up dir in logDirToProject map
+		projectID = s.logDirToProject[dir]
 	}
 
 	if projectID == "" {
-		s.logger.Debug("no project found for claude dir, skipping lines",
-			slog.String("claudeDir", claudeDir),
+		s.logger.Debug("no project found for dir, skipping lines",
+			slog.String("dir", dir),
+			slog.String("provider", string(provider)),
 			slog.Int("lineCount", len(lines)),
 		)
 		return
@@ -279,7 +317,35 @@ func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
 		}
 	}
 
-	s.bufferByProject[projectID] = append(s.bufferByProject[projectID], filtered...)
+	entry := s.bufferByProject[projectID]
+	if entry == nil {
+		entry = &bufferEntry{Provider: provider}
+		s.bufferByProject[projectID] = entry
+	}
+	entry.Lines = append(entry.Lines, filtered...)
+}
+
+// AddLinesForClaudeDir adds raw JSONL lines to the buffer for a Claude Code directory.
+// Delegates to AddLinesForDir with ProviderClaudeCode.
+func (s *Service) AddLinesForClaudeDir(claudeDir string, lines []string) {
+	s.AddLinesForDir(claudeDir, lines, domain.ProviderClaudeCode)
+}
+
+// GetProviderForDir returns the provider for a watched directory.
+func (s *Service) GetProviderForDir(dir string) domain.Provider {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if provider, ok := s.dirToProvider[dir]; ok {
+		return provider
+	}
+
+	// Check if dir is under Claude projects path
+	if s.IsClaudeProjectsDir(dir) {
+		return domain.ProviderClaudeCode
+	}
+
+	return ""
 }
 
 // getProjectIDForClaudeDirUnlocked is the unlocked version of GetProjectIDForClaudeDir.
@@ -341,29 +407,29 @@ func (s *Service) Flush(ctx context.Context) error {
 	}
 
 	// 2. Take ownership of buffer (swap with new empty map) and unlock
-	bufferedLines := s.bufferByProject
-	s.bufferByProject = make(map[shareddomain.ID][]string)
+	bufferedEntries := s.bufferByProject
+	s.bufferByProject = make(map[shareddomain.ID]*bufferEntry)
 	s.mu.Unlock()
 
 	// 3. Initialize lastErr variable for tracking errors
 	var lastErr error
 
-	// 4. For each projectID and lines in bufferedLines
-	for projectID, lines := range bufferedLines {
-		// a. Skip if lines is empty
-		if len(lines) == 0 {
+	// 4. For each projectID and entry in bufferedEntries
+	for projectID, entry := range bufferedEntries {
+		// a. Skip if entry is nil or lines is empty
+		if entry == nil || len(entry.Lines) == 0 {
 			continue
 		}
 
 		// b. Log start of flush
 		s.logger.Info("flushing log batch",
 			slog.String("projectID", projectID.String()),
-			slog.Int("totalLines", len(lines)),
+			slog.Int("totalLines", len(entry.Lines)),
 			slog.Int("maxBatchSize", s.maxBatchSize),
 		)
 
 		// c. Call s.flushProjectLines
-		if err := s.flushProjectLines(ctx, projectID, lines); err != nil {
+		if err := s.flushProjectLines(ctx, projectID, entry); err != nil {
 			// d. If error returned, set lastErr and continue to next project
 			lastErr = err
 			continue
@@ -376,10 +442,10 @@ func (s *Service) Flush(ctx context.Context) error {
 
 // flushProjectLines sends all lines for a single project using adaptive batching.
 // Returns any unsent lines to the buffer on failure.
-func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.ID, lines []string) error {
+func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.ID, entry *bufferEntry) error {
 	// 1. Initialize state
 	currentBatchSize := s.maxBatchSize
-	remainingLines := lines
+	remainingLines := entry.Lines
 	batchNum := 0
 	totalSent := 0
 
@@ -405,7 +471,7 @@ func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.
 			ProjectID:      projectID,
 			OrganizationID: orgID,
 			Version:        "v1",
-			Provider:       "claude",
+			Provider:       entry.Provider,
 		}
 
 		s.logger.Debug("attempting batch",
@@ -432,7 +498,7 @@ func (s *Service) flushProjectLines(ctx context.Context, projectID shareddomain.
 				continue
 			}
 			// Other errors - return lines to buffer and return error
-			s.returnLinesToBuffer(projectID, remainingLines)
+			s.returnLinesToBuffer(projectID, remainingLines, entry.Provider)
 			return err
 		}
 
@@ -551,15 +617,22 @@ func (s *Service) sendBatchWithRetry(
 }
 
 // returnLinesToBuffer puts unsent lines back into the buffer for retry in next flush.
-func (s *Service) returnLinesToBuffer(projectID shareddomain.ID, lines []string) {
+func (s *Service) returnLinesToBuffer(projectID shareddomain.ID, lines []string, provider domain.Provider) {
 	// 1. Lock mutex
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// 2. Prepend lines to s.bufferByProject[projectID]
-	s.bufferByProject[projectID] = append(lines, s.bufferByProject[projectID]...)
+	// 2. Get or create bufferEntry for projectID
+	entry := s.bufferByProject[projectID]
+	if entry == nil {
+		entry = &bufferEntry{Provider: provider}
+		s.bufferByProject[projectID] = entry
+	}
 
-	// 3. Log info
+	// 3. Prepend lines to entry.Lines
+	entry.Lines = append(lines, entry.Lines...)
+
+	// 4. Log info
 	s.logger.Info("returned lines to buffer",
 		slog.String("projectID", projectID.String()),
 		slog.Int("lineCount", len(lines)),
@@ -819,7 +892,12 @@ func (s *Service) ScanProjectLogs(ctx context.Context, params ScanProjectLogsPar
 
 		// Add lines to buffer
 		s.mu.Lock()
-		s.bufferByProject[params.ProjectID] = append(s.bufferByProject[params.ProjectID], lines...)
+		entry := s.bufferByProject[params.ProjectID]
+		if entry == nil {
+			entry = &bufferEntry{Provider: domain.ProviderClaudeCode}
+			s.bufferByProject[params.ProjectID] = entry
+		}
+		entry.Lines = append(entry.Lines, lines...)
 		s.projectIDToOrgID[params.ProjectID] = params.OrganizationID
 		s.mu.Unlock()
 

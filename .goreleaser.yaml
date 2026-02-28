@@ -37,7 +37,5 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-release:
-  github:
-    owner: team-attention
-    name: cops
+snapshot:
+  version_template: "{{ .Version }}"

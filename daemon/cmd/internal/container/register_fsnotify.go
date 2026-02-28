@@ -27,6 +27,13 @@ type FsnotifyHandler interface {
 	Stop(ctx context.Context) error
 }
 
+// LifecycleHandler is implemented by handlers that manage their own lifecycle
+// (e.g., polling workers, background tasks) rather than reacting to filesystem events.
+type LifecycleHandler interface {
+	Start(ctx context.Context) error
+	Stop(ctx context.Context) error
+}
+
 type handlerParams struct {
 	fx.In
 
@@ -35,16 +42,18 @@ type handlerParams struct {
 	SubscriberHandlers []SubscriberHandler `group:"subscriber_handlers"`
 	PublisherHandlers  []PublisherHandler  `group:"publisher_handlers"`
 	FsnotifyHandlers   []FsnotifyHandler   `group:"fsnotify_handlers"`
+	LifecycleHandlers  []LifecycleHandler  `group:"lifecycle_handlers"`
 }
 
 // registerHandlers manages the lifecycle of all handlers with correct start order.
-// Order: SubscriberHandlers -> PublisherHandlers -> FsnotifyHandlers
+// Order: SubscriberHandlers -> PublisherHandlers -> FsnotifyHandlers -> LifecycleHandlers
 func registerHandlers(p handlerParams) {
-	totalHandlers := len(p.SubscriberHandlers) + len(p.PublisherHandlers) + len(p.FsnotifyHandlers)
+	totalHandlers := len(p.SubscriberHandlers) + len(p.PublisherHandlers) + len(p.FsnotifyHandlers) + len(p.LifecycleHandlers)
 	p.Logger.Info("registering handlers",
 		slog.Int("subscriber_handlers", len(p.SubscriberHandlers)),
 		slog.Int("publisher_handlers", len(p.PublisherHandlers)),
 		slog.Int("fsnotify_handlers", len(p.FsnotifyHandlers)),
+		slog.Int("lifecycle_handlers", len(p.LifecycleHandlers)),
 		slog.Int("total", totalHandlers),
 	)
 
@@ -74,11 +83,22 @@ func registerHandlers(p handlerParams) {
 			}
 			p.Logger.Info("fsnotify handlers started", slog.Int("count", len(p.FsnotifyHandlers)))
 
+			// 4. Start lifecycle handlers (polling, background workers)
+			for _, handler := range p.LifecycleHandlers {
+				if err := handler.Start(ctx); err != nil {
+					return err
+				}
+			}
+			p.Logger.Info("lifecycle handlers started", slog.Int("count", len(p.LifecycleHandlers)))
+
 			p.Logger.Info("all handlers started")
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			// Stop in reverse order: fsnotify -> publishers -> subscribers
+			// Stop in reverse order: lifecycle -> fsnotify -> publishers -> subscribers
+			for i := len(p.LifecycleHandlers) - 1; i >= 0; i-- {
+				_ = p.LifecycleHandlers[i].Stop(ctx)
+			}
 			for i := len(p.FsnotifyHandlers) - 1; i >= 0; i-- {
 				_ = p.FsnotifyHandlers[i].Stop(ctx)
 			}

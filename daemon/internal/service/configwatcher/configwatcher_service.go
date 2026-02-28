@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/bytedance/sonic"
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
@@ -135,6 +136,7 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 			ProjectID:         localCfg.ProjectID,
 			OrganizationID:    localCfg.OrganizationID,
 			ParentProjectPath: "",
+			Provider:          domain.ProviderClaudeCode,
 		})
 
 		// Note: Subdirectories are no longer pre-walked here.
@@ -180,12 +182,134 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 					ProjectID:         worktreeCfg.ProjectID,
 					OrganizationID:    worktreeCfg.OrganizationID,
 					ParentProjectPath: project.Path,
+					Provider:          domain.ProviderClaudeCode,
 				})
 			}
 		}
 	}
 
+	// Discover non-Claude provider targets
+	targets = append(targets, s.discoverGeminiTargets()...)
+	targets = append(targets, s.discoverCodexTargets()...)
+	targets = append(targets, s.discoverOpenCodeTargets()...)
+
 	return targets
+}
+
+// discoverGeminiTargets discovers Gemini CLI log directories.
+// Gemini stores session JSON files at ~/.gemini/tmp/{project_hash}/chats/session-*.json.
+// Each project_hash directory becomes a WatchTarget.
+func (s *Service) discoverGeminiTargets() []domain.WatchTarget {
+	baseDir := pathutil.GetGeminiLogBaseDir()
+	if baseDir == "" {
+		return nil
+	}
+
+	if _, err := os.Stat(baseDir); os.IsNotExist(err) {
+		return nil
+	}
+
+	entries, err := os.ReadDir(baseDir)
+	if err != nil {
+		s.logger.Debug("failed to read gemini base dir",
+			slog.String("path", baseDir),
+			slog.Any("error", err),
+		)
+		return nil
+	}
+
+	var targets []domain.WatchTarget
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		// Skip Gemini internal directories
+		name := entry.Name()
+		if name == "bin" || name == "garden" {
+			continue
+		}
+
+		chatsDir := filepath.Join(baseDir, name, "chats")
+		if _, err := os.Stat(chatsDir); err == nil {
+			targets = append(targets, domain.WatchTarget{
+				LogDir:   chatsDir,
+				Provider: domain.ProviderGeminiCLI,
+				Type:     domain.WatchTargetRoot,
+			})
+		}
+	}
+
+	// Also add the base dir itself to detect new project hashes
+	targets = append(targets, domain.WatchTarget{
+		LogDir:   baseDir,
+		Provider: domain.ProviderGeminiCLI,
+		Type:     domain.WatchTargetRoot,
+	})
+
+	return targets
+}
+
+// discoverCodexTargets discovers Codex CLI log directories.
+// Codex stores JSONL files at ~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl.
+// The sessions base directory and its date subdirectories become WatchTargets.
+func (s *Service) discoverCodexTargets() []domain.WatchTarget {
+	baseDir := pathutil.GetCodexSessionsBaseDir()
+	if baseDir == "" {
+		return nil
+	}
+
+	if _, err := os.Stat(baseDir); os.IsNotExist(err) {
+		return nil
+	}
+
+	var targets []domain.WatchTarget
+
+	// Walk to find all leaf date directories (YYYY/MM/DD) and intermediate dirs
+	err := filepath.WalkDir(baseDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil // Skip inaccessible directories
+		}
+		if d.IsDir() {
+			targets = append(targets, domain.WatchTarget{
+				LogDir:   path,
+				Provider: domain.ProviderCodexCLI,
+				Type:     domain.WatchTargetRoot,
+			})
+		}
+		return nil
+	})
+	if err != nil {
+		s.logger.Debug("failed to walk codex sessions dir",
+			slog.String("path", baseDir),
+			slog.Any("error", err),
+		)
+	}
+
+	return targets
+}
+
+// discoverOpenCodeTargets discovers OpenCode log directory.
+// OpenCode uses a SQLite DB at ~/.local/share/opencode/opencode.db.
+// Returns a single WatchTarget pointing to the data directory.
+func (s *Service) discoverOpenCodeTargets() []domain.WatchTarget {
+	dbPath := pathutil.GetOpenCodeDBPath()
+	if dbPath == "" {
+		return nil
+	}
+
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		return nil
+	}
+
+	return []domain.WatchTarget{
+		{
+			LogDir:   pathutil.GetOpenCodeDataDir(),
+			Provider: domain.ProviderOpenCode,
+			Type:     domain.WatchTargetRoot,
+		},
+	}
 }
 
 // loadLocalConfig loads the full LocalConfig from the local config file.

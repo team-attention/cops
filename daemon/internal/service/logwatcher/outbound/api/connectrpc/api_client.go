@@ -42,7 +42,7 @@ func (c *APIClient) SendLogs(ctx context.Context, batch domain.LogBatch) error {
 			ProjectId:      batch.ProjectID.String(),
 			Jsonl:          batch.Lines,
 			Version:        batch.Version,
-			Provider:       batch.Provider,
+			Provider:       string(batch.Provider),
 		},
 	}
 

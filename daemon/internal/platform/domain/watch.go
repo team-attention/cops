@@ -22,10 +22,12 @@ const (
 type WatchTarget struct {
 	ProjectPath       string               // Original project path from GlobalConfig
 	ClaudeDir         string               // ~/.claude/projects/{encoded-path}
+	LogDir            string               // Generic log directory path (used by non-Claude providers)
 	Type              WatchTargetType      // Type of watch target
 	ProjectID         shareddomain.ID      // Project ID from local config
 	OrganizationID    string               // Organization ID from local config
 	ParentProjectPath string               // Parent project path (for subdirectories)
+	Provider          Provider             // Source provider identifier
 }
 
 // FilePosition tracks read position for incremental file reading.
@@ -41,5 +43,5 @@ type LogBatch struct {
 	ProjectID      shareddomain.ID // Project ID (for aggregation API)
 	OrganizationID string          // Organization ID (for aggregation API)
 	Version        string          // Event schema version (e.g., "v1")
-	Provider       string          // Source provider (e.g., "claude")
+	Provider       Provider        // Source provider (e.g., ProviderClaudeCode)
 }

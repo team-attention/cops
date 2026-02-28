@@ -8,6 +8,7 @@ import (
 	"github.com/team-attention/cops/daemon/internal/platform/pkg/pubsub/inmemory"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher"
 	fsnotifyhandler "github.com/team-attention/cops/daemon/internal/service/logwatcher/inbound/worker/fsnotify"
+	pollinghandler "github.com/team-attention/cops/daemon/internal/service/logwatcher/inbound/worker/polling"
 	pubsubhandler "github.com/team-attention/cops/daemon/internal/service/logwatcher/inbound/worker/pubsub"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api"
 	connectrpc "github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/api/connectrpc"
@@ -60,6 +61,14 @@ func newLogModule() fx.Option {
 			pubsubhandler.NewLogPubsubHandler,
 			fx.As(new(SubscriberHandler)),
 			fx.ResultTags(`group:"subscriber_handlers"`),
+		)),
+
+		// Inbound 3: OpenCode Polling Handler (LifecycleHandler, not FsnotifyHandler)
+		fx.Provide(fx.Annotate(
+			pollinghandler.NewLogPollingHandler,
+			fx.ParamTags(``, ``, `name:"opencode_db"`, `name:"opencode_data_dir"`),
+			fx.As(new(LifecycleHandler)),
+			fx.ResultTags(`group:"lifecycle_handlers"`),
 		)),
 	)
 }

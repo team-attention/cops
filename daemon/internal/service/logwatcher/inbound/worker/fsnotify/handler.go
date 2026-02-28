@@ -12,20 +12,22 @@ import (
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/repository"
 )
 
 // LogFsnotifyHandler owns the fsnotify event loop for log file watching.
 type LogFsnotifyHandler struct {
-	logger        *slog.Logger
-	svc           *logwatcher.Service
-	stateRepo     repository.StateRepositoryPort
-	watcher       *fsnotify.Watcher // shared with Outbound FileWatchPort
-	filePositions map[string]int64
-	flushTicker   *time.Ticker
-	ctx           context.Context
-	cancel        context.CancelFunc
+	logger             *slog.Logger
+	svc                *logwatcher.Service
+	stateRepo          repository.StateRepositoryPort
+	watcher            *fsnotify.Watcher // shared with Outbound FileWatchPort
+	filePositions      map[string]int64
+	geminiFileModTimes map[string]time.Time
+	flushTicker        *time.Ticker
+	ctx                context.Context
+	cancel             context.CancelFunc
 }
 
 // NewLogFsnotifyHandler creates a new fsnotify handler for log watching.
@@ -37,11 +39,12 @@ func NewLogFsnotifyHandler(
 	cfg *setup.Config,
 ) *LogFsnotifyHandler {
 	return &LogFsnotifyHandler{
-		logger:        l.With(slog.String("name", "log.worker.fsnotify")),
-		svc:           svc,
-		stateRepo:     stateRepo,
-		watcher:       watcher,
-		filePositions: make(map[string]int64),
+		logger:             l.With(slog.String("name", "log.worker.fsnotify")),
+		svc:                svc,
+		stateRepo:          stateRepo,
+		watcher:            watcher,
+		filePositions:      make(map[string]int64),
+		geminiFileModTimes: make(map[string]time.Time),
 	}
 }
 
@@ -76,7 +79,7 @@ func (h *LogFsnotifyHandler) Start(ctx context.Context) error {
 	return nil
 }
 
-// scanExistingFiles scans all watched directories for existing JSONL files
+// scanExistingFiles scans all watched directories for existing files
 // and processes any new content since the last recorded position.
 // This must be called after fsnotify watches are set up to avoid missing
 // events that occur during the scan.
@@ -94,39 +97,80 @@ func (h *LogFsnotifyHandler) scanExistingFiles() {
 	var totalFiles int
 
 	for _, dir := range watchList {
-		// Find all .jsonl files in the directory
-		pattern := filepath.Join(dir, "*.jsonl")
-		files, err := filepath.Glob(pattern)
-		if err != nil {
-			h.logger.Warn("failed to glob directory",
-				slog.String("dir", dir),
-				slog.Any("error", err),
-			)
-			continue
-		}
+		provider := h.svc.GetProviderForDir(dir)
 
-		for _, filePath := range files {
-			// Get the stored offset (0 if new file)
-			offset := h.filePositions[filePath]
-
-			// Get current file size to check if file has new content
-			info, err := os.Stat(filePath)
+		switch provider {
+		case domain.ProviderGeminiCLI:
+			// Gemini: scan for session-*.json files
+			pattern := filepath.Join(dir, "session-*.json")
+			files, err := filepath.Glob(pattern)
 			if err != nil {
-				h.logger.Debug("failed to stat file during scan",
-					slog.String("path", filePath),
+				h.logger.Warn("failed to glob gemini directory",
+					slog.String("dir", dir),
 					slog.Any("error", err),
 				)
 				continue
 			}
-
-			// Skip if file hasn't grown since last position
-			if info.Size() <= offset {
-				continue
+			for _, filePath := range files {
+				h.processGeminiSessionFile(filePath)
+				totalFiles++
 			}
 
-			// Process the file from the stored offset
-			h.processFileFromOffset(filePath, offset)
-			totalFiles++
+		case domain.ProviderCodexCLI:
+			// Codex: scan for rollout-*.jsonl files
+			pattern := filepath.Join(dir, "rollout-*.jsonl")
+			files, err := filepath.Glob(pattern)
+			if err != nil {
+				h.logger.Warn("failed to glob codex directory",
+					slog.String("dir", dir),
+					slog.Any("error", err),
+				)
+				continue
+			}
+			for _, filePath := range files {
+				offset := h.filePositions[filePath]
+				info, err := os.Stat(filePath)
+				if err != nil {
+					continue
+				}
+				if info.Size() <= offset {
+					continue
+				}
+				h.processCodexFileFromOffset(filePath, offset)
+				totalFiles++
+			}
+
+		case domain.ProviderOpenCode:
+			// OpenCode: skip (handled by polling)
+			continue
+
+		default:
+			// Claude Code (or empty/unknown): scan for *.jsonl files
+			pattern := filepath.Join(dir, "*.jsonl")
+			files, err := filepath.Glob(pattern)
+			if err != nil {
+				h.logger.Warn("failed to glob directory",
+					slog.String("dir", dir),
+					slog.Any("error", err),
+				)
+				continue
+			}
+			for _, filePath := range files {
+				offset := h.filePositions[filePath]
+				info, err := os.Stat(filePath)
+				if err != nil {
+					h.logger.Debug("failed to stat file during scan",
+						slog.String("path", filePath),
+						slog.Any("error", err),
+					)
+					continue
+				}
+				if info.Size() <= offset {
+					continue
+				}
+				h.processFileFromOffset(filePath, offset)
+				totalFiles++
+			}
 		}
 	}
 
@@ -190,9 +234,11 @@ func (h *LogFsnotifyHandler) isValidWatchTarget(path string) string {
 }
 
 // handleDirectoryCreate processes a new directory creation event.
-// Handles two cases:
+// Handles cases:
 // 1. New directories under ~/.claude/projects/ - always watch for log files
-// 2. New directories under registered project paths - add as subdirectory watch
+// 2. New directories under Codex sessions base - watch for date directories
+// 3. New directories under Gemini base - watch for project hash directories
+// 4. New directories under registered project paths - add as subdirectory watch
 func (h *LogFsnotifyHandler) handleDirectoryCreate(path string) {
 	// Case 1: Check if this is a new directory under ~/.claude/projects/
 	if h.svc.IsClaudeProjectsDir(path) {
@@ -203,19 +249,62 @@ func (h *LogFsnotifyHandler) handleDirectoryCreate(path string) {
 			)
 		}
 		// Recursively watch subdirectories and scan existing files
-		// This handles the race condition where files are created before the watch is added
 		h.scanDirectoryRecursive(path)
 		return
 	}
 
-	// Case 2: Validate if directory is a valid watch target (under registered project)
-	parentPath := h.isValidWatchTarget(path)
-	if parentPath == "" {
-		// Not registered - silently ignore
+	// Case 2: Check if path is under Codex sessions base dir
+	codexBase := pathutil.GetCodexSessionsBaseDir()
+	if codexBase != "" && strings.HasPrefix(path, codexBase+"/") {
+		if err := h.watcher.Add(path); err != nil {
+			h.logger.Debug("failed to add watch for codex subdirectory",
+				slog.String("path", path),
+				slog.Any("error", err),
+			)
+		}
+		// Scan for existing rollout-*.jsonl files
+		pattern := filepath.Join(path, "rollout-*.jsonl")
+		files, _ := filepath.Glob(pattern)
+		for _, f := range files {
+			h.processCodexFileFromOffset(f, 0)
+		}
 		return
 	}
 
-	// Add watch through service layer
+	// Case 3: Check if path is under Gemini base dir
+	geminiBase := pathutil.GetGeminiLogBaseDir()
+	if geminiBase != "" && strings.HasPrefix(path, geminiBase+"/") {
+		if err := h.watcher.Add(path); err != nil {
+			h.logger.Debug("failed to add watch for gemini subdirectory",
+				slog.String("path", path),
+				slog.Any("error", err),
+			)
+		}
+		// Check if "chats" subdirectory exists; if so, add watch and scan
+		chatsDir := filepath.Join(path, "chats")
+		if info, err := os.Stat(chatsDir); err == nil && info.IsDir() {
+			if err := h.watcher.Add(chatsDir); err != nil {
+				h.logger.Debug("failed to add watch for gemini chats dir",
+					slog.String("path", chatsDir),
+					slog.Any("error", err),
+				)
+			}
+			// Scan for existing session-*.json files
+			pattern := filepath.Join(chatsDir, "session-*.json")
+			files, _ := filepath.Glob(pattern)
+			for _, f := range files {
+				h.processGeminiSessionFile(f)
+			}
+		}
+		return
+	}
+
+	// Case 4: Validate if directory is a valid watch target (under registered project)
+	parentPath := h.isValidWatchTarget(path)
+	if parentPath == "" {
+		return
+	}
+
 	if err := h.svc.AddWatchForSubdirectory(path, parentPath); err != nil {
 		h.logger.Debug("failed to add watch for new directory",
 			slog.String("path", path),
@@ -227,7 +316,6 @@ func (h *LogFsnotifyHandler) handleDirectoryCreate(path string) {
 	h.logger.Debug("added watch for new directory",
 		slog.String("path", path),
 	)
-	// Also scan and add any nested directories through service
 	h.svc.AddNestedDirectoryWatches(path, parentPath)
 }
 
@@ -240,19 +328,45 @@ func (h *LogFsnotifyHandler) handleFileEvent(event fsnotify.Event) {
 		}
 	}
 
-	// Only process JSONL files
-	if !strings.HasSuffix(event.Name, ".jsonl") {
-		return
-	}
-
 	// Only process write and create events
 	if !event.Has(fsnotify.Write) && !event.Has(fsnotify.Create) {
 		return
 	}
 
-	// Get stored offset (0 if not found for new files)
-	offset := h.filePositions[event.Name]
-	h.processFileFromOffset(event.Name, offset)
+	// Determine provider for the file's parent directory
+	dir := filepath.Dir(event.Name)
+	provider := h.svc.GetProviderForDir(dir)
+
+	switch provider {
+	case domain.ProviderCodexCLI:
+		// Codex: only process rollout-*.jsonl files
+		base := filepath.Base(event.Name)
+		if !strings.HasSuffix(base, ".jsonl") || !strings.HasPrefix(base, "rollout-") {
+			return
+		}
+		offset := h.filePositions[event.Name]
+		h.processCodexFileFromOffset(event.Name, offset)
+
+	case domain.ProviderGeminiCLI:
+		// Gemini: only process session-*.json files
+		base := filepath.Base(event.Name)
+		if !strings.HasSuffix(base, ".json") || !strings.HasPrefix(base, "session-") {
+			return
+		}
+		h.processGeminiSessionFile(event.Name)
+
+	case domain.ProviderOpenCode:
+		// OpenCode: ignore (handled by polling)
+		return
+
+	default:
+		// Claude Code (or empty/unknown): only process .jsonl files
+		if !strings.HasSuffix(event.Name, ".jsonl") {
+			return
+		}
+		offset := h.filePositions[event.Name]
+		h.processFileFromOffset(event.Name, offset)
+	}
 }
 
 // scanDirectoryRecursive adds watches for a directory and all its subdirectories,
@@ -302,6 +416,73 @@ func (h *LogFsnotifyHandler) scanDirectoryRecursive(root string) {
 	if err != nil {
 		h.logger.Debug("failed to scan files in directory",
 			slog.String("root", root),
+			slog.Any("error", err),
+		)
+	}
+}
+
+// processGeminiSessionFile reads an entire Gemini session JSON file and sends it.
+func (h *LogFsnotifyHandler) processGeminiSessionFile(filePath string) {
+	info, err := os.Stat(filePath)
+	if err != nil {
+		h.logger.Debug("failed to stat gemini session file",
+			slog.String("path", filePath),
+			slog.Any("error", err),
+		)
+		return
+	}
+
+	// Check if modification time is newer than last recorded time
+	modTime := info.ModTime()
+	if lastMod, ok := h.geminiFileModTimes[filePath]; ok && !modTime.After(lastMod) {
+		return // File already processed
+	}
+
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		h.logger.Debug("failed to read gemini session file",
+			slog.String("path", filePath),
+			slog.Any("error", err),
+		)
+		return
+	}
+
+	if len(content) == 0 {
+		return
+	}
+
+	parentDir := filepath.Dir(filePath)
+	h.svc.AddLinesForDir(parentDir, []string{string(content)}, domain.ProviderGeminiCLI)
+
+	h.geminiFileModTimes[filePath] = modTime
+}
+
+// processCodexFileFromOffset reads a Codex rollout JSONL file incrementally.
+func (h *LogFsnotifyHandler) processCodexFileFromOffset(filePath string, offset int64) {
+	lines, newOffset, err := h.svc.HandleFileChange(filePath, offset)
+	if err != nil {
+		h.logger.Debug("failed to handle codex file change",
+			slog.String("path", filePath),
+			slog.Any("error", err),
+		)
+		return
+	}
+
+	if len(lines) == 0 {
+		return
+	}
+
+	dir := filepath.Dir(filePath)
+	h.svc.AddLinesForDir(dir, lines, domain.ProviderCodexCLI)
+
+	h.filePositions[filePath] = newOffset
+
+	if err := h.stateRepo.SaveFilePosition(h.ctx, &domain.FilePosition{
+		Path:   filePath,
+		Offset: newOffset,
+	}); err != nil {
+		h.logger.Warn("failed to save file position",
+			slog.String("path", filePath),
 			slog.Any("error", err),
 		)
 	}
