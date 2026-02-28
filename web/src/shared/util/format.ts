@@ -1,4 +1,5 @@
-import { type Timestamp, timestampMs } from '@bufbuild/protobuf/wkt'
+import { timestampMs } from '@bufbuild/protobuf/wkt'
+import type { Timestamp } from '@bufbuild/protobuf/wkt'
 
 /**
  * Formats a protobuf Timestamp to relative time string (e.g., "5m ago", "2d ago")

@@ -1,0 +1,15 @@
+{
+  "todo-1": {
+    "proto_path": "idl/protobuf/dashboard/v1/dashboard.proto",
+    "go_stubs_dir": "shared/gen/grpcstub/dashboard/v1/",
+    "ts_stubs_dir": "web/src/gen/grpcstub/dashboard/v1/"
+  },
+  "todo-2": {
+    "featured_service_dir": "api/internal/service/featured/",
+    "featured_module_path": "api/cmd/internal/container/module_featured.go"
+  },
+  "todo-3": {
+    "featured_route_path": "web/src/route/featured/$orgSlug.tsx",
+    "featured_feature_dir": "web/src/feature/featured/"
+  }
+}
