@@ -55,9 +55,24 @@ export function MemberCard({ member }: MemberCardProps) {
     )
   }, [member.usage])
 
-  // Top 5 tool calls sorted by count descending
-  const topTools = useMemo(() => {
-    return [...member.toolCalls].sort((a, b) => b.count - a.count).slice(0, 5)
+  // Categorize tool calls into fixed groups
+  const toolCategories = useMemo(() => {
+    const cats = [
+      { label: 'Agent Calls', count: 0, color: 'text-orange-400' },
+      { label: 'File Read', count: 0, color: 'text-cyan-400' },
+      { label: 'File Write', count: 0, color: 'text-emerald-400' },
+    ]
+    for (const tool of member.toolCalls) {
+      const name = tool.toolName.toLowerCase()
+      if (name === 'agent' || name === 'sendmessage' || name === 'skill') {
+        cats[0].count += tool.count
+      } else if (['read', 'glob', 'grep'].includes(name)) {
+        cats[1].count += tool.count
+      } else if (['write', 'edit', 'notebookedit'].includes(name)) {
+        cats[2].count += tool.count
+      }
+    }
+    return cats
   }, [member.toolCalls])
 
   return (
@@ -144,30 +159,26 @@ export function MemberCard({ member }: MemberCardProps) {
             </p>
           </div>
 
-          {/* Tool Calls */}
+          {/* Tool Calls — categorized */}
           <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/50 p-2.5">
             <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-600">
-              Top Tools
+              Tool Usage
             </p>
-            {topTools.length === 0 ? (
-              <p className="mt-1 font-mono text-xs text-zinc-600">—</p>
-            ) : (
-              <div className="mt-1 space-y-0.5">
-                {topTools.map((tool) => (
-                  <div
-                    key={tool.toolName}
-                    className="flex items-center justify-between gap-1"
-                  >
-                    <span className="truncate font-mono text-[9px] text-zinc-400">
-                      {tool.toolName}
-                    </span>
-                    <span className="shrink-0 font-mono text-[9px] font-bold text-amber-400">
-                      {tool.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="mt-1 space-y-0.5">
+              {toolCategories.map((cat) => (
+                <div
+                  key={cat.label}
+                  className="flex items-center justify-between gap-1"
+                >
+                  <span className={`truncate font-mono text-[9px] ${cat.color}`}>
+                    {cat.label}
+                  </span>
+                  <span className="shrink-0 font-mono text-[9px] font-bold text-amber-400">
+                    {cat.count}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

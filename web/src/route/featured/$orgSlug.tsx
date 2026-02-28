@@ -9,22 +9,22 @@ interface FeaturedSearchParams {
   since?: number
 }
 
-// Default since: today at 19:30 local time as Unix timestamp
+// Default since: today at 20:00 (8PM) local time as Unix timestamp
 function getDefaultSince(): bigint {
   const now = new Date()
-  const todayAt1930 = new Date(
+  const todayAt8PM = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
-    19, // 19:30 local time
-    30,
+    20,
+    0,
     0,
     0,
   )
-  if (now.getTime() < todayAt1930.getTime()) {
-    todayAt1930.setDate(todayAt1930.getDate() - 1)
+  if (now.getTime() < todayAt8PM.getTime()) {
+    todayAt8PM.setDate(todayAt8PM.getDate() - 1)
   }
-  return BigInt(Math.floor(todayAt1930.getTime() / 1000))
+  return BigInt(Math.floor(todayAt8PM.getTime() / 1000))
 }
 
 export const Route = createFileRoute('/featured/$orgSlug')({
@@ -171,22 +171,22 @@ function FeaturedBoardPage() {
       <div className="pointer-events-none fixed left-0 top-0 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/5 blur-3xl" />
       <div className="pointer-events-none fixed bottom-0 right-0 h-[400px] w-[400px] translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-500/5 blur-3xl" />
 
-      <div className="relative mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-cyan-400" />
-              <h1 className="font-mono text-lg font-bold uppercase tracking-widest text-zinc-100">
-                {data?.organizationName || orgSlug}
-              </h1>
-              <span className="font-mono text-xs text-zinc-600">
-                // Featured Board
-              </span>
-            </div>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-zinc-700">
-              C-Ops // Live Agent Activity
-            </p>
+      <div className={`relative mx-auto max-w-screen-2xl ${isFullscreen ? 'px-4 py-2 sm:px-6' : 'px-4 py-8 sm:px-6 lg:px-8'}`}>
+        {/* Header — compact in fullscreen */}
+        <div className={`flex items-center justify-between ${isFullscreen ? 'mb-2' : 'mb-8'}`}>
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 animate-pulse rounded-full bg-cyan-400" />
+            <h1 className={`font-mono font-bold uppercase tracking-widest text-zinc-100 ${isFullscreen ? 'text-sm' : 'text-lg'}`}>
+              {data?.organizationName || orgSlug}
+            </h1>
+            <span className="font-mono text-xs text-zinc-600">
+              // Featured Board
+            </span>
+            {!isFullscreen && (
+              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-700">
+                C-Ops // Live Agent Activity
+              </p>
+            )}
           </div>
           <button
             onClick={toggleFullscreen}
