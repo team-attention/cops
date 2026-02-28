@@ -25,9 +25,15 @@ function RootComponent() {
   const isAuthRoute = pathname.startsWith('/auth')
   const isOrganizationNewRoute = pathname === '/organizations/new'
   const isInviteRoute = pathname.startsWith('/invite')
+  const isFeaturedRoute = pathname.startsWith('/featured')
 
-  // Auth routes, organization creation, and invite routes render without sidebar/header layout
-  if (isAuthRoute || isOrganizationNewRoute || isInviteRoute) {
+  // Auth routes, organization creation, invite routes, and featured routes render without sidebar/header layout
+  if (
+    isAuthRoute ||
+    isOrganizationNewRoute ||
+    isInviteRoute ||
+    isFeaturedRoute
+  ) {
     return (
       <>
         <Outlet />

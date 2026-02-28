@@ -19,6 +19,7 @@ import { Route as SessionsSessionIdRouteImport } from './route/sessions/$session
 import { Route as ProjectsProjectIdRouteImport } from './route/projects/$projectId'
 import { Route as OrganizationsNewRouteImport } from './route/organizations/new'
 import { Route as InviteTokenRouteImport } from './route/invite/$token'
+import { Route as FeaturedOrgSlugRouteImport } from './route/featured/$orgSlug'
 import { Route as AuthDeviceRouteImport } from './route/auth/device'
 import { Route as AuthCallbackRouteImport } from './route/auth/callback'
 
@@ -72,6 +73,11 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeaturedOrgSlugRoute = FeaturedOrgSlugRouteImport.update({
+  id: '/featured/$orgSlug',
+  path: '/featured/$orgSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthDeviceRoute = AuthDeviceRouteImport.update({
   id: '/auth/device',
   path: '/auth/device',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/featured/$orgSlug': typeof FeaturedOrgSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/featured/$orgSlug': typeof FeaturedOrgSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/device': typeof AuthDeviceRoute
+  '/featured/$orgSlug': typeof FeaturedOrgSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/organizations/new': typeof OrganizationsNewRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/featured/$orgSlug'
     | '/invite/$token'
     | '/organizations/new'
     | '/projects/$projectId'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/featured/$orgSlug'
     | '/invite/$token'
     | '/organizations/new'
     | '/projects/$projectId'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/auth/callback'
     | '/auth/device'
+    | '/featured/$orgSlug'
     | '/invite/$token'
     | '/organizations/new'
     | '/projects/$projectId'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthDeviceRoute: typeof AuthDeviceRoute
+  FeaturedOrgSlugRoute: typeof FeaturedOrgSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
   OrganizationsNewRoute: typeof OrganizationsNewRoute
   ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/featured/$orgSlug': {
+      id: '/featured/$orgSlug'
+      path: '/featured/$orgSlug'
+      fullPath: '/featured/$orgSlug'
+      preLoaderRoute: typeof FeaturedOrgSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/device': {
       id: '/auth/device'
       path: '/auth/device'
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthDeviceRoute: AuthDeviceRoute,
+  FeaturedOrgSlugRoute: FeaturedOrgSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
   OrganizationsNewRoute: OrganizationsNewRoute,
   ProjectsProjectIdRoute: ProjectsProjectIdRoute,
