@@ -9,8 +9,8 @@ NC='\033[0m' # No Color
 
 # Configuration
 INSTALL_DIR="$HOME/.cops/bin"
-REPO_OWNER="team-attention"
-REPO_NAME="cops"
+CDN_BASE_URL="https://cops.build/releases"
+PROJECT_NAME="cops"
 
 # Print colored message (to stderr to avoid capturing in subshells)
 info() {
@@ -56,17 +56,32 @@ detect_arch() {
     esac
 }
 
-# Get latest version from GitHub API
+# Detect SHA256 checksum command.
+# Sets the global variable SHA256_CMD (intentionally global) used by verify_checksum.
+detect_sha256_cmd() {
+    if command -v sha256sum >/dev/null 2>&1; then
+        SHA256_CMD="sha256sum"
+    elif command -v shasum >/dev/null 2>&1; then
+        SHA256_CMD="shasum -a 256"
+    else
+        error "No SHA256 checksum tool found. Install sha256sum or shasum."
+    fi
+}
+
+# Get latest version from CDN or use COPS_VERSION override
 get_latest_version() {
     local version="${COPS_VERSION:-}"
 
     if [ -z "$version" ]; then
-        info "Fetching latest version from GitHub..."
-        version=$(curl -fsSL "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+        info "Fetching latest version from CDN..."
+        version=$(curl -fsSL "${CDN_BASE_URL}/latest")
 
         if [ -z "$version" ]; then
-            error "Failed to fetch latest version"
+            error "Failed to fetch latest version from CDN"
         fi
+
+        # Trim trailing whitespace/newline only (preserves internal spaces if any)
+        version=$(echo "$version" | sed 's/[[:space:]]*$//')
     fi
 
     echo "$version"
@@ -77,36 +92,85 @@ is_upgrade() {
     [ -f "$INSTALL_DIR/cops" ] || [ -f "$INSTALL_DIR/cops-daemon" ]
 }
 
-# Fetch latest version from GitHub API (unconditionally)
-fetch_latest_version() {
+# Fetch latest version from CDN unconditionally (used for fallback in download)
+fetch_latest_version_from_cdn() {
     local ver
-    ver=$(curl -fsSL "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    ver=$(curl -fsSL "${CDN_BASE_URL}/latest")
     if [ -z "$ver" ]; then
-        error "Failed to fetch latest version from GitHub"
+        error "Failed to fetch latest version from CDN"
     fi
+    ver=$(echo "$ver" | sed 's/[[:space:]]*$//')
     echo "$ver"
 }
 
-# Download and extract archive
+# Verify SHA256 checksum of downloaded archive.
+# Parameters: tmp_dir (explicit), archive_name, version
+verify_checksum() {
+    local tmp_dir=$1
+    local archive_name=$2
+    local version=$3
+    local archive_path="$tmp_dir/$archive_name"
+
+    info "Downloading checksums..."
+    local checksums_url="${CDN_BASE_URL}/${version}/checksums.txt"
+    if ! curl -fsSL "$checksums_url" -o "$tmp_dir/checksums.txt"; then
+        rm -rf "$tmp_dir"
+        error "Failed to download checksums from $checksums_url"
+    fi
+
+    # Extract expected checksum for our archive.
+    # checksums.txt uses GoReleaser format: "<hash>  <filename>" (two spaces, standard sha256sum output).
+    local expected_hash
+    expected_hash=$(grep "  ${archive_name}$" "$tmp_dir/checksums.txt" | awk '{print $1}')
+
+    if [ -z "$expected_hash" ]; then
+        rm -rf "$tmp_dir"
+        error "Archive $archive_name not found in checksums.txt"
+    fi
+
+    # Compute actual checksum using platform-detected SHA256_CMD (set by detect_sha256_cmd)
+    info "Verifying checksum..."
+    local actual_hash
+    actual_hash=$($SHA256_CMD "$archive_path" | awk '{print $1}')
+
+    if [ "$expected_hash" != "$actual_hash" ]; then
+        rm -rf "$tmp_dir"
+        printf "${RED}Error:${NC} Checksum verification failed for %s\n" "$archive_name" >&2
+        printf "  Expected: %s\n" "$expected_hash" >&2
+        printf "  Actual:   %s\n" "$actual_hash" >&2
+        exit 1
+    fi
+
+    info "Checksum verified successfully"
+}
+
+# Download, verify, and extract archive.
+# Sets global INSTALLED_VERSION with the actual version used (may differ from input due to fallback).
 download_and_extract() {
     local version=$1
     local os=$2
     local arch=$3
 
-    local archive_name="${REPO_NAME}_${version#v}_${os}_${arch}.tar.gz"
-    local download_url="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$version/$archive_name"
-    local tmp_dir=$(mktemp -d)
+    local archive_name="${PROJECT_NAME}_${version#v}_${os}_${arch}.tar.gz"
+    local download_url="${CDN_BASE_URL}/${version}/${archive_name}"
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    # Ensure temp directory is cleaned up on unexpected exit (SIGINT, SIGTERM)
+    trap 'rm -rf "$tmp_dir"' EXIT
 
     info "Downloading $archive_name..."
     if ! curl -fsSL "$download_url" -o "$tmp_dir/$archive_name"; then
         if [ -n "${COPS_VERSION:-}" ]; then
-            warn "Version $version not found. Falling back to latest release..."
+            warn "Version $version not found on CDN. Falling back to latest release..."
             rm -rf "$tmp_dir"
-            version=$(fetch_latest_version)
+            version=$(fetch_latest_version_from_cdn)
             info "Using latest version: $version"
-            archive_name="${REPO_NAME}_${version#v}_${os}_${arch}.tar.gz"
-            download_url="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$version/$archive_name"
+            archive_name="${PROJECT_NAME}_${version#v}_${os}_${arch}.tar.gz"
+            download_url="${CDN_BASE_URL}/${version}/${archive_name}"
             tmp_dir=$(mktemp -d)
+            # Re-set trap for new tmp_dir
+            trap 'rm -rf "$tmp_dir"' EXIT
             if ! curl -fsSL "$download_url" -o "$tmp_dir/$archive_name"; then
                 rm -rf "$tmp_dir"
                 error "Failed to download $download_url"
@@ -116,6 +180,10 @@ download_and_extract() {
             error "Failed to download $download_url"
         fi
     fi
+
+    # Verify checksum before extraction (covers both direct download and fallback paths,
+    # since $version and $archive_name are updated in the fallback branch above)
+    verify_checksum "$tmp_dir" "$archive_name" "$version"
 
     info "Extracting archive..."
     tar -xzf "$tmp_dir/$archive_name" -C "$tmp_dir"
@@ -132,11 +200,12 @@ download_and_extract() {
     chmod +x "$INSTALL_DIR/cops"
     chmod +x "$INSTALL_DIR/cops-daemon"
 
-    # Cleanup
+    # Cleanup and clear trap
     rm -rf "$tmp_dir"
+    trap - EXIT
 
-    # Output the actual version used (for fallback case)
-    echo "$version"
+    # Set global variable with actual version used (avoids stdout capture fragility)
+    INSTALLED_VERSION="$version"
 }
 
 # Detect shell and config file
@@ -217,6 +286,9 @@ main() {
     local arch=$(detect_arch)
     info "Detected platform: $os/$arch"
 
+    # Detect SHA256 command for checksum verification
+    detect_sha256_cmd
+
     # Check if upgrade
     local is_upgrade_install=false
     if is_upgrade; then
@@ -230,8 +302,10 @@ main() {
     local version=$(get_latest_version)
     info "Installing version: $version"
 
-    # Download and install (captures actual version used after potential fallback)
-    version=$(download_and_extract "$version" "$os" "$arch")
+    # Download, verify, and install. Sets INSTALLED_VERSION global
+    # (may differ from $version if fallback occurred).
+    download_and_extract "$version" "$os" "$arch"
+    version="$INSTALLED_VERSION"
 
     # Update PATH (only for fresh install)
     if [ "$is_upgrade_install" = false ]; then
