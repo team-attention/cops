@@ -51,7 +51,7 @@ func NewFeaturedBoardService(
 }
 
 // GetFeaturedBoard assembles the featured board for the given organization slug.
-// sinceUnix is a Unix timestamp (seconds); if zero, all activity is included.
+// sinceUnix is a Unix timestamp (seconds); if zero or negative, defaults to 24 hours ago.
 func (s *FeaturedBoardService) GetFeaturedBoard(
 	ctx context.Context,
 	orgSlug string,
@@ -132,14 +132,25 @@ func (s *FeaturedBoardService) GetFeaturedBoard(
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get project names"))
 	}
 
+	// Filter memberIDs to only those who have a mapped project.
+	// Members without a project produce zero-stat cards, so exclude them here.
+	filteredMemberIDs := make([]string, 0, len(memberProjectIDs))
+	for _, id := range memberIDs {
+		if _, ok := memberProjectIDs[id]; ok {
+			filteredMemberIDs = append(filteredMemberIDs, id)
+		}
+	}
+
 	// Determine since time
 	var since time.Time
 	if sinceUnix > 0 {
 		since = time.Unix(sinceUnix, 0)
+	} else {
+		since = time.Now().UTC().Add(-24 * time.Hour)
 	}
 
-	// 4. Get featured board stats for all members
-	stats, err := s.dashboardRepo.GetFeaturedBoardStats(ctx, memberProjectIDs, memberIDs, since)
+	// 4. Get featured board stats for members with projects only
+	stats, err := s.dashboardRepo.GetFeaturedBoardStats(ctx, memberProjectIDs, filteredMemberIDs, since)
 	if err != nil {
 		s.logger.Error("failed to get featured board stats",
 			slog.String("orgID", string(org.ID)),

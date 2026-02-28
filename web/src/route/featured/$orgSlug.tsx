@@ -20,14 +20,16 @@ function getDefaultSince(): bigint {
     0,
     0,
   )
+  if (now.getTime() < todayAt8PM.getTime()) {
+    todayAt8PM.setDate(todayAt8PM.getDate() - 1)
+  }
   return BigInt(Math.floor(todayAt8PM.getTime() / 1000))
 }
 
 export const Route = createFileRoute('/featured/$orgSlug')({
   validateSearch: (search: Record<string, unknown>): FeaturedSearchParams => {
-    return {
-      since: search.since !== undefined ? Number(search.since) : undefined,
-    }
+    const n = Number(search.since)
+    return { since: Number.isFinite(n) ? n : undefined }
   },
   component: FeaturedBoardPage,
 })

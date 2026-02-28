@@ -26,6 +26,11 @@ const (
 	SessionUUIDField               = "uuid"
 )
 
+// ToolExecution field names.
+const (
+	SessionToolNameField = "toolName"
+)
+
 // AgentMessage token usage field paths (for sessions collection).
 // These are used for aggregation queries on agent message types.
 const (

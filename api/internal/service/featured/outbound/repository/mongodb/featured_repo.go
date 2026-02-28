@@ -232,7 +232,7 @@ func (r *MongoFeaturedBoardRepository) GetFeaturedBoardStats(
 				bson.M{"$group": bson.M{
 					"_id": bson.M{
 						"userId":   "$" + mongoschema.SessionUserIDField,
-						"toolName": "$toolName",
+						"toolName": "$" + mongoschema.SessionToolNameField,
 					},
 					aggFeaturedToolCountField: bson.M{"$sum": 1},
 				}},
