@@ -13,6 +13,7 @@ import (
 	"github.com/team-attention/cops/shared/domain/mongoschema"
 	session "github.com/team-attention/cops/shared/domain/v2"
 	"github.com/team-attention/cops/shared/domain/v2/claudecodeadapter"
+	"github.com/team-attention/cops/shared/domain/v2/codexcliadapter"
 	"github.com/team-attention/cops/shared/domain/v2/geminicliadapter"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -253,9 +254,15 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 }
 
 // convertEventsToSessions converts event data to Session records.
+// Processes events in insertion order. Claude and Gemini events are converted per-event
+// inline. Codex events are collected into a slice and batch-processed after the loop,
+// since the Codex adapter is stateful and needs to process metadata entries before content
+// entries (two-pass). This preserves insertion-ordered output for Claude/Gemini while
+// enabling batch-level metadata context for Codex.
 func (s *Service) convertEventsToSessions(events []*domain.Event) ([]*session.Session, []domain.ID, error) {
 	var sessions []*session.Session
 	var failedIDs []domain.ID
+	var codexEvents []*domain.Event
 
 	for _, event := range events {
 		provider := DetectProvider(event.Data)
@@ -285,13 +292,50 @@ func (s *Service) convertEventsToSessions(events []*domain.Event) ([]*session.Se
 			}
 			sessions = append(sessions, converted...)
 
+		case ProviderCodexCLI:
+			codexEvents = append(codexEvents, event)
+
 		case ProviderUnknown:
 			s.logger.Warn("unknown provider for event", slog.String("eventID", string(event.ID)))
 			failedIDs = append(failedIDs, event.ID)
 		}
 	}
 
+	if len(codexEvents) > 0 {
+		codexSessions := s.convertCodexCLIEvents(codexEvents)
+		sessions = append(sessions, codexSessions...)
+	}
+
 	return sessions, failedIDs, nil
+}
+
+// convertCodexCLIEvents converts a group of Codex CLI events to sessions.
+// Creates a new adapter per call to avoid state leakage across batches.
+//
+// Unlike the Claude and Gemini adapters (which are stateless and stored on the Service struct),
+// the Codex adapter is stateful: it caches session_meta (session ID, model provider) and
+// turn_context (model) entries, applying them to subsequently produced sessions. A fresh
+// adapter per batch ensures cached metadata from one event group does not leak into another.
+//
+// Uses AdaptBatch which handles per-line error resilience internally (skips invalid lines
+// with warning logs rather than failing the entire batch).
+func (s *Service) convertCodexCLIEvents(events []*domain.Event) []*session.Session {
+	adapter := codexcliadapter.NewAdapter(s.logger)
+
+	var lines []string
+	for _, event := range events {
+		jsonBytes, err := sonic.Marshal(event.Data)
+		if err != nil {
+			s.logger.Warn("failed to marshal Codex CLI event data",
+				slog.String("eventID", string(event.ID)),
+				slog.Any("error", err),
+			)
+			continue
+		}
+		lines = append(lines, string(jsonBytes))
+	}
+
+	return adapter.AdaptBatch(lines)
 }
 
 // convertClaudeCodeEvent converts a single Claude Code event data to sessions.

@@ -8,6 +8,8 @@ const (
 	ProviderClaudeCode Provider = "claude_code"
 	// ProviderGeminiCLI represents Gemini CLI logs (JSON session format).
 	ProviderGeminiCLI Provider = "gemini_cli"
+	// ProviderCodexCLI represents Codex CLI logs (JSONL format).
+	ProviderCodexCLI Provider = "codex_cli"
 	// ProviderUnknown represents unrecognized format.
 	ProviderUnknown Provider = "unknown"
 )
@@ -22,12 +24,35 @@ var claudeCodeTypes = map[string]bool{
 	"progress":              true,
 }
 
+// codexCLITypes are the valid top-level type values for Codex CLI entries.
+// Includes both metadata types (session_meta, turn_context) used by the adapter for
+// state caching, and content types (event_msg, response_item) that produce v2 sessions.
+// This differs from the adapter's internal metadataTypes map, which only contains the
+// metadata subset for two-pass batch processing.
+var codexCLITypes = map[string]bool{
+	"session_meta":  true,
+	"event_msg":     true,
+	"response_item": true,
+	"turn_context":  true,
+}
+
 // DetectProvider analyzes event data to determine which provider it came from.
 // The data parameter is expected to be a map[string]any from parsed JSON.
+//
+// Detection order:
+// 1. Codex CLI (has "type" + "payload") - checked first because both Codex and Claude
+//    use "type", but only Codex has "payload". Checking Codex first prevents false
+//    positives if Codex type values were to overlap with Claude type values.
+// 2. Claude Code (has "type" with Claude-specific values, no "payload")
+// 3. Gemini CLI (has "sessionId" + "messages")
 func DetectProvider(data any) Provider {
 	dataMap, ok := data.(map[string]any)
 	if !ok {
 		return ProviderUnknown
+	}
+
+	if isCodexCLIFormat(dataMap) {
+		return ProviderCodexCLI
 	}
 
 	if isClaudeCodeFormat(dataMap) {
@@ -39,6 +64,30 @@ func DetectProvider(data any) Provider {
 	}
 
 	return ProviderUnknown
+}
+
+// isCodexCLIFormat checks if the JSON structure matches Codex CLI format.
+// Codex entries have both a "type" field (with Codex-specific values) and a "payload" field.
+// The "payload" field is the decisive discriminator: Claude Code entries also have a "type"
+// field but never contain a "payload" field. This allows unambiguous detection even when
+// Codex type values overlap with Claude Code type values (they currently do not, but the
+// "payload" check provides a more robust structural guarantee).
+func isCodexCLIFormat(data map[string]any) bool {
+	typeVal, ok := data["type"]
+	if !ok {
+		return false
+	}
+	typeStr, ok := typeVal.(string)
+	if !ok {
+		return false
+	}
+	if !codexCLITypes[typeStr] {
+		return false
+	}
+	if _, ok := data["payload"]; !ok {
+		return false
+	}
+	return true
 }
 
 // isClaudeCodeFormat checks if the JSON structure matches Claude Code format.
