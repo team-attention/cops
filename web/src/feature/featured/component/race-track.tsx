@@ -1462,12 +1462,14 @@ export function RaceTrack({ members, sinceUnix }: RaceTrackProps) {
             </div>
 
             {/* Track lane */}
-            <div className="relative flex-1 h-11 rounded-lg border border-zinc-800/60 bg-zinc-900/40 overflow-hidden">
-              {/* Lane background gradient */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-r ${color.track} opacity-40`}
-                style={{ width: `${Math.max(progress, 2)}%` }}
-              />
+            <div className="relative flex-1 h-11 rounded-lg border border-zinc-800/60 bg-zinc-900/40 overflow-visible">
+              {/* Lane background gradient (clipped to track bounds) */}
+              <div className="absolute inset-0 overflow-hidden rounded-lg">
+                <div
+                  className={`h-full bg-gradient-to-r ${color.track} opacity-40`}
+                  style={{ width: `${Math.max(progress, 2)}%` }}
+                />
+              </div>
 
               {/* Dashed lane markers */}
               <div className="absolute inset-0 flex items-center">
