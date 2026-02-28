@@ -80,7 +80,7 @@ _upload-release:
 		-h "Cache-Control:public, max-age=31536000, immutable" \
 		"gs://$(GCS_BUCKET)/$(RELEASE_PREFIX)/$(VERSION)/checksums.txt"
 	@echo "Creating and uploading latest version file..."
-	echo -n "$(VERSION)" > $(DIST_DIR)/latest
+	printf '%s' "$(VERSION)" > $(DIST_DIR)/latest
 	gsutil -h "Cache-Control:no-cache, no-store, must-revalidate" \
 		cp $(DIST_DIR)/latest gs://$(GCS_BUCKET)/$(RELEASE_PREFIX)/latest
 	@echo "Upload complete: $(VERSION)"
