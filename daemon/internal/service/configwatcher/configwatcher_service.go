@@ -188,18 +188,36 @@ func (s *Service) buildWatchTargets(cfg *domain.GlobalConfig) []domain.WatchTarg
 		}
 	}
 
+	// Collect registered project info for cross-provider association
+	var registered []registeredProject
+	for _, t := range targets {
+		if t.ProjectID != "" && t.ProjectPath != "" {
+			registered = append(registered, registeredProject{
+				Path:           t.ProjectPath,
+				ProjectID:      t.ProjectID,
+				OrganizationID: t.OrganizationID,
+			})
+		}
+	}
+
 	// Discover non-Claude provider targets
-	targets = append(targets, s.discoverGeminiTargets()...)
+	targets = append(targets, s.discoverGeminiTargets(registered)...)
 	targets = append(targets, s.discoverCodexTargets()...)
 	targets = append(targets, s.discoverOpenCodeTargets()...)
 
 	return targets
 }
 
-// discoverGeminiTargets discovers Gemini CLI log directories.
-// Gemini stores session JSON files at ~/.gemini/tmp/{project_hash}/chats/session-*.json.
-// Each project_hash directory becomes a WatchTarget.
-func (s *Service) discoverGeminiTargets() []domain.WatchTarget {
+// registeredProject holds pre-loaded project metadata for cross-provider association.
+type registeredProject struct {
+	Path           string
+	ProjectID      shareddomain.ID
+	OrganizationID string
+}
+
+// discoverGeminiTargets discovers Gemini CLI log directories and pre-resolves
+// project associations by matching Gemini project hashes against registered projects.
+func (s *Service) discoverGeminiTargets(registered []registeredProject) []domain.WatchTarget {
 	baseDir := pathutil.GetGeminiLogBaseDir()
 	if baseDir == "" {
 		return nil
@@ -218,6 +236,13 @@ func (s *Service) discoverGeminiTargets() []domain.WatchTarget {
 		return nil
 	}
 
+	// Build hash-to-registered map for pre-resolution
+	hashToRegistered := make(map[string]registeredProject, len(registered))
+	for _, rp := range registered {
+		hash := pathutil.GeminiProjectHash(rp.Path)
+		hashToRegistered[hash] = rp
+	}
+
 	var targets []domain.WatchTarget
 
 	for _, entry := range entries {
@@ -233,11 +258,24 @@ func (s *Service) discoverGeminiTargets() []domain.WatchTarget {
 
 		chatsDir := filepath.Join(baseDir, name, "chats")
 		if _, err := os.Stat(chatsDir); err == nil {
-			targets = append(targets, domain.WatchTarget{
+			target := domain.WatchTarget{
 				LogDir:   chatsDir,
 				Provider: domain.ProviderGeminiCLI,
 				Type:     domain.WatchTargetRoot,
-			})
+			}
+
+			// Pre-resolve project association
+			if rp, ok := hashToRegistered[name]; ok {
+				target.ProjectID = rp.ProjectID
+				target.OrganizationID = rp.OrganizationID
+				target.ProjectPath = rp.Path
+			} else {
+				s.logger.Debug("unregistered Gemini project hash",
+					slog.String("hash", name),
+				)
+			}
+
+			targets = append(targets, target)
 		}
 	}
 

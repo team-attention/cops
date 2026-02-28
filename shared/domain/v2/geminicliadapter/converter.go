@@ -105,6 +105,10 @@ func (a *Adapter) adaptInfoMessage(msg *GeminiMessage, sessionID string) []*sess
 		Subtype: session.SystemMessageSubtypeInfo,
 	}
 
+	if msg.Content != "" {
+		sys.Info = &session.InfoData{Content: msg.Content}
+	}
+
 	return []*session.Session{{
 		Type: session.SessionTypeSystem,
 		Data: sys,

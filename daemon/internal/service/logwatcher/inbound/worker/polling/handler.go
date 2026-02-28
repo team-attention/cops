@@ -76,23 +76,31 @@ func (h *LogPollingHandler) loop() {
 	}
 }
 
-// openCodeMessage represents a row from the OpenCode messages table.
+// openCodeMessage represents a row from the OpenCode messages table
+// joined with the sessions table for project path.
+// JSON tags use camelCase per project convention (go-platform-domain.md).
 type openCodeMessage struct {
-	ID         string  `json:"id"`
-	SessionID  string  `json:"session_id"`
-	Role       string  `json:"role"`
-	Parts      string  `json:"parts"`
-	Model      string  `json:"model"`
-	CreatedAt  int64   `json:"created_at"`
-	UpdatedAt  int64   `json:"updated_at"`
-	FinishedAt *int64  `json:"finished_at,omitempty"`
+	ID          string `json:"id"`
+	SessionID   string `json:"sessionId"`
+	Role        string `json:"role"`
+	Parts       string `json:"parts"`
+	Model       string `json:"model"`
+	CreatedAt   int64  `json:"createdAt"`
+	UpdatedAt   int64  `json:"updatedAt"`
+	FinishedAt  *int64 `json:"finishedAt,omitempty"`
+	ProjectPath string `json:"projectPath,omitempty"`
 }
 
 // pollNewMessages queries the OpenCode SQLite DB for messages newer than lastUpdatedAt.
+// Groups messages by project path for per-project resolution.
 func (h *LogPollingHandler) pollNewMessages() {
 	rows, err := h.db.QueryContext(h.ctx,
-		`SELECT id, session_id, role, parts, model, created_at, updated_at, finished_at
-		FROM messages WHERE updated_at > ? ORDER BY updated_at ASC`,
+		`SELECT m.id, m.session_id, m.role, m.parts, m.model,
+		        m.created_at, m.updated_at, m.finished_at,
+		        s.dir as project_path
+		FROM messages m
+		LEFT JOIN sessions s ON m.session_id = s.id
+		WHERE m.updated_at > ? ORDER BY m.updated_at ASC`,
 		h.lastUpdatedAt,
 	)
 	if err != nil {
@@ -103,12 +111,13 @@ func (h *LogPollingHandler) pollNewMessages() {
 	}
 	defer rows.Close()
 
-	var lines []string
+	linesByProject := make(map[string][]string)
 	var maxUpdatedAt int64
 
 	for rows.Next() {
 		var msg openCodeMessage
 		var finishedAt sql.NullInt64
+		var projectPath sql.NullString
 
 		if err := rows.Scan(
 			&msg.ID,
@@ -119,6 +128,7 @@ func (h *LogPollingHandler) pollNewMessages() {
 			&msg.CreatedAt,
 			&msg.UpdatedAt,
 			&finishedAt,
+			&projectPath,
 		); err != nil {
 			h.logger.Warn("failed to scan OpenCode message row",
 				slog.Any("error", err),
@@ -129,6 +139,9 @@ func (h *LogPollingHandler) pollNewMessages() {
 		if finishedAt.Valid {
 			msg.FinishedAt = &finishedAt.Int64
 		}
+		if projectPath.Valid {
+			msg.ProjectPath = projectPath.String
+		}
 
 		data, err := json.Marshal(msg)
 		if err != nil {
@@ -138,7 +151,7 @@ func (h *LogPollingHandler) pollNewMessages() {
 			continue
 		}
 
-		lines = append(lines, string(data))
+		linesByProject[msg.ProjectPath] = append(linesByProject[msg.ProjectPath], string(data))
 
 		if msg.UpdatedAt > maxUpdatedAt {
 			maxUpdatedAt = msg.UpdatedAt
@@ -151,8 +164,19 @@ func (h *LogPollingHandler) pollNewMessages() {
 		)
 	}
 
-	if len(lines) > 0 {
-		h.svc.AddLinesForDir(h.dataDir, lines, domain.ProviderOpenCode)
+	for projectPath, lines := range linesByProject {
+		if projectPath == "" {
+			h.logger.Debug("OpenCode message without project path, skipping",
+				slog.Int("lineCount", len(lines)),
+			)
+			continue
+		}
+
+		compositeKey := h.svc.ResolveAndCacheOpenCodeProject(h.dataDir, projectPath)
+		h.svc.AddLinesForDir(compositeKey, lines, domain.ProviderOpenCode)
+	}
+
+	if maxUpdatedAt > 0 {
 		h.lastUpdatedAt = maxUpdatedAt
 	}
 }

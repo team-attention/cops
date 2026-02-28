@@ -84,6 +84,7 @@ type Service struct {
 	projectIDToOrgID   map[shareddomain.ID]string  // ProjectID -> OrganizationID mapping
 	dirToProvider      map[string]domain.Provider   // Watched dir -> provider mapping
 	logDirToProject    map[string]shareddomain.ID   // Non-Claude LogDir -> ProjectID mapping
+	associator         projectAssociator            // Project association logic (value type, rebuilt on UpdateTargets)
 	bufferByProject    map[shareddomain.ID]*bufferEntry
 	mu                 sync.Mutex
 }
@@ -107,6 +108,7 @@ func NewService(
 		projectIDToOrgID:   make(map[shareddomain.ID]string),
 		dirToProvider:      make(map[string]domain.Provider),
 		logDirToProject:    make(map[string]shareddomain.ID),
+		associator:         newProjectAssociator(make(map[string]projectMapping)),
 		bufferByProject:    make(map[shareddomain.ID]*bufferEntry),
 	}
 }
@@ -230,6 +232,7 @@ func (s *Service) UpdateTargets(targets []domain.WatchTarget) error {
 	s.projectPathToID = newProjectPathToID
 	s.dirToProvider = newDirToProvider
 	s.logDirToProject = newLogDirToProject
+	s.associator = newProjectAssociator(newProjectMappings)
 
 	s.logger.Info("updated watch targets",
 		slog.Int("watching", len(s.watchedDirs)),
@@ -296,8 +299,12 @@ func (s *Service) AddLinesForDir(dir string, lines []string, provider domain.Pro
 			projectID = s.getProjectIDForClaudeDirUnlocked(dir)
 		}
 	} else {
-		// Non-Claude providers: look up dir in logDirToProject map
+		// Non-Claude providers: check logDirToProject map first (pre-resolved or cached)
 		projectID = s.logDirToProject[dir]
+		if projectID == "" && provider == domain.ProviderGeminiCLI {
+			// Gemini runtime resolution for hash directories detected after startup
+			projectID = s.associator.resolveGemini(dir)
+		}
 	}
 
 	if projectID == "" {
@@ -309,12 +316,15 @@ func (s *Service) AddLinesForDir(dir string, lines []string, provider domain.Pro
 		return
 	}
 
-	// Filter out transient types
-	filtered := make([]string, 0, len(lines))
-	for _, line := range lines {
-		if !shouldSkipLine(line) {
-			filtered = append(filtered, line)
+	// Filter transient types only for Claude provider
+	if provider == domain.ProviderClaudeCode {
+		filtered := make([]string, 0, len(lines))
+		for _, line := range lines {
+			if !shouldSkipLine(line) {
+				filtered = append(filtered, line)
+			}
 		}
+		lines = filtered
 	}
 
 	entry := s.bufferByProject[projectID]
@@ -322,7 +332,7 @@ func (s *Service) AddLinesForDir(dir string, lines []string, provider domain.Pro
 		entry = &bufferEntry{Provider: provider}
 		s.bufferByProject[projectID] = entry
 	}
-	entry.Lines = append(entry.Lines, filtered...)
+	entry.Lines = append(entry.Lines, lines...)
 }
 
 // AddLinesForClaudeDir adds raw JSONL lines to the buffer for a Claude Code directory.
@@ -351,49 +361,11 @@ func (s *Service) GetProviderForDir(dir string) domain.Provider {
 // getProjectIDForClaudeDirUnlocked is the unlocked version of GetProjectIDForClaudeDir.
 // Caller must hold s.mu lock.
 func (s *Service) getProjectIDForClaudeDirUnlocked(claudeDir string) shareddomain.ID {
-	// Decode claudeDir to original path
 	decodedPath := pathutil.DecodeClaudeProjectDir(claudeDir)
 	if decodedPath == "" {
 		return ""
 	}
-
-	// Find best match based on priority and path length
-	var bestMatch *projectMapping
-	var bestMatchPath string
-
-	for projectPath, mapping := range s.projectMappings {
-		if projectPath == decodedPath {
-			return mapping.ProjectID
-		}
-
-		if strings.HasPrefix(decodedPath, projectPath+"/") {
-			if bestMatch == nil {
-				m := mapping // Create a copy to avoid aliasing
-				bestMatch = &m
-				bestMatchPath = projectPath
-				continue
-			}
-
-			// Compare priority (lower is better)
-			if mapping.Priority < bestMatch.Priority {
-				m := mapping
-				bestMatch = &m
-				bestMatchPath = projectPath
-			} else if mapping.Priority == bestMatch.Priority {
-				// Same priority: prefer longer path (more specific match)
-				if len(projectPath) > len(bestMatchPath) {
-					m := mapping
-					bestMatch = &m
-					bestMatchPath = projectPath
-				}
-			}
-		}
-	}
-
-	if bestMatch != nil {
-		return bestMatch.ProjectID
-	}
-	return ""
+	return s.associator.resolveByProjectPath(decodedPath)
 }
 
 // Flush sends buffered lines to the API server using adaptive batching.
@@ -652,49 +624,7 @@ func (s *Service) GetProjectIDForClaudeDir(claudeDir string) shareddomain.ID {
 		return projectID
 	}
 
-	// Decode claudeDir to original path
-	decodedPath := pathutil.DecodeClaudeProjectDir(claudeDir)
-	if decodedPath == "" {
-		return ""
-	}
-
-	// Find best match based on priority and path length
-	var bestMatch *projectMapping
-	var bestMatchPath string
-
-	for projectPath, mapping := range s.projectMappings {
-		if projectPath == decodedPath {
-			return mapping.ProjectID
-		}
-
-		if strings.HasPrefix(decodedPath, projectPath+"/") {
-			if bestMatch == nil {
-				m := mapping // Create a copy to avoid aliasing
-				bestMatch = &m
-				bestMatchPath = projectPath
-				continue
-			}
-
-			// Compare priority (lower is better)
-			if mapping.Priority < bestMatch.Priority {
-				m := mapping
-				bestMatch = &m
-				bestMatchPath = projectPath
-			} else if mapping.Priority == bestMatch.Priority {
-				// Same priority: prefer longer path (more specific match)
-				if len(projectPath) > len(bestMatchPath) {
-					m := mapping
-					bestMatch = &m
-					bestMatchPath = projectPath
-				}
-			}
-		}
-	}
-
-	if bestMatch != nil {
-		return bestMatch.ProjectID
-	}
-	return ""
+	return s.getProjectIDForClaudeDirUnlocked(claudeDir)
 }
 
 // FindParentProjectPath finds the parent project path for a given path.
@@ -830,6 +760,53 @@ func (s *Service) IsClaudeProjectsDir(path string) bool {
 		return false
 	}
 	return strings.HasPrefix(path, baseDir+"/") || path == baseDir
+}
+
+// ResolveAndCacheCodexProject resolves a Codex CLI working directory to a project ID
+// and caches the mapping in logDirToProject for future AddLinesForDir calls.
+func (s *Service) ResolveAndCacheCodexProject(dir string, cwd string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.logDirToProject[dir]; ok {
+		return // Already resolved
+	}
+
+	projectID := s.associator.resolveCodexCwd(cwd)
+	if projectID != "" {
+		s.logDirToProject[dir] = projectID
+		s.logger.Debug("resolved Codex project",
+			slog.String("dir", dir),
+			slog.String("cwd", cwd),
+			slog.String("projectID", string(projectID)),
+		)
+	}
+}
+
+// ResolveAndCacheOpenCodeProject resolves an OpenCode project path to a project ID
+// and caches the mapping in logDirToProject using a composite key of dataDir + ":" + projectPath.
+// This supports per-message project resolution since multiple projects share the same dataDir.
+func (s *Service) ResolveAndCacheOpenCodeProject(dataDir string, projectPath string) string {
+	compositeKey := dataDir + ":" + projectPath
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.logDirToProject[compositeKey]; ok {
+		return compositeKey
+	}
+
+	projectID := s.associator.resolveOpenCode(projectPath)
+	if projectID != "" {
+		s.logDirToProject[compositeKey] = projectID
+		s.logger.Debug("resolved OpenCode project",
+			slog.String("compositeKey", compositeKey),
+			slog.String("projectPath", projectPath),
+			slog.String("projectID", string(projectID)),
+		)
+	}
+
+	return compositeKey
 }
 
 // ScanProjectLogsParams contains parameters for ScanProjectLogs operation.

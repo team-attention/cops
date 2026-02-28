@@ -12,6 +12,7 @@ import (
 
 	"github.com/team-attention/cops/daemon/internal/platform/domain"
 	"github.com/team-attention/cops/daemon/internal/platform/setup"
+	"github.com/team-attention/cops/daemon/internal/platform/util/codexutil"
 	"github.com/team-attention/cops/daemon/internal/platform/util/pathutil"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher"
 	"github.com/team-attention/cops/daemon/internal/service/logwatcher/outbound/repository"
@@ -473,6 +474,12 @@ func (h *LogFsnotifyHandler) processCodexFileFromOffset(filePath string, offset 
 	}
 
 	dir := filepath.Dir(filePath)
+
+	// Extract CWD from lines and resolve project association
+	if cwd := codexutil.ExtractCwdFromLines(lines); cwd != "" {
+		h.svc.ResolveAndCacheCodexProject(dir, cwd)
+	}
+
 	h.svc.AddLinesForDir(dir, lines, domain.ProviderCodexCLI)
 
 	h.filePositions[filePath] = newOffset

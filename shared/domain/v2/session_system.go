@@ -35,6 +35,16 @@ type SystemMessage struct {
 
 	// For subtype="file_snapshot"
 	FileSnapshot *FileSnapshotData `json:"fileSnapshot,omitempty" bson:"fileSnapshot,omitempty"`
+
+	// For subtype="info"
+	Info *InfoData `json:"info,omitempty" bson:"info,omitempty"`
+}
+
+// InfoData contains informational message content.
+// Used for provider-specific system-level messages (e.g., context loading, session metadata).
+type InfoData struct {
+	// Content is the informational text content.
+	Content string `json:"content" bson:"content"`
 }
 
 // TurnDurationData contains turn duration metrics.
