@@ -106,13 +106,8 @@ func (s *Service) processEvent(ctx context.Context, event *domain.FailedEvent) e
 		return nil
 	}
 
-	if err := s.retryRepo.DeleteEvent(ctx, event.ID); err != nil {
-		s.logger.Error("failed to delete successfully processed event",
-			slog.String("eventID", string(event.ID)),
-			slog.Any("error", err),
-		)
-		return err
-	}
+	// TODO: Event deletion is temporarily disabled to retain raw event data for analysis.
+	//       Re-enable when raw data retention is no longer needed.
 
 	s.logger.Info("successfully retried event",
 		slog.String("eventID", string(event.ID)),

@@ -231,16 +231,12 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 		}
 	}
 
+	// TODO: Event deletion is temporarily disabled to retain raw event data for analysis.
+	//       Re-enable when raw data retention is no longer needed.
 	if len(successfulIDs) > 0 {
-		if s.cfg.App.Debug {
-			s.logger.Debug("skipping event deletion in debug mode",
-				slog.Int("count", len(successfulIDs)),
-			)
-		} else {
-			if deleteErr := s.eventQuery.DeleteByIDs(ctx, successfulIDs); deleteErr != nil {
-				s.logger.Warn("failed to delete processed events", slog.Any("error", deleteErr))
-			}
-		}
+		s.logger.Debug("event deletion disabled, retaining processed events",
+			slog.Int("count", len(successfulIDs)),
+		)
 	}
 
 	s.logger.Info("batch processed",
