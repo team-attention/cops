@@ -44,15 +44,10 @@ export function MemberCard({ member }: MemberCardProps) {
     [member.lastActivityAt],
   )
 
-  // Total token usage: input + output + cache
+  // Total token usage: input + output only (excludes cache)
   const totalTokens = useMemo(() => {
     if (!member.usage) return 0n
-    return (
-      member.usage.totalInputTokens +
-      member.usage.totalOutputTokens +
-      member.usage.totalCacheCreationTokens +
-      member.usage.totalCacheReadTokens
-    )
+    return member.usage.totalInputTokens + member.usage.totalOutputTokens
   }, [member.usage])
 
   // Categorize tool calls into fixed groups
