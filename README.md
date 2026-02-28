@@ -62,13 +62,10 @@ graph TD
 
 ## Getting Started
 
-### Prerequisites
-- [GitHub CLI](https://cli.github.com/) installed and authenticated (`gh auth login`)
-
 ### Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/team-attention/cops/main/script/dev.sh | bash
+curl -fsSL https://raw.githubusercontent.com/team-attention/cops/main/script/install.sh | bash
 ```
 
 ### Supported Platforms
