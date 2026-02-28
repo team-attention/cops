@@ -7,12 +7,10 @@ import "encoding/json"
 // Returns empty string if the line is not a session_meta event or cwd is not found.
 func ExtractCwd(line string) string {
 	var data struct {
-		Type        string `json:"type"`
-		SessionMeta struct {
-			Payload struct {
-				Cwd string `json:"cwd"`
-			} `json:"payload"`
-		} `json:"session_meta"`
+		Type    string `json:"type"`
+		Payload struct {
+			Cwd string `json:"cwd"`
+		} `json:"payload"`
 	}
 
 	if err := json.Unmarshal([]byte(line), &data); err != nil {
@@ -23,7 +21,7 @@ func ExtractCwd(line string) string {
 		return ""
 	}
 
-	return data.SessionMeta.Payload.Cwd
+	return data.Payload.Cwd
 }
 
 // ExtractCwdFromLines scans a batch of lines for the first session_meta

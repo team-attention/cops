@@ -16,7 +16,7 @@ func TestCodexutil(t *testing.T) {
 
 var _ = Describe("ExtractCwd", func() {
 	It("extracts cwd from a valid session_meta line", func() {
-		line := `{"type":"session_meta","session_meta":{"payload":{"cwd":"/home/user/project"}}}`
+		line := `{"type":"session_meta","payload":{"cwd":"/home/user/project"}}`
 		cwd := codexutil.ExtractCwd(line)
 		Expect(cwd).To(Equal("/home/user/project"))
 	})
@@ -28,7 +28,7 @@ var _ = Describe("ExtractCwd", func() {
 	})
 
 	It("returns empty for session_meta without cwd", func() {
-		line := `{"type":"session_meta","session_meta":{"payload":{}}}`
+		line := `{"type":"session_meta","payload":{}}`
 		cwd := codexutil.ExtractCwd(line)
 		Expect(cwd).To(BeEmpty())
 	})
@@ -44,7 +44,7 @@ var _ = Describe("ExtractCwdFromLines", func() {
 		lines := []string{
 			`{"type":"message","content":"hello"}`,
 			`{"type":"event","data":"something"}`,
-			`{"type":"session_meta","session_meta":{"payload":{"cwd":"/home/user/project"}}}`,
+			`{"type":"session_meta","payload":{"cwd":"/home/user/project"}}`,
 		}
 		cwd := codexutil.ExtractCwdFromLines(lines)
 		Expect(cwd).To(Equal("/home/user/project"))
@@ -64,8 +64,8 @@ var _ = Describe("ExtractCwdFromLines", func() {
 
 	It("returns the first cwd found when multiple exist", func() {
 		lines := []string{
-			`{"type":"session_meta","session_meta":{"payload":{"cwd":"/first/project"}}}`,
-			`{"type":"session_meta","session_meta":{"payload":{"cwd":"/second/project"}}}`,
+			`{"type":"session_meta","payload":{"cwd":"/first/project"}}`,
+			`{"type":"session_meta","payload":{"cwd":"/second/project"}}`,
 		}
 		cwd := codexutil.ExtractCwdFromLines(lines)
 		Expect(cwd).To(Equal("/first/project"))
