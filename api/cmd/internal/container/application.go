@@ -14,6 +14,7 @@ func Run() {
 		newHealthModule(),
 		newAuthModule(),
 		newDashboardModule(),
+		newFeaturedModule(),
 		newProjectModule(),
 		newRBACModule(),
 		newUserModule(),
