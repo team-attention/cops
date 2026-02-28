@@ -178,6 +178,7 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 	}
 
 	var successfulIDs []domain.ID
+	var allFailedIDs []domain.ID
 
 	for key, groupEvents := range groups {
 		sessions, failedIDs, err := s.convertEventsToSessions(groupEvents)
@@ -224,6 +225,7 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 		for _, id := range failedIDs {
 			failedSet[id] = true
 		}
+		allFailedIDs = append(allFailedIDs, failedIDs...)
 		for _, event := range groupEvents {
 			if !failedSet[event.ID] {
 				successfulIDs = append(successfulIDs, event.ID)
@@ -231,12 +233,18 @@ func (s *Service) processBatch(ctx context.Context, batchID string) error {
 		}
 	}
 
-	// TODO: Event deletion is temporarily disabled to retain raw event data for analysis.
-	//       Re-enable when raw data retention is no longer needed.
+	// Mark successfully processed events as completed
 	if len(successfulIDs) > 0 {
-		s.logger.Debug("event deletion disabled, retaining processed events",
-			slog.Int("count", len(successfulIDs)),
-		)
+		if err := s.eventQuery.UpdateStatusByIDs(ctx, successfulIDs, domain.EventStatusCompleted); err != nil {
+			s.logger.Error("failed to mark events as completed", slog.Any("error", err))
+		}
+	}
+
+	// Mark failed events as failed
+	if len(allFailedIDs) > 0 {
+		if err := s.eventQuery.UpdateStatusByIDs(ctx, allFailedIDs, domain.EventStatusFailed); err != nil {
+			s.logger.Error("failed to mark events as failed", slog.Any("error", err))
+		}
 	}
 
 	s.logger.Info("batch processed",

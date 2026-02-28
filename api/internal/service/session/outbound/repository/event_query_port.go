@@ -50,4 +50,7 @@ type EventQueryPort interface {
 	// IncrementRetryCount increments retryCount for a single event.
 	// Called when event processing fails.
 	IncrementRetryCount(ctx context.Context, id domain.ID) error
+
+	// UpdateStatusByIDs updates the status of events with the given IDs.
+	UpdateStatusByIDs(ctx context.Context, ids []domain.ID, status domain.EventStatus) error
 }

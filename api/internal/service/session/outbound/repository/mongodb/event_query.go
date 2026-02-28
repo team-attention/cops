@@ -89,6 +89,7 @@ func (q *MongoEventQuery) FindByBatchID(ctx context.Context, batchID string, max
 	filter := bson.M{
 		mongoschema.EventBatchIDField:    batchID,
 		mongoschema.EventRetryCountField: bson.M{"$lt": maxRetries},
+		mongoschema.EventStatusField:     domain.EventStatusPending,
 	}
 
 	cursor, err := q.eventsColl.Find(ctx, filter)
@@ -146,6 +147,33 @@ func (q *MongoEventQuery) IncrementRetryCount(ctx context.Context, id domain.ID)
 	if err != nil {
 		return errutil.Wrap(errutil.ErrorTypeInternal, "failed to increment retry count", err)
 	}
+
+	return nil
+}
+
+// UpdateStatusByIDs updates the status of events with the given IDs.
+func (q *MongoEventQuery) UpdateStatusByIDs(ctx context.Context, ids []domain.ID, status domain.EventStatus) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	objectIDs := make([]bson.ObjectID, len(ids))
+	for i, id := range ids {
+		objectIDs[i], _ = bson.ObjectIDFromHex(string(id))
+	}
+
+	filter := bson.M{mongoschema.EventIDField: bson.M{"$in": objectIDs}}
+	update := bson.M{"$set": bson.M{mongoschema.EventStatusField: status}}
+
+	result, err := q.eventsColl.UpdateMany(ctx, filter, update)
+	if err != nil {
+		return errutil.Wrap(errutil.ErrorTypeInternal, "failed to update event status", err)
+	}
+
+	q.logger.Debug("updated event status",
+		slog.String("status", string(status)),
+		slog.Int64("count", result.ModifiedCount),
+	)
 
 	return nil
 }

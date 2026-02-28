@@ -22,7 +22,8 @@ func Run() {
 		newInvitationModule(),
 		newAPIKeyModule(),
 		newEventModule(),
-		newRetryModule(),
+		// TODO: Re-enable when retry logic is needed.
+		// newRetryModule(),
 		newSessionModule(),
 
 		// Registrations (invoked for side effects)
