@@ -34,7 +34,7 @@ endif
 .PHONY: _upload
 _upload:
 	@echo "Uploading to gs://$(GCS_BUCKET)/ (version: $(VERSION))..."
-	gsutil -m rsync -r -d dist/ gs://$(GCS_BUCKET)/
+	gsutil -m rsync -r -d -x 'releases/.*' dist/ gs://$(GCS_BUCKET)/
 	@echo "Setting cache headers and version metadata..."
 	gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" -h "x-goog-meta-version:$(VERSION)" "gs://$(GCS_BUCKET)/assets/**"
 	gsutil -m setmeta -h "Cache-Control:no-cache, no-store, must-revalidate" -h "x-goog-meta-version:$(VERSION)" "gs://$(GCS_BUCKET)/index.html"
