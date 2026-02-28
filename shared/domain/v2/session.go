@@ -74,7 +74,7 @@ type TreeNodeMeta struct {
 	AgentID            *string   `json:"agentId,omitempty" bson:"agentId,omitempty"`                     // SubAgent identifier (nil for Main session)
 	SpawnedByToolUseID *string   `json:"spawnedByToolUseId,omitempty" bson:"spawnedByToolUseId,omitempty"` // Tool Use ID that spawned this SubAgent
 	Timestamp          time.Time `json:"timestamp" bson:"timestamp"`
-	Provider           string    `json:"provider" bson:"provider"` // "claude_code" | "gemini_cli"
+	Provider           string    `json:"provider" bson:"provider"` // "claude_code" | "gemini_cli" | "open_code"
 	Version            string    `json:"version,omitempty" bson:"version,omitempty"`
 	GitBranch          string    `json:"gitBranch,omitempty" bson:"gitBranch,omitempty"`
 	IsSidechain        bool      `json:"isSidechain,omitempty" bson:"isSidechain,omitempty"`

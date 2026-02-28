@@ -14,6 +14,7 @@ import (
 	session "github.com/team-attention/cops/shared/domain/v2"
 	"github.com/team-attention/cops/shared/domain/v2/claudecodeadapter"
 	"github.com/team-attention/cops/shared/domain/v2/geminicliadapter"
+	"github.com/team-attention/cops/shared/domain/v2/opencodeadapter"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -26,6 +27,7 @@ type Service struct {
 	resumeTokenRepo repository.ResumeTokenRepositoryPort
 	claudeAdapter   *claudecodeadapter.Adapter
 	geminiAdapter   *geminicliadapter.Adapter
+	opencodeAdapter *opencodeadapter.Adapter
 
 	// Runtime state
 	mu         sync.Mutex
@@ -50,6 +52,7 @@ func NewService(
 		resumeTokenRepo: resumeTokenRepo,
 		claudeAdapter:   claudecodeadapter.NewAdapter(),
 		geminiAdapter:   geminicliadapter.NewAdapter(),
+		opencodeAdapter: opencodeadapter.NewAdapter(),
 	}
 }
 
@@ -285,6 +288,18 @@ func (s *Service) convertEventsToSessions(events []*domain.Event) ([]*session.Se
 			}
 			sessions = append(sessions, converted...)
 
+		case ProviderOpenCode:
+			converted, err := s.convertOpenCodeEvent(event.Data)
+			if err != nil {
+				s.logger.Warn("failed to convert OpenCode event",
+					slog.String("eventID", string(event.ID)),
+					slog.Any("error", err),
+				)
+				failedIDs = append(failedIDs, event.ID)
+				continue
+			}
+			sessions = append(sessions, converted...)
+
 		case ProviderUnknown:
 			s.logger.Warn("unknown provider for event", slog.String("eventID", string(event.ID)))
 			failedIDs = append(failedIDs, event.ID)
@@ -324,4 +339,20 @@ func (s *Service) convertGeminiCLIEvent(data any) ([]*session.Session, error) {
 	}
 
 	return s.geminiAdapter.AdaptSession(&geminiSession)
+}
+
+// convertOpenCodeEvent converts a single OpenCode event data to sessions.
+func (s *Service) convertOpenCodeEvent(data any) ([]*session.Session, error) {
+	// Re-marshal and unmarshal to convert map[string]any to OpenCodeMessage
+	jsonBytes, err := sonic.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal event data: %w", err)
+	}
+
+	var msg opencodeadapter.OpenCodeMessage
+	if err := sonic.Unmarshal(jsonBytes, &msg); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal OpenCode message: %w", err)
+	}
+
+	return s.opencodeAdapter.AdaptMessage(&msg)
 }

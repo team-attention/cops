@@ -14,9 +14,10 @@ const (
 type EventProvider string
 
 const (
-	EventProviderClaude EventProvider = "claude"
-	EventProviderGemini EventProvider = "gemini"
-	EventProviderCodex  EventProvider = "codex"
+	EventProviderClaude   EventProvider = "claude"
+	EventProviderGemini   EventProvider = "gemini"
+	EventProviderCodex    EventProvider = "codex"
+	EventProviderOpenCode EventProvider = "opencode"
 )
 
 // Event represents a log event received from the Daemon.
