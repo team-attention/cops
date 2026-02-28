@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file dashboard/v1/dashboard.proto.
  */
 export const file_dashboard_v1_dashboard: GenFile = /*@__PURE__*/
-  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKUAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJQoIc2Vzc2lvbnMYCSADKAsyEy5zZXNzaW9uLnYxLlNlc3Npb25KBAgEEAVSA2N3ZCIpCg5HZXRPdmVydmlld1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAki4gEKDkdldE92ZXJ2aWV3UmVzEjQKC3RvdGFsX3VzYWdlGAEgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5EhUKDXByb2plY3RfY291bnQYAiABKAUSFQoNc2Vzc2lvbl9jb3VudBgDIAEoBRI1Cg9yZWNlbnRfcHJvamVjdHMYBCADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSNQoPcmVjZW50X3Nlc3Npb25zGAUgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5IlsKD0xpc3RQcm9qZWN0c1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0UHJvamVjdFJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKTAQoPTGlzdFNlc3Npb25zUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAQgASgJEhEKCXNvcnRfZGVzYxgFIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIpEBCg1HZXRTZXNzaW9uUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIVCghhZ2VudF9pZBgEIAEoCUgAiAEBQgsKCV9hZ2VudF9pZCJ5Cg1HZXRTZXNzaW9uUmVzEiwKB3Nlc3Npb24YASABKAsyGy5kYXNoYm9hcmQudjEuU2Vzc2lvbkRldGFpbBI6ChV0cmFuc2NyaXB0X3BhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcyKgAQoOU2Vzc2lvblNlZ21lbnQSCgoCaWQYASABKAkSDQoFbGFiZWwYAiABKAkSLgoKc3RhcnRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDW1lc3NhZ2VfY291bnQYBSABKAUiRAoVR2V0U2Vzc2lvblNlZ21lbnRzUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJIsUBChVHZXRTZXNzaW9uU2VnbWVudHNSZXMSLgoIc2VnbWVudHMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblNlZ21lbnQSLgoKc3RhcnRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh4KFnRvdGFsX2R1cmF0aW9uX3NlY29uZHMYBCABKAMiUAoNR2V0TWVzc2FnZVJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRISCgptZXNzYWdlX2lkGAMgASgJIjUKDUdldE1lc3NhZ2VSZXMSJAoHbWVzc2FnZRgBIAEoCzITLnNlc3Npb24udjEuU2Vzc2lvbjKxBAoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcxJeChJHZXRTZXNzaW9uU2VnbWVudHMSIy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblNlZ21lbnRzUmVxGiMuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25TZWdtZW50c1JlcxJGCgpHZXRNZXNzYWdlEhsuZGFzaGJvYXJkLnYxLkdldE1lc3NhZ2VSZXEaGy5kYXNoYm9hcmQudjEuR2V0TWVzc2FnZVJlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_session_v1_session]);
+  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKUAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJQoIc2Vzc2lvbnMYCSADKAsyEy5zZXNzaW9uLnYxLlNlc3Npb25KBAgEEAVSA2N3ZCIpCg5HZXRPdmVydmlld1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAki4gEKDkdldE92ZXJ2aWV3UmVzEjQKC3RvdGFsX3VzYWdlGAEgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5EhUKDXByb2plY3RfY291bnQYAiABKAUSFQoNc2Vzc2lvbl9jb3VudBgDIAEoBRI1Cg9yZWNlbnRfcHJvamVjdHMYBCADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSNQoPcmVjZW50X3Nlc3Npb25zGAUgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5IlsKD0xpc3RQcm9qZWN0c1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0UHJvamVjdFJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKTAQoPTGlzdFNlc3Npb25zUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAQgASgJEhEKCXNvcnRfZGVzYxgFIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIpEBCg1HZXRTZXNzaW9uUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIVCghhZ2VudF9pZBgEIAEoCUgAiAEBQgsKCV9hZ2VudF9pZCJ5Cg1HZXRTZXNzaW9uUmVzEiwKB3Nlc3Npb24YASABKAsyGy5kYXNoYm9hcmQudjEuU2Vzc2lvbkRldGFpbBI6ChV0cmFuc2NyaXB0X3BhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcyKgAQoOU2Vzc2lvblNlZ21lbnQSCgoCaWQYASABKAkSDQoFbGFiZWwYAiABKAkSLgoKc3RhcnRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDW1lc3NhZ2VfY291bnQYBSABKAUiRAoVR2V0U2Vzc2lvblNlZ21lbnRzUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJIsUBChVHZXRTZXNzaW9uU2VnbWVudHNSZXMSLgoIc2VnbWVudHMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblNlZ21lbnQSLgoKc3RhcnRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh4KFnRvdGFsX2R1cmF0aW9uX3NlY29uZHMYBCABKAMiUAoNR2V0TWVzc2FnZVJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRISCgptZXNzYWdlX2lkGAMgASgJIjUKDUdldE1lc3NhZ2VSZXMSJAoHbWVzc2FnZRgBIAEoCzITLnNlc3Npb24udjEuU2Vzc2lvbiIzCg9Ub29sQ2FsbFN1bW1hcnkSEQoJdG9vbF9uYW1lGAEgASgJEg0KBWNvdW50GAIgASgFIo0CCg5GZWF0dXJlZE1lbWJlchIPCgd1c2VyX2lkGAEgASgJEhEKCXVzZXJfbmFtZRgCIAEoCRISCgpwcm9qZWN0X2lkGAMgASgJEhQKDHByb2plY3RfbmFtZRgEIAEoCRIuCgV1c2FnZRgFIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIUCgxwcm9tcHRfY291bnQYBiABKAUSMQoKdG9vbF9jYWxscxgHIAMoCzIdLmRhc2hib2FyZC52MS5Ub29sQ2FsbFN1bW1hcnkSNAoQbGFzdF9hY3Rpdml0eV9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiOwoTR2V0RmVhdHVyZWRCb2FyZFJlcRIQCghvcmdfc2x1ZxgBIAEoCRISCgpzaW5jZV91bml4GAIgASgDIl8KE0dldEZlYXR1cmVkQm9hcmRSZXMSLQoHbWVtYmVycxgBIAMoCzIcLmRhc2hib2FyZC52MS5GZWF0dXJlZE1lbWJlchIZChFvcmdhbml6YXRpb25fbmFtZRgCIAEoCTKxBAoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcxJeChJHZXRTZXNzaW9uU2VnbWVudHMSIy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblNlZ21lbnRzUmVxGiMuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25TZWdtZW50c1JlcxJGCgpHZXRNZXNzYWdlEhsuZGFzaGJvYXJkLnYxLkdldE1lc3NhZ2VSZXEaGy5kYXNoYm9hcmQudjEuR2V0TWVzc2FnZVJlczJwChRGZWF0dXJlZEJvYXJkU2VydmljZRJYChBHZXRGZWF0dXJlZEJvYXJkEiEuZGFzaGJvYXJkLnYxLkdldEZlYXR1cmVkQm9hcmRSZXEaIS5kYXNoYm9hcmQudjEuR2V0RmVhdHVyZWRCb2FyZFJlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_session_v1_session]);
 
 /**
  * TokenUsageSummary aggregates token usage statistics.
@@ -883,6 +883,160 @@ export const GetMessageResSchema: GenMessage<GetMessageRes> = /*@__PURE__*/
   messageDesc(file_dashboard_v1_dashboard, 21);
 
 /**
+ * ToolCallSummary aggregates tool call counts by tool name.
+ *
+ * @generated from message dashboard.v1.ToolCallSummary
+ */
+export type ToolCallSummary = Message<"dashboard.v1.ToolCallSummary"> & {
+  /**
+   * Tool name
+   *
+   * @generated from field: string tool_name = 1;
+   */
+  toolName: string;
+
+  /**
+   * Number of times this tool was called
+   *
+   * @generated from field: int32 count = 2;
+   */
+  count: number;
+};
+
+/**
+ * Describes the message dashboard.v1.ToolCallSummary.
+ * Use `create(ToolCallSummarySchema)` to create a new message.
+ */
+export const ToolCallSummarySchema: GenMessage<ToolCallSummary> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 22);
+
+/**
+ * FeaturedMember contains aggregated stats for a user on the featured board.
+ *
+ * @generated from message dashboard.v1.FeaturedMember
+ */
+export type FeaturedMember = Message<"dashboard.v1.FeaturedMember"> & {
+  /**
+   * User unique identifier
+   *
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * User display name
+   *
+   * @generated from field: string user_name = 2;
+   */
+  userName: string;
+
+  /**
+   * Project unique identifier
+   *
+   * @generated from field: string project_id = 3;
+   */
+  projectId: string;
+
+  /**
+   * Project display name
+   *
+   * @generated from field: string project_name = 4;
+   */
+  projectName: string;
+
+  /**
+   * Aggregated token usage
+   *
+   * @generated from field: dashboard.v1.TokenUsageSummary usage = 5;
+   */
+  usage?: TokenUsageSummary;
+
+  /**
+   * Number of prompts sent
+   *
+   * @generated from field: int32 prompt_count = 6;
+   */
+  promptCount: number;
+
+  /**
+   * Tool call breakdown
+   *
+   * @generated from field: repeated dashboard.v1.ToolCallSummary tool_calls = 7;
+   */
+  toolCalls: ToolCallSummary[];
+
+  /**
+   * Last activity timestamp
+   *
+   * @generated from field: google.protobuf.Timestamp last_activity_at = 8;
+   */
+  lastActivityAt?: Timestamp;
+};
+
+/**
+ * Describes the message dashboard.v1.FeaturedMember.
+ * Use `create(FeaturedMemberSchema)` to create a new message.
+ */
+export const FeaturedMemberSchema: GenMessage<FeaturedMember> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 23);
+
+/**
+ * GetFeaturedBoardReq is the request for GetFeaturedBoard RPC.
+ *
+ * @generated from message dashboard.v1.GetFeaturedBoardReq
+ */
+export type GetFeaturedBoardReq = Message<"dashboard.v1.GetFeaturedBoardReq"> & {
+  /**
+   * Organization slug identifier
+   *
+   * @generated from field: string org_slug = 1;
+   */
+  orgSlug: string;
+
+  /**
+   * Unix timestamp to filter activity since
+   *
+   * @generated from field: int64 since_unix = 2;
+   */
+  sinceUnix: bigint;
+};
+
+/**
+ * Describes the message dashboard.v1.GetFeaturedBoardReq.
+ * Use `create(GetFeaturedBoardReqSchema)` to create a new message.
+ */
+export const GetFeaturedBoardReqSchema: GenMessage<GetFeaturedBoardReq> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 24);
+
+/**
+ * GetFeaturedBoardRes is the response for GetFeaturedBoard RPC.
+ *
+ * @generated from message dashboard.v1.GetFeaturedBoardRes
+ */
+export type GetFeaturedBoardRes = Message<"dashboard.v1.GetFeaturedBoardRes"> & {
+  /**
+   * List of featured members
+   *
+   * @generated from field: repeated dashboard.v1.FeaturedMember members = 1;
+   */
+  members: FeaturedMember[];
+
+  /**
+   * Organization display name
+   *
+   * @generated from field: string organization_name = 2;
+   */
+  organizationName: string;
+};
+
+/**
+ * Describes the message dashboard.v1.GetFeaturedBoardRes.
+ * Use `create(GetFeaturedBoardResSchema)` to create a new message.
+ */
+export const GetFeaturedBoardResSchema: GenMessage<GetFeaturedBoardRes> = /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 25);
+
+/**
  * DashboardService provides dashboard data access.
  *
  * @generated from service dashboard.v1.DashboardService
@@ -960,4 +1114,23 @@ export const DashboardService: GenService<{
   },
 }> = /*@__PURE__*/
   serviceDesc(file_dashboard_v1_dashboard, 0);
+
+/**
+ * FeaturedBoardService provides featured board data access.
+ *
+ * @generated from service dashboard.v1.FeaturedBoardService
+ */
+export const FeaturedBoardService: GenService<{
+  /**
+   * GetFeaturedBoard returns aggregated stats for featured members.
+   *
+   * @generated from rpc dashboard.v1.FeaturedBoardService.GetFeaturedBoard
+   */
+  getFeaturedBoard: {
+    methodKind: "unary";
+    input: typeof GetFeaturedBoardReqSchema;
+    output: typeof GetFeaturedBoardResSchema;
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_dashboard_v1_dashboard, 1);
 

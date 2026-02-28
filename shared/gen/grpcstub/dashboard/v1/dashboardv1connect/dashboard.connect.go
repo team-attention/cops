@@ -23,6 +23,8 @@ const _ = connect.IsAtLeastVersion1_13_0
 const (
 	// DashboardServiceName is the fully-qualified name of the DashboardService service.
 	DashboardServiceName = "dashboard.v1.DashboardService"
+	// FeaturedBoardServiceName is the fully-qualified name of the FeaturedBoardService service.
+	FeaturedBoardServiceName = "dashboard.v1.FeaturedBoardService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -54,6 +56,9 @@ const (
 	// DashboardServiceGetMessageProcedure is the fully-qualified name of the DashboardService's
 	// GetMessage RPC.
 	DashboardServiceGetMessageProcedure = "/dashboard.v1.DashboardService/GetMessage"
+	// FeaturedBoardServiceGetFeaturedBoardProcedure is the fully-qualified name of the
+	// FeaturedBoardService's GetFeaturedBoard RPC.
+	FeaturedBoardServiceGetFeaturedBoardProcedure = "/dashboard.v1.FeaturedBoardService/GetFeaturedBoard"
 )
 
 // DashboardServiceClient is a client for the dashboard.v1.DashboardService service.
@@ -294,4 +299,77 @@ func (UnimplementedDashboardServiceHandler) GetSessionSegments(context.Context, 
 
 func (UnimplementedDashboardServiceHandler) GetMessage(context.Context, *connect.Request[v1.GetMessageReq]) (*connect.Response[v1.GetMessageRes], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.DashboardService.GetMessage is not implemented"))
+}
+
+// FeaturedBoardServiceClient is a client for the dashboard.v1.FeaturedBoardService service.
+type FeaturedBoardServiceClient interface {
+	// GetFeaturedBoard returns aggregated stats for featured members.
+	GetFeaturedBoard(context.Context, *connect.Request[v1.GetFeaturedBoardReq]) (*connect.Response[v1.GetFeaturedBoardRes], error)
+}
+
+// NewFeaturedBoardServiceClient constructs a client for the dashboard.v1.FeaturedBoardService
+// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
+// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
+// the connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewFeaturedBoardServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) FeaturedBoardServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	featuredBoardServiceMethods := v1.File_dashboard_v1_dashboard_proto.Services().ByName("FeaturedBoardService").Methods()
+	return &featuredBoardServiceClient{
+		getFeaturedBoard: connect.NewClient[v1.GetFeaturedBoardReq, v1.GetFeaturedBoardRes](
+			httpClient,
+			baseURL+FeaturedBoardServiceGetFeaturedBoardProcedure,
+			connect.WithSchema(featuredBoardServiceMethods.ByName("GetFeaturedBoard")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// featuredBoardServiceClient implements FeaturedBoardServiceClient.
+type featuredBoardServiceClient struct {
+	getFeaturedBoard *connect.Client[v1.GetFeaturedBoardReq, v1.GetFeaturedBoardRes]
+}
+
+// GetFeaturedBoard calls dashboard.v1.FeaturedBoardService.GetFeaturedBoard.
+func (c *featuredBoardServiceClient) GetFeaturedBoard(ctx context.Context, req *connect.Request[v1.GetFeaturedBoardReq]) (*connect.Response[v1.GetFeaturedBoardRes], error) {
+	return c.getFeaturedBoard.CallUnary(ctx, req)
+}
+
+// FeaturedBoardServiceHandler is an implementation of the dashboard.v1.FeaturedBoardService
+// service.
+type FeaturedBoardServiceHandler interface {
+	// GetFeaturedBoard returns aggregated stats for featured members.
+	GetFeaturedBoard(context.Context, *connect.Request[v1.GetFeaturedBoardReq]) (*connect.Response[v1.GetFeaturedBoardRes], error)
+}
+
+// NewFeaturedBoardServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewFeaturedBoardServiceHandler(svc FeaturedBoardServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	featuredBoardServiceMethods := v1.File_dashboard_v1_dashboard_proto.Services().ByName("FeaturedBoardService").Methods()
+	featuredBoardServiceGetFeaturedBoardHandler := connect.NewUnaryHandler(
+		FeaturedBoardServiceGetFeaturedBoardProcedure,
+		svc.GetFeaturedBoard,
+		connect.WithSchema(featuredBoardServiceMethods.ByName("GetFeaturedBoard")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/dashboard.v1.FeaturedBoardService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case FeaturedBoardServiceGetFeaturedBoardProcedure:
+			featuredBoardServiceGetFeaturedBoardHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedFeaturedBoardServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedFeaturedBoardServiceHandler struct{}
+
+func (UnimplementedFeaturedBoardServiceHandler) GetFeaturedBoard(context.Context, *connect.Request[v1.GetFeaturedBoardReq]) (*connect.Response[v1.GetFeaturedBoardRes], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("dashboard.v1.FeaturedBoardService.GetFeaturedBoard is not implemented"))
 }

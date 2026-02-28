@@ -319,6 +319,60 @@ message GetMessageRes {
   session.v1.Session message = 1;
 }
 
+// ToolCallSummary aggregates tool call counts by tool name.
+message ToolCallSummary {
+  // Tool name
+  string tool_name = 1;
+
+  // Number of times this tool was called
+  int32 count = 2;
+}
+
+// FeaturedMember contains aggregated stats for a user on the featured board.
+message FeaturedMember {
+  // User unique identifier
+  string user_id = 1;
+
+  // User display name
+  string user_name = 2;
+
+  // Project unique identifier
+  string project_id = 3;
+
+  // Project display name
+  string project_name = 4;
+
+  // Aggregated token usage
+  TokenUsageSummary usage = 5;
+
+  // Number of prompts sent
+  int32 prompt_count = 6;
+
+  // Tool call breakdown
+  repeated ToolCallSummary tool_calls = 7;
+
+  // Last activity timestamp
+  google.protobuf.Timestamp last_activity_at = 8;
+}
+
+// GetFeaturedBoardReq is the request for GetFeaturedBoard RPC.
+message GetFeaturedBoardReq {
+  // Organization slug identifier
+  string org_slug = 1;
+
+  // Unix timestamp to filter activity since
+  int64 since_unix = 2;
+}
+
+// GetFeaturedBoardRes is the response for GetFeaturedBoard RPC.
+message GetFeaturedBoardRes {
+  // List of featured members
+  repeated FeaturedMember members = 1;
+
+  // Organization display name
+  string organization_name = 2;
+}
+
 // DashboardService provides dashboard data access.
 service DashboardService {
   // GetOverview returns dashboard summary statistics.
@@ -341,4 +395,10 @@ service DashboardService {
 
   // GetMessage returns a single message by UUID.
   rpc GetMessage(GetMessageReq) returns (GetMessageRes);
+}
+
+// FeaturedBoardService provides featured board data access.
+service FeaturedBoardService {
+  // GetFeaturedBoard returns aggregated stats for featured members.
+  rpc GetFeaturedBoard(GetFeaturedBoardReq) returns (GetFeaturedBoardRes);
 }
