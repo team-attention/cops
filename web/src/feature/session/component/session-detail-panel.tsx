@@ -69,10 +69,11 @@ export const SessionDetailPanel = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`rounded-lg border p-2 ${isMain
-                ? 'border-violet-500/20 bg-violet-500/10'
-                : 'border-cyan-500/20 bg-cyan-500/10'
-                }`}
+              className={`rounded-lg border p-2 ${
+                isMain
+                  ? 'border-violet-500/20 bg-violet-500/10'
+                  : 'border-cyan-500/20 bg-cyan-500/10'
+              }`}
             >
               <MessageSquare
                 className={`h-4 w-4 ${isMain ? 'text-violet-400' : 'text-cyan-400'}`}
@@ -90,10 +91,11 @@ export const SessionDetailPanel = ({
           <div className="flex items-center gap-2">
             <Badge
               variant="outline"
-              className={`font-mono text-xs ${isMain
-                ? 'border-violet-500/20 bg-violet-500/5 text-violet-400'
-                : 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400'
-                }`}
+              className={`font-mono text-xs ${
+                isMain
+                  ? 'border-violet-500/20 bg-violet-500/5 text-violet-400'
+                  : 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400'
+              }`}
             >
               {messageCount} msgs
             </Badge>
@@ -142,10 +144,9 @@ export const SessionDetailPanel = ({
 
       {/* Bottom accent */}
       <div
-        className={`h-[2px] w-full bg-gradient-to-r ${isMain
-          ? 'from-violet-500 to-violet-600'
-          : 'from-cyan-500 to-cyan-600'
-          }`}
+        className={`h-[2px] w-full bg-gradient-to-r ${
+          isMain ? 'from-violet-500 to-violet-600' : 'from-cyan-500 to-cyan-600'
+        }`}
       />
     </Card>
   )

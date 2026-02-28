@@ -170,7 +170,9 @@ export function MemberCard({ member }: MemberCardProps) {
                   key={cat.label}
                   className="flex items-center justify-between gap-1"
                 >
-                  <span className={`truncate font-mono text-[9px] ${cat.color}`}>
+                  <span
+                    className={`truncate font-mono text-[9px] ${cat.color}`}
+                  >
                     {cat.label}
                   </span>
                   <span className="shrink-0 font-mono text-[9px] font-bold text-amber-400">

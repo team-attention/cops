@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
 import { useGetFeaturedBoard } from '@/feature/featured/hook/use-get-featured-board'
@@ -171,12 +171,18 @@ function FeaturedBoardPage() {
       <div className="pointer-events-none fixed left-0 top-0 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/5 blur-3xl" />
       <div className="pointer-events-none fixed bottom-0 right-0 h-[400px] w-[400px] translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-500/5 blur-3xl" />
 
-      <div className={`relative mx-auto max-w-screen-2xl ${isFullscreen ? 'px-4 py-2 sm:px-6' : 'px-4 py-8 sm:px-6 lg:px-8'}`}>
+      <div
+        className={`relative mx-auto max-w-screen-2xl ${isFullscreen ? 'px-4 py-2 sm:px-6' : 'px-4 py-8 sm:px-6 lg:px-8'}`}
+      >
         {/* Header — compact in fullscreen */}
-        <div className={`flex items-center justify-between ${isFullscreen ? 'mb-2' : 'mb-8'}`}>
+        <div
+          className={`flex items-center justify-between ${isFullscreen ? 'mb-2' : 'mb-8'}`}
+        >
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 animate-pulse rounded-full bg-cyan-400" />
-            <h1 className={`font-mono font-bold uppercase tracking-widest text-zinc-100 ${isFullscreen ? 'text-sm' : 'text-lg'}`}>
+            <h1
+              className={`font-mono font-bold uppercase tracking-widest text-zinc-100 ${isFullscreen ? 'text-sm' : 'text-lg'}`}
+            >
               {data?.organizationName || orgSlug}
             </h1>
             <span className="font-mono text-xs text-zinc-600">

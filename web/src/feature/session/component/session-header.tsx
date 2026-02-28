@@ -53,9 +53,12 @@ const truncateId = (id: string): string => {
   return `${id.slice(0, 6)}...${id.slice(-4)}`
 }
 
-export const SessionHeader = ({ session, totalMessageCount }: SessionHeaderProps) => {
+export const SessionHeader = ({
+  session,
+  totalMessageCount,
+}: SessionHeaderProps) => {
   const isActive = !session.endedAt
-  const messageCount = totalMessageCount ?? (session.sessions?.length ?? 0)
+  const messageCount = totalMessageCount ?? session.sessions?.length ?? 0
   const inputTokens = formatTokenCount(session.usage?.totalInputTokens)
   const outputTokens = formatTokenCount(session.usage?.totalOutputTokens)
   const duration = formatDuration(session.startedAt, session.endedAt)

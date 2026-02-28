@@ -2,874 +2,909 @@
 // @generated from file session/v1/session.proto (package session.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_struct, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenEnum, GenFile, GenMessage } from '@bufbuild/protobuf/codegenv2'
+import { enumDesc, fileDesc, messageDesc } from '@bufbuild/protobuf/codegenv2'
+import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import {
+  file_google_protobuf_struct,
+  file_google_protobuf_timestamp,
+} from '@bufbuild/protobuf/wkt'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file session/v1/session.proto.
  */
-export const file_session_v1_session: GenFile = /*@__PURE__*/
-  fileDesc("ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEi8wEKDFRyZWVOb2RlTWV0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIMCgR1dWlkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSLQoJdGltZXN0YW1wGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIQCghwcm92aWRlchgFIAEoCRIPCgd2ZXJzaW9uGAYgASgJEhIKCmdpdF9icmFuY2gYByABKAkSFAoMaXNfc2lkZWNoYWluGAggASgIEhAKCGFnZW50X2lkGAkgASgJEh4KFnNwYXduZWRfYnlfdG9vbF91c2VfaWQYCiABKAkiLQoJSW1hZ2VEYXRhEhIKCm1lZGlhX3R5cGUYASABKAkSDAoEZGF0YRgCIAEoCSJ4ChFIdW1hbkNvbnRlbnRCbG9jaxIvCgR0eXBlGAEgASgOMiEuc2Vzc2lvbi52MS5IdW1hbkNvbnRlbnRCbG9ja1R5cGUSDAoEdGV4dBgCIAEoCRIkCgVpbWFnZRgDIAEoCzIVLnNlc3Npb24udjEuSW1hZ2VEYXRhIjwKBFRvZG8SDwoHY29udGVudBgBIAEoCRIOCgZzdGF0dXMYAiABKAkSEwoLYWN0aXZlX2Zvcm0YAyABKAkinAEKDEh1bWFuTWVzc2FnZRIqCghtZXRhZGF0YRgBIAEoCzIYLnNlc3Npb24udjEuVHJlZU5vZGVNZXRhEi4KB2NvbnRlbnQYAiADKAsyHS5zZXNzaW9uLnYxLkh1bWFuQ29udGVudEJsb2NrEg8KB2lzX21ldGEYAyABKAgSHwoFdG9kb3MYBCADKAsyEC5zZXNzaW9uLnYxLlRvZG8iMwoNVGhpbmtpbmdCbG9jaxIPCgdjb250ZW50GAEgASgJEhEKCXNpZ25hdHVyZRgCIAEoCSJBChFUb29sQ2FsbFJlZmVyZW5jZRIZChF0b29sX2V4ZWN1dGlvbl9pZBgBIAEoCRIRCgl0b29sX25hbWUYAiABKAkitQEKEUFnZW50Q29udGVudEJsb2NrEi8KBHR5cGUYASABKA4yIS5zZXNzaW9uLnYxLkFnZW50Q29udGVudEJsb2NrVHlwZRIMCgR0ZXh0GAIgASgJEisKCHRoaW5raW5nGAMgASgLMhkuc2Vzc2lvbi52MS5UaGlua2luZ0Jsb2NrEjQKDXRvb2xfY2FsbF9yZWYYBCABKAsyHS5zZXNzaW9uLnYxLlRvb2xDYWxsUmVmZXJlbmNlIpUBCgpUb2tlblVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAki2wEKDEFnZW50TWVzc2FnZRIqCghtZXRhZGF0YRgBIAEoCzIYLnNlc3Npb24udjEuVHJlZU5vZGVNZXRhEhAKCHByb3ZpZGVyGAIgASgJEg0KBW1vZGVsGAMgASgJEhIKCnJlcXVlc3RfaWQYBCABKAkSLgoHY29udGVudBgFIAMoCzIdLnNlc3Npb24udjEuQWdlbnRDb250ZW50QmxvY2sSEwoLc3RvcF9yZWFzb24YBiABKAkSJQoFdXNhZ2UYByABKAsyFi5zZXNzaW9uLnYxLlRva2VuVXNhZ2UiWgoKVG9vbFJlc3VsdBIsCgZzdGF0dXMYASABKA4yHC5zZXNzaW9uLnYxLlRvb2xSZXN1bHRTdGF0dXMSDwoHY29udGVudBgCIAEoCRINCgVlcnJvchgDIAEoCSKeAQoVVG9vbEV4ZWN1dGlvbk1ldGFkYXRhEhMKC2R1cmF0aW9uX21zGAEgASgFEhUKDWFwcHJvdmFsX21vZGUYAiABKAkSLwoLZXhlY3V0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhMKC2lzX3N1YmFnZW50GAQgASgIEhMKC3N1YmFnZW50X2lkGAUgASgJIusBCg1Ub29sRXhlY3V0aW9uEioKCG1ldGFkYXRhGAEgASgLMhguc2Vzc2lvbi52MS5UcmVlTm9kZU1ldGESCgoCaWQYAiABKAkSEQoJdG9vbF9uYW1lGAMgASgJEhIKCmlucHV0X2pzb24YBCABKAkSJgoGcmVzdWx0GAUgASgLMhYuc2Vzc2lvbi52MS5Ub29sUmVzdWx0EjgKDWV4ZWNfbWV0YWRhdGEYBiABKAsyIS5zZXNzaW9uLnYxLlRvb2xFeGVjdXRpb25NZXRhZGF0YRIZChFzb3VyY2VfYWdlbnRfdXVpZBgHIAEoCSInChBUdXJuRHVyYXRpb25EYXRhEhMKC2R1cmF0aW9uX21zGAEgASgFIjEKC1N1bW1hcnlEYXRhEg8KB3N1bW1hcnkYASABKAkSEQoJbGVhZl91dWlkGAIgASgJImgKCkZpbGVCYWNrdXASGAoQYmFja3VwX2ZpbGVfbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFEi8KC2JhY2t1cF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKhAgoQRmlsZVNuYXBzaG90RGF0YRISCgptZXNzYWdlX2lkGAEgASgJElIKFHRyYWNrZWRfZmlsZV9iYWNrdXBzGAIgAygLMjQuc2Vzc2lvbi52MS5GaWxlU25hcHNob3REYXRhLlRyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EjYKEnNuYXBzaG90X3RpbWVzdGFtcBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASGgoSaXNfc25hcHNob3RfdXBkYXRlGAQgASgIGlEKF1RyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EgsKA2tleRgBIAEoCRIlCgV2YWx1ZRgCIAEoCzIWLnNlc3Npb24udjEuRmlsZUJhY2t1cDoCOAEikwIKDVN5c3RlbU1lc3NhZ2USKgoIbWV0YWRhdGEYASABKAsyGC5zZXNzaW9uLnYxLlRyZWVOb2RlTWV0YRIxCgdzdWJ0eXBlGAIgASgOMiAuc2Vzc2lvbi52MS5TeXN0ZW1NZXNzYWdlU3VidHlwZRIPCgdpc19tZXRhGAMgASgIEjMKDXR1cm5fZHVyYXRpb24YBCABKAsyHC5zZXNzaW9uLnYxLlR1cm5EdXJhdGlvbkRhdGESKAoHc3VtbWFyeRgFIAEoCzIXLnNlc3Npb24udjEuU3VtbWFyeURhdGESMwoNZmlsZV9zbmFwc2hvdBgGIAEoCzIcLnNlc3Npb24udjEuRmlsZVNuYXBzaG90RGF0YSLIAQoMUHJvZ3Jlc3NEYXRhEiYKBHR5cGUYASABKA4yGC5zZXNzaW9uLnYxLlByb2dyZXNzVHlwZRIUCgxtZXNzYWdlX2pzb24YAiABKAkSIAoYbm9ybWFsaXplZF9tZXNzYWdlc19qc29uGAMgASgJEg4KBnByb21wdBgEIAEoCRIQCghhZ2VudF9pZBgFIAEoCRISCgpob29rX2V2ZW50GAYgASgJEhEKCWhvb2tfbmFtZRgHIAEoCRIPCgdjb21tYW5kGAggASgJIpsBCghQcm9ncmVzcxIqCghtZXRhZGF0YRgBIAEoCzIYLnNlc3Npb24udjEuVHJlZU5vZGVNZXRhEhkKEXRvb2xfZXhlY3V0aW9uX2lkGAIgASgJEiAKGHBhcmVudF90b29sX2V4ZWN1dGlvbl9pZBgDIAEoCRImCgRkYXRhGAQgASgLMhguc2Vzc2lvbi52MS5Qcm9ncmVzc0RhdGEiswIKB1Nlc3Npb24SJQoEdHlwZRgBIAEoDjIXLnNlc3Npb24udjEuU2Vzc2lvblR5cGUSLgoKaHVtYW5fZGF0YRgCIAEoCzIYLnNlc3Npb24udjEuSHVtYW5NZXNzYWdlSAASLgoKYWdlbnRfZGF0YRgDIAEoCzIYLnNlc3Npb24udjEuQWdlbnRNZXNzYWdlSAASOAoTdG9vbF9leGVjdXRpb25fZGF0YRgEIAEoCzIZLnNlc3Npb24udjEuVG9vbEV4ZWN1dGlvbkgAEjAKC3N5c3RlbV9kYXRhGAUgASgLMhkuc2Vzc2lvbi52MS5TeXN0ZW1NZXNzYWdlSAASLQoNcHJvZ3Jlc3NfZGF0YRgGIAEoCzIULnNlc3Npb24udjEuUHJvZ3Jlc3NIAEIGCgRkYXRhKrABCgtTZXNzaW9uVHlwZRIcChhTRVNTSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIWChJTRVNTSU9OX1RZUEVfSFVNQU4QARIWChJTRVNTSU9OX1RZUEVfQUdFTlQQAhIfChtTRVNTSU9OX1RZUEVfVE9PTF9FWEVDVVRJT04QAxIXChNTRVNTSU9OX1RZUEVfU1lTVEVNEAQSGQoVU0VTU0lPTl9UWVBFX1BST0dSRVNTEAUq1wEKFFN5c3RlbU1lc3NhZ2VTdWJ0eXBlEiYKIlNZU1RFTV9NRVNTQUdFX1NVQlRZUEVfVU5TUEVDSUZJRUQQABIoCiRTWVNURU1fTUVTU0FHRV9TVUJUWVBFX1RVUk5fRFVSQVRJT04QARIiCh5TWVNURU1fTUVTU0FHRV9TVUJUWVBFX1NVTU1BUlkQAhIoCiRTWVNURU1fTUVTU0FHRV9TVUJUWVBFX0ZJTEVfU05BUFNIT1QQAxIfChtTWVNURU1fTUVTU0FHRV9TVUJUWVBFX0lORk8QBCqmAQoMUHJvZ3Jlc3NUeXBlEh0KGVBST0dSRVNTX1RZUEVfVU5TUEVDSUZJRUQQABIXChNQUk9HUkVTU19UWVBFX0FHRU5UEAESFwoTUFJPR1JFU1NfVFlQRV9TS0lMTBACEhYKElBST0dSRVNTX1RZUEVfSE9PSxADEhYKElBST0dSRVNTX1RZUEVfQkFTSBAEEhUKEVBST0dSRVNTX1RZUEVfTUNQEAUqtAEKEFRvb2xSZXN1bHRTdGF0dXMSIgoeVE9PTF9SRVNVTFRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASHgoaVE9PTF9SRVNVTFRfU1RBVFVTX1NVQ0NFU1MQARIcChhUT09MX1JFU1VMVF9TVEFUVVNfRVJST1IQAhIeChpUT09MX1JFU1VMVF9TVEFUVVNfVElNRU9VVBADEh4KGlRPT0xfUkVTVUxUX1NUQVRVU19TS0lQUEVEEAQqiAEKFUh1bWFuQ29udGVudEJsb2NrVHlwZRIoCiRIVU1BTl9DT05URU5UX0JMT0NLX1RZUEVfVU5TUEVDSUZJRUQQABIhCh1IVU1BTl9DT05URU5UX0JMT0NLX1RZUEVfVEVYVBABEiIKHkhVTUFOX0NPTlRFTlRfQkxPQ0tfVFlQRV9JTUFHRRACKrcBChVBZ2VudENvbnRlbnRCbG9ja1R5cGUSKAokQUdFTlRfQ09OVEVOVF9CTE9DS19UWVBFX1VOU1BFQ0lGSUVEEAASIQodQUdFTlRfQ09OVEVOVF9CTE9DS19UWVBFX1RFWFQQARIlCiFBR0VOVF9DT05URU5UX0JMT0NLX1RZUEVfVEhJTktJTkcQAhIqCiZBR0VOVF9DT05URU5UX0JMT0NLX1RZUEVfVE9PTF9DQUxMX1JFRhADQrABCg5jb20uc2Vzc2lvbi52MUIMU2Vzc2lvblByb3RvUAFaR2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL3Nlc3Npb24vdjE7c2Vzc2lvbnYxogIDU1hYqgIKU2Vzc2lvbi5WMcoCClNlc3Npb25cVjHiAhZTZXNzaW9uXFYxXEdQQk1ldGFkYXRh6gILU2Vzc2lvbjo6VjFiBnByb3RvMw", [file_google_protobuf_struct, file_google_protobuf_timestamp]);
+export const file_session_v1_session: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChhzZXNzaW9uL3YxL3Nlc3Npb24ucHJvdG8SCnNlc3Npb24udjEi8wEKDFRyZWVOb2RlTWV0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIMCgR1dWlkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSLQoJdGltZXN0YW1wGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIQCghwcm92aWRlchgFIAEoCRIPCgd2ZXJzaW9uGAYgASgJEhIKCmdpdF9icmFuY2gYByABKAkSFAoMaXNfc2lkZWNoYWluGAggASgIEhAKCGFnZW50X2lkGAkgASgJEh4KFnNwYXduZWRfYnlfdG9vbF91c2VfaWQYCiABKAkiLQoJSW1hZ2VEYXRhEhIKCm1lZGlhX3R5cGUYASABKAkSDAoEZGF0YRgCIAEoCSJ4ChFIdW1hbkNvbnRlbnRCbG9jaxIvCgR0eXBlGAEgASgOMiEuc2Vzc2lvbi52MS5IdW1hbkNvbnRlbnRCbG9ja1R5cGUSDAoEdGV4dBgCIAEoCRIkCgVpbWFnZRgDIAEoCzIVLnNlc3Npb24udjEuSW1hZ2VEYXRhIjwKBFRvZG8SDwoHY29udGVudBgBIAEoCRIOCgZzdGF0dXMYAiABKAkSEwoLYWN0aXZlX2Zvcm0YAyABKAkinAEKDEh1bWFuTWVzc2FnZRIqCghtZXRhZGF0YRgBIAEoCzIYLnNlc3Npb24udjEuVHJlZU5vZGVNZXRhEi4KB2NvbnRlbnQYAiADKAsyHS5zZXNzaW9uLnYxLkh1bWFuQ29udGVudEJsb2NrEg8KB2lzX21ldGEYAyABKAgSHwoFdG9kb3MYBCADKAsyEC5zZXNzaW9uLnYxLlRvZG8iMwoNVGhpbmtpbmdCbG9jaxIPCgdjb250ZW50GAEgASgJEhEKCXNpZ25hdHVyZRgCIAEoCSJBChFUb29sQ2FsbFJlZmVyZW5jZRIZChF0b29sX2V4ZWN1dGlvbl9pZBgBIAEoCRIRCgl0b29sX25hbWUYAiABKAkitQEKEUFnZW50Q29udGVudEJsb2NrEi8KBHR5cGUYASABKA4yIS5zZXNzaW9uLnYxLkFnZW50Q29udGVudEJsb2NrVHlwZRIMCgR0ZXh0GAIgASgJEisKCHRoaW5raW5nGAMgASgLMhkuc2Vzc2lvbi52MS5UaGlua2luZ0Jsb2NrEjQKDXRvb2xfY2FsbF9yZWYYBCABKAsyHS5zZXNzaW9uLnYxLlRvb2xDYWxsUmVmZXJlbmNlIpUBCgpUb2tlblVzYWdlEhQKDGlucHV0X3Rva2VucxgBIAEoBRIVCg1vdXRwdXRfdG9rZW5zGAIgASgFEiMKG2NhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucxgDIAEoBRIfChdjYWNoZV9yZWFkX2lucHV0X3Rva2VucxgEIAEoBRIUCgxzZXJ2aWNlX3RpZXIYBSABKAki2wEKDEFnZW50TWVzc2FnZRIqCghtZXRhZGF0YRgBIAEoCzIYLnNlc3Npb24udjEuVHJlZU5vZGVNZXRhEhAKCHByb3ZpZGVyGAIgASgJEg0KBW1vZGVsGAMgASgJEhIKCnJlcXVlc3RfaWQYBCABKAkSLgoHY29udGVudBgFIAMoCzIdLnNlc3Npb24udjEuQWdlbnRDb250ZW50QmxvY2sSEwoLc3RvcF9yZWFzb24YBiABKAkSJQoFdXNhZ2UYByABKAsyFi5zZXNzaW9uLnYxLlRva2VuVXNhZ2UiWgoKVG9vbFJlc3VsdBIsCgZzdGF0dXMYASABKA4yHC5zZXNzaW9uLnYxLlRvb2xSZXN1bHRTdGF0dXMSDwoHY29udGVudBgCIAEoCRINCgVlcnJvchgDIAEoCSKeAQoVVG9vbEV4ZWN1dGlvbk1ldGFkYXRhEhMKC2R1cmF0aW9uX21zGAEgASgFEhUKDWFwcHJvdmFsX21vZGUYAiABKAkSLwoLZXhlY3V0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhMKC2lzX3N1YmFnZW50GAQgASgIEhMKC3N1YmFnZW50X2lkGAUgASgJIusBCg1Ub29sRXhlY3V0aW9uEioKCG1ldGFkYXRhGAEgASgLMhguc2Vzc2lvbi52MS5UcmVlTm9kZU1ldGESCgoCaWQYAiABKAkSEQoJdG9vbF9uYW1lGAMgASgJEhIKCmlucHV0X2pzb24YBCABKAkSJgoGcmVzdWx0GAUgASgLMhYuc2Vzc2lvbi52MS5Ub29sUmVzdWx0EjgKDWV4ZWNfbWV0YWRhdGEYBiABKAsyIS5zZXNzaW9uLnYxLlRvb2xFeGVjdXRpb25NZXRhZGF0YRIZChFzb3VyY2VfYWdlbnRfdXVpZBgHIAEoCSInChBUdXJuRHVyYXRpb25EYXRhEhMKC2R1cmF0aW9uX21zGAEgASgFIjEKC1N1bW1hcnlEYXRhEg8KB3N1bW1hcnkYASABKAkSEQoJbGVhZl91dWlkGAIgASgJImgKCkZpbGVCYWNrdXASGAoQYmFja3VwX2ZpbGVfbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFEi8KC2JhY2t1cF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKhAgoQRmlsZVNuYXBzaG90RGF0YRISCgptZXNzYWdlX2lkGAEgASgJElIKFHRyYWNrZWRfZmlsZV9iYWNrdXBzGAIgAygLMjQuc2Vzc2lvbi52MS5GaWxlU25hcHNob3REYXRhLlRyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EjYKEnNuYXBzaG90X3RpbWVzdGFtcBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASGgoSaXNfc25hcHNob3RfdXBkYXRlGAQgASgIGlEKF1RyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EgsKA2tleRgBIAEoCRIlCgV2YWx1ZRgCIAEoCzIWLnNlc3Npb24udjEuRmlsZUJhY2t1cDoCOAEikwIKDVN5c3RlbU1lc3NhZ2USKgoIbWV0YWRhdGEYASABKAsyGC5zZXNzaW9uLnYxLlRyZWVOb2RlTWV0YRIxCgdzdWJ0eXBlGAIgASgOMiAuc2Vzc2lvbi52MS5TeXN0ZW1NZXNzYWdlU3VidHlwZRIPCgdpc19tZXRhGAMgASgIEjMKDXR1cm5fZHVyYXRpb24YBCABKAsyHC5zZXNzaW9uLnYxLlR1cm5EdXJhdGlvbkRhdGESKAoHc3VtbWFyeRgFIAEoCzIXLnNlc3Npb24udjEuU3VtbWFyeURhdGESMwoNZmlsZV9zbmFwc2hvdBgGIAEoCzIcLnNlc3Npb24udjEuRmlsZVNuYXBzaG90RGF0YSLIAQoMUHJvZ3Jlc3NEYXRhEiYKBHR5cGUYASABKA4yGC5zZXNzaW9uLnYxLlByb2dyZXNzVHlwZRIUCgxtZXNzYWdlX2pzb24YAiABKAkSIAoYbm9ybWFsaXplZF9tZXNzYWdlc19qc29uGAMgASgJEg4KBnByb21wdBgEIAEoCRIQCghhZ2VudF9pZBgFIAEoCRISCgpob29rX2V2ZW50GAYgASgJEhEKCWhvb2tfbmFtZRgHIAEoCRIPCgdjb21tYW5kGAggASgJIpsBCghQcm9ncmVzcxIqCghtZXRhZGF0YRgBIAEoCzIYLnNlc3Npb24udjEuVHJlZU5vZGVNZXRhEhkKEXRvb2xfZXhlY3V0aW9uX2lkGAIgASgJEiAKGHBhcmVudF90b29sX2V4ZWN1dGlvbl9pZBgDIAEoCRImCgRkYXRhGAQgASgLMhguc2Vzc2lvbi52MS5Qcm9ncmVzc0RhdGEiswIKB1Nlc3Npb24SJQoEdHlwZRgBIAEoDjIXLnNlc3Npb24udjEuU2Vzc2lvblR5cGUSLgoKaHVtYW5fZGF0YRgCIAEoCzIYLnNlc3Npb24udjEuSHVtYW5NZXNzYWdlSAASLgoKYWdlbnRfZGF0YRgDIAEoCzIYLnNlc3Npb24udjEuQWdlbnRNZXNzYWdlSAASOAoTdG9vbF9leGVjdXRpb25fZGF0YRgEIAEoCzIZLnNlc3Npb24udjEuVG9vbEV4ZWN1dGlvbkgAEjAKC3N5c3RlbV9kYXRhGAUgASgLMhkuc2Vzc2lvbi52MS5TeXN0ZW1NZXNzYWdlSAASLQoNcHJvZ3Jlc3NfZGF0YRgGIAEoCzIULnNlc3Npb24udjEuUHJvZ3Jlc3NIAEIGCgRkYXRhKrABCgtTZXNzaW9uVHlwZRIcChhTRVNTSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIWChJTRVNTSU9OX1RZUEVfSFVNQU4QARIWChJTRVNTSU9OX1RZUEVfQUdFTlQQAhIfChtTRVNTSU9OX1RZUEVfVE9PTF9FWEVDVVRJT04QAxIXChNTRVNTSU9OX1RZUEVfU1lTVEVNEAQSGQoVU0VTU0lPTl9UWVBFX1BST0dSRVNTEAUq1wEKFFN5c3RlbU1lc3NhZ2VTdWJ0eXBlEiYKIlNZU1RFTV9NRVNTQUdFX1NVQlRZUEVfVU5TUEVDSUZJRUQQABIoCiRTWVNURU1fTUVTU0FHRV9TVUJUWVBFX1RVUk5fRFVSQVRJT04QARIiCh5TWVNURU1fTUVTU0FHRV9TVUJUWVBFX1NVTU1BUlkQAhIoCiRTWVNURU1fTUVTU0FHRV9TVUJUWVBFX0ZJTEVfU05BUFNIT1QQAxIfChtTWVNURU1fTUVTU0FHRV9TVUJUWVBFX0lORk8QBCqmAQoMUHJvZ3Jlc3NUeXBlEh0KGVBST0dSRVNTX1RZUEVfVU5TUEVDSUZJRUQQABIXChNQUk9HUkVTU19UWVBFX0FHRU5UEAESFwoTUFJPR1JFU1NfVFlQRV9TS0lMTBACEhYKElBST0dSRVNTX1RZUEVfSE9PSxADEhYKElBST0dSRVNTX1RZUEVfQkFTSBAEEhUKEVBST0dSRVNTX1RZUEVfTUNQEAUqtAEKEFRvb2xSZXN1bHRTdGF0dXMSIgoeVE9PTF9SRVNVTFRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASHgoaVE9PTF9SRVNVTFRfU1RBVFVTX1NVQ0NFU1MQARIcChhUT09MX1JFU1VMVF9TVEFUVVNfRVJST1IQAhIeChpUT09MX1JFU1VMVF9TVEFUVVNfVElNRU9VVBADEh4KGlRPT0xfUkVTVUxUX1NUQVRVU19TS0lQUEVEEAQqiAEKFUh1bWFuQ29udGVudEJsb2NrVHlwZRIoCiRIVU1BTl9DT05URU5UX0JMT0NLX1RZUEVfVU5TUEVDSUZJRUQQABIhCh1IVU1BTl9DT05URU5UX0JMT0NLX1RZUEVfVEVYVBABEiIKHkhVTUFOX0NPTlRFTlRfQkxPQ0tfVFlQRV9JTUFHRRACKrcBChVBZ2VudENvbnRlbnRCbG9ja1R5cGUSKAokQUdFTlRfQ09OVEVOVF9CTE9DS19UWVBFX1VOU1BFQ0lGSUVEEAASIQodQUdFTlRfQ09OVEVOVF9CTE9DS19UWVBFX1RFWFQQARIlCiFBR0VOVF9DT05URU5UX0JMT0NLX1RZUEVfVEhJTktJTkcQAhIqCiZBR0VOVF9DT05URU5UX0JMT0NLX1RZUEVfVE9PTF9DQUxMX1JFRhADQrABCg5jb20uc2Vzc2lvbi52MUIMU2Vzc2lvblByb3RvUAFaR2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL3Nlc3Npb24vdjE7c2Vzc2lvbnYxogIDU1hYqgIKU2Vzc2lvbi5WMcoCClNlc3Npb25cVjHiAhZTZXNzaW9uXFYxXEdQQk1ldGFkYXRh6gILU2Vzc2lvbjo6VjFiBnByb3RvMw',
+    [file_google_protobuf_struct, file_google_protobuf_timestamp],
+  )
 
 /**
  * TreeNodeMeta contains common metadata for conversation tree nodes.
  *
  * @generated from message session.v1.TreeNodeMeta
  */
-export type TreeNodeMeta = Message<"session.v1.TreeNodeMeta"> & {
+export type TreeNodeMeta = Message<'session.v1.TreeNodeMeta'> & {
   /**
    * Parent node UUID (empty for root nodes)
    *
    * @generated from field: string parent_uuid = 1;
    */
-  parentUuid: string;
+  parentUuid: string
 
   /**
    * Node UUID
    *
    * @generated from field: string uuid = 2;
    */
-  uuid: string;
+  uuid: string
 
   /**
    * Session identifier
    *
    * @generated from field: string session_id = 3;
    */
-  sessionId: string;
+  sessionId: string
 
   /**
    * Entry timestamp
    *
    * @generated from field: google.protobuf.Timestamp timestamp = 4;
    */
-  timestamp?: Timestamp;
+  timestamp?: Timestamp
 
   /**
    * Provider identifier (e.g., "claude_code", "gemini_cli")
    *
    * @generated from field: string provider = 5;
    */
-  provider: string;
+  provider: string
 
   /**
    * CLI version
    *
    * @generated from field: string version = 6;
    */
-  version: string;
+  version: string
 
   /**
    * Git branch name
    *
    * @generated from field: string git_branch = 7;
    */
-  gitBranch: string;
+  gitBranch: string
 
   /**
    * Whether this is a sidechain message
    *
    * @generated from field: bool is_sidechain = 8;
    */
-  isSidechain: boolean;
+  isSidechain: boolean
 
   /**
    * SubAgent identifier (empty for Main session entries)
    *
    * @generated from field: string agent_id = 9;
    */
-  agentId: string;
+  agentId: string
 
   /**
    * Tool Use ID that spawned this SubAgent (for linking in Graph view)
    *
    * @generated from field: string spawned_by_tool_use_id = 10;
    */
-  spawnedByToolUseId: string;
-};
+  spawnedByToolUseId: string
+}
 
 /**
  * Describes the message session.v1.TreeNodeMeta.
  * Use `create(TreeNodeMetaSchema)` to create a new message.
  */
-export const TreeNodeMetaSchema: GenMessage<TreeNodeMeta> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 0);
+export const TreeNodeMetaSchema: GenMessage<TreeNodeMeta> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 0)
 
 /**
  * ImageData represents image content with base64-encoded data.
  *
  * @generated from message session.v1.ImageData
  */
-export type ImageData = Message<"session.v1.ImageData"> & {
+export type ImageData = Message<'session.v1.ImageData'> & {
   /**
    * Media type (e.g., "image/png", "image/jpeg")
    *
    * @generated from field: string media_type = 1;
    */
-  mediaType: string;
+  mediaType: string
 
   /**
    * Base64-encoded image data
    *
    * @generated from field: string data = 2;
    */
-  data: string;
-};
+  data: string
+}
 
 /**
  * Describes the message session.v1.ImageData.
  * Use `create(ImageDataSchema)` to create a new message.
  */
-export const ImageDataSchema: GenMessage<ImageData> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 1);
+export const ImageDataSchema: GenMessage<ImageData> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 1)
 
 /**
  * HumanContentBlock represents a content block in a human message.
  *
  * @generated from message session.v1.HumanContentBlock
  */
-export type HumanContentBlock = Message<"session.v1.HumanContentBlock"> & {
+export type HumanContentBlock = Message<'session.v1.HumanContentBlock'> & {
   /**
    * @generated from field: session.v1.HumanContentBlockType type = 1;
    */
-  type: HumanContentBlockType;
+  type: HumanContentBlockType
 
   /**
    * For type=TEXT
    *
    * @generated from field: string text = 2;
    */
-  text: string;
+  text: string
 
   /**
    * For type=IMAGE
    *
    * @generated from field: session.v1.ImageData image = 3;
    */
-  image?: ImageData;
-};
+  image?: ImageData
+}
 
 /**
  * Describes the message session.v1.HumanContentBlock.
  * Use `create(HumanContentBlockSchema)` to create a new message.
  */
-export const HumanContentBlockSchema: GenMessage<HumanContentBlock> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 2);
+export const HumanContentBlockSchema: GenMessage<HumanContentBlock> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 2)
 
 /**
  * Todo represents a task item tracked during agent execution.
  *
  * @generated from message session.v1.Todo
  */
-export type Todo = Message<"session.v1.Todo"> & {
+export type Todo = Message<'session.v1.Todo'> & {
   /**
    * @generated from field: string content = 1;
    */
-  content: string;
+  content: string
 
   /**
    * Status: "pending", "in_progress", "completed"
    *
    * @generated from field: string status = 2;
    */
-  status: string;
+  status: string
 
   /**
    * @generated from field: string active_form = 3;
    */
-  activeForm: string;
-};
+  activeForm: string
+}
 
 /**
  * Describes the message session.v1.Todo.
  * Use `create(TodoSchema)` to create a new message.
  */
-export const TodoSchema: GenMessage<Todo> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 3);
+export const TodoSchema: GenMessage<Todo> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 3)
 
 /**
  * HumanMessage represents user input in the conversation tree.
  *
  * @generated from message session.v1.HumanMessage
  */
-export type HumanMessage = Message<"session.v1.HumanMessage"> & {
+export type HumanMessage = Message<'session.v1.HumanMessage'> & {
   /**
    * @generated from field: session.v1.TreeNodeMeta metadata = 1;
    */
-  metadata?: TreeNodeMeta;
+  metadata?: TreeNodeMeta
 
   /**
    * @generated from field: repeated session.v1.HumanContentBlock content = 2;
    */
-  content: HumanContentBlock[];
+  content: HumanContentBlock[]
 
   /**
    * @generated from field: bool is_meta = 3;
    */
-  isMeta: boolean;
+  isMeta: boolean
 
   /**
    * @generated from field: repeated session.v1.Todo todos = 4;
    */
-  todos: Todo[];
-};
+  todos: Todo[]
+}
 
 /**
  * Describes the message session.v1.HumanMessage.
  * Use `create(HumanMessageSchema)` to create a new message.
  */
-export const HumanMessageSchema: GenMessage<HumanMessage> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 4);
+export const HumanMessageSchema: GenMessage<HumanMessage> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 4)
 
 /**
  * ThinkingBlock represents extended thinking content from the agent.
  *
  * @generated from message session.v1.ThinkingBlock
  */
-export type ThinkingBlock = Message<"session.v1.ThinkingBlock"> & {
+export type ThinkingBlock = Message<'session.v1.ThinkingBlock'> & {
   /**
    * @generated from field: string content = 1;
    */
-  content: string;
+  content: string
 
   /**
    * Signature for verification (optional)
    *
    * @generated from field: string signature = 2;
    */
-  signature: string;
-};
+  signature: string
+}
 
 /**
  * Describes the message session.v1.ThinkingBlock.
  * Use `create(ThinkingBlockSchema)` to create a new message.
  */
-export const ThinkingBlockSchema: GenMessage<ThinkingBlock> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 5);
+export const ThinkingBlockSchema: GenMessage<ThinkingBlock> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 5)
 
 /**
  * ToolCallReference is a reference to a ToolExecution entry.
  *
  * @generated from message session.v1.ToolCallReference
  */
-export type ToolCallReference = Message<"session.v1.ToolCallReference"> & {
+export type ToolCallReference = Message<'session.v1.ToolCallReference'> & {
   /**
    * References ToolExecution.ID
    *
    * @generated from field: string tool_execution_id = 1;
    */
-  toolExecutionId: string;
+  toolExecutionId: string
 
   /**
    * Tool name for quick display
    *
    * @generated from field: string tool_name = 2;
    */
-  toolName: string;
-};
+  toolName: string
+}
 
 /**
  * Describes the message session.v1.ToolCallReference.
  * Use `create(ToolCallReferenceSchema)` to create a new message.
  */
-export const ToolCallReferenceSchema: GenMessage<ToolCallReference> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 6);
+export const ToolCallReferenceSchema: GenMessage<ToolCallReference> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 6)
 
 /**
  * AgentContentBlock represents a content block in an agent response.
  *
  * @generated from message session.v1.AgentContentBlock
  */
-export type AgentContentBlock = Message<"session.v1.AgentContentBlock"> & {
+export type AgentContentBlock = Message<'session.v1.AgentContentBlock'> & {
   /**
    * @generated from field: session.v1.AgentContentBlockType type = 1;
    */
-  type: AgentContentBlockType;
+  type: AgentContentBlockType
 
   /**
    * For type=TEXT
    *
    * @generated from field: string text = 2;
    */
-  text: string;
+  text: string
 
   /**
    * For type=THINKING
    *
    * @generated from field: session.v1.ThinkingBlock thinking = 3;
    */
-  thinking?: ThinkingBlock;
+  thinking?: ThinkingBlock
 
   /**
    * For type=TOOL_CALL_REF
    *
    * @generated from field: session.v1.ToolCallReference tool_call_ref = 4;
    */
-  toolCallRef?: ToolCallReference;
-};
+  toolCallRef?: ToolCallReference
+}
 
 /**
  * Describes the message session.v1.AgentContentBlock.
  * Use `create(AgentContentBlockSchema)` to create a new message.
  */
-export const AgentContentBlockSchema: GenMessage<AgentContentBlock> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 7);
+export const AgentContentBlockSchema: GenMessage<AgentContentBlock> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 7)
 
 /**
  * TokenUsage represents provider-agnostic token usage statistics.
  *
  * @generated from message session.v1.TokenUsage
  */
-export type TokenUsage = Message<"session.v1.TokenUsage"> & {
+export type TokenUsage = Message<'session.v1.TokenUsage'> & {
   /**
    * @generated from field: int32 input_tokens = 1;
    */
-  inputTokens: number;
+  inputTokens: number
 
   /**
    * @generated from field: int32 output_tokens = 2;
    */
-  outputTokens: number;
+  outputTokens: number
 
   /**
    * @generated from field: int32 cache_creation_input_tokens = 3;
    */
-  cacheCreationInputTokens: number;
+  cacheCreationInputTokens: number
 
   /**
    * @generated from field: int32 cache_read_input_tokens = 4;
    */
-  cacheReadInputTokens: number;
+  cacheReadInputTokens: number
 
   /**
    * @generated from field: string service_tier = 5;
    */
-  serviceTier: string;
-};
+  serviceTier: string
+}
 
 /**
  * Describes the message session.v1.TokenUsage.
  * Use `create(TokenUsageSchema)` to create a new message.
  */
-export const TokenUsageSchema: GenMessage<TokenUsage> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 8);
+export const TokenUsageSchema: GenMessage<TokenUsage> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 8)
 
 /**
  * AgentMessage represents an AI agent response in the conversation tree.
  *
  * @generated from message session.v1.AgentMessage
  */
-export type AgentMessage = Message<"session.v1.AgentMessage"> & {
+export type AgentMessage = Message<'session.v1.AgentMessage'> & {
   /**
    * @generated from field: session.v1.TreeNodeMeta metadata = 1;
    */
-  metadata?: TreeNodeMeta;
+  metadata?: TreeNodeMeta
 
   /**
    * Provider (e.g., "anthropic", "openai")
    *
    * @generated from field: string provider = 2;
    */
-  provider: string;
+  provider: string
 
   /**
    * Model (e.g., "claude-sonnet-4-20250514")
    *
    * @generated from field: string model = 3;
    */
-  model: string;
+  model: string
 
   /**
    * Provider's response ID
    *
    * @generated from field: string request_id = 4;
    */
-  requestId: string;
+  requestId: string
 
   /**
    * Content blocks
    *
    * @generated from field: repeated session.v1.AgentContentBlock content = 5;
    */
-  content: AgentContentBlock[];
+  content: AgentContentBlock[]
 
   /**
    * @generated from field: string stop_reason = 6;
    */
-  stopReason: string;
+  stopReason: string
 
   /**
    * @generated from field: session.v1.TokenUsage usage = 7;
    */
-  usage?: TokenUsage;
-};
+  usage?: TokenUsage
+}
 
 /**
  * Describes the message session.v1.AgentMessage.
  * Use `create(AgentMessageSchema)` to create a new message.
  */
-export const AgentMessageSchema: GenMessage<AgentMessage> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 9);
+export const AgentMessageSchema: GenMessage<AgentMessage> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 9)
 
 /**
  * ToolResult represents the result of a tool execution.
  *
  * @generated from message session.v1.ToolResult
  */
-export type ToolResult = Message<"session.v1.ToolResult"> & {
+export type ToolResult = Message<'session.v1.ToolResult'> & {
   /**
    * @generated from field: session.v1.ToolResultStatus status = 1;
    */
-  status: ToolResultStatus;
+  status: ToolResultStatus
 
   /**
    * Result content (JSON string for complex types)
    *
    * @generated from field: string content = 2;
    */
-  content: string;
+  content: string
 
   /**
    * Error message if status is error or timeout
    *
    * @generated from field: string error = 3;
    */
-  error: string;
-};
+  error: string
+}
 
 /**
  * Describes the message session.v1.ToolResult.
  * Use `create(ToolResultSchema)` to create a new message.
  */
-export const ToolResultSchema: GenMessage<ToolResult> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 10);
+export const ToolResultSchema: GenMessage<ToolResult> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 10)
 
 /**
  * ToolExecutionMetadata contains additional metadata about tool execution.
  *
  * @generated from message session.v1.ToolExecutionMetadata
  */
-export type ToolExecutionMetadata = Message<"session.v1.ToolExecutionMetadata"> & {
-  /**
-   * Execution time in milliseconds
-   *
-   * @generated from field: int32 duration_ms = 1;
-   */
-  durationMs: number;
+export type ToolExecutionMetadata =
+  Message<'session.v1.ToolExecutionMetadata'> & {
+    /**
+     * Execution time in milliseconds
+     *
+     * @generated from field: int32 duration_ms = 1;
+     */
+    durationMs: number
 
-  /**
-   * Approval mode (e.g., "auto", "manual")
-   *
-   * @generated from field: string approval_mode = 2;
-   */
-  approvalMode: string;
+    /**
+     * Approval mode (e.g., "auto", "manual")
+     *
+     * @generated from field: string approval_mode = 2;
+     */
+    approvalMode: string
 
-  /**
-   * When the tool was executed
-   *
-   * @generated from field: google.protobuf.Timestamp executed_at = 3;
-   */
-  executedAt?: Timestamp;
+    /**
+     * When the tool was executed
+     *
+     * @generated from field: google.protobuf.Timestamp executed_at = 3;
+     */
+    executedAt?: Timestamp
 
-  /**
-   * Whether called by a subagent
-   *
-   * @generated from field: bool is_subagent = 4;
-   */
-  isSubagent: boolean;
+    /**
+     * Whether called by a subagent
+     *
+     * @generated from field: bool is_subagent = 4;
+     */
+    isSubagent: boolean
 
-  /**
-   * Subagent ID if applicable
-   *
-   * @generated from field: string subagent_id = 5;
-   */
-  subagentId: string;
-};
+    /**
+     * Subagent ID if applicable
+     *
+     * @generated from field: string subagent_id = 5;
+     */
+    subagentId: string
+  }
 
 /**
  * Describes the message session.v1.ToolExecutionMetadata.
  * Use `create(ToolExecutionMetadataSchema)` to create a new message.
  */
-export const ToolExecutionMetadataSchema: GenMessage<ToolExecutionMetadata> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 11);
+export const ToolExecutionMetadataSchema: GenMessage<ToolExecutionMetadata> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 11)
 
 /**
  * ToolExecution represents a tool call with its result.
  *
  * @generated from message session.v1.ToolExecution
  */
-export type ToolExecution = Message<"session.v1.ToolExecution"> & {
+export type ToolExecution = Message<'session.v1.ToolExecution'> & {
   /**
    * @generated from field: session.v1.TreeNodeMeta metadata = 1;
    */
-  metadata?: TreeNodeMeta;
+  metadata?: TreeNodeMeta
 
   /**
    * Unique identifier (corresponds to tool_use_id)
    *
    * @generated from field: string id = 2;
    */
-  id: string;
+  id: string
 
   /**
    * Tool name (e.g., "Bash", "Read", "Write")
    *
    * @generated from field: string tool_name = 3;
    */
-  toolName: string;
+  toolName: string
 
   /**
    * Tool parameters as JSON
    *
    * @generated from field: string input_json = 4;
    */
-  inputJson: string;
+  inputJson: string
 
   /**
    * Execution result (nil if pending)
    *
    * @generated from field: session.v1.ToolResult result = 5;
    */
-  result?: ToolResult;
+  result?: ToolResult
 
   /**
    * Execution metadata
    *
    * @generated from field: session.v1.ToolExecutionMetadata exec_metadata = 6;
    */
-  execMetadata?: ToolExecutionMetadata;
+  execMetadata?: ToolExecutionMetadata
 
   /**
    * Reference to the agent message that initiated this call
    *
    * @generated from field: string source_agent_uuid = 7;
    */
-  sourceAgentUuid: string;
-};
+  sourceAgentUuid: string
+}
 
 /**
  * Describes the message session.v1.ToolExecution.
  * Use `create(ToolExecutionSchema)` to create a new message.
  */
-export const ToolExecutionSchema: GenMessage<ToolExecution> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 12);
+export const ToolExecutionSchema: GenMessage<ToolExecution> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 12)
 
 /**
  * TurnDurationData contains turn duration metrics.
  *
  * @generated from message session.v1.TurnDurationData
  */
-export type TurnDurationData = Message<"session.v1.TurnDurationData"> & {
+export type TurnDurationData = Message<'session.v1.TurnDurationData'> & {
   /**
    * @generated from field: int32 duration_ms = 1;
    */
-  durationMs: number;
-};
+  durationMs: number
+}
 
 /**
  * Describes the message session.v1.TurnDurationData.
  * Use `create(TurnDurationDataSchema)` to create a new message.
  */
-export const TurnDurationDataSchema: GenMessage<TurnDurationData> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 13);
+export const TurnDurationDataSchema: GenMessage<TurnDurationData> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 13)
 
 /**
  * SummaryData contains conversation branch summary.
  *
  * @generated from message session.v1.SummaryData
  */
-export type SummaryData = Message<"session.v1.SummaryData"> & {
+export type SummaryData = Message<'session.v1.SummaryData'> & {
   /**
    * @generated from field: string summary = 1;
    */
-  summary: string;
+  summary: string
 
   /**
    * @generated from field: string leaf_uuid = 2;
    */
-  leafUuid: string;
-};
+  leafUuid: string
+}
 
 /**
  * Describes the message session.v1.SummaryData.
  * Use `create(SummaryDataSchema)` to create a new message.
  */
-export const SummaryDataSchema: GenMessage<SummaryData> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 14);
+export const SummaryDataSchema: GenMessage<SummaryData> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 14)
 
 /**
  * FileBackup represents backup info for a single file.
  *
  * @generated from message session.v1.FileBackup
  */
-export type FileBackup = Message<"session.v1.FileBackup"> & {
+export type FileBackup = Message<'session.v1.FileBackup'> & {
   /**
    * @generated from field: string backup_file_name = 1;
    */
-  backupFileName: string;
+  backupFileName: string
 
   /**
    * @generated from field: int32 version = 2;
    */
-  version: number;
+  version: number
 
   /**
    * @generated from field: google.protobuf.Timestamp backup_time = 3;
    */
-  backupTime?: Timestamp;
-};
+  backupTime?: Timestamp
+}
 
 /**
  * Describes the message session.v1.FileBackup.
  * Use `create(FileBackupSchema)` to create a new message.
  */
-export const FileBackupSchema: GenMessage<FileBackup> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 15);
+export const FileBackupSchema: GenMessage<FileBackup> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 15)
 
 /**
  * FileSnapshotData contains file change tracking information.
  *
  * @generated from message session.v1.FileSnapshotData
  */
-export type FileSnapshotData = Message<"session.v1.FileSnapshotData"> & {
+export type FileSnapshotData = Message<'session.v1.FileSnapshotData'> & {
   /**
    * @generated from field: string message_id = 1;
    */
-  messageId: string;
+  messageId: string
 
   /**
    * @generated from field: map<string, session.v1.FileBackup> tracked_file_backups = 2;
    */
-  trackedFileBackups: { [key: string]: FileBackup };
+  trackedFileBackups: { [key: string]: FileBackup }
 
   /**
    * @generated from field: google.protobuf.Timestamp snapshot_timestamp = 3;
    */
-  snapshotTimestamp?: Timestamp;
+  snapshotTimestamp?: Timestamp
 
   /**
    * @generated from field: bool is_snapshot_update = 4;
    */
-  isSnapshotUpdate: boolean;
-};
+  isSnapshotUpdate: boolean
+}
 
 /**
  * Describes the message session.v1.FileSnapshotData.
  * Use `create(FileSnapshotDataSchema)` to create a new message.
  */
-export const FileSnapshotDataSchema: GenMessage<FileSnapshotData> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 16);
+export const FileSnapshotDataSchema: GenMessage<FileSnapshotData> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 16)
 
 /**
  * SystemMessage represents system-level metadata in the conversation.
  *
  * @generated from message session.v1.SystemMessage
  */
-export type SystemMessage = Message<"session.v1.SystemMessage"> & {
+export type SystemMessage = Message<'session.v1.SystemMessage'> & {
   /**
    * @generated from field: session.v1.TreeNodeMeta metadata = 1;
    */
-  metadata?: TreeNodeMeta;
+  metadata?: TreeNodeMeta
 
   /**
    * @generated from field: session.v1.SystemMessageSubtype subtype = 2;
    */
-  subtype: SystemMessageSubtype;
+  subtype: SystemMessageSubtype
 
   /**
    * @generated from field: bool is_meta = 3;
    */
-  isMeta: boolean;
+  isMeta: boolean
 
   /**
    * For subtype=TURN_DURATION
    *
    * @generated from field: session.v1.TurnDurationData turn_duration = 4;
    */
-  turnDuration?: TurnDurationData;
+  turnDuration?: TurnDurationData
 
   /**
    * For subtype=SUMMARY
    *
    * @generated from field: session.v1.SummaryData summary = 5;
    */
-  summary?: SummaryData;
+  summary?: SummaryData
 
   /**
    * For subtype=FILE_SNAPSHOT
    *
    * @generated from field: session.v1.FileSnapshotData file_snapshot = 6;
    */
-  fileSnapshot?: FileSnapshotData;
-};
+  fileSnapshot?: FileSnapshotData
+}
 
 /**
  * Describes the message session.v1.SystemMessage.
  * Use `create(SystemMessageSchema)` to create a new message.
  */
-export const SystemMessageSchema: GenMessage<SystemMessage> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 17);
+export const SystemMessageSchema: GenMessage<SystemMessage> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 17)
 
 /**
  * ProgressData contains the progress payload.
  *
  * @generated from message session.v1.ProgressData
  */
-export type ProgressData = Message<"session.v1.ProgressData"> & {
+export type ProgressData = Message<'session.v1.ProgressData'> & {
   /**
    * @generated from field: session.v1.ProgressType type = 1;
    */
-  type: ProgressType;
+  type: ProgressType
 
   /**
    * Provider-specific progress message (JSON)
    *
    * @generated from field: string message_json = 2;
    */
-  messageJson: string;
+  messageJson: string
 
   /**
    * Normalized progress messages (JSON array)
    *
    * @generated from field: string normalized_messages_json = 3;
    */
-  normalizedMessagesJson: string;
+  normalizedMessagesJson: string
 
   /**
    * User prompt for subagent progress
    *
    * @generated from field: string prompt = 4;
    */
-  prompt: string;
+  prompt: string
 
   /**
    * Subagent ID for agent progress
    *
    * @generated from field: string agent_id = 5;
    */
-  agentId: string;
+  agentId: string
 
   /**
    * Hook progress fields
    *
    * @generated from field: string hook_event = 6;
    */
-  hookEvent: string;
+  hookEvent: string
 
   /**
    * @generated from field: string hook_name = 7;
    */
-  hookName: string;
+  hookName: string
 
   /**
    * @generated from field: string command = 8;
    */
-  command: string;
-};
+  command: string
+}
 
 /**
  * Describes the message session.v1.ProgressData.
  * Use `create(ProgressDataSchema)` to create a new message.
  */
-export const ProgressDataSchema: GenMessage<ProgressData> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 18);
+export const ProgressDataSchema: GenMessage<ProgressData> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 18)
 
 /**
  * Progress represents real-time progress updates during tool execution.
  *
  * @generated from message session.v1.Progress
  */
-export type Progress = Message<"session.v1.Progress"> & {
+export type Progress = Message<'session.v1.Progress'> & {
   /**
    * @generated from field: session.v1.TreeNodeMeta metadata = 1;
    */
-  metadata?: TreeNodeMeta;
+  metadata?: TreeNodeMeta
 
   /**
    * Reference to the ToolExecution this progress is for
    *
    * @generated from field: string tool_execution_id = 2;
    */
-  toolExecutionId: string;
+  toolExecutionId: string
 
   /**
    * Parent tool execution ID for nested operations
    *
    * @generated from field: string parent_tool_execution_id = 3;
    */
-  parentToolExecutionId: string;
+  parentToolExecutionId: string
 
   /**
    * Progress payload
    *
    * @generated from field: session.v1.ProgressData data = 4;
    */
-  data?: ProgressData;
-};
+  data?: ProgressData
+}
 
 /**
  * Describes the message session.v1.Progress.
  * Use `create(ProgressSchema)` to create a new message.
  */
-export const ProgressSchema: GenMessage<Progress> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 19);
+export const ProgressSchema: GenMessage<Progress> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 19)
 
 /**
  * Session represents a single entry with polymorphic data.
  *
  * @generated from message session.v1.Session
  */
-export type Session = Message<"session.v1.Session"> & {
+export type Session = Message<'session.v1.Session'> & {
   /**
    * @generated from field: session.v1.SessionType type = 1;
    */
-  type: SessionType;
+  type: SessionType
 
   /**
    * @generated from oneof session.v1.Session.data
    */
-  data: {
-    /**
-     * @generated from field: session.v1.HumanMessage human_data = 2;
-     */
-    value: HumanMessage;
-    case: "humanData";
-  } | {
-    /**
-     * @generated from field: session.v1.AgentMessage agent_data = 3;
-     */
-    value: AgentMessage;
-    case: "agentData";
-  } | {
-    /**
-     * @generated from field: session.v1.ToolExecution tool_execution_data = 4;
-     */
-    value: ToolExecution;
-    case: "toolExecutionData";
-  } | {
-    /**
-     * @generated from field: session.v1.SystemMessage system_data = 5;
-     */
-    value: SystemMessage;
-    case: "systemData";
-  } | {
-    /**
-     * @generated from field: session.v1.Progress progress_data = 6;
-     */
-    value: Progress;
-    case: "progressData";
-  } | { case: undefined; value?: undefined };
-};
+  data:
+    | {
+        /**
+         * @generated from field: session.v1.HumanMessage human_data = 2;
+         */
+        value: HumanMessage
+        case: 'humanData'
+      }
+    | {
+        /**
+         * @generated from field: session.v1.AgentMessage agent_data = 3;
+         */
+        value: AgentMessage
+        case: 'agentData'
+      }
+    | {
+        /**
+         * @generated from field: session.v1.ToolExecution tool_execution_data = 4;
+         */
+        value: ToolExecution
+        case: 'toolExecutionData'
+      }
+    | {
+        /**
+         * @generated from field: session.v1.SystemMessage system_data = 5;
+         */
+        value: SystemMessage
+        case: 'systemData'
+      }
+    | {
+        /**
+         * @generated from field: session.v1.Progress progress_data = 6;
+         */
+        value: Progress
+        case: 'progressData'
+      }
+    | { case: undefined; value?: undefined }
+}
 
 /**
  * Describes the message session.v1.Session.
  * Use `create(SessionSchema)` to create a new message.
  */
-export const SessionSchema: GenMessage<Session> = /*@__PURE__*/
-  messageDesc(file_session_v1_session, 20);
+export const SessionSchema: GenMessage<Session> =
+  /*@__PURE__*/
+  messageDesc(file_session_v1_session, 20)
 
 /**
  * SessionType represents the type discriminator for session entries.
@@ -911,8 +946,9 @@ export enum SessionType {
 /**
  * Describes the enum session.v1.SessionType.
  */
-export const SessionTypeSchema: GenEnum<SessionType> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 0);
+export const SessionTypeSchema: GenEnum<SessionType> =
+  /*@__PURE__*/
+  enumDesc(file_session_v1_session, 0)
 
 /**
  * SystemMessageSubtype represents the subtype of a system message.
@@ -949,8 +985,9 @@ export enum SystemMessageSubtype {
 /**
  * Describes the enum session.v1.SystemMessageSubtype.
  */
-export const SystemMessageSubtypeSchema: GenEnum<SystemMessageSubtype> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 1);
+export const SystemMessageSubtypeSchema: GenEnum<SystemMessageSubtype> =
+  /*@__PURE__*/
+  enumDesc(file_session_v1_session, 1)
 
 /**
  * ProgressType represents the type of progress update.
@@ -992,8 +1029,9 @@ export enum ProgressType {
 /**
  * Describes the enum session.v1.ProgressType.
  */
-export const ProgressTypeSchema: GenEnum<ProgressType> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 2);
+export const ProgressTypeSchema: GenEnum<ProgressType> =
+  /*@__PURE__*/
+  enumDesc(file_session_v1_session, 2)
 
 /**
  * ToolResultStatus represents the execution status of a tool call.
@@ -1030,8 +1068,9 @@ export enum ToolResultStatus {
 /**
  * Describes the enum session.v1.ToolResultStatus.
  */
-export const ToolResultStatusSchema: GenEnum<ToolResultStatus> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 3);
+export const ToolResultStatusSchema: GenEnum<ToolResultStatus> =
+  /*@__PURE__*/
+  enumDesc(file_session_v1_session, 3)
 
 /**
  * HumanContentBlockType represents the type of content block in a human message.
@@ -1058,8 +1097,9 @@ export enum HumanContentBlockType {
 /**
  * Describes the enum session.v1.HumanContentBlockType.
  */
-export const HumanContentBlockTypeSchema: GenEnum<HumanContentBlockType> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 4);
+export const HumanContentBlockTypeSchema: GenEnum<HumanContentBlockType> =
+  /*@__PURE__*/
+  enumDesc(file_session_v1_session, 4)
 
 /**
  * AgentContentBlockType represents the type of content block in an agent message.
@@ -1091,6 +1131,6 @@ export enum AgentContentBlockType {
 /**
  * Describes the enum session.v1.AgentContentBlockType.
  */
-export const AgentContentBlockTypeSchema: GenEnum<AgentContentBlockType> = /*@__PURE__*/
-  enumDesc(file_session_v1_session, 5);
-
+export const AgentContentBlockTypeSchema: GenEnum<AgentContentBlockType> =
+  /*@__PURE__*/
+  enumDesc(file_session_v1_session, 5)

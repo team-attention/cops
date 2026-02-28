@@ -21,9 +21,8 @@ export const Route = createFileRoute('/dashboard')({
   },
   loader: async ({ context }) => {
     // Fetch user data and wait for it before making redirect decision
-    const response = await context.queryClient.ensureQueryData(
-      getMeQueryOptions(),
-    )
+    const response =
+      await context.queryClient.ensureQueryData(getMeQueryOptions())
 
     // Check if user has organizations
     if (response.organizations.length === 0) {
@@ -53,9 +52,7 @@ export const Route = createFileRoute('/dashboard')({
           id: org.id,
           name: org.name,
           slug: org.slug,
-          role: (membership?.role === 'admin' ? 'admin' : 'member') as
-            | 'admin'
-            | 'member',
+          role: membership?.role === 'admin' ? 'admin' : 'member',
         }
       }),
     )

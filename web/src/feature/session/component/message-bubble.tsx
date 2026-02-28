@@ -1,5 +1,15 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { AlertCircle, Bot, Check, ChevronRight, Copy, Play, User, Wrench, Zap } from 'lucide-react'
+import {
+  AlertCircle,
+  Bot,
+  Check,
+  ChevronRight,
+  Copy,
+  Play,
+  User,
+  Wrench,
+  Zap,
+} from 'lucide-react'
 import type { ParsedMessage } from '../type/content-block'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 import { Badge } from '@/gen/shadcn/ui/badge'
@@ -117,17 +127,18 @@ export const MessageBubble = ({
   const containerStyles = `
     w-full group relative rounded-xl border p-3 transition-all duration-200 cursor-pointer
     ${isSelected ? 'ring-2 ring-cyan-500/50' : ''}
-    ${isSystem
-      ? 'border-dashed border-zinc-700/50 bg-zinc-900/30 opacity-50 hover:opacity-75'
-      : isUser
-        ? 'border-cyan-500/20 bg-gradient-to-br from-cyan-950/30 to-zinc-900/80 hover:border-cyan-500/40'
-        : isAssistant
-          ? 'border-violet-500/20 bg-gradient-to-br from-violet-950/30 to-zinc-900/80 hover:border-violet-500/40'
-          : isToolResult
-            ? 'border-amber-500/20 bg-gradient-to-br from-amber-950/30 to-zinc-900/80 hover:border-amber-500/40'
-            : isProgress
-              ? 'border-emerald-500/20 bg-gradient-to-br from-emerald-950/30 to-zinc-900/80 hover:border-emerald-500/40'
-              : 'border-zinc-800/50 bg-zinc-900/50 hover:border-zinc-700/50'
+    ${
+      isSystem
+        ? 'border-dashed border-zinc-700/50 bg-zinc-900/30 opacity-50 hover:opacity-75'
+        : isUser
+          ? 'border-cyan-500/20 bg-gradient-to-br from-cyan-950/30 to-zinc-900/80 hover:border-cyan-500/40'
+          : isAssistant
+            ? 'border-violet-500/20 bg-gradient-to-br from-violet-950/30 to-zinc-900/80 hover:border-violet-500/40'
+            : isToolResult
+              ? 'border-amber-500/20 bg-gradient-to-br from-amber-950/30 to-zinc-900/80 hover:border-amber-500/40'
+              : isProgress
+                ? 'border-emerald-500/20 bg-gradient-to-br from-emerald-950/30 to-zinc-900/80 hover:border-emerald-500/40'
+                : 'border-zinc-800/50 bg-zinc-900/50 hover:border-zinc-700/50'
     }
   `
 
@@ -136,14 +147,15 @@ export const MessageBubble = ({
       {/* Glow effect on hover */}
       {!isSystem && (
         <div
-          className={`pointer-events-none absolute inset-0 rounded-xl opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-20 ${isUser
-            ? 'bg-cyan-500'
-            : isToolResult
-              ? 'bg-amber-500'
-              : isProgress
-                ? 'bg-emerald-500'
-                : 'bg-violet-500'
-            }`}
+          className={`pointer-events-none absolute inset-0 rounded-xl opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-20 ${
+            isUser
+              ? 'bg-cyan-500'
+              : isToolResult
+                ? 'bg-amber-500'
+                : isProgress
+                  ? 'bg-emerald-500'
+                  : 'bg-violet-500'
+          }`}
         />
       )}
 
@@ -152,16 +164,17 @@ export const MessageBubble = ({
         <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
           {/* Avatar */}
           <div
-            className={`rounded-lg p-1.5 ${isSystem
-              ? 'bg-zinc-800'
-              : isUser
-                ? 'bg-cyan-500/10 text-cyan-400'
-                : isToolResult
-                  ? 'bg-amber-500/10 text-amber-400'
-                  : isProgress
-                    ? 'bg-emerald-500/10 text-emerald-400'
-                    : 'bg-violet-500/10 text-violet-400'
-              }`}
+            className={`rounded-lg p-1.5 ${
+              isSystem
+                ? 'bg-zinc-800'
+                : isUser
+                  ? 'bg-cyan-500/10 text-cyan-400'
+                  : isToolResult
+                    ? 'bg-amber-500/10 text-amber-400'
+                    : isProgress
+                      ? 'bg-emerald-500/10 text-emerald-400'
+                      : 'bg-violet-500/10 text-violet-400'
+            }`}
           >
             {isSystem ? (
               <AlertCircle className="h-4 w-4 text-zinc-500" />
@@ -180,16 +193,17 @@ export const MessageBubble = ({
 
           {/* Role label */}
           <span
-            className={`font-mono text-xs font-medium ${isSystem
-              ? 'text-zinc-600'
-              : isUser
-                ? 'text-cyan-400'
-                : isToolResult
-                  ? 'text-amber-400'
-                  : isProgress
-                    ? 'text-emerald-400'
-                    : 'text-violet-400'
-              }`}
+            className={`font-mono text-xs font-medium ${
+              isSystem
+                ? 'text-zinc-600'
+                : isUser
+                  ? 'text-cyan-400'
+                  : isToolResult
+                    ? 'text-amber-400'
+                    : isProgress
+                      ? 'text-emerald-400'
+                      : 'text-violet-400'
+            }`}
           >
             {isSystem
               ? 'System'
@@ -254,24 +268,26 @@ export const MessageBubble = ({
           <div className="relative">
             <div
               ref={textRef}
-              className={`line-clamp-3 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed tracking-wide ${isSystem ? 'text-zinc-500' : 'text-zinc-200'
-                }`}
+              className={`line-clamp-3 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed tracking-wide ${
+                isSystem ? 'text-zinc-500' : 'text-zinc-200'
+              }`}
             >
               {textContent}
             </div>
             {/* Fade-out gradient when truncated */}
             {isTruncated && (
               <div
-                className={`pointer-events-none absolute bottom-0 left-0 right-0 h-6 ${isUser
-                  ? 'bg-gradient-to-t from-cyan-950/80 to-transparent'
-                  : isToolResult
-                    ? 'bg-gradient-to-t from-amber-950/80 to-transparent'
-                    : isProgress
-                      ? 'bg-gradient-to-t from-emerald-950/80 to-transparent'
-                      : isSystem
-                        ? 'bg-gradient-to-t from-zinc-900/80 to-transparent'
-                        : 'bg-gradient-to-t from-violet-950/80 to-transparent'
-                  }`}
+                className={`pointer-events-none absolute bottom-0 left-0 right-0 h-6 ${
+                  isUser
+                    ? 'bg-gradient-to-t from-cyan-950/80 to-transparent'
+                    : isToolResult
+                      ? 'bg-gradient-to-t from-amber-950/80 to-transparent'
+                      : isProgress
+                        ? 'bg-gradient-to-t from-emerald-950/80 to-transparent'
+                        : isSystem
+                          ? 'bg-gradient-to-t from-zinc-900/80 to-transparent'
+                          : 'bg-gradient-to-t from-violet-950/80 to-transparent'
+                }`}
               />
             )}
           </div>
@@ -311,9 +327,7 @@ export const MessageBubble = ({
             className="group/result mt-2 flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 transition-all hover:border-amber-500/40 hover:bg-amber-500/10"
           >
             <span className="font-mono text-xs text-amber-300">
-              {message.toolName
-                ? getToolIcon(message.toolName)
-                : '📤'}
+              {message.toolName ? getToolIcon(message.toolName) : '📤'}
             </span>
             <span className="font-mono text-xs text-zinc-400">
               Result returned

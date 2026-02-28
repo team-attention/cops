@@ -2,75 +2,80 @@
 // @generated from file domain/v1/domain.proto (package domain.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage } from '@bufbuild/protobuf/codegenv2'
+import { fileDesc, messageDesc } from '@bufbuild/protobuf/codegenv2'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file domain/v1/domain.proto.
  */
-export const file_domain_v1_domain: GenFile = /*@__PURE__*/
-  fileDesc("ChZkb21haW4vdjEvZG9tYWluLnByb3RvEglkb21haW4udjEiQwoEVXNlchIKCgJpZBgBIAEoCRINCgVlbWFpbBgCIAEoCRIMCgRuYW1lGAMgASgJEhIKCmF2YXRhcl91cmwYBCABKAkiMwoST3JnYW5pemF0aW9uTWVtYmVyEg8KB3VzZXJfaWQYASABKAkSDAoEcm9sZRgCIAEoCSJmCgxPcmdhbml6YXRpb24SCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRzbHVnGAMgASgJEi4KB21lbWJlcnMYBCADKAsyHS5kb21haW4udjEuT3JnYW5pemF0aW9uTWVtYmVyQqgBCg1jb20uZG9tYWluLnYxQgtEb21haW5Qcm90b1ABWkVnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9kb21haW4vdjE7ZG9tYWludjGiAgNEWFiqAglEb21haW4uVjHKAglEb21haW5cVjHiAhVEb21haW5cVjFcR1BCTWV0YWRhdGHqAgpEb21haW46OlYxYgZwcm90bzM");
+export const file_domain_v1_domain: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChZkb21haW4vdjEvZG9tYWluLnByb3RvEglkb21haW4udjEiQwoEVXNlchIKCgJpZBgBIAEoCRINCgVlbWFpbBgCIAEoCRIMCgRuYW1lGAMgASgJEhIKCmF2YXRhcl91cmwYBCABKAkiMwoST3JnYW5pemF0aW9uTWVtYmVyEg8KB3VzZXJfaWQYASABKAkSDAoEcm9sZRgCIAEoCSJmCgxPcmdhbml6YXRpb24SCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRzbHVnGAMgASgJEi4KB21lbWJlcnMYBCADKAsyHS5kb21haW4udjEuT3JnYW5pemF0aW9uTWVtYmVyQqgBCg1jb20uZG9tYWluLnYxQgtEb21haW5Qcm90b1ABWkVnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9kb21haW4vdjE7ZG9tYWludjGiAgNEWFiqAglEb21haW4uVjHKAglEb21haW5cVjHiAhVEb21haW5cVjFcR1BCTWV0YWRhdGHqAgpEb21haW46OlYxYgZwcm90bzM',
+  )
 
 /**
  * User represents an authenticated user in the system.
  *
  * @generated from message domain.v1.User
  */
-export type User = Message<"domain.v1.User"> & {
+export type User = Message<'domain.v1.User'> & {
   /**
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * @generated from field: string email = 2;
    */
-  email: string;
+  email: string
 
   /**
    * @generated from field: string name = 3;
    */
-  name: string;
+  name: string
 
   /**
    * @generated from field: string avatar_url = 4;
    */
-  avatarUrl: string;
-};
+  avatarUrl: string
+}
 
 /**
  * Describes the message domain.v1.User.
  * Use `create(UserSchema)` to create a new message.
  */
-export const UserSchema: GenMessage<User> = /*@__PURE__*/
-  messageDesc(file_domain_v1_domain, 0);
+export const UserSchema: GenMessage<User> =
+  /*@__PURE__*/
+  messageDesc(file_domain_v1_domain, 0)
 
 /**
  * OrganizationMember represents a user's membership within an organization.
  *
  * @generated from message domain.v1.OrganizationMember
  */
-export type OrganizationMember = Message<"domain.v1.OrganizationMember"> & {
+export type OrganizationMember = Message<'domain.v1.OrganizationMember'> & {
   /**
    * @generated from field: string user_id = 1;
    */
-  userId: string;
+  userId: string
 
   /**
    * "admin" or "member"
    *
    * @generated from field: string role = 2;
    */
-  role: string;
-};
+  role: string
+}
 
 /**
  * Describes the message domain.v1.OrganizationMember.
  * Use `create(OrganizationMemberSchema)` to create a new message.
  */
-export const OrganizationMemberSchema: GenMessage<OrganizationMember> = /*@__PURE__*/
-  messageDesc(file_domain_v1_domain, 1);
+export const OrganizationMemberSchema: GenMessage<OrganizationMember> =
+  /*@__PURE__*/
+  messageDesc(file_domain_v1_domain, 1)
 
 /**
  * Organization represents a group that owns projects.
@@ -78,32 +83,32 @@ export const OrganizationMemberSchema: GenMessage<OrganizationMember> = /*@__PUR
  *
  * @generated from message domain.v1.Organization
  */
-export type Organization = Message<"domain.v1.Organization"> & {
+export type Organization = Message<'domain.v1.Organization'> & {
   /**
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * @generated from field: string name = 2;
    */
-  name: string;
+  name: string
 
   /**
    * @generated from field: string slug = 3;
    */
-  slug: string;
+  slug: string
 
   /**
    * @generated from field: repeated domain.v1.OrganizationMember members = 4;
    */
-  members: OrganizationMember[];
-};
+  members: OrganizationMember[]
+}
 
 /**
  * Describes the message domain.v1.Organization.
  * Use `create(OrganizationSchema)` to create a new message.
  */
-export const OrganizationSchema: GenMessage<Organization> = /*@__PURE__*/
-  messageDesc(file_domain_v1_domain, 2);
-
+export const OrganizationSchema: GenMessage<Organization> =
+  /*@__PURE__*/
+  messageDesc(file_domain_v1_domain, 2)

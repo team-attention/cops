@@ -2,313 +2,331 @@
 // @generated from file dashboard/v1/dashboard.proto (package dashboard.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Session } from "../../session/v1/session_pb";
-import { file_session_v1_session } from "../../session/v1/session_pb";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Timestamp } from '@bufbuild/protobuf/wkt'
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt'
+import type { Session } from '../../session/v1/session_pb'
+import { file_session_v1_session } from '../../session/v1/session_pb'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file dashboard/v1/dashboard.proto.
  */
-export const file_dashboard_v1_dashboard: GenFile = /*@__PURE__*/
-  fileDesc("ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKUAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJQoIc2Vzc2lvbnMYCSADKAsyEy5zZXNzaW9uLnYxLlNlc3Npb25KBAgEEAVSA2N3ZCIpCg5HZXRPdmVydmlld1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAki4gEKDkdldE92ZXJ2aWV3UmVzEjQKC3RvdGFsX3VzYWdlGAEgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5EhUKDXByb2plY3RfY291bnQYAiABKAUSFQoNc2Vzc2lvbl9jb3VudBgDIAEoBRI1Cg9yZWNlbnRfcHJvamVjdHMYBCADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSNQoPcmVjZW50X3Nlc3Npb25zGAUgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5IlsKD0xpc3RQcm9qZWN0c1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0UHJvamVjdFJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKTAQoPTGlzdFNlc3Npb25zUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAQgASgJEhEKCXNvcnRfZGVzYxgFIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIpEBCg1HZXRTZXNzaW9uUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIVCghhZ2VudF9pZBgEIAEoCUgAiAEBQgsKCV9hZ2VudF9pZCJ5Cg1HZXRTZXNzaW9uUmVzEiwKB3Nlc3Npb24YASABKAsyGy5kYXNoYm9hcmQudjEuU2Vzc2lvbkRldGFpbBI6ChV0cmFuc2NyaXB0X3BhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcyKgAQoOU2Vzc2lvblNlZ21lbnQSCgoCaWQYASABKAkSDQoFbGFiZWwYAiABKAkSLgoKc3RhcnRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDW1lc3NhZ2VfY291bnQYBSABKAUiRAoVR2V0U2Vzc2lvblNlZ21lbnRzUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJIsUBChVHZXRTZXNzaW9uU2VnbWVudHNSZXMSLgoIc2VnbWVudHMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblNlZ21lbnQSLgoKc3RhcnRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh4KFnRvdGFsX2R1cmF0aW9uX3NlY29uZHMYBCABKAMiUAoNR2V0TWVzc2FnZVJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRISCgptZXNzYWdlX2lkGAMgASgJIjUKDUdldE1lc3NhZ2VSZXMSJAoHbWVzc2FnZRgBIAEoCzITLnNlc3Npb24udjEuU2Vzc2lvbiIzCg9Ub29sQ2FsbFN1bW1hcnkSEQoJdG9vbF9uYW1lGAEgASgJEg0KBWNvdW50GAIgASgFIo0CCg5GZWF0dXJlZE1lbWJlchIPCgd1c2VyX2lkGAEgASgJEhEKCXVzZXJfbmFtZRgCIAEoCRISCgpwcm9qZWN0X2lkGAMgASgJEhQKDHByb2plY3RfbmFtZRgEIAEoCRIuCgV1c2FnZRgFIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIUCgxwcm9tcHRfY291bnQYBiABKAUSMQoKdG9vbF9jYWxscxgHIAMoCzIdLmRhc2hib2FyZC52MS5Ub29sQ2FsbFN1bW1hcnkSNAoQbGFzdF9hY3Rpdml0eV9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiOwoTR2V0RmVhdHVyZWRCb2FyZFJlcRIQCghvcmdfc2x1ZxgBIAEoCRISCgpzaW5jZV91bml4GAIgASgDIl8KE0dldEZlYXR1cmVkQm9hcmRSZXMSLQoHbWVtYmVycxgBIAMoCzIcLmRhc2hib2FyZC52MS5GZWF0dXJlZE1lbWJlchIZChFvcmdhbml6YXRpb25fbmFtZRgCIAEoCTKxBAoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcxJeChJHZXRTZXNzaW9uU2VnbWVudHMSIy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblNlZ21lbnRzUmVxGiMuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25TZWdtZW50c1JlcxJGCgpHZXRNZXNzYWdlEhsuZGFzaGJvYXJkLnYxLkdldE1lc3NhZ2VSZXEaGy5kYXNoYm9hcmQudjEuR2V0TWVzc2FnZVJlczJwChRGZWF0dXJlZEJvYXJkU2VydmljZRJYChBHZXRGZWF0dXJlZEJvYXJkEiEuZGFzaGJvYXJkLnYxLkdldEZlYXR1cmVkQm9hcmRSZXEaIS5kYXNoYm9hcmQudjEuR2V0RmVhdHVyZWRCb2FyZFJlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp, file_session_v1_session]);
+export const file_dashboard_v1_dashboard: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChxkYXNoYm9hcmQvdjEvZGFzaGJvYXJkLnByb3RvEgxkYXNoYm9hcmQudjEikgEKEVRva2VuVXNhZ2VTdW1tYXJ5EhoKEnRvdGFsX2lucHV0X3Rva2VucxgBIAEoAxIbChN0b3RhbF9vdXRwdXRfdG9rZW5zGAIgASgDEiMKG3RvdGFsX2NhY2hlX2NyZWF0aW9uX3Rva2VucxgDIAEoAxIfChd0b3RhbF9jYWNoZV9yZWFkX3Rva2VucxgEIAEoAyIwCg1QYWdpbmF0aW9uUmVxEgwKBHBhZ2UYASABKAUSEQoJcGFnZV9zaXplGAIgASgFImIKDVBhZ2luYXRpb25SZXMSFAoMY3VycmVudF9wYWdlGAEgASgFEhEKCXBhZ2Vfc2l6ZRgCIAEoBRITCgt0b3RhbF9wYWdlcxgDIAEoBRITCgt0b3RhbF9jb3VudBgEIAEoAyKyAQoOUHJvamVjdFN1bW1hcnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBCABKAUSLgoFdXNhZ2UYBSABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSMQoNbGFzdF9hY3Rpdml0eRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi4QEKDVByb2plY3REZXRhaWwSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIMCgRwYXRoGAMgASgJEhUKDXNlc3Npb25fY291bnQYBSABKAUSLgoFdXNhZ2UYBiABKAsyHy5kYXNoYm9hcmQudjEuVG9rZW5Vc2FnZVN1bW1hcnkSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoNbGFzdF9hY3Rpdml0eRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi6QEKDlNlc3Npb25TdW1tYXJ5EgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSEgoKZ2l0X2JyYW5jaBgDIAEoCRIVCg1tZXNzYWdlX2NvdW50GAQgASgFEi4KBXVzYWdlGAUgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5Ei4KCnN0YXJ0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKUAgoNU2Vzc2lvbkRldGFpbBIKCgJpZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEhIKCmdpdF9icmFuY2gYAyABKAkSDwoHdmVyc2lvbhgFIAEoCRIuCgV1c2FnZRgGIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIuCgpzdGFydGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghlbmRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJQoIc2Vzc2lvbnMYCSADKAsyEy5zZXNzaW9uLnYxLlNlc3Npb25KBAgEEAVSA2N3ZCIpCg5HZXRPdmVydmlld1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAki4gEKDkdldE92ZXJ2aWV3UmVzEjQKC3RvdGFsX3VzYWdlGAEgASgLMh8uZGFzaGJvYXJkLnYxLlRva2VuVXNhZ2VTdW1tYXJ5EhUKDXByb2plY3RfY291bnQYAiABKAUSFQoNc2Vzc2lvbl9jb3VudBgDIAEoBRI1Cg9yZWNlbnRfcHJvamVjdHMYBCADKAsyHC5kYXNoYm9hcmQudjEuUHJvamVjdFN1bW1hcnkSNQoPcmVjZW50X3Nlc3Npb25zGAUgAygLMhwuZGFzaGJvYXJkLnYxLlNlc3Npb25TdW1tYXJ5IlsKD0xpc3RQcm9qZWN0c1JlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVxInIKD0xpc3RQcm9qZWN0c1JlcxIuCghwcm9qZWN0cxgBIAMoCzIcLmRhc2hib2FyZC52MS5Qcm9qZWN0U3VtbWFyeRIvCgpwYWdpbmF0aW9uGAIgASgLMhsuZGFzaGJvYXJkLnYxLlBhZ2luYXRpb25SZXMiPAoNR2V0UHJvamVjdFJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCSI9Cg1HZXRQcm9qZWN0UmVzEiwKB3Byb2plY3QYASABKAsyGy5kYXNoYm9hcmQudjEuUHJvamVjdERldGFpbCKTAQoPTGlzdFNlc3Npb25zUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIPCgdzb3J0X2J5GAQgASgJEhEKCXNvcnRfZGVzYxgFIAEoCCJyCg9MaXN0U2Vzc2lvbnNSZXMSLgoIc2Vzc2lvbnMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblN1bW1hcnkSLwoKcGFnaW5hdGlvbhgCIAEoCzIbLmRhc2hib2FyZC52MS5QYWdpbmF0aW9uUmVzIpEBCg1HZXRTZXNzaW9uUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJEi8KCnBhZ2luYXRpb24YAyABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcRIVCghhZ2VudF9pZBgEIAEoCUgAiAEBQgsKCV9hZ2VudF9pZCJ5Cg1HZXRTZXNzaW9uUmVzEiwKB3Nlc3Npb24YASABKAsyGy5kYXNoYm9hcmQudjEuU2Vzc2lvbkRldGFpbBI6ChV0cmFuc2NyaXB0X3BhZ2luYXRpb24YAiABKAsyGy5kYXNoYm9hcmQudjEuUGFnaW5hdGlvblJlcyKgAQoOU2Vzc2lvblNlZ21lbnQSCgoCaWQYASABKAkSDQoFbGFiZWwYAiABKAkSLgoKc3RhcnRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDW1lc3NhZ2VfY291bnQYBSABKAUiRAoVR2V0U2Vzc2lvblNlZ21lbnRzUmVxEhcKD29yZ2FuaXphdGlvbl9pZBgBIAEoCRISCgpzZXNzaW9uX2lkGAIgASgJIsUBChVHZXRTZXNzaW9uU2VnbWVudHNSZXMSLgoIc2VnbWVudHMYASADKAsyHC5kYXNoYm9hcmQudjEuU2Vzc2lvblNlZ21lbnQSLgoKc3RhcnRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoIZW5kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh4KFnRvdGFsX2R1cmF0aW9uX3NlY29uZHMYBCABKAMiUAoNR2V0TWVzc2FnZVJlcRIXCg9vcmdhbml6YXRpb25faWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRISCgptZXNzYWdlX2lkGAMgASgJIjUKDUdldE1lc3NhZ2VSZXMSJAoHbWVzc2FnZRgBIAEoCzITLnNlc3Npb24udjEuU2Vzc2lvbiIzCg9Ub29sQ2FsbFN1bW1hcnkSEQoJdG9vbF9uYW1lGAEgASgJEg0KBWNvdW50GAIgASgFIo0CCg5GZWF0dXJlZE1lbWJlchIPCgd1c2VyX2lkGAEgASgJEhEKCXVzZXJfbmFtZRgCIAEoCRISCgpwcm9qZWN0X2lkGAMgASgJEhQKDHByb2plY3RfbmFtZRgEIAEoCRIuCgV1c2FnZRgFIAEoCzIfLmRhc2hib2FyZC52MS5Ub2tlblVzYWdlU3VtbWFyeRIUCgxwcm9tcHRfY291bnQYBiABKAUSMQoKdG9vbF9jYWxscxgHIAMoCzIdLmRhc2hib2FyZC52MS5Ub29sQ2FsbFN1bW1hcnkSNAoQbGFzdF9hY3Rpdml0eV9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiOwoTR2V0RmVhdHVyZWRCb2FyZFJlcRIQCghvcmdfc2x1ZxgBIAEoCRISCgpzaW5jZV91bml4GAIgASgDIl8KE0dldEZlYXR1cmVkQm9hcmRSZXMSLQoHbWVtYmVycxgBIAMoCzIcLmRhc2hib2FyZC52MS5GZWF0dXJlZE1lbWJlchIZChFvcmdhbml6YXRpb25fbmFtZRgCIAEoCTKxBAoQRGFzaGJvYXJkU2VydmljZRJJCgtHZXRPdmVydmlldxIcLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcRocLmRhc2hib2FyZC52MS5HZXRPdmVydmlld1JlcxJMCgxMaXN0UHJvamVjdHMSHS5kYXNoYm9hcmQudjEuTGlzdFByb2plY3RzUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RQcm9qZWN0c1JlcxJGCgpHZXRQcm9qZWN0EhsuZGFzaGJvYXJkLnYxLkdldFByb2plY3RSZXEaGy5kYXNoYm9hcmQudjEuR2V0UHJvamVjdFJlcxJMCgxMaXN0U2Vzc2lvbnMSHS5kYXNoYm9hcmQudjEuTGlzdFNlc3Npb25zUmVxGh0uZGFzaGJvYXJkLnYxLkxpc3RTZXNzaW9uc1JlcxJGCgpHZXRTZXNzaW9uEhsuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25SZXEaGy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblJlcxJeChJHZXRTZXNzaW9uU2VnbWVudHMSIy5kYXNoYm9hcmQudjEuR2V0U2Vzc2lvblNlZ21lbnRzUmVxGiMuZGFzaGJvYXJkLnYxLkdldFNlc3Npb25TZWdtZW50c1JlcxJGCgpHZXRNZXNzYWdlEhsuZGFzaGJvYXJkLnYxLkdldE1lc3NhZ2VSZXEaGy5kYXNoYm9hcmQudjEuR2V0TWVzc2FnZVJlczJwChRGZWF0dXJlZEJvYXJkU2VydmljZRJYChBHZXRGZWF0dXJlZEJvYXJkEiEuZGFzaGJvYXJkLnYxLkdldEZlYXR1cmVkQm9hcmRSZXEaIS5kYXNoYm9hcmQudjEuR2V0RmVhdHVyZWRCb2FyZFJlc0LAAQoQY29tLmRhc2hib2FyZC52MUIORGFzaGJvYXJkUHJvdG9QAVpLZ2l0aHViLmNvbS90ZWFtLWF0dGVudGlvbi9jb3BzL3NoYXJlZC9nZW4vZ3JwY3N0dWIvZGFzaGJvYXJkL3YxO2Rhc2hib2FyZHYxogIDRFhYqgIMRGFzaGJvYXJkLlYxygIMRGFzaGJvYXJkXFYx4gIYRGFzaGJvYXJkXFYxXEdQQk1ldGFkYXRh6gINRGFzaGJvYXJkOjpWMWIGcHJvdG8z',
+    [file_google_protobuf_timestamp, file_session_v1_session],
+  )
 
 /**
  * TokenUsageSummary aggregates token usage statistics.
  *
  * @generated from message dashboard.v1.TokenUsageSummary
  */
-export type TokenUsageSummary = Message<"dashboard.v1.TokenUsageSummary"> & {
+export type TokenUsageSummary = Message<'dashboard.v1.TokenUsageSummary'> & {
   /**
    * Total input tokens consumed
    *
    * @generated from field: int64 total_input_tokens = 1;
    */
-  totalInputTokens: bigint;
+  totalInputTokens: bigint
 
   /**
    * Total output tokens generated
    *
    * @generated from field: int64 total_output_tokens = 2;
    */
-  totalOutputTokens: bigint;
+  totalOutputTokens: bigint
 
   /**
    * Total cache creation tokens
    *
    * @generated from field: int64 total_cache_creation_tokens = 3;
    */
-  totalCacheCreationTokens: bigint;
+  totalCacheCreationTokens: bigint
 
   /**
    * Total cache read tokens
    *
    * @generated from field: int64 total_cache_read_tokens = 4;
    */
-  totalCacheReadTokens: bigint;
-};
+  totalCacheReadTokens: bigint
+}
 
 /**
  * Describes the message dashboard.v1.TokenUsageSummary.
  * Use `create(TokenUsageSummarySchema)` to create a new message.
  */
-export const TokenUsageSummarySchema: GenMessage<TokenUsageSummary> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 0);
+export const TokenUsageSummarySchema: GenMessage<TokenUsageSummary> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 0)
 
 /**
  * PaginationReq contains pagination parameters.
  *
  * @generated from message dashboard.v1.PaginationReq
  */
-export type PaginationReq = Message<"dashboard.v1.PaginationReq"> & {
+export type PaginationReq = Message<'dashboard.v1.PaginationReq'> & {
   /**
    * Page number (1-based)
    *
    * @generated from field: int32 page = 1;
    */
-  page: number;
+  page: number
 
   /**
    * Number of items per page
    *
    * @generated from field: int32 page_size = 2;
    */
-  pageSize: number;
-};
+  pageSize: number
+}
 
 /**
  * Describes the message dashboard.v1.PaginationReq.
  * Use `create(PaginationReqSchema)` to create a new message.
  */
-export const PaginationReqSchema: GenMessage<PaginationReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 1);
+export const PaginationReqSchema: GenMessage<PaginationReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 1)
 
 /**
  * PaginationRes contains pagination metadata.
  *
  * @generated from message dashboard.v1.PaginationRes
  */
-export type PaginationRes = Message<"dashboard.v1.PaginationRes"> & {
+export type PaginationRes = Message<'dashboard.v1.PaginationRes'> & {
   /**
    * Current page number
    *
    * @generated from field: int32 current_page = 1;
    */
-  currentPage: number;
+  currentPage: number
 
   /**
    * Items per page
    *
    * @generated from field: int32 page_size = 2;
    */
-  pageSize: number;
+  pageSize: number
 
   /**
    * Total number of pages
    *
    * @generated from field: int32 total_pages = 3;
    */
-  totalPages: number;
+  totalPages: number
 
   /**
    * Total number of items
    *
    * @generated from field: int64 total_count = 4;
    */
-  totalCount: bigint;
-};
+  totalCount: bigint
+}
 
 /**
  * Describes the message dashboard.v1.PaginationRes.
  * Use `create(PaginationResSchema)` to create a new message.
  */
-export const PaginationResSchema: GenMessage<PaginationRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 2);
+export const PaginationResSchema: GenMessage<PaginationRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 2)
 
 /**
  * ProjectSummary contains basic project information for list views.
  *
  * @generated from message dashboard.v1.ProjectSummary
  */
-export type ProjectSummary = Message<"dashboard.v1.ProjectSummary"> & {
+export type ProjectSummary = Message<'dashboard.v1.ProjectSummary'> & {
   /**
    * Project unique identifier
    *
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * Project display name
    *
    * @generated from field: string name = 2;
    */
-  name: string;
+  name: string
 
   /**
    * Project path
    *
    * @generated from field: string path = 3;
    */
-  path: string;
+  path: string
 
   /**
    * Number of sessions in this project
    *
    * @generated from field: int32 session_count = 4;
    */
-  sessionCount: number;
+  sessionCount: number
 
   /**
    * Aggregated token usage
    *
    * @generated from field: dashboard.v1.TokenUsageSummary usage = 5;
    */
-  usage?: TokenUsageSummary;
+  usage?: TokenUsageSummary
 
   /**
    * Last activity timestamp
    *
    * @generated from field: google.protobuf.Timestamp last_activity = 6;
    */
-  lastActivity?: Timestamp;
-};
+  lastActivity?: Timestamp
+}
 
 /**
  * Describes the message dashboard.v1.ProjectSummary.
  * Use `create(ProjectSummarySchema)` to create a new message.
  */
-export const ProjectSummarySchema: GenMessage<ProjectSummary> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 3);
+export const ProjectSummarySchema: GenMessage<ProjectSummary> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 3)
 
 /**
  * ProjectDetail contains full project information.
  *
  * @generated from message dashboard.v1.ProjectDetail
  */
-export type ProjectDetail = Message<"dashboard.v1.ProjectDetail"> & {
+export type ProjectDetail = Message<'dashboard.v1.ProjectDetail'> & {
   /**
    * Project unique identifier
    *
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * Project display name
    *
    * @generated from field: string name = 2;
    */
-  name: string;
+  name: string
 
   /**
    * Project path
    *
    * @generated from field: string path = 3;
    */
-  path: string;
+  path: string
 
   /**
    * Number of sessions in this project
    *
    * @generated from field: int32 session_count = 5;
    */
-  sessionCount: number;
+  sessionCount: number
 
   /**
    * Aggregated token usage
    *
    * @generated from field: dashboard.v1.TokenUsageSummary usage = 6;
    */
-  usage?: TokenUsageSummary;
+  usage?: TokenUsageSummary
 
   /**
    * Project creation timestamp
    *
    * @generated from field: google.protobuf.Timestamp created_at = 7;
    */
-  createdAt?: Timestamp;
+  createdAt?: Timestamp
 
   /**
    * Last activity timestamp
    *
    * @generated from field: google.protobuf.Timestamp last_activity = 8;
    */
-  lastActivity?: Timestamp;
-};
+  lastActivity?: Timestamp
+}
 
 /**
  * Describes the message dashboard.v1.ProjectDetail.
  * Use `create(ProjectDetailSchema)` to create a new message.
  */
-export const ProjectDetailSchema: GenMessage<ProjectDetail> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 4);
+export const ProjectDetailSchema: GenMessage<ProjectDetail> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 4)
 
 /**
  * SessionSummary contains basic session information for list views.
  *
  * @generated from message dashboard.v1.SessionSummary
  */
-export type SessionSummary = Message<"dashboard.v1.SessionSummary"> & {
+export type SessionSummary = Message<'dashboard.v1.SessionSummary'> & {
   /**
    * Session unique identifier
    *
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * Parent project identifier
    *
    * @generated from field: string project_id = 2;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * Git branch during session
    *
    * @generated from field: string git_branch = 3;
    */
-  gitBranch: string;
+  gitBranch: string
 
   /**
    * Number of messages in session
    *
    * @generated from field: int32 message_count = 4;
    */
-  messageCount: number;
+  messageCount: number
 
   /**
    * Session token usage
    *
    * @generated from field: dashboard.v1.TokenUsageSummary usage = 5;
    */
-  usage?: TokenUsageSummary;
+  usage?: TokenUsageSummary
 
   /**
    * Session start timestamp
    *
    * @generated from field: google.protobuf.Timestamp started_at = 6;
    */
-  startedAt?: Timestamp;
+  startedAt?: Timestamp
 
   /**
    * Session end timestamp
    *
    * @generated from field: google.protobuf.Timestamp ended_at = 7;
    */
-  endedAt?: Timestamp;
-};
+  endedAt?: Timestamp
+}
 
 /**
  * Describes the message dashboard.v1.SessionSummary.
  * Use `create(SessionSummarySchema)` to create a new message.
  */
-export const SessionSummarySchema: GenMessage<SessionSummary> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 5);
+export const SessionSummarySchema: GenMessage<SessionSummary> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 5)
 
 /**
  * SessionDetail contains full session information with records.
@@ -319,55 +337,55 @@ export const SessionSummarySchema: GenMessage<SessionSummary> = /*@__PURE__*/
  *
  * @generated from message dashboard.v1.SessionDetail
  */
-export type SessionDetail = Message<"dashboard.v1.SessionDetail"> & {
+export type SessionDetail = Message<'dashboard.v1.SessionDetail'> & {
   /**
    * Session unique identifier
    *
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * Parent project identifier
    *
    * @generated from field: string project_id = 2;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * Git branch during session
    *
    * @generated from field: string git_branch = 3;
    */
-  gitBranch: string;
+  gitBranch: string
 
   /**
    * Claude Code version
    *
    * @generated from field: string version = 5;
    */
-  version: string;
+  version: string
 
   /**
    * Session token usage (aggregated across Main + all SubAgents)
    *
    * @generated from field: dashboard.v1.TokenUsageSummary usage = 6;
    */
-  usage?: TokenUsageSummary;
+  usage?: TokenUsageSummary
 
   /**
    * Session start timestamp
    *
    * @generated from field: google.protobuf.Timestamp started_at = 7;
    */
-  startedAt?: Timestamp;
+  startedAt?: Timestamp
 
   /**
    * Session end timestamp
    *
    * @generated from field: google.protobuf.Timestamp ended_at = 8;
    */
-  endedAt?: Timestamp;
+  endedAt?: Timestamp
 
   /**
    * All session entries (Main + SubAgent combined)
@@ -377,664 +395,688 @@ export type SessionDetail = Message<"dashboard.v1.SessionDetail"> & {
    *
    * @generated from field: repeated session.v1.Session sessions = 9;
    */
-  sessions: Session[];
-};
+  sessions: Session[]
+}
 
 /**
  * Describes the message dashboard.v1.SessionDetail.
  * Use `create(SessionDetailSchema)` to create a new message.
  */
-export const SessionDetailSchema: GenMessage<SessionDetail> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 6);
+export const SessionDetailSchema: GenMessage<SessionDetail> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 6)
 
 /**
  * GetOverviewReq is the request for GetOverview RPC.
  *
  * @generated from message dashboard.v1.GetOverviewReq
  */
-export type GetOverviewReq = Message<"dashboard.v1.GetOverviewReq"> & {
+export type GetOverviewReq = Message<'dashboard.v1.GetOverviewReq'> & {
   /**
    * Organization identifier (required)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
-};
+  organizationId: string
+}
 
 /**
  * Describes the message dashboard.v1.GetOverviewReq.
  * Use `create(GetOverviewReqSchema)` to create a new message.
  */
-export const GetOverviewReqSchema: GenMessage<GetOverviewReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 7);
+export const GetOverviewReqSchema: GenMessage<GetOverviewReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 7)
 
 /**
  * GetOverviewRes is the response for GetOverview RPC.
  *
  * @generated from message dashboard.v1.GetOverviewRes
  */
-export type GetOverviewRes = Message<"dashboard.v1.GetOverviewRes"> & {
+export type GetOverviewRes = Message<'dashboard.v1.GetOverviewRes'> & {
   /**
    * Total token usage across all projects
    *
    * @generated from field: dashboard.v1.TokenUsageSummary total_usage = 1;
    */
-  totalUsage?: TokenUsageSummary;
+  totalUsage?: TokenUsageSummary
 
   /**
    * Total number of projects
    *
    * @generated from field: int32 project_count = 2;
    */
-  projectCount: number;
+  projectCount: number
 
   /**
    * Total number of sessions
    *
    * @generated from field: int32 session_count = 3;
    */
-  sessionCount: number;
+  sessionCount: number
 
   /**
    * Recent projects (limited to 5)
    *
    * @generated from field: repeated dashboard.v1.ProjectSummary recent_projects = 4;
    */
-  recentProjects: ProjectSummary[];
+  recentProjects: ProjectSummary[]
 
   /**
    * Recent sessions (limited to 5)
    *
    * @generated from field: repeated dashboard.v1.SessionSummary recent_sessions = 5;
    */
-  recentSessions: SessionSummary[];
-};
+  recentSessions: SessionSummary[]
+}
 
 /**
  * Describes the message dashboard.v1.GetOverviewRes.
  * Use `create(GetOverviewResSchema)` to create a new message.
  */
-export const GetOverviewResSchema: GenMessage<GetOverviewRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 8);
+export const GetOverviewResSchema: GenMessage<GetOverviewRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 8)
 
 /**
  * ListProjectsReq is the request for ListProjects RPC.
  *
  * @generated from message dashboard.v1.ListProjectsReq
  */
-export type ListProjectsReq = Message<"dashboard.v1.ListProjectsReq"> & {
+export type ListProjectsReq = Message<'dashboard.v1.ListProjectsReq'> & {
   /**
    * Organization identifier (required)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * Pagination parameters
    *
    * @generated from field: dashboard.v1.PaginationReq pagination = 2;
    */
-  pagination?: PaginationReq;
-};
+  pagination?: PaginationReq
+}
 
 /**
  * Describes the message dashboard.v1.ListProjectsReq.
  * Use `create(ListProjectsReqSchema)` to create a new message.
  */
-export const ListProjectsReqSchema: GenMessage<ListProjectsReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 9);
+export const ListProjectsReqSchema: GenMessage<ListProjectsReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 9)
 
 /**
  * ListProjectsRes is the response for ListProjects RPC.
  *
  * @generated from message dashboard.v1.ListProjectsRes
  */
-export type ListProjectsRes = Message<"dashboard.v1.ListProjectsRes"> & {
+export type ListProjectsRes = Message<'dashboard.v1.ListProjectsRes'> & {
   /**
    * List of projects
    *
    * @generated from field: repeated dashboard.v1.ProjectSummary projects = 1;
    */
-  projects: ProjectSummary[];
+  projects: ProjectSummary[]
 
   /**
    * Pagination metadata
    *
    * @generated from field: dashboard.v1.PaginationRes pagination = 2;
    */
-  pagination?: PaginationRes;
-};
+  pagination?: PaginationRes
+}
 
 /**
  * Describes the message dashboard.v1.ListProjectsRes.
  * Use `create(ListProjectsResSchema)` to create a new message.
  */
-export const ListProjectsResSchema: GenMessage<ListProjectsRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 10);
+export const ListProjectsResSchema: GenMessage<ListProjectsRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 10)
 
 /**
  * GetProjectReq is the request for GetProject RPC.
  *
  * @generated from message dashboard.v1.GetProjectReq
  */
-export type GetProjectReq = Message<"dashboard.v1.GetProjectReq"> & {
+export type GetProjectReq = Message<'dashboard.v1.GetProjectReq'> & {
   /**
    * Organization identifier (required)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * Project identifier
    *
    * @generated from field: string project_id = 2;
    */
-  projectId: string;
-};
+  projectId: string
+}
 
 /**
  * Describes the message dashboard.v1.GetProjectReq.
  * Use `create(GetProjectReqSchema)` to create a new message.
  */
-export const GetProjectReqSchema: GenMessage<GetProjectReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 11);
+export const GetProjectReqSchema: GenMessage<GetProjectReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 11)
 
 /**
  * GetProjectRes is the response for GetProject RPC.
  *
  * @generated from message dashboard.v1.GetProjectRes
  */
-export type GetProjectRes = Message<"dashboard.v1.GetProjectRes"> & {
+export type GetProjectRes = Message<'dashboard.v1.GetProjectRes'> & {
   /**
    * Project details
    *
    * @generated from field: dashboard.v1.ProjectDetail project = 1;
    */
-  project?: ProjectDetail;
-};
+  project?: ProjectDetail
+}
 
 /**
  * Describes the message dashboard.v1.GetProjectRes.
  * Use `create(GetProjectResSchema)` to create a new message.
  */
-export const GetProjectResSchema: GenMessage<GetProjectRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 12);
+export const GetProjectResSchema: GenMessage<GetProjectRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 12)
 
 /**
  * ListSessionsReq is the request for ListSessions RPC.
  *
  * @generated from message dashboard.v1.ListSessionsReq
  */
-export type ListSessionsReq = Message<"dashboard.v1.ListSessionsReq"> & {
+export type ListSessionsReq = Message<'dashboard.v1.ListSessionsReq'> & {
   /**
    * Organization identifier (required)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * Project identifier
    *
    * @generated from field: string project_id = 2;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * Pagination parameters
    *
    * @generated from field: dashboard.v1.PaginationReq pagination = 3;
    */
-  pagination?: PaginationReq;
+  pagination?: PaginationReq
 
   /**
    * Sort field: "started_at", "message_count", "usage"
    *
    * @generated from field: string sort_by = 4;
    */
-  sortBy: string;
+  sortBy: string
 
   /**
    * Sort in descending order
    *
    * @generated from field: bool sort_desc = 5;
    */
-  sortDesc: boolean;
-};
+  sortDesc: boolean
+}
 
 /**
  * Describes the message dashboard.v1.ListSessionsReq.
  * Use `create(ListSessionsReqSchema)` to create a new message.
  */
-export const ListSessionsReqSchema: GenMessage<ListSessionsReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 13);
+export const ListSessionsReqSchema: GenMessage<ListSessionsReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 13)
 
 /**
  * ListSessionsRes is the response for ListSessions RPC.
  *
  * @generated from message dashboard.v1.ListSessionsRes
  */
-export type ListSessionsRes = Message<"dashboard.v1.ListSessionsRes"> & {
+export type ListSessionsRes = Message<'dashboard.v1.ListSessionsRes'> & {
   /**
    * List of sessions
    *
    * @generated from field: repeated dashboard.v1.SessionSummary sessions = 1;
    */
-  sessions: SessionSummary[];
+  sessions: SessionSummary[]
 
   /**
    * Pagination metadata
    *
    * @generated from field: dashboard.v1.PaginationRes pagination = 2;
    */
-  pagination?: PaginationRes;
-};
+  pagination?: PaginationRes
+}
 
 /**
  * Describes the message dashboard.v1.ListSessionsRes.
  * Use `create(ListSessionsResSchema)` to create a new message.
  */
-export const ListSessionsResSchema: GenMessage<ListSessionsRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 14);
+export const ListSessionsResSchema: GenMessage<ListSessionsRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 14)
 
 /**
  * GetSessionReq is the request for GetSession RPC.
  *
  * @generated from message dashboard.v1.GetSessionReq
  */
-export type GetSessionReq = Message<"dashboard.v1.GetSessionReq"> & {
+export type GetSessionReq = Message<'dashboard.v1.GetSessionReq'> & {
   /**
    * Organization identifier (required)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * Session identifier
    *
    * @generated from field: string session_id = 2;
    */
-  sessionId: string;
+  sessionId: string
 
   /**
    * Pagination parameters for transcripts
    *
    * @generated from field: dashboard.v1.PaginationReq pagination = 3;
    */
-  pagination?: PaginationReq;
+  pagination?: PaginationReq
 
   /**
    * Optional agent identifier filter ('main' for main session, agentId for SubAgents)
    *
    * @generated from field: optional string agent_id = 4;
    */
-  agentId?: string;
-};
+  agentId?: string
+}
 
 /**
  * Describes the message dashboard.v1.GetSessionReq.
  * Use `create(GetSessionReqSchema)` to create a new message.
  */
-export const GetSessionReqSchema: GenMessage<GetSessionReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 15);
+export const GetSessionReqSchema: GenMessage<GetSessionReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 15)
 
 /**
  * GetSessionRes is the response for GetSession RPC.
  *
  * @generated from message dashboard.v1.GetSessionRes
  */
-export type GetSessionRes = Message<"dashboard.v1.GetSessionRes"> & {
+export type GetSessionRes = Message<'dashboard.v1.GetSessionRes'> & {
   /**
    * Session details with records
    *
    * @generated from field: dashboard.v1.SessionDetail session = 1;
    */
-  session?: SessionDetail;
+  session?: SessionDetail
 
   /**
    * Pagination metadata for transcripts
    *
    * @generated from field: dashboard.v1.PaginationRes transcript_pagination = 2;
    */
-  transcriptPagination?: PaginationRes;
-};
+  transcriptPagination?: PaginationRes
+}
 
 /**
  * Describes the message dashboard.v1.GetSessionRes.
  * Use `create(GetSessionResSchema)` to create a new message.
  */
-export const GetSessionResSchema: GenMessage<GetSessionRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 16);
+export const GetSessionResSchema: GenMessage<GetSessionRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 16)
 
 /**
  * SessionSegment represents an agent's session span in the timeline.
  *
  * @generated from message dashboard.v1.SessionSegment
  */
-export type SessionSegment = Message<"dashboard.v1.SessionSegment"> & {
+export type SessionSegment = Message<'dashboard.v1.SessionSegment'> & {
   /**
    * Agent identifier ('main' or agentId for SubAgents)
    *
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * Display label for the segment
    *
    * @generated from field: string label = 2;
    */
-  label: string;
+  label: string
 
   /**
    * Start timestamp of the agent's first message
    *
    * @generated from field: google.protobuf.Timestamp start_time = 3;
    */
-  startTime?: Timestamp;
+  startTime?: Timestamp
 
   /**
    * End timestamp of the agent's last message
    *
    * @generated from field: google.protobuf.Timestamp end_time = 4;
    */
-  endTime?: Timestamp;
+  endTime?: Timestamp
 
   /**
    * Total number of messages in this segment
    *
    * @generated from field: int32 message_count = 5;
    */
-  messageCount: number;
-};
+  messageCount: number
+}
 
 /**
  * Describes the message dashboard.v1.SessionSegment.
  * Use `create(SessionSegmentSchema)` to create a new message.
  */
-export const SessionSegmentSchema: GenMessage<SessionSegment> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 17);
+export const SessionSegmentSchema: GenMessage<SessionSegment> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 17)
 
 /**
  * GetSessionSegmentsReq is the request for GetSessionSegments RPC.
  *
  * @generated from message dashboard.v1.GetSessionSegmentsReq
  */
-export type GetSessionSegmentsReq = Message<"dashboard.v1.GetSessionSegmentsReq"> & {
-  /**
-   * Organization identifier (required)
-   *
-   * @generated from field: string organization_id = 1;
-   */
-  organizationId: string;
+export type GetSessionSegmentsReq =
+  Message<'dashboard.v1.GetSessionSegmentsReq'> & {
+    /**
+     * Organization identifier (required)
+     *
+     * @generated from field: string organization_id = 1;
+     */
+    organizationId: string
 
-  /**
-   * Session identifier
-   *
-   * @generated from field: string session_id = 2;
-   */
-  sessionId: string;
-};
+    /**
+     * Session identifier
+     *
+     * @generated from field: string session_id = 2;
+     */
+    sessionId: string
+  }
 
 /**
  * Describes the message dashboard.v1.GetSessionSegmentsReq.
  * Use `create(GetSessionSegmentsReqSchema)` to create a new message.
  */
-export const GetSessionSegmentsReqSchema: GenMessage<GetSessionSegmentsReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 18);
+export const GetSessionSegmentsReqSchema: GenMessage<GetSessionSegmentsReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 18)
 
 /**
  * GetSessionSegmentsRes is the response for GetSessionSegments RPC.
  *
  * @generated from message dashboard.v1.GetSessionSegmentsRes
  */
-export type GetSessionSegmentsRes = Message<"dashboard.v1.GetSessionSegmentsRes"> & {
-  /**
-   * All segments (Main + SubAgents)
-   *
-   * @generated from field: repeated dashboard.v1.SessionSegment segments = 1;
-   */
-  segments: SessionSegment[];
+export type GetSessionSegmentsRes =
+  Message<'dashboard.v1.GetSessionSegmentsRes'> & {
+    /**
+     * All segments (Main + SubAgents)
+     *
+     * @generated from field: repeated dashboard.v1.SessionSegment segments = 1;
+     */
+    segments: SessionSegment[]
 
-  /**
-   * Time range for X axis calculation
-   *
-   * @generated from field: google.protobuf.Timestamp start_time = 2;
-   */
-  startTime?: Timestamp;
+    /**
+     * Time range for X axis calculation
+     *
+     * @generated from field: google.protobuf.Timestamp start_time = 2;
+     */
+    startTime?: Timestamp
 
-  /**
-   * @generated from field: google.protobuf.Timestamp end_time = 3;
-   */
-  endTime?: Timestamp;
+    /**
+     * @generated from field: google.protobuf.Timestamp end_time = 3;
+     */
+    endTime?: Timestamp
 
-  /**
-   * Total duration in seconds
-   *
-   * @generated from field: int64 total_duration_seconds = 4;
-   */
-  totalDurationSeconds: bigint;
-};
+    /**
+     * Total duration in seconds
+     *
+     * @generated from field: int64 total_duration_seconds = 4;
+     */
+    totalDurationSeconds: bigint
+  }
 
 /**
  * Describes the message dashboard.v1.GetSessionSegmentsRes.
  * Use `create(GetSessionSegmentsResSchema)` to create a new message.
  */
-export const GetSessionSegmentsResSchema: GenMessage<GetSessionSegmentsRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 19);
+export const GetSessionSegmentsResSchema: GenMessage<GetSessionSegmentsRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 19)
 
 /**
  * GetMessageReq is the request for GetMessage RPC.
  *
  * @generated from message dashboard.v1.GetMessageReq
  */
-export type GetMessageReq = Message<"dashboard.v1.GetMessageReq"> & {
+export type GetMessageReq = Message<'dashboard.v1.GetMessageReq'> & {
   /**
    * Organization identifier (required)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * Session identifier
    *
    * @generated from field: string session_id = 2;
    */
-  sessionId: string;
+  sessionId: string
 
   /**
    * Message UUID
    *
    * @generated from field: string message_id = 3;
    */
-  messageId: string;
-};
+  messageId: string
+}
 
 /**
  * Describes the message dashboard.v1.GetMessageReq.
  * Use `create(GetMessageReqSchema)` to create a new message.
  */
-export const GetMessageReqSchema: GenMessage<GetMessageReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 20);
+export const GetMessageReqSchema: GenMessage<GetMessageReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 20)
 
 /**
  * GetMessageRes is the response for GetMessage RPC.
  *
  * @generated from message dashboard.v1.GetMessageRes
  */
-export type GetMessageRes = Message<"dashboard.v1.GetMessageRes"> & {
+export type GetMessageRes = Message<'dashboard.v1.GetMessageRes'> & {
   /**
    * The message
    *
    * @generated from field: session.v1.Session message = 1;
    */
-  message?: Session;
-};
+  message?: Session
+}
 
 /**
  * Describes the message dashboard.v1.GetMessageRes.
  * Use `create(GetMessageResSchema)` to create a new message.
  */
-export const GetMessageResSchema: GenMessage<GetMessageRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 21);
+export const GetMessageResSchema: GenMessage<GetMessageRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 21)
 
 /**
  * ToolCallSummary aggregates tool call counts by tool name.
  *
  * @generated from message dashboard.v1.ToolCallSummary
  */
-export type ToolCallSummary = Message<"dashboard.v1.ToolCallSummary"> & {
+export type ToolCallSummary = Message<'dashboard.v1.ToolCallSummary'> & {
   /**
    * Tool name
    *
    * @generated from field: string tool_name = 1;
    */
-  toolName: string;
+  toolName: string
 
   /**
    * Number of times this tool was called
    *
    * @generated from field: int32 count = 2;
    */
-  count: number;
-};
+  count: number
+}
 
 /**
  * Describes the message dashboard.v1.ToolCallSummary.
  * Use `create(ToolCallSummarySchema)` to create a new message.
  */
-export const ToolCallSummarySchema: GenMessage<ToolCallSummary> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 22);
+export const ToolCallSummarySchema: GenMessage<ToolCallSummary> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 22)
 
 /**
  * FeaturedMember contains aggregated stats for a user on the featured board.
  *
  * @generated from message dashboard.v1.FeaturedMember
  */
-export type FeaturedMember = Message<"dashboard.v1.FeaturedMember"> & {
+export type FeaturedMember = Message<'dashboard.v1.FeaturedMember'> & {
   /**
    * User unique identifier
    *
    * @generated from field: string user_id = 1;
    */
-  userId: string;
+  userId: string
 
   /**
    * User display name
    *
    * @generated from field: string user_name = 2;
    */
-  userName: string;
+  userName: string
 
   /**
    * Project unique identifier
    *
    * @generated from field: string project_id = 3;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * Project display name
    *
    * @generated from field: string project_name = 4;
    */
-  projectName: string;
+  projectName: string
 
   /**
    * Aggregated token usage
    *
    * @generated from field: dashboard.v1.TokenUsageSummary usage = 5;
    */
-  usage?: TokenUsageSummary;
+  usage?: TokenUsageSummary
 
   /**
    * Number of prompts sent
    *
    * @generated from field: int32 prompt_count = 6;
    */
-  promptCount: number;
+  promptCount: number
 
   /**
    * Tool call breakdown
    *
    * @generated from field: repeated dashboard.v1.ToolCallSummary tool_calls = 7;
    */
-  toolCalls: ToolCallSummary[];
+  toolCalls: ToolCallSummary[]
 
   /**
    * Last activity timestamp
    *
    * @generated from field: google.protobuf.Timestamp last_activity_at = 8;
    */
-  lastActivityAt?: Timestamp;
-};
+  lastActivityAt?: Timestamp
+}
 
 /**
  * Describes the message dashboard.v1.FeaturedMember.
  * Use `create(FeaturedMemberSchema)` to create a new message.
  */
-export const FeaturedMemberSchema: GenMessage<FeaturedMember> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 23);
+export const FeaturedMemberSchema: GenMessage<FeaturedMember> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 23)
 
 /**
  * GetFeaturedBoardReq is the request for GetFeaturedBoard RPC.
  *
  * @generated from message dashboard.v1.GetFeaturedBoardReq
  */
-export type GetFeaturedBoardReq = Message<"dashboard.v1.GetFeaturedBoardReq"> & {
-  /**
-   * Organization slug identifier
-   *
-   * @generated from field: string org_slug = 1;
-   */
-  orgSlug: string;
+export type GetFeaturedBoardReq =
+  Message<'dashboard.v1.GetFeaturedBoardReq'> & {
+    /**
+     * Organization slug identifier
+     *
+     * @generated from field: string org_slug = 1;
+     */
+    orgSlug: string
 
-  /**
-   * Unix timestamp to filter activity since
-   *
-   * @generated from field: int64 since_unix = 2;
-   */
-  sinceUnix: bigint;
-};
+    /**
+     * Unix timestamp to filter activity since
+     *
+     * @generated from field: int64 since_unix = 2;
+     */
+    sinceUnix: bigint
+  }
 
 /**
  * Describes the message dashboard.v1.GetFeaturedBoardReq.
  * Use `create(GetFeaturedBoardReqSchema)` to create a new message.
  */
-export const GetFeaturedBoardReqSchema: GenMessage<GetFeaturedBoardReq> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 24);
+export const GetFeaturedBoardReqSchema: GenMessage<GetFeaturedBoardReq> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 24)
 
 /**
  * GetFeaturedBoardRes is the response for GetFeaturedBoard RPC.
  *
  * @generated from message dashboard.v1.GetFeaturedBoardRes
  */
-export type GetFeaturedBoardRes = Message<"dashboard.v1.GetFeaturedBoardRes"> & {
-  /**
-   * List of featured members
-   *
-   * @generated from field: repeated dashboard.v1.FeaturedMember members = 1;
-   */
-  members: FeaturedMember[];
+export type GetFeaturedBoardRes =
+  Message<'dashboard.v1.GetFeaturedBoardRes'> & {
+    /**
+     * List of featured members
+     *
+     * @generated from field: repeated dashboard.v1.FeaturedMember members = 1;
+     */
+    members: FeaturedMember[]
 
-  /**
-   * Organization display name
-   *
-   * @generated from field: string organization_name = 2;
-   */
-  organizationName: string;
-};
+    /**
+     * Organization display name
+     *
+     * @generated from field: string organization_name = 2;
+     */
+    organizationName: string
+  }
 
 /**
  * Describes the message dashboard.v1.GetFeaturedBoardRes.
  * Use `create(GetFeaturedBoardResSchema)` to create a new message.
  */
-export const GetFeaturedBoardResSchema: GenMessage<GetFeaturedBoardRes> = /*@__PURE__*/
-  messageDesc(file_dashboard_v1_dashboard, 25);
+export const GetFeaturedBoardResSchema: GenMessage<GetFeaturedBoardRes> =
+  /*@__PURE__*/
+  messageDesc(file_dashboard_v1_dashboard, 25)
 
 /**
  * DashboardService provides dashboard data access.
@@ -1048,72 +1090,71 @@ export const DashboardService: GenService<{
    * @generated from rpc dashboard.v1.DashboardService.GetOverview
    */
   getOverview: {
-    methodKind: "unary";
-    input: typeof GetOverviewReqSchema;
-    output: typeof GetOverviewResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof GetOverviewReqSchema
+    output: typeof GetOverviewResSchema
+  }
   /**
    * ListProjects returns a paginated list of projects.
    *
    * @generated from rpc dashboard.v1.DashboardService.ListProjects
    */
   listProjects: {
-    methodKind: "unary";
-    input: typeof ListProjectsReqSchema;
-    output: typeof ListProjectsResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof ListProjectsReqSchema
+    output: typeof ListProjectsResSchema
+  }
   /**
    * GetProject returns detailed project information.
    *
    * @generated from rpc dashboard.v1.DashboardService.GetProject
    */
   getProject: {
-    methodKind: "unary";
-    input: typeof GetProjectReqSchema;
-    output: typeof GetProjectResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof GetProjectReqSchema
+    output: typeof GetProjectResSchema
+  }
   /**
    * ListSessions returns sessions for a project.
    *
    * @generated from rpc dashboard.v1.DashboardService.ListSessions
    */
   listSessions: {
-    methodKind: "unary";
-    input: typeof ListSessionsReqSchema;
-    output: typeof ListSessionsResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof ListSessionsReqSchema
+    output: typeof ListSessionsResSchema
+  }
   /**
    * GetSession returns detailed session information with records.
    *
    * @generated from rpc dashboard.v1.DashboardService.GetSession
    */
   getSession: {
-    methodKind: "unary";
-    input: typeof GetSessionReqSchema;
-    output: typeof GetSessionResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof GetSessionReqSchema
+    output: typeof GetSessionResSchema
+  }
   /**
    * GetSessionSegments returns lightweight segment summaries for timeline display.
    *
    * @generated from rpc dashboard.v1.DashboardService.GetSessionSegments
    */
   getSessionSegments: {
-    methodKind: "unary";
-    input: typeof GetSessionSegmentsReqSchema;
-    output: typeof GetSessionSegmentsResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof GetSessionSegmentsReqSchema
+    output: typeof GetSessionSegmentsResSchema
+  }
   /**
    * GetMessage returns a single message by UUID.
    *
    * @generated from rpc dashboard.v1.DashboardService.GetMessage
    */
   getMessage: {
-    methodKind: "unary";
-    input: typeof GetMessageReqSchema;
-    output: typeof GetMessageResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_dashboard_v1_dashboard, 0);
+    methodKind: 'unary'
+    input: typeof GetMessageReqSchema
+    output: typeof GetMessageResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_dashboard_v1_dashboard, 0)
 
 /**
  * FeaturedBoardService provides featured board data access.
@@ -1127,10 +1168,8 @@ export const FeaturedBoardService: GenService<{
    * @generated from rpc dashboard.v1.FeaturedBoardService.GetFeaturedBoard
    */
   getFeaturedBoard: {
-    methodKind: "unary";
-    input: typeof GetFeaturedBoardReqSchema;
-    output: typeof GetFeaturedBoardResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_dashboard_v1_dashboard, 1);
-
+    methodKind: 'unary'
+    input: typeof GetFeaturedBoardReqSchema
+    output: typeof GetFeaturedBoardResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_dashboard_v1_dashboard, 1)

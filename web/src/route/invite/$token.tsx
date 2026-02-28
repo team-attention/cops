@@ -28,7 +28,10 @@ export const Route = createFileRoute('/invite/$token')({
   beforeLoad: async ({ params }) => {
     const { isAuthenticated } = useAuthStore.getState()
     if (!isAuthenticated) {
-      throw redirect({ to: '/auth', search: { redirect: `/invite/${params.token}` } })
+      throw redirect({
+        to: '/auth',
+        search: { redirect: `/invite/${params.token}` },
+      })
     }
   },
   component: InviteAcceptPage,
@@ -135,7 +138,8 @@ function InviteAcceptPage() {
             </div>
             <CardTitle>Invalid Invitation</CardTitle>
             <CardDescription>
-              This invitation link is invalid, expired, or has already been used.
+              This invitation link is invalid, expired, or has already been
+              used.
             </CardDescription>
           </CardHeader>
           <CardFooter className="justify-center">

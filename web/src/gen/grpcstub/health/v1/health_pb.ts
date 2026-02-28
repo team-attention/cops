@@ -2,99 +2,116 @@
 // @generated from file health/v1/health.proto (package health.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenEnum,
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  enumDesc,
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file health/v1/health.proto.
  */
-export const file_health_v1_health: GenFile = /*@__PURE__*/
-  fileDesc("ChZoZWFsdGgvdjEvaGVhbHRoLnByb3RvEgloZWFsdGgudjEiGwoIQ2hlY2tSZXESDwoHc2VydmljZRgBIAEoCSI0CghDaGVja1JlcxIoCgZzdGF0dXMYASABKA4yGC5oZWFsdGgudjEuU2VydmluZ1N0YXR1cyIbCghXYXRjaFJlcRIPCgdzZXJ2aWNlGAEgASgJIjQKCFdhdGNoUmVzEigKBnN0YXR1cxgBIAEoDjIYLmhlYWx0aC52MS5TZXJ2aW5nU3RhdHVzKo8BCg1TZXJ2aW5nU3RhdHVzEh4KGlNFUlZJTkdfU1RBVFVTX1VOU1BFQ0lGSUVEEAASGgoWU0VSVklOR19TVEFUVVNfU0VSVklORxABEh4KGlNFUlZJTkdfU1RBVFVTX05PVF9TRVJWSU5HEAISIgoeU0VSVklOR19TVEFUVVNfU0VSVklDRV9VTktOT1dOEAMydwoNSGVhbHRoU2VydmljZRIxCgVDaGVjaxITLmhlYWx0aC52MS5DaGVja1JlcRoTLmhlYWx0aC52MS5DaGVja1JlcxIzCgVXYXRjaBITLmhlYWx0aC52MS5XYXRjaFJlcRoTLmhlYWx0aC52MS5XYXRjaFJlczABQqgBCg1jb20uaGVhbHRoLnYxQgtIZWFsdGhQcm90b1ABWkVnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9oZWFsdGgvdjE7aGVhbHRodjGiAgNIWFiqAglIZWFsdGguVjHKAglIZWFsdGhcVjHiAhVIZWFsdGhcVjFcR1BCTWV0YWRhdGHqAgpIZWFsdGg6OlYxYgZwcm90bzM");
+export const file_health_v1_health: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChZoZWFsdGgvdjEvaGVhbHRoLnByb3RvEgloZWFsdGgudjEiGwoIQ2hlY2tSZXESDwoHc2VydmljZRgBIAEoCSI0CghDaGVja1JlcxIoCgZzdGF0dXMYASABKA4yGC5oZWFsdGgudjEuU2VydmluZ1N0YXR1cyIbCghXYXRjaFJlcRIPCgdzZXJ2aWNlGAEgASgJIjQKCFdhdGNoUmVzEigKBnN0YXR1cxgBIAEoDjIYLmhlYWx0aC52MS5TZXJ2aW5nU3RhdHVzKo8BCg1TZXJ2aW5nU3RhdHVzEh4KGlNFUlZJTkdfU1RBVFVTX1VOU1BFQ0lGSUVEEAASGgoWU0VSVklOR19TVEFUVVNfU0VSVklORxABEh4KGlNFUlZJTkdfU1RBVFVTX05PVF9TRVJWSU5HEAISIgoeU0VSVklOR19TVEFUVVNfU0VSVklDRV9VTktOT1dOEAMydwoNSGVhbHRoU2VydmljZRIxCgVDaGVjaxITLmhlYWx0aC52MS5DaGVja1JlcRoTLmhlYWx0aC52MS5DaGVja1JlcxIzCgVXYXRjaBITLmhlYWx0aC52MS5XYXRjaFJlcRoTLmhlYWx0aC52MS5XYXRjaFJlczABQqgBCg1jb20uaGVhbHRoLnYxQgtIZWFsdGhQcm90b1ABWkVnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9oZWFsdGgvdjE7aGVhbHRodjGiAgNIWFiqAglIZWFsdGguVjHKAglIZWFsdGhcVjHiAhVIZWFsdGhcVjFcR1BCTWV0YWRhdGHqAgpIZWFsdGg6OlYxYgZwcm90bzM',
+  )
 
 /**
  * CheckReq is the request message for Check RPC.
  *
  * @generated from message health.v1.CheckReq
  */
-export type CheckReq = Message<"health.v1.CheckReq"> & {
+export type CheckReq = Message<'health.v1.CheckReq'> & {
   /**
    * Service name to check (empty for overall health)
    *
    * @generated from field: string service = 1;
    */
-  service: string;
-};
+  service: string
+}
 
 /**
  * Describes the message health.v1.CheckReq.
  * Use `create(CheckReqSchema)` to create a new message.
  */
-export const CheckReqSchema: GenMessage<CheckReq> = /*@__PURE__*/
-  messageDesc(file_health_v1_health, 0);
+export const CheckReqSchema: GenMessage<CheckReq> =
+  /*@__PURE__*/
+  messageDesc(file_health_v1_health, 0)
 
 /**
  * CheckRes is the response message for Check RPC.
  *
  * @generated from message health.v1.CheckRes
  */
-export type CheckRes = Message<"health.v1.CheckRes"> & {
+export type CheckRes = Message<'health.v1.CheckRes'> & {
   /**
    * Current serving status
    *
    * @generated from field: health.v1.ServingStatus status = 1;
    */
-  status: ServingStatus;
-};
+  status: ServingStatus
+}
 
 /**
  * Describes the message health.v1.CheckRes.
  * Use `create(CheckResSchema)` to create a new message.
  */
-export const CheckResSchema: GenMessage<CheckRes> = /*@__PURE__*/
-  messageDesc(file_health_v1_health, 1);
+export const CheckResSchema: GenMessage<CheckRes> =
+  /*@__PURE__*/
+  messageDesc(file_health_v1_health, 1)
 
 /**
  * WatchReq is the request message for Watch RPC.
  *
  * @generated from message health.v1.WatchReq
  */
-export type WatchReq = Message<"health.v1.WatchReq"> & {
+export type WatchReq = Message<'health.v1.WatchReq'> & {
   /**
    * Service name to watch (empty for overall health)
    *
    * @generated from field: string service = 1;
    */
-  service: string;
-};
+  service: string
+}
 
 /**
  * Describes the message health.v1.WatchReq.
  * Use `create(WatchReqSchema)` to create a new message.
  */
-export const WatchReqSchema: GenMessage<WatchReq> = /*@__PURE__*/
-  messageDesc(file_health_v1_health, 2);
+export const WatchReqSchema: GenMessage<WatchReq> =
+  /*@__PURE__*/
+  messageDesc(file_health_v1_health, 2)
 
 /**
  * WatchRes is the response message for Watch RPC.
  *
  * @generated from message health.v1.WatchRes
  */
-export type WatchRes = Message<"health.v1.WatchRes"> & {
+export type WatchRes = Message<'health.v1.WatchRes'> & {
   /**
    * Current serving status
    *
    * @generated from field: health.v1.ServingStatus status = 1;
    */
-  status: ServingStatus;
-};
+  status: ServingStatus
+}
 
 /**
  * Describes the message health.v1.WatchRes.
  * Use `create(WatchResSchema)` to create a new message.
  */
-export const WatchResSchema: GenMessage<WatchRes> = /*@__PURE__*/
-  messageDesc(file_health_v1_health, 3);
+export const WatchResSchema: GenMessage<WatchRes> =
+  /*@__PURE__*/
+  messageDesc(file_health_v1_health, 3)
 
 /**
  * ServingStatus represents the health status of a service.
@@ -126,8 +143,9 @@ export enum ServingStatus {
 /**
  * Describes the enum health.v1.ServingStatus.
  */
-export const ServingStatusSchema: GenEnum<ServingStatus> = /*@__PURE__*/
-  enumDesc(file_health_v1_health, 0);
+export const ServingStatusSchema: GenEnum<ServingStatus> =
+  /*@__PURE__*/
+  enumDesc(file_health_v1_health, 0)
 
 /**
  * HealthService provides health check operations.
@@ -141,20 +159,18 @@ export const HealthService: GenService<{
    * @generated from rpc health.v1.HealthService.Check
    */
   check: {
-    methodKind: "unary";
-    input: typeof CheckReqSchema;
-    output: typeof CheckResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof CheckReqSchema
+    output: typeof CheckResSchema
+  }
   /**
    * Watch streams the serving status changes.
    *
    * @generated from rpc health.v1.HealthService.Watch
    */
   watch: {
-    methodKind: "server_streaming";
-    input: typeof WatchReqSchema;
-    output: typeof WatchResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_health_v1_health, 0);
-
+    methodKind: 'server_streaming'
+    input: typeof WatchReqSchema
+    output: typeof WatchResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_health_v1_health, 0)

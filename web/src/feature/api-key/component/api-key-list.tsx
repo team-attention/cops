@@ -1,3 +1,5 @@
+import { useRevokeAPIKey } from '../hook/use-revoke-api-key'
+import type { APIKeyInfo } from '@/gen/grpcstub/apikey/v1/apikey_pb'
 import {
   Table,
   TableBody,
@@ -9,13 +11,11 @@ import {
 import { Button } from '@/gen/shadcn/ui/button'
 import { Badge } from '@/gen/shadcn/ui/badge'
 import { Skeleton } from '@/gen/shadcn/ui/skeleton'
-import { useRevokeAPIKey } from '../hook/use-revoke-api-key'
-import type { APIKeyInfo } from '@/gen/grpcstub/apikey/v1/apikey_pb'
 
 // APIKeyListProps defines the component props.
 interface APIKeyListProps {
   // keys is the list of API keys to display
-  keys: APIKeyInfo[]
+  keys: Array<APIKeyInfo>
   // isLoading indicates whether keys are being fetched
   isLoading: boolean
   // onKeyRevoked callback when a key is successfully revoked

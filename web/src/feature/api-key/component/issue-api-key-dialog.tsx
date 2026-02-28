@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useIssueAPIKey } from '../hook/use-issue-api-key'
 import type { FormEventHandler } from 'react'
 import {
   Dialog,
@@ -11,7 +12,6 @@ import {
 } from '@/gen/shadcn/ui/dialog'
 import { Button } from '@/gen/shadcn/ui/button'
 import { Input } from '@/gen/shadcn/ui/input'
-import { useIssueAPIKey } from '../hook/use-issue-api-key'
 
 // IssueAPIKeyDialogProps defines the component props.
 interface IssueAPIKeyDialogProps {

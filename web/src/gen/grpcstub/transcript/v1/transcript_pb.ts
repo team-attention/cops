@@ -2,903 +2,950 @@
 // @generated from file transcript/v1/transcript.proto (package transcript.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp, Value } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_struct, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenEnum, GenFile, GenMessage } from '@bufbuild/protobuf/codegenv2'
+import { enumDesc, fileDesc, messageDesc } from '@bufbuild/protobuf/codegenv2'
+import type { Timestamp, Value } from '@bufbuild/protobuf/wkt'
+import {
+  file_google_protobuf_struct,
+  file_google_protobuf_timestamp,
+} from '@bufbuild/protobuf/wkt'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file transcript/v1/transcript.proto.
  */
-export const file_transcript_v1_transcript: GenFile = /*@__PURE__*/
-  fileDesc("Ch50cmFuc2NyaXB0L3YxL3RyYW5zY3JpcHQucHJvdG8SDXRyYW5zY3JpcHQudjEi3QEKDFRyZWVOb2RlTWV0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIMCgR1dWlkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSLQoJdGltZXN0YW1wGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIPCgd2ZXJzaW9uGAUgASgJEgsKA2N3ZBgGIAEoCRISCgpnaXRfYnJhbmNoGAcgASgJEgwKBHNsdWcYCCABKAkSEQoJdXNlcl90eXBlGAkgASgJEhQKDGlzX3NpZGVjaGFpbhgKIAEoCCI9CgtJbWFnZVNvdXJjZRIMCgR0eXBlGAEgASgJEhIKCm1lZGlhX3R5cGUYAiABKAkSDAoEZGF0YRgDIAEoCSI5ChFUb29sUmVzdWx0Q29udGVudBITCgt0b29sX3VzZV9pZBgBIAEoCRIPCgdjb250ZW50GAIgASgJIpEBChBVc2VyTWVzc2FnZUJsb2NrEgwKBHR5cGUYASABKAkSDAoEdGV4dBgCIAEoCRIqCgZzb3VyY2UYAyABKAsyGi50cmFuc2NyaXB0LnYxLkltYWdlU291cmNlEjUKC3Rvb2xfcmVzdWx0GAQgASgLMiAudHJhbnNjcmlwdC52MS5Ub29sUmVzdWx0Q29udGVudCJHChRVc2VyTWVzc2FnZUJsb2NrTGlzdBIvCgZibG9ja3MYASADKAsyHy50cmFuc2NyaXB0LnYxLlVzZXJNZXNzYWdlQmxvY2sibQoLVXNlck1lc3NhZ2USDAoEcm9sZRgBIAEoCRIOCgR0ZXh0GAIgASgJSAASNQoGYmxvY2tzGAMgASgLMiMudHJhbnNjcmlwdC52MS5Vc2VyTWVzc2FnZUJsb2NrTGlzdEgAQgkKB2NvbnRlbnQiOwoPVGhpbmtpbmdUcmlnZ2VyEg0KBXN0YXJ0GAEgASgFEgsKA2VuZBgCIAEoBRIMCgR0ZXh0GAMgASgJImUKEFRoaW5raW5nTWV0YWRhdGESDQoFbGV2ZWwYASABKAkSEAoIZGlzYWJsZWQYAiABKAgSMAoIdHJpZ2dlcnMYAyADKAsyHi50cmFuc2NyaXB0LnYxLlRoaW5raW5nVHJpZ2dlciI8CgRUb2RvEg8KB2NvbnRlbnQYASABKAkSDgoGc3RhdHVzGAIgASgJEhMKC2FjdGl2ZV9mb3JtGAMgASgJIrYCChJVc2VyVHJhbnNjcmlwdERhdGESLQoIbWV0YWRhdGEYASABKAsyGy50cmFuc2NyaXB0LnYxLlRyZWVOb2RlTWV0YRIrCgdtZXNzYWdlGAIgASgLMhoudHJhbnNjcmlwdC52MS5Vc2VyTWVzc2FnZRIPCgdpc19tZXRhGAMgASgIEjoKEXRoaW5raW5nX21ldGFkYXRhGAQgASgLMh8udHJhbnNjcmlwdC52MS5UaGlua2luZ01ldGFkYXRhEiIKBXRvZG9zGAUgAygLMhMudHJhbnNjcmlwdC52MS5Ub2RvEi8KD3Rvb2xfdXNlX3Jlc3VsdBgGIAEoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZRIiChpzb3VyY2VfdG9vbF9hc3Npc3RhbnRfdXVpZBgHIAEoCSKGAQoVQXNzaXN0YW50Q29udGVudEJsb2NrEgwKBHR5cGUYASABKAkSEAoIdGhpbmtpbmcYAiABKAkSEQoJc2lnbmF0dXJlGAMgASgJEgwKBHRleHQYBCABKAkSCgoCaWQYBSABKAkSDAoEbmFtZRgGIAEoCRISCgppbnB1dF9qc29uGAcgASgJIlUKDUNhY2hlQ3JlYXRpb24SIQoZZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucxgBIAEoBRIhChllcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zGAIgASgFIs8BCg5Bc3Npc3RhbnRVc2FnZRIUCgxpbnB1dF90b2tlbnMYASABKAUSFQoNb3V0cHV0X3Rva2VucxgCIAEoBRIjChtjYWNoZV9jcmVhdGlvbl9pbnB1dF90b2tlbnMYAyABKAUSHwoXY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMYBCABKAUSNAoOY2FjaGVfY3JlYXRpb24YBSABKAsyHC50cmFuc2NyaXB0LnYxLkNhY2hlQ3JlYXRpb24SFAoMc2VydmljZV90aWVyGAYgASgJItoBChBBc3Npc3RhbnRNZXNzYWdlEg0KBW1vZGVsGAEgASgJEgoKAmlkGAIgASgJEgwKBHR5cGUYAyABKAkSDAoEcm9sZRgEIAEoCRI1Cgdjb250ZW50GAUgAygLMiQudHJhbnNjcmlwdC52MS5Bc3Npc3RhbnRDb250ZW50QmxvY2sSEwoLc3RvcF9yZWFzb24YBiABKAkSFQoNc3RvcF9zZXF1ZW5jZRgHIAEoCRIsCgV1c2FnZRgIIAEoCzIdLnRyYW5zY3JpcHQudjEuQXNzaXN0YW50VXNhZ2UijgEKF0Fzc2lzdGFudFRyYW5zY3JpcHREYXRhEi0KCG1ldGFkYXRhGAEgASgLMhsudHJhbnNjcmlwdC52MS5UcmVlTm9kZU1ldGESEgoKcmVxdWVzdF9pZBgCIAEoCRIwCgdtZXNzYWdlGAMgASgLMh8udHJhbnNjcmlwdC52MS5Bc3Npc3RhbnRNZXNzYWdlIqQBChRTeXN0ZW1UcmFuc2NyaXB0RGF0YRItCghtZXRhZGF0YRgBIAEoCzIbLnRyYW5zY3JpcHQudjEuVHJlZU5vZGVNZXRhEjcKB3N1YnR5cGUYAiABKA4yJi50cmFuc2NyaXB0LnYxLlN5c3RlbVRyYW5zY3JpcHRTdWJ0eXBlEhMKC2R1cmF0aW9uX21zGAMgASgFEg8KB2lzX21ldGEYBCABKAgiOwoVU3VtbWFyeVRyYW5zY3JpcHREYXRhEg8KB3N1bW1hcnkYASABKAkSEQoJbGVhZl91dWlkGAIgASgJImgKCkZpbGVCYWNrdXASGAoQYmFja3VwX2ZpbGVfbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFEi8KC2JhY2t1cF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCL6AQoMRmlsZVNuYXBzaG90EhIKCm1lc3NhZ2VfaWQYASABKAkSUQoUdHJhY2tlZF9maWxlX2JhY2t1cHMYAiADKAsyMy50cmFuc2NyaXB0LnYxLkZpbGVTbmFwc2hvdC5UcmFja2VkRmlsZUJhY2t1cHNFbnRyeRItCgl0aW1lc3RhbXAYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGlQKF1RyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EgsKA2tleRgBIAEoCRIoCgV2YWx1ZRgCIAEoCzIZLnRyYW5zY3JpcHQudjEuRmlsZUJhY2t1cDoCOAEiggEKIUZpbGVIaXN0b3J5U25hcHNob3RUcmFuc2NyaXB0RGF0YRISCgptZXNzYWdlX2lkGAEgASgJEi0KCHNuYXBzaG90GAIgASgLMhsudHJhbnNjcmlwdC52MS5GaWxlU25hcHNob3QSGgoSaXNfc25hcHNob3RfdXBkYXRlGAMgASgIIpcBCgxQcm9ncmVzc0RhdGESLQoEdHlwZRgBIAEoDjIfLnRyYW5zY3JpcHQudjEuUHJvZ3Jlc3NEYXRhVHlwZRIUCgxtZXNzYWdlX2pzb24YAiABKAkSIAoYbm9ybWFsaXplZF9tZXNzYWdlc19qc29uGAMgASgJEg4KBnByb21wdBgEIAEoCRIQCghhZ2VudF9pZBgFIAEoCSKjAQoWUHJvZ3Jlc3NUcmFuc2NyaXB0RGF0YRItCghtZXRhZGF0YRgBIAEoCzIbLnRyYW5zY3JpcHQudjEuVHJlZU5vZGVNZXRhEhMKC3Rvb2xfdXNlX2lkGAIgASgJEhoKEnBhcmVudF90b29sX3VzZV9pZBgDIAEoCRIpCgRkYXRhGAQgASgLMhsudHJhbnNjcmlwdC52MS5Qcm9ncmVzc0RhdGEizQMKClRyYW5zY3JpcHQSKwoEdHlwZRgBIAEoDjIdLnRyYW5zY3JpcHQudjEuVHJhbnNjcmlwdFR5cGUSNgoJdXNlcl9kYXRhGAIgASgLMiEudHJhbnNjcmlwdC52MS5Vc2VyVHJhbnNjcmlwdERhdGFIABJACg5hc3Npc3RhbnRfZGF0YRgDIAEoCzImLnRyYW5zY3JpcHQudjEuQXNzaXN0YW50VHJhbnNjcmlwdERhdGFIABI6CgtzeXN0ZW1fZGF0YRgEIAEoCzIjLnRyYW5zY3JpcHQudjEuU3lzdGVtVHJhbnNjcmlwdERhdGFIABI8CgxzdW1tYXJ5X2RhdGEYBSABKAsyJC50cmFuc2NyaXB0LnYxLlN1bW1hcnlUcmFuc2NyaXB0RGF0YUgAElYKGmZpbGVfaGlzdG9yeV9zbmFwc2hvdF9kYXRhGAYgASgLMjAudHJhbnNjcmlwdC52MS5GaWxlSGlzdG9yeVNuYXBzaG90VHJhbnNjcmlwdERhdGFIABI+Cg1wcm9ncmVzc19kYXRhGAcgASgLMiUudHJhbnNjcmlwdC52MS5Qcm9ncmVzc1RyYW5zY3JpcHREYXRhSABCBgoEZGF0YSrsAQoOVHJhbnNjcmlwdFR5cGUSHwobVFJBTlNDUklQVF9UWVBFX1VOU1BFQ0lGSUVEEAASGAoUVFJBTlNDUklQVF9UWVBFX1VTRVIQARIdChlUUkFOU0NSSVBUX1RZUEVfQVNTSVNUQU5UEAISGgoWVFJBTlNDUklQVF9UWVBFX1NZU1RFTRADEhsKF1RSQU5TQ1JJUFRfVFlQRV9TVU1NQVJZEAQSKQolVFJBTlNDUklQVF9UWVBFX0ZJTEVfSElTVE9SWV9TTkFQU0hPVBAFEhwKGFRSQU5TQ1JJUFRfVFlQRV9QUk9HUkVTUxAGKnEKF1N5c3RlbVRyYW5zY3JpcHRTdWJ0eXBlEikKJVNZU1RFTV9UUkFOU0NSSVBUX1NVQlRZUEVfVU5TUEVDSUZJRUQQABIrCidTWVNURU1fVFJBTlNDUklQVF9TVUJUWVBFX1RVUk5fRFVSQVRJT04QASpyChBQcm9ncmVzc0RhdGFUeXBlEiIKHlBST0dSRVNTX0RBVEFfVFlQRV9VTlNQRUNJRklFRBAAEhwKGFBST0dSRVNTX0RBVEFfVFlQRV9BR0VOVBABEhwKGFBST0dSRVNTX0RBVEFfVFlQRV9TS0lMTBACQsgBChFjb20udHJhbnNjcmlwdC52MUIPVHJhbnNjcmlwdFByb3RvUAFaTWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL3RyYW5zY3JpcHQvdjE7dHJhbnNjcmlwdHYxogIDVFhYqgINVHJhbnNjcmlwdC5WMcoCDVRyYW5zY3JpcHRcVjHiAhlUcmFuc2NyaXB0XFYxXEdQQk1ldGFkYXRh6gIOVHJhbnNjcmlwdDo6VjFiBnByb3RvMw", [file_google_protobuf_struct, file_google_protobuf_timestamp]);
+export const file_transcript_v1_transcript: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'Ch50cmFuc2NyaXB0L3YxL3RyYW5zY3JpcHQucHJvdG8SDXRyYW5zY3JpcHQudjEi3QEKDFRyZWVOb2RlTWV0YRITCgtwYXJlbnRfdXVpZBgBIAEoCRIMCgR1dWlkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSLQoJdGltZXN0YW1wGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIPCgd2ZXJzaW9uGAUgASgJEgsKA2N3ZBgGIAEoCRISCgpnaXRfYnJhbmNoGAcgASgJEgwKBHNsdWcYCCABKAkSEQoJdXNlcl90eXBlGAkgASgJEhQKDGlzX3NpZGVjaGFpbhgKIAEoCCI9CgtJbWFnZVNvdXJjZRIMCgR0eXBlGAEgASgJEhIKCm1lZGlhX3R5cGUYAiABKAkSDAoEZGF0YRgDIAEoCSI5ChFUb29sUmVzdWx0Q29udGVudBITCgt0b29sX3VzZV9pZBgBIAEoCRIPCgdjb250ZW50GAIgASgJIpEBChBVc2VyTWVzc2FnZUJsb2NrEgwKBHR5cGUYASABKAkSDAoEdGV4dBgCIAEoCRIqCgZzb3VyY2UYAyABKAsyGi50cmFuc2NyaXB0LnYxLkltYWdlU291cmNlEjUKC3Rvb2xfcmVzdWx0GAQgASgLMiAudHJhbnNjcmlwdC52MS5Ub29sUmVzdWx0Q29udGVudCJHChRVc2VyTWVzc2FnZUJsb2NrTGlzdBIvCgZibG9ja3MYASADKAsyHy50cmFuc2NyaXB0LnYxLlVzZXJNZXNzYWdlQmxvY2sibQoLVXNlck1lc3NhZ2USDAoEcm9sZRgBIAEoCRIOCgR0ZXh0GAIgASgJSAASNQoGYmxvY2tzGAMgASgLMiMudHJhbnNjcmlwdC52MS5Vc2VyTWVzc2FnZUJsb2NrTGlzdEgAQgkKB2NvbnRlbnQiOwoPVGhpbmtpbmdUcmlnZ2VyEg0KBXN0YXJ0GAEgASgFEgsKA2VuZBgCIAEoBRIMCgR0ZXh0GAMgASgJImUKEFRoaW5raW5nTWV0YWRhdGESDQoFbGV2ZWwYASABKAkSEAoIZGlzYWJsZWQYAiABKAgSMAoIdHJpZ2dlcnMYAyADKAsyHi50cmFuc2NyaXB0LnYxLlRoaW5raW5nVHJpZ2dlciI8CgRUb2RvEg8KB2NvbnRlbnQYASABKAkSDgoGc3RhdHVzGAIgASgJEhMKC2FjdGl2ZV9mb3JtGAMgASgJIrYCChJVc2VyVHJhbnNjcmlwdERhdGESLQoIbWV0YWRhdGEYASABKAsyGy50cmFuc2NyaXB0LnYxLlRyZWVOb2RlTWV0YRIrCgdtZXNzYWdlGAIgASgLMhoudHJhbnNjcmlwdC52MS5Vc2VyTWVzc2FnZRIPCgdpc19tZXRhGAMgASgIEjoKEXRoaW5raW5nX21ldGFkYXRhGAQgASgLMh8udHJhbnNjcmlwdC52MS5UaGlua2luZ01ldGFkYXRhEiIKBXRvZG9zGAUgAygLMhMudHJhbnNjcmlwdC52MS5Ub2RvEi8KD3Rvb2xfdXNlX3Jlc3VsdBgGIAEoCzIWLmdvb2dsZS5wcm90b2J1Zi5WYWx1ZRIiChpzb3VyY2VfdG9vbF9hc3Npc3RhbnRfdXVpZBgHIAEoCSKGAQoVQXNzaXN0YW50Q29udGVudEJsb2NrEgwKBHR5cGUYASABKAkSEAoIdGhpbmtpbmcYAiABKAkSEQoJc2lnbmF0dXJlGAMgASgJEgwKBHRleHQYBCABKAkSCgoCaWQYBSABKAkSDAoEbmFtZRgGIAEoCRISCgppbnB1dF9qc29uGAcgASgJIlUKDUNhY2hlQ3JlYXRpb24SIQoZZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucxgBIAEoBRIhChllcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zGAIgASgFIs8BCg5Bc3Npc3RhbnRVc2FnZRIUCgxpbnB1dF90b2tlbnMYASABKAUSFQoNb3V0cHV0X3Rva2VucxgCIAEoBRIjChtjYWNoZV9jcmVhdGlvbl9pbnB1dF90b2tlbnMYAyABKAUSHwoXY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMYBCABKAUSNAoOY2FjaGVfY3JlYXRpb24YBSABKAsyHC50cmFuc2NyaXB0LnYxLkNhY2hlQ3JlYXRpb24SFAoMc2VydmljZV90aWVyGAYgASgJItoBChBBc3Npc3RhbnRNZXNzYWdlEg0KBW1vZGVsGAEgASgJEgoKAmlkGAIgASgJEgwKBHR5cGUYAyABKAkSDAoEcm9sZRgEIAEoCRI1Cgdjb250ZW50GAUgAygLMiQudHJhbnNjcmlwdC52MS5Bc3Npc3RhbnRDb250ZW50QmxvY2sSEwoLc3RvcF9yZWFzb24YBiABKAkSFQoNc3RvcF9zZXF1ZW5jZRgHIAEoCRIsCgV1c2FnZRgIIAEoCzIdLnRyYW5zY3JpcHQudjEuQXNzaXN0YW50VXNhZ2UijgEKF0Fzc2lzdGFudFRyYW5zY3JpcHREYXRhEi0KCG1ldGFkYXRhGAEgASgLMhsudHJhbnNjcmlwdC52MS5UcmVlTm9kZU1ldGESEgoKcmVxdWVzdF9pZBgCIAEoCRIwCgdtZXNzYWdlGAMgASgLMh8udHJhbnNjcmlwdC52MS5Bc3Npc3RhbnRNZXNzYWdlIqQBChRTeXN0ZW1UcmFuc2NyaXB0RGF0YRItCghtZXRhZGF0YRgBIAEoCzIbLnRyYW5zY3JpcHQudjEuVHJlZU5vZGVNZXRhEjcKB3N1YnR5cGUYAiABKA4yJi50cmFuc2NyaXB0LnYxLlN5c3RlbVRyYW5zY3JpcHRTdWJ0eXBlEhMKC2R1cmF0aW9uX21zGAMgASgFEg8KB2lzX21ldGEYBCABKAgiOwoVU3VtbWFyeVRyYW5zY3JpcHREYXRhEg8KB3N1bW1hcnkYASABKAkSEQoJbGVhZl91dWlkGAIgASgJImgKCkZpbGVCYWNrdXASGAoQYmFja3VwX2ZpbGVfbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgFEi8KC2JhY2t1cF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCL6AQoMRmlsZVNuYXBzaG90EhIKCm1lc3NhZ2VfaWQYASABKAkSUQoUdHJhY2tlZF9maWxlX2JhY2t1cHMYAiADKAsyMy50cmFuc2NyaXB0LnYxLkZpbGVTbmFwc2hvdC5UcmFja2VkRmlsZUJhY2t1cHNFbnRyeRItCgl0aW1lc3RhbXAYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGlQKF1RyYWNrZWRGaWxlQmFja3Vwc0VudHJ5EgsKA2tleRgBIAEoCRIoCgV2YWx1ZRgCIAEoCzIZLnRyYW5zY3JpcHQudjEuRmlsZUJhY2t1cDoCOAEiggEKIUZpbGVIaXN0b3J5U25hcHNob3RUcmFuc2NyaXB0RGF0YRISCgptZXNzYWdlX2lkGAEgASgJEi0KCHNuYXBzaG90GAIgASgLMhsudHJhbnNjcmlwdC52MS5GaWxlU25hcHNob3QSGgoSaXNfc25hcHNob3RfdXBkYXRlGAMgASgIIpcBCgxQcm9ncmVzc0RhdGESLQoEdHlwZRgBIAEoDjIfLnRyYW5zY3JpcHQudjEuUHJvZ3Jlc3NEYXRhVHlwZRIUCgxtZXNzYWdlX2pzb24YAiABKAkSIAoYbm9ybWFsaXplZF9tZXNzYWdlc19qc29uGAMgASgJEg4KBnByb21wdBgEIAEoCRIQCghhZ2VudF9pZBgFIAEoCSKjAQoWUHJvZ3Jlc3NUcmFuc2NyaXB0RGF0YRItCghtZXRhZGF0YRgBIAEoCzIbLnRyYW5zY3JpcHQudjEuVHJlZU5vZGVNZXRhEhMKC3Rvb2xfdXNlX2lkGAIgASgJEhoKEnBhcmVudF90b29sX3VzZV9pZBgDIAEoCRIpCgRkYXRhGAQgASgLMhsudHJhbnNjcmlwdC52MS5Qcm9ncmVzc0RhdGEizQMKClRyYW5zY3JpcHQSKwoEdHlwZRgBIAEoDjIdLnRyYW5zY3JpcHQudjEuVHJhbnNjcmlwdFR5cGUSNgoJdXNlcl9kYXRhGAIgASgLMiEudHJhbnNjcmlwdC52MS5Vc2VyVHJhbnNjcmlwdERhdGFIABJACg5hc3Npc3RhbnRfZGF0YRgDIAEoCzImLnRyYW5zY3JpcHQudjEuQXNzaXN0YW50VHJhbnNjcmlwdERhdGFIABI6CgtzeXN0ZW1fZGF0YRgEIAEoCzIjLnRyYW5zY3JpcHQudjEuU3lzdGVtVHJhbnNjcmlwdERhdGFIABI8CgxzdW1tYXJ5X2RhdGEYBSABKAsyJC50cmFuc2NyaXB0LnYxLlN1bW1hcnlUcmFuc2NyaXB0RGF0YUgAElYKGmZpbGVfaGlzdG9yeV9zbmFwc2hvdF9kYXRhGAYgASgLMjAudHJhbnNjcmlwdC52MS5GaWxlSGlzdG9yeVNuYXBzaG90VHJhbnNjcmlwdERhdGFIABI+Cg1wcm9ncmVzc19kYXRhGAcgASgLMiUudHJhbnNjcmlwdC52MS5Qcm9ncmVzc1RyYW5zY3JpcHREYXRhSABCBgoEZGF0YSrsAQoOVHJhbnNjcmlwdFR5cGUSHwobVFJBTlNDUklQVF9UWVBFX1VOU1BFQ0lGSUVEEAASGAoUVFJBTlNDUklQVF9UWVBFX1VTRVIQARIdChlUUkFOU0NSSVBUX1RZUEVfQVNTSVNUQU5UEAISGgoWVFJBTlNDUklQVF9UWVBFX1NZU1RFTRADEhsKF1RSQU5TQ1JJUFRfVFlQRV9TVU1NQVJZEAQSKQolVFJBTlNDUklQVF9UWVBFX0ZJTEVfSElTVE9SWV9TTkFQU0hPVBAFEhwKGFRSQU5TQ1JJUFRfVFlQRV9QUk9HUkVTUxAGKnEKF1N5c3RlbVRyYW5zY3JpcHRTdWJ0eXBlEikKJVNZU1RFTV9UUkFOU0NSSVBUX1NVQlRZUEVfVU5TUEVDSUZJRUQQABIrCidTWVNURU1fVFJBTlNDUklQVF9TVUJUWVBFX1RVUk5fRFVSQVRJT04QASpyChBQcm9ncmVzc0RhdGFUeXBlEiIKHlBST0dSRVNTX0RBVEFfVFlQRV9VTlNQRUNJRklFRBAAEhwKGFBST0dSRVNTX0RBVEFfVFlQRV9BR0VOVBABEhwKGFBST0dSRVNTX0RBVEFfVFlQRV9TS0lMTBACQsgBChFjb20udHJhbnNjcmlwdC52MUIPVHJhbnNjcmlwdFByb3RvUAFaTWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL3RyYW5zY3JpcHQvdjE7dHJhbnNjcmlwdHYxogIDVFhYqgINVHJhbnNjcmlwdC5WMcoCDVRyYW5zY3JpcHRcVjHiAhlUcmFuc2NyaXB0XFYxXEdQQk1ldGFkYXRh6gIOVHJhbnNjcmlwdDo6VjFiBnByb3RvMw',
+    [file_google_protobuf_struct, file_google_protobuf_timestamp],
+  )
 
 /**
  * TreeNodeMeta contains common metadata for conversation tree nodes.
  *
  * @generated from message transcript.v1.TreeNodeMeta
  */
-export type TreeNodeMeta = Message<"transcript.v1.TreeNodeMeta"> & {
+export type TreeNodeMeta = Message<'transcript.v1.TreeNodeMeta'> & {
   /**
    * Parent node UUID (null for root nodes)
    *
    * @generated from field: string parent_uuid = 1;
    */
-  parentUuid: string;
+  parentUuid: string
 
   /**
    * Node UUID
    *
    * @generated from field: string uuid = 2;
    */
-  uuid: string;
+  uuid: string
 
   /**
    * Session identifier
    *
    * @generated from field: string session_id = 3;
    */
-  sessionId: string;
+  sessionId: string
 
   /**
    * Entry timestamp
    *
    * @generated from field: google.protobuf.Timestamp timestamp = 4;
    */
-  timestamp?: Timestamp;
+  timestamp?: Timestamp
 
   /**
    * Claude Code version
    *
    * @generated from field: string version = 5;
    */
-  version: string;
+  version: string
 
   /**
    * Current working directory
    *
    * @generated from field: string cwd = 6;
    */
-  cwd: string;
+  cwd: string
 
   /**
    * Git branch name
    *
    * @generated from field: string git_branch = 7;
    */
-  gitBranch: string;
+  gitBranch: string
 
   /**
    * Project slug
    *
    * @generated from field: string slug = 8;
    */
-  slug: string;
+  slug: string
 
   /**
    * User type (e.g., "external")
    *
    * @generated from field: string user_type = 9;
    */
-  userType: string;
+  userType: string
 
   /**
    * Whether this is a sidechain message
    *
    * @generated from field: bool is_sidechain = 10;
    */
-  isSidechain: boolean;
-};
+  isSidechain: boolean
+}
 
 /**
  * Describes the message transcript.v1.TreeNodeMeta.
  * Use `create(TreeNodeMetaSchema)` to create a new message.
  */
-export const TreeNodeMetaSchema: GenMessage<TreeNodeMeta> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 0);
+export const TreeNodeMetaSchema: GenMessage<TreeNodeMeta> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 0)
 
 /**
  * ImageSource represents base64 image data.
  *
  * @generated from message transcript.v1.ImageSource
  */
-export type ImageSource = Message<"transcript.v1.ImageSource"> & {
+export type ImageSource = Message<'transcript.v1.ImageSource'> & {
   /**
    * Source type (e.g., "base64")
    *
    * @generated from field: string type = 1;
    */
-  type: string;
+  type: string
 
   /**
    * Media type (e.g., "image/png")
    *
    * @generated from field: string media_type = 2;
    */
-  mediaType: string;
+  mediaType: string
 
   /**
    * Base64-encoded data
    *
    * @generated from field: string data = 3;
    */
-  data: string;
-};
+  data: string
+}
 
 /**
  * Describes the message transcript.v1.ImageSource.
  * Use `create(ImageSourceSchema)` to create a new message.
  */
-export const ImageSourceSchema: GenMessage<ImageSource> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 1);
+export const ImageSourceSchema: GenMessage<ImageSource> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 1)
 
 /**
  * ToolResultContent represents tool execution result.
  *
  * @generated from message transcript.v1.ToolResultContent
  */
-export type ToolResultContent = Message<"transcript.v1.ToolResultContent"> & {
+export type ToolResultContent = Message<'transcript.v1.ToolResultContent'> & {
   /**
    * Tool use ID reference
    *
    * @generated from field: string tool_use_id = 1;
    */
-  toolUseId: string;
+  toolUseId: string
 
   /**
    * Result content (JSON string for complex types)
    *
    * @generated from field: string content = 2;
    */
-  content: string;
-};
+  content: string
+}
 
 /**
  * Describes the message transcript.v1.ToolResultContent.
  * Use `create(ToolResultContentSchema)` to create a new message.
  */
-export const ToolResultContentSchema: GenMessage<ToolResultContent> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 2);
+export const ToolResultContentSchema: GenMessage<ToolResultContent> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 2)
 
 /**
  * UserMessageBlock represents a block in user message content.
  *
  * @generated from message transcript.v1.UserMessageBlock
  */
-export type UserMessageBlock = Message<"transcript.v1.UserMessageBlock"> & {
+export type UserMessageBlock = Message<'transcript.v1.UserMessageBlock'> & {
   /**
    * Block type: "text", "tool_result", "image"
    *
    * @generated from field: string type = 1;
    */
-  type: string;
+  type: string
 
   /**
    * Text content (for type="text")
    *
    * @generated from field: string text = 2;
    */
-  text: string;
+  text: string
 
   /**
    * Image source (for type="image")
    *
    * @generated from field: transcript.v1.ImageSource source = 3;
    */
-  source?: ImageSource;
+  source?: ImageSource
 
   /**
    * Tool result (for type="tool_result")
    *
    * @generated from field: transcript.v1.ToolResultContent tool_result = 4;
    */
-  toolResult?: ToolResultContent;
-};
+  toolResult?: ToolResultContent
+}
 
 /**
  * Describes the message transcript.v1.UserMessageBlock.
  * Use `create(UserMessageBlockSchema)` to create a new message.
  */
-export const UserMessageBlockSchema: GenMessage<UserMessageBlock> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 3);
+export const UserMessageBlockSchema: GenMessage<UserMessageBlock> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 3)
 
 /**
  * UserMessageBlockList wraps repeated blocks for oneof usage.
  *
  * @generated from message transcript.v1.UserMessageBlockList
  */
-export type UserMessageBlockList = Message<"transcript.v1.UserMessageBlockList"> & {
-  /**
-   * @generated from field: repeated transcript.v1.UserMessageBlock blocks = 1;
-   */
-  blocks: UserMessageBlock[];
-};
+export type UserMessageBlockList =
+  Message<'transcript.v1.UserMessageBlockList'> & {
+    /**
+     * @generated from field: repeated transcript.v1.UserMessageBlock blocks = 1;
+     */
+    blocks: UserMessageBlock[]
+  }
 
 /**
  * Describes the message transcript.v1.UserMessageBlockList.
  * Use `create(UserMessageBlockListSchema)` to create a new message.
  */
-export const UserMessageBlockListSchema: GenMessage<UserMessageBlockList> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 4);
+export const UserMessageBlockListSchema: GenMessage<UserMessageBlockList> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 4)
 
 /**
  * UserMessage represents user message content.
  *
  * @generated from message transcript.v1.UserMessage
  */
-export type UserMessage = Message<"transcript.v1.UserMessage"> & {
+export type UserMessage = Message<'transcript.v1.UserMessage'> & {
   /**
    * Role (always "user")
    *
    * @generated from field: string role = 1;
    */
-  role: string;
+  role: string
 
   /**
    * Content can be text or blocks
    *
    * @generated from oneof transcript.v1.UserMessage.content
    */
-  content: {
-    /**
-     * @generated from field: string text = 2;
-     */
-    value: string;
-    case: "text";
-  } | {
-    /**
-     * @generated from field: transcript.v1.UserMessageBlockList blocks = 3;
-     */
-    value: UserMessageBlockList;
-    case: "blocks";
-  } | { case: undefined; value?: undefined };
-};
+  content:
+    | {
+        /**
+         * @generated from field: string text = 2;
+         */
+        value: string
+        case: 'text'
+      }
+    | {
+        /**
+         * @generated from field: transcript.v1.UserMessageBlockList blocks = 3;
+         */
+        value: UserMessageBlockList
+        case: 'blocks'
+      }
+    | { case: undefined; value?: undefined }
+}
 
 /**
  * Describes the message transcript.v1.UserMessage.
  * Use `create(UserMessageSchema)` to create a new message.
  */
-export const UserMessageSchema: GenMessage<UserMessage> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 5);
+export const UserMessageSchema: GenMessage<UserMessage> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 5)
 
 /**
  * ThinkingTrigger represents a trigger keyword for extended thinking.
  *
  * @generated from message transcript.v1.ThinkingTrigger
  */
-export type ThinkingTrigger = Message<"transcript.v1.ThinkingTrigger"> & {
+export type ThinkingTrigger = Message<'transcript.v1.ThinkingTrigger'> & {
   /**
    * @generated from field: int32 start = 1;
    */
-  start: number;
+  start: number
 
   /**
    * @generated from field: int32 end = 2;
    */
-  end: number;
+  end: number
 
   /**
    * @generated from field: string text = 3;
    */
-  text: string;
-};
+  text: string
+}
 
 /**
  * Describes the message transcript.v1.ThinkingTrigger.
  * Use `create(ThinkingTriggerSchema)` to create a new message.
  */
-export const ThinkingTriggerSchema: GenMessage<ThinkingTrigger> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 6);
+export const ThinkingTriggerSchema: GenMessage<ThinkingTrigger> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 6)
 
 /**
  * ThinkingMetadata contains extended thinking configuration.
  *
  * @generated from message transcript.v1.ThinkingMetadata
  */
-export type ThinkingMetadata = Message<"transcript.v1.ThinkingMetadata"> & {
+export type ThinkingMetadata = Message<'transcript.v1.ThinkingMetadata'> & {
   /**
    * Thinking level: "high", "medium", "low"
    *
    * @generated from field: string level = 1;
    */
-  level: string;
+  level: string
 
   /**
    * Whether thinking is disabled
    *
    * @generated from field: bool disabled = 2;
    */
-  disabled: boolean;
+  disabled: boolean
 
   /**
    * Trigger keywords
    *
    * @generated from field: repeated transcript.v1.ThinkingTrigger triggers = 3;
    */
-  triggers: ThinkingTrigger[];
-};
+  triggers: ThinkingTrigger[]
+}
 
 /**
  * Describes the message transcript.v1.ThinkingMetadata.
  * Use `create(ThinkingMetadataSchema)` to create a new message.
  */
-export const ThinkingMetadataSchema: GenMessage<ThinkingMetadata> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 7);
+export const ThinkingMetadataSchema: GenMessage<ThinkingMetadata> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 7)
 
 /**
  * Todo represents a task item.
  *
  * @generated from message transcript.v1.Todo
  */
-export type Todo = Message<"transcript.v1.Todo"> & {
+export type Todo = Message<'transcript.v1.Todo'> & {
   /**
    * @generated from field: string content = 1;
    */
-  content: string;
+  content: string
 
   /**
    * Status: "pending", "in_progress", "completed"
    *
    * @generated from field: string status = 2;
    */
-  status: string;
+  status: string
 
   /**
    * @generated from field: string active_form = 3;
    */
-  activeForm: string;
-};
+  activeForm: string
+}
 
 /**
  * Describes the message transcript.v1.Todo.
  * Use `create(TodoSchema)` to create a new message.
  */
-export const TodoSchema: GenMessage<Todo> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 8);
+export const TodoSchema: GenMessage<Todo> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 8)
 
 /**
  * UserTranscriptData contains user-specific transcript data.
  *
  * @generated from message transcript.v1.UserTranscriptData
  */
-export type UserTranscriptData = Message<"transcript.v1.UserTranscriptData"> & {
+export type UserTranscriptData = Message<'transcript.v1.UserTranscriptData'> & {
   /**
    * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
    */
-  metadata?: TreeNodeMeta;
+  metadata?: TreeNodeMeta
 
   /**
    * @generated from field: transcript.v1.UserMessage message = 2;
    */
-  message?: UserMessage;
+  message?: UserMessage
 
   /**
    * @generated from field: bool is_meta = 3;
    */
-  isMeta: boolean;
+  isMeta: boolean
 
   /**
    * @generated from field: transcript.v1.ThinkingMetadata thinking_metadata = 4;
    */
-  thinkingMetadata?: ThinkingMetadata;
+  thinkingMetadata?: ThinkingMetadata
 
   /**
    * @generated from field: repeated transcript.v1.Todo todos = 5;
    */
-  todos: Todo[];
+  todos: Todo[]
 
   /**
    * @generated from field: google.protobuf.Value tool_use_result = 6;
    */
-  toolUseResult?: Value;
+  toolUseResult?: Value
 
   /**
    * @generated from field: string source_tool_assistant_uuid = 7;
    */
-  sourceToolAssistantUuid: string;
-};
+  sourceToolAssistantUuid: string
+}
 
 /**
  * Describes the message transcript.v1.UserTranscriptData.
  * Use `create(UserTranscriptDataSchema)` to create a new message.
  */
-export const UserTranscriptDataSchema: GenMessage<UserTranscriptData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 9);
+export const UserTranscriptDataSchema: GenMessage<UserTranscriptData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 9)
 
 /**
  * AssistantContentBlock represents a content block in assistant response.
  *
  * @generated from message transcript.v1.AssistantContentBlock
  */
-export type AssistantContentBlock = Message<"transcript.v1.AssistantContentBlock"> & {
-  /**
-   * Block type: "thinking", "text", "tool_use"
-   *
-   * @generated from field: string type = 1;
-   */
-  type: string;
+export type AssistantContentBlock =
+  Message<'transcript.v1.AssistantContentBlock'> & {
+    /**
+     * Block type: "thinking", "text", "tool_use"
+     *
+     * @generated from field: string type = 1;
+     */
+    type: string
 
-  /**
-   * For type="thinking"
-   *
-   * @generated from field: string thinking = 2;
-   */
-  thinking: string;
+    /**
+     * For type="thinking"
+     *
+     * @generated from field: string thinking = 2;
+     */
+    thinking: string
 
-  /**
-   * @generated from field: string signature = 3;
-   */
-  signature: string;
+    /**
+     * @generated from field: string signature = 3;
+     */
+    signature: string
 
-  /**
-   * For type="text"
-   *
-   * @generated from field: string text = 4;
-   */
-  text: string;
+    /**
+     * For type="text"
+     *
+     * @generated from field: string text = 4;
+     */
+    text: string
 
-  /**
-   * For type="tool_use"
-   *
-   * @generated from field: string id = 5;
-   */
-  id: string;
+    /**
+     * For type="tool_use"
+     *
+     * @generated from field: string id = 5;
+     */
+    id: string
 
-  /**
-   * @generated from field: string name = 6;
-   */
-  name: string;
+    /**
+     * @generated from field: string name = 6;
+     */
+    name: string
 
-  /**
-   * @generated from field: string input_json = 7;
-   */
-  inputJson: string;
-};
+    /**
+     * @generated from field: string input_json = 7;
+     */
+    inputJson: string
+  }
 
 /**
  * Describes the message transcript.v1.AssistantContentBlock.
  * Use `create(AssistantContentBlockSchema)` to create a new message.
  */
-export const AssistantContentBlockSchema: GenMessage<AssistantContentBlock> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 10);
+export const AssistantContentBlockSchema: GenMessage<AssistantContentBlock> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 10)
 
 /**
  * CacheCreation represents ephemeral cache token counts.
  *
  * @generated from message transcript.v1.CacheCreation
  */
-export type CacheCreation = Message<"transcript.v1.CacheCreation"> & {
+export type CacheCreation = Message<'transcript.v1.CacheCreation'> & {
   /**
    * @generated from field: int32 ephemeral_5m_input_tokens = 1;
    */
-  ephemeral5mInputTokens: number;
+  ephemeral5mInputTokens: number
 
   /**
    * @generated from field: int32 ephemeral_1h_input_tokens = 2;
    */
-  ephemeral1hInputTokens: number;
-};
+  ephemeral1hInputTokens: number
+}
 
 /**
  * Describes the message transcript.v1.CacheCreation.
  * Use `create(CacheCreationSchema)` to create a new message.
  */
-export const CacheCreationSchema: GenMessage<CacheCreation> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 11);
+export const CacheCreationSchema: GenMessage<CacheCreation> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 11)
 
 /**
  * AssistantUsage represents token usage statistics.
  *
  * @generated from message transcript.v1.AssistantUsage
  */
-export type AssistantUsage = Message<"transcript.v1.AssistantUsage"> & {
+export type AssistantUsage = Message<'transcript.v1.AssistantUsage'> & {
   /**
    * @generated from field: int32 input_tokens = 1;
    */
-  inputTokens: number;
+  inputTokens: number
 
   /**
    * @generated from field: int32 output_tokens = 2;
    */
-  outputTokens: number;
+  outputTokens: number
 
   /**
    * @generated from field: int32 cache_creation_input_tokens = 3;
    */
-  cacheCreationInputTokens: number;
+  cacheCreationInputTokens: number
 
   /**
    * @generated from field: int32 cache_read_input_tokens = 4;
    */
-  cacheReadInputTokens: number;
+  cacheReadInputTokens: number
 
   /**
    * @generated from field: transcript.v1.CacheCreation cache_creation = 5;
    */
-  cacheCreation?: CacheCreation;
+  cacheCreation?: CacheCreation
 
   /**
    * @generated from field: string service_tier = 6;
    */
-  serviceTier: string;
-};
+  serviceTier: string
+}
 
 /**
  * Describes the message transcript.v1.AssistantUsage.
  * Use `create(AssistantUsageSchema)` to create a new message.
  */
-export const AssistantUsageSchema: GenMessage<AssistantUsage> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 12);
+export const AssistantUsageSchema: GenMessage<AssistantUsage> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 12)
 
 /**
  * AssistantMessage represents the API response message.
  *
  * @generated from message transcript.v1.AssistantMessage
  */
-export type AssistantMessage = Message<"transcript.v1.AssistantMessage"> & {
+export type AssistantMessage = Message<'transcript.v1.AssistantMessage'> & {
   /**
    * @generated from field: string model = 1;
    */
-  model: string;
+  model: string
 
   /**
    * @generated from field: string id = 2;
    */
-  id: string;
+  id: string
 
   /**
    * Type (e.g., "message")
    *
    * @generated from field: string type = 3;
    */
-  type: string;
+  type: string
 
   /**
    * Role (always "assistant")
    *
    * @generated from field: string role = 4;
    */
-  role: string;
+  role: string
 
   /**
    * @generated from field: repeated transcript.v1.AssistantContentBlock content = 5;
    */
-  content: AssistantContentBlock[];
+  content: AssistantContentBlock[]
 
   /**
    * @generated from field: string stop_reason = 6;
    */
-  stopReason: string;
+  stopReason: string
 
   /**
    * @generated from field: string stop_sequence = 7;
    */
-  stopSequence: string;
+  stopSequence: string
 
   /**
    * @generated from field: transcript.v1.AssistantUsage usage = 8;
    */
-  usage?: AssistantUsage;
-};
+  usage?: AssistantUsage
+}
 
 /**
  * Describes the message transcript.v1.AssistantMessage.
  * Use `create(AssistantMessageSchema)` to create a new message.
  */
-export const AssistantMessageSchema: GenMessage<AssistantMessage> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 13);
+export const AssistantMessageSchema: GenMessage<AssistantMessage> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 13)
 
 /**
  * AssistantTranscriptData contains assistant-specific transcript data.
  *
  * @generated from message transcript.v1.AssistantTranscriptData
  */
-export type AssistantTranscriptData = Message<"transcript.v1.AssistantTranscriptData"> & {
-  /**
-   * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
-   */
-  metadata?: TreeNodeMeta;
+export type AssistantTranscriptData =
+  Message<'transcript.v1.AssistantTranscriptData'> & {
+    /**
+     * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
+     */
+    metadata?: TreeNodeMeta
 
-  /**
-   * @generated from field: string request_id = 2;
-   */
-  requestId: string;
+    /**
+     * @generated from field: string request_id = 2;
+     */
+    requestId: string
 
-  /**
-   * @generated from field: transcript.v1.AssistantMessage message = 3;
-   */
-  message?: AssistantMessage;
-};
+    /**
+     * @generated from field: transcript.v1.AssistantMessage message = 3;
+     */
+    message?: AssistantMessage
+  }
 
 /**
  * Describes the message transcript.v1.AssistantTranscriptData.
  * Use `create(AssistantTranscriptDataSchema)` to create a new message.
  */
-export const AssistantTranscriptDataSchema: GenMessage<AssistantTranscriptData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 14);
+export const AssistantTranscriptDataSchema: GenMessage<AssistantTranscriptData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 14)
 
 /**
  * SystemTranscriptData contains system-level metadata.
  *
  * @generated from message transcript.v1.SystemTranscriptData
  */
-export type SystemTranscriptData = Message<"transcript.v1.SystemTranscriptData"> & {
-  /**
-   * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
-   */
-  metadata?: TreeNodeMeta;
+export type SystemTranscriptData =
+  Message<'transcript.v1.SystemTranscriptData'> & {
+    /**
+     * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
+     */
+    metadata?: TreeNodeMeta
 
-  /**
-   * @generated from field: transcript.v1.SystemTranscriptSubtype subtype = 2;
-   */
-  subtype: SystemTranscriptSubtype;
+    /**
+     * @generated from field: transcript.v1.SystemTranscriptSubtype subtype = 2;
+     */
+    subtype: SystemTranscriptSubtype
 
-  /**
-   * @generated from field: int32 duration_ms = 3;
-   */
-  durationMs: number;
+    /**
+     * @generated from field: int32 duration_ms = 3;
+     */
+    durationMs: number
 
-  /**
-   * @generated from field: bool is_meta = 4;
-   */
-  isMeta: boolean;
-};
+    /**
+     * @generated from field: bool is_meta = 4;
+     */
+    isMeta: boolean
+  }
 
 /**
  * Describes the message transcript.v1.SystemTranscriptData.
  * Use `create(SystemTranscriptDataSchema)` to create a new message.
  */
-export const SystemTranscriptDataSchema: GenMessage<SystemTranscriptData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 15);
+export const SystemTranscriptDataSchema: GenMessage<SystemTranscriptData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 15)
 
 /**
  * SummaryTranscriptData contains conversation summary data.
  *
  * @generated from message transcript.v1.SummaryTranscriptData
  */
-export type SummaryTranscriptData = Message<"transcript.v1.SummaryTranscriptData"> & {
-  /**
-   * @generated from field: string summary = 1;
-   */
-  summary: string;
+export type SummaryTranscriptData =
+  Message<'transcript.v1.SummaryTranscriptData'> & {
+    /**
+     * @generated from field: string summary = 1;
+     */
+    summary: string
 
-  /**
-   * @generated from field: string leaf_uuid = 2;
-   */
-  leafUuid: string;
-};
+    /**
+     * @generated from field: string leaf_uuid = 2;
+     */
+    leafUuid: string
+  }
 
 /**
  * Describes the message transcript.v1.SummaryTranscriptData.
  * Use `create(SummaryTranscriptDataSchema)` to create a new message.
  */
-export const SummaryTranscriptDataSchema: GenMessage<SummaryTranscriptData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 16);
+export const SummaryTranscriptDataSchema: GenMessage<SummaryTranscriptData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 16)
 
 /**
  * FileBackup represents backup info for a single file.
  *
  * @generated from message transcript.v1.FileBackup
  */
-export type FileBackup = Message<"transcript.v1.FileBackup"> & {
+export type FileBackup = Message<'transcript.v1.FileBackup'> & {
   /**
    * @generated from field: string backup_file_name = 1;
    */
-  backupFileName: string;
+  backupFileName: string
 
   /**
    * @generated from field: int32 version = 2;
    */
-  version: number;
+  version: number
 
   /**
    * @generated from field: google.protobuf.Timestamp backup_time = 3;
    */
-  backupTime?: Timestamp;
-};
+  backupTime?: Timestamp
+}
 
 /**
  * Describes the message transcript.v1.FileBackup.
  * Use `create(FileBackupSchema)` to create a new message.
  */
-export const FileBackupSchema: GenMessage<FileBackup> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 17);
+export const FileBackupSchema: GenMessage<FileBackup> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 17)
 
 /**
  * FileSnapshot represents file backup state at a point in time.
  *
  * @generated from message transcript.v1.FileSnapshot
  */
-export type FileSnapshot = Message<"transcript.v1.FileSnapshot"> & {
+export type FileSnapshot = Message<'transcript.v1.FileSnapshot'> & {
   /**
    * @generated from field: string message_id = 1;
    */
-  messageId: string;
+  messageId: string
 
   /**
    * @generated from field: map<string, transcript.v1.FileBackup> tracked_file_backups = 2;
    */
-  trackedFileBackups: { [key: string]: FileBackup };
+  trackedFileBackups: { [key: string]: FileBackup }
 
   /**
    * @generated from field: google.protobuf.Timestamp timestamp = 3;
    */
-  timestamp?: Timestamp;
-};
+  timestamp?: Timestamp
+}
 
 /**
  * Describes the message transcript.v1.FileSnapshot.
  * Use `create(FileSnapshotSchema)` to create a new message.
  */
-export const FileSnapshotSchema: GenMessage<FileSnapshot> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 18);
+export const FileSnapshotSchema: GenMessage<FileSnapshot> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 18)
 
 /**
  * FileHistorySnapshotTranscriptData contains file history snapshot data.
  *
  * @generated from message transcript.v1.FileHistorySnapshotTranscriptData
  */
-export type FileHistorySnapshotTranscriptData = Message<"transcript.v1.FileHistorySnapshotTranscriptData"> & {
-  /**
-   * @generated from field: string message_id = 1;
-   */
-  messageId: string;
+export type FileHistorySnapshotTranscriptData =
+  Message<'transcript.v1.FileHistorySnapshotTranscriptData'> & {
+    /**
+     * @generated from field: string message_id = 1;
+     */
+    messageId: string
 
-  /**
-   * @generated from field: transcript.v1.FileSnapshot snapshot = 2;
-   */
-  snapshot?: FileSnapshot;
+    /**
+     * @generated from field: transcript.v1.FileSnapshot snapshot = 2;
+     */
+    snapshot?: FileSnapshot
 
-  /**
-   * @generated from field: bool is_snapshot_update = 3;
-   */
-  isSnapshotUpdate: boolean;
-};
+    /**
+     * @generated from field: bool is_snapshot_update = 3;
+     */
+    isSnapshotUpdate: boolean
+  }
 
 /**
  * Describes the message transcript.v1.FileHistorySnapshotTranscriptData.
  * Use `create(FileHistorySnapshotTranscriptDataSchema)` to create a new message.
  */
-export const FileHistorySnapshotTranscriptDataSchema: GenMessage<FileHistorySnapshotTranscriptData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 19);
+export const FileHistorySnapshotTranscriptDataSchema: GenMessage<FileHistorySnapshotTranscriptData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 19)
 
 /**
  * ProgressData contains the progress payload.
  *
  * @generated from message transcript.v1.ProgressData
  */
-export type ProgressData = Message<"transcript.v1.ProgressData"> & {
+export type ProgressData = Message<'transcript.v1.ProgressData'> & {
   /**
    * @generated from field: transcript.v1.ProgressDataType type = 1;
    */
-  type: ProgressDataType;
+  type: ProgressDataType
 
   /**
    * JSON-serialized message object
    *
    * @generated from field: string message_json = 2;
    */
-  messageJson: string;
+  messageJson: string
 
   /**
    * JSON-serialized normalized messages array
    *
    * @generated from field: string normalized_messages_json = 3;
    */
-  normalizedMessagesJson: string;
+  normalizedMessagesJson: string
 
   /**
    * @generated from field: string prompt = 4;
    */
-  prompt: string;
+  prompt: string
 
   /**
    * @generated from field: string agent_id = 5;
    */
-  agentId: string;
-};
+  agentId: string
+}
 
 /**
  * Describes the message transcript.v1.ProgressData.
  * Use `create(ProgressDataSchema)` to create a new message.
  */
-export const ProgressDataSchema: GenMessage<ProgressData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 20);
+export const ProgressDataSchema: GenMessage<ProgressData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 20)
 
 /**
  * ProgressTranscriptData contains agent/skill progress transcript data.
  *
  * @generated from message transcript.v1.ProgressTranscriptData
  */
-export type ProgressTranscriptData = Message<"transcript.v1.ProgressTranscriptData"> & {
-  /**
-   * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
-   */
-  metadata?: TreeNodeMeta;
+export type ProgressTranscriptData =
+  Message<'transcript.v1.ProgressTranscriptData'> & {
+    /**
+     * @generated from field: transcript.v1.TreeNodeMeta metadata = 1;
+     */
+    metadata?: TreeNodeMeta
 
-  /**
-   * @generated from field: string tool_use_id = 2;
-   */
-  toolUseId: string;
+    /**
+     * @generated from field: string tool_use_id = 2;
+     */
+    toolUseId: string
 
-  /**
-   * @generated from field: string parent_tool_use_id = 3;
-   */
-  parentToolUseId: string;
+    /**
+     * @generated from field: string parent_tool_use_id = 3;
+     */
+    parentToolUseId: string
 
-  /**
-   * @generated from field: transcript.v1.ProgressData data = 4;
-   */
-  data?: ProgressData;
-};
+    /**
+     * @generated from field: transcript.v1.ProgressData data = 4;
+     */
+    data?: ProgressData
+  }
 
 /**
  * Describes the message transcript.v1.ProgressTranscriptData.
  * Use `create(ProgressTranscriptDataSchema)` to create a new message.
  */
-export const ProgressTranscriptDataSchema: GenMessage<ProgressTranscriptData> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 21);
+export const ProgressTranscriptDataSchema: GenMessage<ProgressTranscriptData> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 21)
 
 /**
  * Transcript represents a single transcript entry with type-specific data.
  *
  * @generated from message transcript.v1.Transcript
  */
-export type Transcript = Message<"transcript.v1.Transcript"> & {
+export type Transcript = Message<'transcript.v1.Transcript'> & {
   /**
    * @generated from field: transcript.v1.TranscriptType type = 1;
    */
-  type: TranscriptType;
+  type: TranscriptType
 
   /**
    * @generated from oneof transcript.v1.Transcript.data
    */
-  data: {
-    /**
-     * @generated from field: transcript.v1.UserTranscriptData user_data = 2;
-     */
-    value: UserTranscriptData;
-    case: "userData";
-  } | {
-    /**
-     * @generated from field: transcript.v1.AssistantTranscriptData assistant_data = 3;
-     */
-    value: AssistantTranscriptData;
-    case: "assistantData";
-  } | {
-    /**
-     * @generated from field: transcript.v1.SystemTranscriptData system_data = 4;
-     */
-    value: SystemTranscriptData;
-    case: "systemData";
-  } | {
-    /**
-     * @generated from field: transcript.v1.SummaryTranscriptData summary_data = 5;
-     */
-    value: SummaryTranscriptData;
-    case: "summaryData";
-  } | {
-    /**
-     * @generated from field: transcript.v1.FileHistorySnapshotTranscriptData file_history_snapshot_data = 6;
-     */
-    value: FileHistorySnapshotTranscriptData;
-    case: "fileHistorySnapshotData";
-  } | {
-    /**
-     * @generated from field: transcript.v1.ProgressTranscriptData progress_data = 7;
-     */
-    value: ProgressTranscriptData;
-    case: "progressData";
-  } | { case: undefined; value?: undefined };
-};
+  data:
+    | {
+        /**
+         * @generated from field: transcript.v1.UserTranscriptData user_data = 2;
+         */
+        value: UserTranscriptData
+        case: 'userData'
+      }
+    | {
+        /**
+         * @generated from field: transcript.v1.AssistantTranscriptData assistant_data = 3;
+         */
+        value: AssistantTranscriptData
+        case: 'assistantData'
+      }
+    | {
+        /**
+         * @generated from field: transcript.v1.SystemTranscriptData system_data = 4;
+         */
+        value: SystemTranscriptData
+        case: 'systemData'
+      }
+    | {
+        /**
+         * @generated from field: transcript.v1.SummaryTranscriptData summary_data = 5;
+         */
+        value: SummaryTranscriptData
+        case: 'summaryData'
+      }
+    | {
+        /**
+         * @generated from field: transcript.v1.FileHistorySnapshotTranscriptData file_history_snapshot_data = 6;
+         */
+        value: FileHistorySnapshotTranscriptData
+        case: 'fileHistorySnapshotData'
+      }
+    | {
+        /**
+         * @generated from field: transcript.v1.ProgressTranscriptData progress_data = 7;
+         */
+        value: ProgressTranscriptData
+        case: 'progressData'
+      }
+    | { case: undefined; value?: undefined }
+}
 
 /**
  * Describes the message transcript.v1.Transcript.
  * Use `create(TranscriptSchema)` to create a new message.
  */
-export const TranscriptSchema: GenMessage<Transcript> = /*@__PURE__*/
-  messageDesc(file_transcript_v1_transcript, 22);
+export const TranscriptSchema: GenMessage<Transcript> =
+  /*@__PURE__*/
+  messageDesc(file_transcript_v1_transcript, 22)
 
 /**
  * TranscriptType represents the type discriminator for transcript entries.
@@ -945,8 +992,9 @@ export enum TranscriptType {
 /**
  * Describes the enum transcript.v1.TranscriptType.
  */
-export const TranscriptTypeSchema: GenEnum<TranscriptType> = /*@__PURE__*/
-  enumDesc(file_transcript_v1_transcript, 0);
+export const TranscriptTypeSchema: GenEnum<TranscriptType> =
+  /*@__PURE__*/
+  enumDesc(file_transcript_v1_transcript, 0)
 
 /**
  * SystemTranscriptSubtype represents the subtype of system transcript.
@@ -968,8 +1016,9 @@ export enum SystemTranscriptSubtype {
 /**
  * Describes the enum transcript.v1.SystemTranscriptSubtype.
  */
-export const SystemTranscriptSubtypeSchema: GenEnum<SystemTranscriptSubtype> = /*@__PURE__*/
-  enumDesc(file_transcript_v1_transcript, 1);
+export const SystemTranscriptSubtypeSchema: GenEnum<SystemTranscriptSubtype> =
+  /*@__PURE__*/
+  enumDesc(file_transcript_v1_transcript, 1)
 
 /**
  * ProgressDataType represents the subtype of progress entry.
@@ -996,6 +1045,6 @@ export enum ProgressDataType {
 /**
  * Describes the enum transcript.v1.ProgressDataType.
  */
-export const ProgressDataTypeSchema: GenEnum<ProgressDataType> = /*@__PURE__*/
-  enumDesc(file_transcript_v1_transcript, 2);
-
+export const ProgressDataTypeSchema: GenEnum<ProgressDataType> =
+  /*@__PURE__*/
+  enumDesc(file_transcript_v1_transcript, 2)

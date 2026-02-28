@@ -30,7 +30,7 @@ const getSessionMetadata = (session: Session) => {
 }
 
 // getFirstTimestamp returns the earliest timestamp from sessions
-const getFirstTimestamp = (sessions: Session[]): Timestamp | undefined => {
+const getFirstTimestamp = (sessions: Array<Session>): Timestamp | undefined => {
   let earliest: Timestamp | undefined
 
   for (const session of sessions) {
@@ -48,9 +48,9 @@ const getFirstTimestamp = (sessions: Session[]): Timestamp | undefined => {
 
 // extractSubAgentInfo extracts SubAgent information from grouped sessions
 const extractSubAgentInfo = (
-  groupedSessions: Map<string, Session[]>,
-): SubAgentInfo[] => {
-  const subAgents: SubAgentInfo[] = []
+  groupedSessions: Map<string, Array<Session>>,
+): Array<SubAgentInfo> => {
+  const subAgents: Array<SubAgentInfo> = []
 
   for (const [agentId, sessions] of groupedSessions) {
     if (agentId === 'main') {
@@ -76,8 +76,10 @@ const extractSubAgentInfo = (
 }
 
 // groupSessionsByAgent groups sessions by their agentId
-const groupSessionsByAgent = (sessions: Session[]): Map<string, Session[]> => {
-  const grouped = new Map<string, Session[]>()
+const groupSessionsByAgent = (
+  sessions: Array<Session>,
+): Map<string, Array<Session>> => {
+  const grouped = new Map<string, Array<Session>>()
 
   for (const session of sessions) {
     const metadata = getSessionMetadata(session)
@@ -93,7 +95,7 @@ const groupSessionsByAgent = (sessions: Session[]): Map<string, Session[]> => {
 
 // getTimeRange calculates min and max timestamps from sessions
 const getTimeRange = (
-  sessions: Session[],
+  sessions: Array<Session>,
 ): { minTime: Timestamp | undefined; maxTime: Timestamp | undefined } => {
   let minTime: Timestamp | undefined
   let maxTime: Timestamp | undefined
@@ -115,7 +117,9 @@ const getTimeRange = (
 }
 
 // buildSegmentData converts sessions into SegmentTimelineData for visualization
-export const buildSegmentData = (sessions: Session[]): SegmentTimelineData => {
+export const buildSegmentData = (
+  sessions: Array<Session>,
+): SegmentTimelineData => {
   const groupedSessions = groupSessionsByAgent(sessions)
   const subAgentInfos = extractSubAgentInfo(groupedSessions)
 
@@ -143,7 +147,7 @@ export const buildSegmentData = (sessions: Session[]): SegmentTimelineData => {
   const totalDuration = maxTimeSeconds - minTimeSeconds
 
   // Build segments
-  const segments: AgentSegment[] = []
+  const segments: Array<AgentSegment> = []
 
   // Main segment (center position, y = 0)
   const mainSessions = groupedSessions.get('main') || []
@@ -224,7 +228,7 @@ export const getSessionMessageId = (session: Session): string | undefined => {
 // TimelineData contains processed segment data for timeline rendering
 export interface TimelineData {
   // All segments with calculated yPosition
-  segments: TimelineSegment[]
+  segments: Array<TimelineSegment>
   // Time range in seconds for X axis calculation
   timeRange: { start: number; end: number }
   // Total duration in seconds
@@ -233,7 +237,7 @@ export interface TimelineData {
 
 // convertApiSegmentsToTimeline converts API SessionSegment array to TimelineData
 export const convertApiSegmentsToTimeline = (
-  apiSegments: SessionSegment[],
+  apiSegments: Array<SessionSegment>,
   startTime: Timestamp | undefined,
   endTime: Timestamp | undefined,
   totalDurationSeconds: bigint,
@@ -256,7 +260,7 @@ export const convertApiSegmentsToTimeline = (
   })
 
   // Build timeline segments with y positions
-  const segments: TimelineSegment[] = []
+  const segments: Array<TimelineSegment> = []
 
   // Main segment at center (y = 0)
   if (mainSegment && mainSegment.startTime && mainSegment.endTime) {

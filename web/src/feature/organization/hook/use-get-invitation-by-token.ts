@@ -9,6 +9,8 @@ interface UseGetInvitationByTokenInput {
 // useGetInvitationByToken provides a query hook for fetching invitation details by token.
 // This is a public endpoint (no auth required for viewing).
 // Returns a TanStack Query object with data, isLoading, error states.
-export const useGetInvitationByToken = (input: UseGetInvitationByTokenInput) => {
+export const useGetInvitationByToken = (
+  input: UseGetInvitationByTokenInput,
+) => {
   return useQuery(getInvitationByToken, input, { transport })
 }

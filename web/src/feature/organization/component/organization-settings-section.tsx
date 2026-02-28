@@ -1,11 +1,20 @@
-import { Building2, Crown, LogOut, Mail, Pencil, User, UserPlus, Users } from 'lucide-react'
+import {
+  Building2,
+  Crown,
+  LogOut,
+  Mail,
+  Pencil,
+  User,
+  UserPlus,
+  Users,
+} from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { EditOrganizationDialog } from './edit-organization-dialog'
 import { MemberList } from './member-list'
 import { LeaveOrganizationDialog } from './leave-organization-dialog'
 import { InviteMemberDialog } from './invite-member-dialog'
 import { PendingInvitationsList } from './pending-invitations-list'
 import { useUserStore } from '@/shared/store/user-store'
-import { useQueryClient } from '@tanstack/react-query'
 import {
   Card,
   CardContent,
@@ -117,7 +126,10 @@ export const OrganizationSettingsSection = () => {
                 onSuccess={() => {
                   // Invalidate invitations query to refresh the list
                   queryClient.invalidateQueries({
-                    queryKey: ['organization.v1.OrganizationService', 'ListInvitations'],
+                    queryKey: [
+                      'organization.v1.OrganizationService',
+                      'ListInvitations',
+                    ],
                   })
                 }}
               />

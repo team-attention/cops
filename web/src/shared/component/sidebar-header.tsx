@@ -13,7 +13,11 @@ export const SidebarHeader = () => {
           <div className="relative rounded-lg border border-cyan-500/30 bg-gradient-to-br from-zinc-900 to-zinc-950 p-2 shadow-lg shadow-cyan-500/10">
             {/* Inner icon with scanline effect */}
             <div className="relative overflow-hidden">
-              <img src="/logo192.png" alt="C-Ops" className="relative z-10 h-6 w-6" />
+              <img
+                src="/logo192.png"
+                alt="C-Ops"
+                className="relative z-10 h-6 w-6"
+              />
               {/* Scanline overlay */}
               <div
                 className="pointer-events-none absolute inset-0 opacity-20"

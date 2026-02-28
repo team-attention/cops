@@ -78,7 +78,10 @@ export const InviteMemberDialog = ({
     }
 
     if (!validateEmail(trimmedEmail)) {
-      setState({ status: 'error', message: 'Please enter a valid email address' })
+      setState({
+        status: 'error',
+        message: 'Please enter a valid email address',
+      })
       return
     }
 
@@ -105,10 +108,9 @@ export const InviteMemberDialog = ({
       if (connectError.code === Code.PermissionDenied) {
         errorMessage = 'You must be an admin to invite members'
       } else if (connectError.code === Code.AlreadyExists) {
-        errorMessage =
-          connectError.message?.includes('already a member')
-            ? 'This user is already a member of the organization'
-            : 'An invitation has already been sent to this email'
+        errorMessage = connectError.message?.includes('already a member')
+          ? 'This user is already a member of the organization'
+          : 'An invitation has already been sent to this email'
       } else if (connectError.code === Code.InvalidArgument) {
         errorMessage = connectError.message || 'Invalid input'
       } else if (connectError.message) {
@@ -148,7 +150,9 @@ export const InviteMemberDialog = ({
                 value={email}
                 onChange={handleEmailChange}
                 placeholder="colleague@example.com"
-                disabled={state.status === 'submitting' || state.status === 'success'}
+                disabled={
+                  state.status === 'submitting' || state.status === 'success'
+                }
                 className="pl-10"
               />
             </div>
@@ -182,7 +186,11 @@ export const InviteMemberDialog = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!isEmailValid || state.status === 'submitting' || state.status === 'success'}
+            disabled={
+              !isEmailValid ||
+              state.status === 'submitting' ||
+              state.status === 'success'
+            }
           >
             {state.status === 'submitting' && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

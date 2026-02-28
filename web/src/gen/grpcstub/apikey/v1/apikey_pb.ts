@@ -2,15 +2,26 @@
 // @generated from file apikey/v1/apikey.proto (package apikey.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file apikey/v1/apikey.proto.
  */
-export const file_apikey_v1_apikey: GenFile = /*@__PURE__*/
-  fileDesc("ChZhcGlrZXkvdjEvYXBpa2V5LnByb3RvEglhcGlrZXkudjEinQEKCkFQSUtleUluZm8SCgoCaWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCRIMCgRuYW1lGAMgASgJEhIKCmtleV9wcmVmaXgYBCABKAkSEgoKY3JlYXRlZF9hdBgFIAEoAxIUCgxsYXN0X3VzZWRfYXQYBiABKAMSEgoKcmV2b2tlZF9hdBgHIAEoAxISCgpleHBpcmVzX2F0GAggASgDIjcKDklzc3VlQVBJS2V5UmVxEgwKBG5hbWUYASABKAkSFwoPZXhwaXJlc19pbl9kYXlzGAIgASgFIkoKDklzc3VlQVBJS2V5UmVzEg8KB2FwaV9rZXkYASABKAkSJwoIa2V5X2luZm8YAiABKAsyFS5hcGlrZXkudjEuQVBJS2V5SW5mbyIpCg5MaXN0QVBJS2V5c1JlcRIXCg9pbmNsdWRlX3Jldm9rZWQYASABKAgiNQoOTGlzdEFQSUtleXNSZXMSIwoEa2V5cxgBIAMoCzIVLmFwaWtleS52MS5BUElLZXlJbmZvIiEKD1Jldm9rZUFQSUtleVJlcRIOCgZrZXlfaWQYASABKAkiIgoPUmV2b2tlQVBJS2V5UmVzEg8KB3N1Y2Nlc3MYASABKAgiJAoRVmFsaWRhdGVBUElLZXlSZXESDwoHYXBpX2tleRgBIAEoCSJKChFWYWxpZGF0ZUFQSUtleVJlcxINCgV2YWxpZBgBIAEoCBIPCgd1c2VyX2lkGAIgASgJEhUKDWVycm9yX21lc3NhZ2UYAyABKAkyrwIKDUFQSUtleVNlcnZpY2USQwoLSXNzdWVBUElLZXkSGS5hcGlrZXkudjEuSXNzdWVBUElLZXlSZXEaGS5hcGlrZXkudjEuSXNzdWVBUElLZXlSZXMSQwoLTGlzdEFQSUtleXMSGS5hcGlrZXkudjEuTGlzdEFQSUtleXNSZXEaGS5hcGlrZXkudjEuTGlzdEFQSUtleXNSZXMSRgoMUmV2b2tlQVBJS2V5EhouYXBpa2V5LnYxLlJldm9rZUFQSUtleVJlcRoaLmFwaWtleS52MS5SZXZva2VBUElLZXlSZXMSTAoOVmFsaWRhdGVBUElLZXkSHC5hcGlrZXkudjEuVmFsaWRhdGVBUElLZXlSZXEaHC5hcGlrZXkudjEuVmFsaWRhdGVBUElLZXlSZXNCqAEKDWNvbS5hcGlrZXkudjFCC0FwaWtleVByb3RvUAFaRWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2FwaWtleS92MTthcGlrZXl2MaICA0FYWKoCCUFwaWtleS5WMcoCCUFwaWtleVxWMeICFUFwaWtleVxWMVxHUEJNZXRhZGF0YeoCCkFwaWtleTo6VjFiBnByb3RvMw");
+export const file_apikey_v1_apikey: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChZhcGlrZXkvdjEvYXBpa2V5LnByb3RvEglhcGlrZXkudjEinQEKCkFQSUtleUluZm8SCgoCaWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCRIMCgRuYW1lGAMgASgJEhIKCmtleV9wcmVmaXgYBCABKAkSEgoKY3JlYXRlZF9hdBgFIAEoAxIUCgxsYXN0X3VzZWRfYXQYBiABKAMSEgoKcmV2b2tlZF9hdBgHIAEoAxISCgpleHBpcmVzX2F0GAggASgDIjcKDklzc3VlQVBJS2V5UmVxEgwKBG5hbWUYASABKAkSFwoPZXhwaXJlc19pbl9kYXlzGAIgASgFIkoKDklzc3VlQVBJS2V5UmVzEg8KB2FwaV9rZXkYASABKAkSJwoIa2V5X2luZm8YAiABKAsyFS5hcGlrZXkudjEuQVBJS2V5SW5mbyIpCg5MaXN0QVBJS2V5c1JlcRIXCg9pbmNsdWRlX3Jldm9rZWQYASABKAgiNQoOTGlzdEFQSUtleXNSZXMSIwoEa2V5cxgBIAMoCzIVLmFwaWtleS52MS5BUElLZXlJbmZvIiEKD1Jldm9rZUFQSUtleVJlcRIOCgZrZXlfaWQYASABKAkiIgoPUmV2b2tlQVBJS2V5UmVzEg8KB3N1Y2Nlc3MYASABKAgiJAoRVmFsaWRhdGVBUElLZXlSZXESDwoHYXBpX2tleRgBIAEoCSJKChFWYWxpZGF0ZUFQSUtleVJlcxINCgV2YWxpZBgBIAEoCBIPCgd1c2VyX2lkGAIgASgJEhUKDWVycm9yX21lc3NhZ2UYAyABKAkyrwIKDUFQSUtleVNlcnZpY2USQwoLSXNzdWVBUElLZXkSGS5hcGlrZXkudjEuSXNzdWVBUElLZXlSZXEaGS5hcGlrZXkudjEuSXNzdWVBUElLZXlSZXMSQwoLTGlzdEFQSUtleXMSGS5hcGlrZXkudjEuTGlzdEFQSUtleXNSZXEaGS5hcGlrZXkudjEuTGlzdEFQSUtleXNSZXMSRgoMUmV2b2tlQVBJS2V5EhouYXBpa2V5LnYxLlJldm9rZUFQSUtleVJlcRoaLmFwaWtleS52MS5SZXZva2VBUElLZXlSZXMSTAoOVmFsaWRhdGVBUElLZXkSHC5hcGlrZXkudjEuVmFsaWRhdGVBUElLZXlSZXEaHC5hcGlrZXkudjEuVmFsaWRhdGVBUElLZXlSZXNCqAEKDWNvbS5hcGlrZXkudjFCC0FwaWtleVByb3RvUAFaRWdpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2FwaWtleS92MTthcGlrZXl2MaICA0FYWKoCCUFwaWtleS5WMcoCCUFwaWtleVxWMeICFUFwaWtleVxWMVxHUEJNZXRhZGF0YeoCCkFwaWtleTo6VjFiBnByb3RvMw',
+  )
 
 /**
  * APIKeyInfo represents API key metadata (excludes actual key value).
@@ -18,64 +29,65 @@ export const file_apikey_v1_apikey: GenFile = /*@__PURE__*/
  *
  * @generated from message apikey.v1.APIKeyInfo
  */
-export type APIKeyInfo = Message<"apikey.v1.APIKeyInfo"> & {
+export type APIKeyInfo = Message<'apikey.v1.APIKeyInfo'> & {
   /**
    * @generated from field: string id = 1;
    */
-  id: string;
+  id: string
 
   /**
    * @generated from field: string user_id = 2;
    */
-  userId: string;
+  userId: string
 
   /**
    * @generated from field: string name = 3;
    */
-  name: string;
+  name: string
 
   /**
    * First 8 chars for identification
    *
    * @generated from field: string key_prefix = 4;
    */
-  keyPrefix: string;
+  keyPrefix: string
 
   /**
    * Unix timestamp
    *
    * @generated from field: int64 created_at = 5;
    */
-  createdAt: bigint;
+  createdAt: bigint
 
   /**
    * Unix timestamp (0 if never used)
    *
    * @generated from field: int64 last_used_at = 6;
    */
-  lastUsedAt: bigint;
+  lastUsedAt: bigint
 
   /**
    * Unix timestamp (0 if not revoked)
    *
    * @generated from field: int64 revoked_at = 7;
    */
-  revokedAt: bigint;
+  revokedAt: bigint
 
   /**
    * Unix timestamp (0 if no expiration)
    *
    * @generated from field: int64 expires_at = 8;
    */
-  expiresAt: bigint;
-};
+  expiresAt: bigint
+}
 
 /**
  * Describes the message apikey.v1.APIKeyInfo.
  * Use `create(APIKeyInfoSchema)` to create a new message.
  */
-export const APIKeyInfoSchema: GenMessage<APIKeyInfo> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 0);
+export const APIKeyInfoSchema: GenMessage<APIKeyInfo> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 0)
 
 /**
  * IssueAPIKeyReq contains parameters for issuing a new API key.
@@ -83,28 +95,29 @@ export const APIKeyInfoSchema: GenMessage<APIKeyInfo> = /*@__PURE__*/
  *
  * @generated from message apikey.v1.IssueAPIKeyReq
  */
-export type IssueAPIKeyReq = Message<"apikey.v1.IssueAPIKeyReq"> & {
+export type IssueAPIKeyReq = Message<'apikey.v1.IssueAPIKeyReq'> & {
   /**
    * name is a human-readable label for the key (e.g., "Production Hook")
    *
    * @generated from field: string name = 1;
    */
-  name: string;
+  name: string
 
   /**
    * expires_in_days optionally sets key expiration (0 = no expiration)
    *
    * @generated from field: int32 expires_in_days = 2;
    */
-  expiresInDays: number;
-};
+  expiresInDays: number
+}
 
 /**
  * Describes the message apikey.v1.IssueAPIKeyReq.
  * Use `create(IssueAPIKeyReqSchema)` to create a new message.
  */
-export const IssueAPIKeyReqSchema: GenMessage<IssueAPIKeyReq> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 1);
+export const IssueAPIKeyReqSchema: GenMessage<IssueAPIKeyReq> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 1)
 
 /**
  * IssueAPIKeyRes contains the newly created API key.
@@ -112,29 +125,30 @@ export const IssueAPIKeyReqSchema: GenMessage<IssueAPIKeyReq> = /*@__PURE__*/
  *
  * @generated from message apikey.v1.IssueAPIKeyRes
  */
-export type IssueAPIKeyRes = Message<"apikey.v1.IssueAPIKeyRes"> & {
+export type IssueAPIKeyRes = Message<'apikey.v1.IssueAPIKeyRes'> & {
   /**
    * api_key is the full key value (format: cops_{random_32_chars})
    * This is the ONLY time the full key is exposed - store it securely!
    *
    * @generated from field: string api_key = 1;
    */
-  apiKey: string;
+  apiKey: string
 
   /**
    * key_info contains metadata about the created key
    *
    * @generated from field: apikey.v1.APIKeyInfo key_info = 2;
    */
-  keyInfo?: APIKeyInfo;
-};
+  keyInfo?: APIKeyInfo
+}
 
 /**
  * Describes the message apikey.v1.IssueAPIKeyRes.
  * Use `create(IssueAPIKeyResSchema)` to create a new message.
  */
-export const IssueAPIKeyResSchema: GenMessage<IssueAPIKeyRes> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 2);
+export const IssueAPIKeyResSchema: GenMessage<IssueAPIKeyRes> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 2)
 
 /**
  * ListAPIKeysReq requests API keys for the authenticated user.
@@ -142,78 +156,82 @@ export const IssueAPIKeyResSchema: GenMessage<IssueAPIKeyRes> = /*@__PURE__*/
  *
  * @generated from message apikey.v1.ListAPIKeysReq
  */
-export type ListAPIKeysReq = Message<"apikey.v1.ListAPIKeysReq"> & {
+export type ListAPIKeysReq = Message<'apikey.v1.ListAPIKeysReq'> & {
   /**
    * If true, include revoked keys
    *
    * @generated from field: bool include_revoked = 1;
    */
-  includeRevoked: boolean;
-};
+  includeRevoked: boolean
+}
 
 /**
  * Describes the message apikey.v1.ListAPIKeysReq.
  * Use `create(ListAPIKeysReqSchema)` to create a new message.
  */
-export const ListAPIKeysReqSchema: GenMessage<ListAPIKeysReq> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 3);
+export const ListAPIKeysReqSchema: GenMessage<ListAPIKeysReq> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 3)
 
 /**
  * ListAPIKeysRes contains the list of API keys for a project.
  *
  * @generated from message apikey.v1.ListAPIKeysRes
  */
-export type ListAPIKeysRes = Message<"apikey.v1.ListAPIKeysRes"> & {
+export type ListAPIKeysRes = Message<'apikey.v1.ListAPIKeysRes'> & {
   /**
    * @generated from field: repeated apikey.v1.APIKeyInfo keys = 1;
    */
-  keys: APIKeyInfo[];
-};
+  keys: APIKeyInfo[]
+}
 
 /**
  * Describes the message apikey.v1.ListAPIKeysRes.
  * Use `create(ListAPIKeysResSchema)` to create a new message.
  */
-export const ListAPIKeysResSchema: GenMessage<ListAPIKeysRes> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 4);
+export const ListAPIKeysResSchema: GenMessage<ListAPIKeysRes> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 4)
 
 /**
  * RevokeAPIKeyReq contains the key ID to revoke.
  *
  * @generated from message apikey.v1.RevokeAPIKeyReq
  */
-export type RevokeAPIKeyReq = Message<"apikey.v1.RevokeAPIKeyReq"> & {
+export type RevokeAPIKeyReq = Message<'apikey.v1.RevokeAPIKeyReq'> & {
   /**
    * @generated from field: string key_id = 1;
    */
-  keyId: string;
-};
+  keyId: string
+}
 
 /**
  * Describes the message apikey.v1.RevokeAPIKeyReq.
  * Use `create(RevokeAPIKeyReqSchema)` to create a new message.
  */
-export const RevokeAPIKeyReqSchema: GenMessage<RevokeAPIKeyReq> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 5);
+export const RevokeAPIKeyReqSchema: GenMessage<RevokeAPIKeyReq> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 5)
 
 /**
  * RevokeAPIKeyRes confirms the revocation.
  *
  * @generated from message apikey.v1.RevokeAPIKeyRes
  */
-export type RevokeAPIKeyRes = Message<"apikey.v1.RevokeAPIKeyRes"> & {
+export type RevokeAPIKeyRes = Message<'apikey.v1.RevokeAPIKeyRes'> & {
   /**
    * @generated from field: bool success = 1;
    */
-  success: boolean;
-};
+  success: boolean
+}
 
 /**
  * Describes the message apikey.v1.RevokeAPIKeyRes.
  * Use `create(RevokeAPIKeyResSchema)` to create a new message.
  */
-export const RevokeAPIKeyResSchema: GenMessage<RevokeAPIKeyRes> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 6);
+export const RevokeAPIKeyResSchema: GenMessage<RevokeAPIKeyRes> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 6)
 
 /**
  * ValidateAPIKeyReq contains the API key to validate.
@@ -221,54 +239,56 @@ export const RevokeAPIKeyResSchema: GenMessage<RevokeAPIKeyRes> = /*@__PURE__*/
  *
  * @generated from message apikey.v1.ValidateAPIKeyReq
  */
-export type ValidateAPIKeyReq = Message<"apikey.v1.ValidateAPIKeyReq"> & {
+export type ValidateAPIKeyReq = Message<'apikey.v1.ValidateAPIKeyReq'> & {
   /**
    * api_key is the full key value from Authorization header
    *
    * @generated from field: string api_key = 1;
    */
-  apiKey: string;
-};
+  apiKey: string
+}
 
 /**
  * Describes the message apikey.v1.ValidateAPIKeyReq.
  * Use `create(ValidateAPIKeyReqSchema)` to create a new message.
  */
-export const ValidateAPIKeyReqSchema: GenMessage<ValidateAPIKeyReq> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 7);
+export const ValidateAPIKeyReqSchema: GenMessage<ValidateAPIKeyReq> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 7)
 
 /**
  * ValidateAPIKeyRes contains validation result with associated metadata.
  *
  * @generated from message apikey.v1.ValidateAPIKeyRes
  */
-export type ValidateAPIKeyRes = Message<"apikey.v1.ValidateAPIKeyRes"> & {
+export type ValidateAPIKeyRes = Message<'apikey.v1.ValidateAPIKeyRes'> & {
   /**
    * @generated from field: bool valid = 1;
    */
-  valid: boolean;
+  valid: boolean
 
   /**
    * Empty if invalid
    *
    * @generated from field: string user_id = 2;
    */
-  userId: string;
+  userId: string
 
   /**
    * Error reason if invalid
    *
    * @generated from field: string error_message = 3;
    */
-  errorMessage: string;
-};
+  errorMessage: string
+}
 
 /**
  * Describes the message apikey.v1.ValidateAPIKeyRes.
  * Use `create(ValidateAPIKeyResSchema)` to create a new message.
  */
-export const ValidateAPIKeyResSchema: GenMessage<ValidateAPIKeyRes> = /*@__PURE__*/
-  messageDesc(file_apikey_v1_apikey, 8);
+export const ValidateAPIKeyResSchema: GenMessage<ValidateAPIKeyRes> =
+  /*@__PURE__*/
+  messageDesc(file_apikey_v1_apikey, 8)
 
 /**
  * APIKeyService handles API key management operations.
@@ -284,10 +304,10 @@ export const APIKeyService: GenService<{
    * @generated from rpc apikey.v1.APIKeyService.IssueAPIKey
    */
   issueAPIKey: {
-    methodKind: "unary";
-    input: typeof IssueAPIKeyReqSchema;
-    output: typeof IssueAPIKeyResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof IssueAPIKeyReqSchema
+    output: typeof IssueAPIKeyResSchema
+  }
   /**
    * ListAPIKeys retrieves all API keys for a project.
    * Requires authenticated user with read access to the project.
@@ -295,10 +315,10 @@ export const APIKeyService: GenService<{
    * @generated from rpc apikey.v1.APIKeyService.ListAPIKeys
    */
   listAPIKeys: {
-    methodKind: "unary";
-    input: typeof ListAPIKeysReqSchema;
-    output: typeof ListAPIKeysResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof ListAPIKeysReqSchema
+    output: typeof ListAPIKeysResSchema
+  }
   /**
    * RevokeAPIKey invalidates an API key.
    * Requires authenticated user with write access to the project.
@@ -306,10 +326,10 @@ export const APIKeyService: GenService<{
    * @generated from rpc apikey.v1.APIKeyService.RevokeAPIKey
    */
   revokeAPIKey: {
-    methodKind: "unary";
-    input: typeof RevokeAPIKeyReqSchema;
-    output: typeof RevokeAPIKeyResSchema;
-  },
+    methodKind: 'unary'
+    input: typeof RevokeAPIKeyReqSchema
+    output: typeof RevokeAPIKeyResSchema
+  }
   /**
    * ValidateAPIKey checks if an API key is valid and returns associated metadata.
    * This is called internally by the auth interceptor - no JWT required.
@@ -317,10 +337,8 @@ export const APIKeyService: GenService<{
    * @generated from rpc apikey.v1.APIKeyService.ValidateAPIKey
    */
   validateAPIKey: {
-    methodKind: "unary";
-    input: typeof ValidateAPIKeyReqSchema;
-    output: typeof ValidateAPIKeyResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_apikey_v1_apikey, 0);
-
+    methodKind: 'unary'
+    input: typeof ValidateAPIKeyReqSchema
+    output: typeof ValidateAPIKeyResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_apikey_v1_apikey, 0)

@@ -1,4 +1,7 @@
 import { Key } from 'lucide-react'
+import { useListAPIKeys } from '../hook/use-list-api-keys'
+import { APIKeyList } from './api-key-list'
+import { IssueAPIKeyDialog } from './issue-api-key-dialog'
 import {
   Card,
   CardContent,
@@ -6,9 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/gen/shadcn/ui/card'
-import { APIKeyList } from './api-key-list'
-import { IssueAPIKeyDialog } from './issue-api-key-dialog'
-import { useListAPIKeys } from '../hook/use-list-api-keys'
 
 // APIKeySettings provides a complete API key management section.
 export const APIKeySettings = () => {

@@ -2,78 +2,91 @@
 // @generated from file daemon/v1/daemon.proto (package daemon.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file daemon/v1/daemon.proto.
  */
-export const file_daemon_v1_daemon: GenFile = /*@__PURE__*/
-  fileDesc("ChZkYWVtb24vdjEvZGFlbW9uLnByb3RvEglkYWVtb24udjEiUAoLU2NhbkxvZ3NSZXESEgoKcHJvamVjdF9pZBgBIAEoCRIUCgxwcm9qZWN0X3BhdGgYAiABKAkSFwoPb3JnYW5pemF0aW9uX2lkGAMgASgJIi8KC1NjYW5Mb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSDwoHbWVzc2FnZRgCIAEoCTJLCg1EYWVtb25TZXJ2aWNlEjoKCFNjYW5Mb2dzEhYuZGFlbW9uLnYxLlNjYW5Mb2dzUmVxGhYuZGFlbW9uLnYxLlNjYW5Mb2dzUmVzQqgBCg1jb20uZGFlbW9uLnYxQgtEYWVtb25Qcm90b1ABWkVnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9kYWVtb24vdjE7ZGFlbW9udjGiAgNEWFiqAglEYWVtb24uVjHKAglEYWVtb25cVjHiAhVEYWVtb25cVjFcR1BCTWV0YWRhdGHqAgpEYWVtb246OlYxYgZwcm90bzM");
+export const file_daemon_v1_daemon: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChZkYWVtb24vdjEvZGFlbW9uLnByb3RvEglkYWVtb24udjEiUAoLU2NhbkxvZ3NSZXESEgoKcHJvamVjdF9pZBgBIAEoCRIUCgxwcm9qZWN0X3BhdGgYAiABKAkSFwoPb3JnYW5pemF0aW9uX2lkGAMgASgJIi8KC1NjYW5Mb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSDwoHbWVzc2FnZRgCIAEoCTJLCg1EYWVtb25TZXJ2aWNlEjoKCFNjYW5Mb2dzEhYuZGFlbW9uLnYxLlNjYW5Mb2dzUmVxGhYuZGFlbW9uLnYxLlNjYW5Mb2dzUmVzQqgBCg1jb20uZGFlbW9uLnYxQgtEYWVtb25Qcm90b1ABWkVnaXRodWIuY29tL3RlYW0tYXR0ZW50aW9uL2NvcHMvc2hhcmVkL2dlbi9ncnBjc3R1Yi9kYWVtb24vdjE7ZGFlbW9udjGiAgNEWFiqAglEYWVtb24uVjHKAglEYWVtb25cVjHiAhVEYWVtb25cVjFcR1BCTWV0YWRhdGHqAgpEYWVtb246OlYxYgZwcm90bzM',
+  )
 
 /**
  * ScanLogsReq is the request message for ScanLogs RPC.
  *
  * @generated from message daemon.v1.ScanLogsReq
  */
-export type ScanLogsReq = Message<"daemon.v1.ScanLogsReq"> & {
+export type ScanLogsReq = Message<'daemon.v1.ScanLogsReq'> & {
   /**
    * project_id is the ID of the project to scan logs for
    *
    * @generated from field: string project_id = 1;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * project_path is the filesystem path of the project
    *
    * @generated from field: string project_path = 2;
    */
-  projectPath: string;
+  projectPath: string
 
   /**
    * organization_id is the organization this project belongs to
    *
    * @generated from field: string organization_id = 3;
    */
-  organizationId: string;
-};
+  organizationId: string
+}
 
 /**
  * Describes the message daemon.v1.ScanLogsReq.
  * Use `create(ScanLogsReqSchema)` to create a new message.
  */
-export const ScanLogsReqSchema: GenMessage<ScanLogsReq> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 0);
+export const ScanLogsReqSchema: GenMessage<ScanLogsReq> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 0)
 
 /**
  * ScanLogsRes is the response message for ScanLogs RPC.
  *
  * @generated from message daemon.v1.ScanLogsRes
  */
-export type ScanLogsRes = Message<"daemon.v1.ScanLogsRes"> & {
+export type ScanLogsRes = Message<'daemon.v1.ScanLogsRes'> & {
   /**
    * success indicates whether the scan request was accepted
    *
    * @generated from field: bool success = 1;
    */
-  success: boolean;
+  success: boolean
 
   /**
    * message provides additional information about the result
    *
    * @generated from field: string message = 2;
    */
-  message: string;
-};
+  message: string
+}
 
 /**
  * Describes the message daemon.v1.ScanLogsRes.
  * Use `create(ScanLogsResSchema)` to create a new message.
  */
-export const ScanLogsResSchema: GenMessage<ScanLogsRes> = /*@__PURE__*/
-  messageDesc(file_daemon_v1_daemon, 1);
+export const ScanLogsResSchema: GenMessage<ScanLogsRes> =
+  /*@__PURE__*/
+  messageDesc(file_daemon_v1_daemon, 1)
 
 /**
  * DaemonService provides IPC operations for CLI-Daemon communication.
@@ -88,10 +101,8 @@ export const DaemonService: GenService<{
    * @generated from rpc daemon.v1.DaemonService.ScanLogs
    */
   scanLogs: {
-    methodKind: "unary";
-    input: typeof ScanLogsReqSchema;
-    output: typeof ScanLogsResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_daemon_v1_daemon, 0);
-
+    methodKind: 'unary'
+    input: typeof ScanLogsReqSchema
+    output: typeof ScanLogsResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_daemon_v1_daemon, 0)

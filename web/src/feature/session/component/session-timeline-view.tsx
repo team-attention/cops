@@ -201,12 +201,7 @@ export const SessionTimelineView = ({
                     stroke={segmentColors.main.line}
                     strokeWidth={3}
                   />
-                  <circle
-                    cx={4}
-                    cy={8}
-                    r={3}
-                    fill={segmentColors.main.point}
-                  />
+                  <circle cx={4} cy={8} r={3} fill={segmentColors.main.point} />
                   <circle
                     cx={20}
                     cy={8}
@@ -249,10 +244,7 @@ export const SessionTimelineView = ({
       </CardHeader>
 
       <CardContent className="relative flex-1 overflow-hidden p-0">
-        <div
-          ref={containerRef}
-          className="flex max-h-[500px] overflow-auto"
-        >
+        <div ref={containerRef} className="flex max-h-[500px] overflow-auto">
           {/* Label Area - sticky left, syncs with vertical scroll */}
           <div
             className="sticky left-0 z-10 flex-shrink-0 bg-zinc-900"
@@ -399,7 +391,9 @@ export const SessionTimelineView = ({
                     y1={y}
                     x2={endX}
                     y2={y}
-                    stroke={isHovered || isSelected ? colors.hover : colors.line}
+                    stroke={
+                      isHovered || isSelected ? colors.hover : colors.line
+                    }
                     strokeWidth={
                       isHovered || isSelected
                         ? SEGMENT_LINE_WIDTH + 2
@@ -469,56 +463,57 @@ export const SessionTimelineView = ({
             })}
 
             {/* Tooltip for hovered segment */}
-            {hoveredSegment && (() => {
-              const startX = timestampToX(
-                hoveredSegment.startTime,
-                segmentData.timeRange,
-                svgWidth,
-              )
-              const endX = timestampToX(
-                hoveredSegment.endTime,
-                segmentData.timeRange,
-                svgWidth,
-              )
-              const y = centerY + hoveredSegment.yPosition
-              const tooltipX = (startX + endX) / 2
+            {hoveredSegment &&
+              (() => {
+                const startX = timestampToX(
+                  hoveredSegment.startTime,
+                  segmentData.timeRange,
+                  svgWidth,
+                )
+                const endX = timestampToX(
+                  hoveredSegment.endTime,
+                  segmentData.timeRange,
+                  svgWidth,
+                )
+                const y = centerY + hoveredSegment.yPosition
+                const tooltipX = (startX + endX) / 2
 
-              return (
-                <g>
-                  <rect
-                    x={tooltipX - 50}
-                    y={y + 14}
-                    width={100}
-                    height={34}
-                    rx={4}
-                    fill="#27272a"
-                    stroke="#3f3f46"
-                    strokeWidth={1}
-                  />
-                  <text
-                    x={tooltipX}
-                    y={y + 28}
-                    fill="#e4e4e7"
-                    fontSize={10}
-                    fontFamily="monospace"
-                    textAnchor="middle"
-                  >
-                    {hoveredSegment.label}
-                  </text>
-                  <text
-                    x={tooltipX}
-                    y={y + 40}
-                    fill="#71717a"
-                    fontSize={9}
-                    fontFamily="monospace"
-                    textAnchor="middle"
-                  >
-                    {formatTime(Number(hoveredSegment.startTime.seconds))} -{' '}
-                    {formatTime(Number(hoveredSegment.endTime.seconds))}
-                  </text>
-                </g>
-              )
-            })()}
+                return (
+                  <g>
+                    <rect
+                      x={tooltipX - 50}
+                      y={y + 14}
+                      width={100}
+                      height={34}
+                      rx={4}
+                      fill="#27272a"
+                      stroke="#3f3f46"
+                      strokeWidth={1}
+                    />
+                    <text
+                      x={tooltipX}
+                      y={y + 28}
+                      fill="#e4e4e7"
+                      fontSize={10}
+                      fontFamily="monospace"
+                      textAnchor="middle"
+                    >
+                      {hoveredSegment.label}
+                    </text>
+                    <text
+                      x={tooltipX}
+                      y={y + 40}
+                      fill="#71717a"
+                      fontSize={9}
+                      fontFamily="monospace"
+                      textAnchor="middle"
+                    >
+                      {formatTime(Number(hoveredSegment.startTime.seconds))} -{' '}
+                      {formatTime(Number(hoveredSegment.endTime.seconds))}
+                    </text>
+                  </g>
+                )
+              })()}
 
             {/* Time axis */}
             <g>

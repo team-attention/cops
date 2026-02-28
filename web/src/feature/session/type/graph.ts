@@ -12,7 +12,7 @@ export interface AgentSegment {
   // End timestamp of the agent's last session
   endTime: Timestamp
   // All sessions belonging to this agent
-  sessions: Session[]
+  sessions: Array<Session>
   // Calculated Y position for rendering
   yPosition: number
   // Total number of messages in this segment
@@ -38,7 +38,7 @@ export interface TimelineSegment {
 // SegmentTimelineData contains all data needed to render the segment-based timeline
 export interface SegmentTimelineData {
   // All segments (Main + SubAgents)
-  segments: AgentSegment[]
+  segments: Array<AgentSegment>
   // Time range in seconds for X axis calculation
   timeRange: { start: number; end: number }
   // Total duration in seconds

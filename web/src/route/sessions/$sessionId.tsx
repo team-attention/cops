@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
+import type { TimelineSegment } from '@/feature/session/type/graph'
 import { useGetSession } from '@/feature/session/hook/use-get-session'
 import { useGetSessionSegments } from '@/feature/session/hook/use-get-session-segments'
 import { SessionHeader } from '@/feature/session/component/session-header'
@@ -14,7 +15,6 @@ import { Card } from '@/gen/shadcn/ui/card'
 import { useUserStore } from '@/shared/store/user-store'
 import { useAuthStore } from '@/shared/store/auth-store'
 import { APP_VERSION } from '@/shared/config/version'
-import type { TimelineSegment } from '@/feature/session/type/graph'
 
 export const Route = createFileRoute('/sessions/$sessionId')({
   beforeLoad: ({ location }) => {
@@ -52,13 +52,7 @@ function SessionDetailPage() {
     setSelectedSegment(segment)
   }, [])
 
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    isFetching,
-  } = useGetSession({
+  const { data, isLoading, isError, refetch, isFetching } = useGetSession({
     organizationId: selectedOrganizationId,
     sessionId,
   })
@@ -151,7 +145,10 @@ function SessionDetailPage() {
             </div>
 
             {/* Session Header */}
-            <SessionHeader session={session} totalMessageCount={totalMessageCount} />
+            <SessionHeader
+              session={session}
+              totalMessageCount={totalMessageCount}
+            />
 
             {/* Timeline View */}
             {timelineData ? (

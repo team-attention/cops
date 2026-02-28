@@ -9,14 +9,14 @@ import {
   User,
   Wrench,
 } from 'lucide-react'
-import { ContentPanel } from './content-panel'
-import { ToolCallItem } from './tool-call-item'
 import { useGetMessage } from '../hook/use-get-message'
 import {
   enrichToolResultMessages,
   extractToolCalls,
   parseMessageContent,
 } from '../util/parse-content'
+import { ContentPanel } from './content-panel'
+import { ToolCallItem } from './tool-call-item'
 import type { Timestamp } from '@bufbuild/protobuf/wkt'
 import {
   Sheet,
@@ -160,7 +160,10 @@ export const MessageDetailSheet = ({
   const typeInfo = getTypeInfo()
   const TypeIcon = typeInfo.icon
 
-  const colorClasses: Record<string, { bg: string; text: string; border: string }> = {
+  const colorClasses: Record<
+    string,
+    { bg: string; text: string; border: string }
+  > = {
     zinc: {
       bg: 'bg-zinc-800',
       text: 'text-zinc-500',

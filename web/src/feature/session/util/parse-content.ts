@@ -6,11 +6,11 @@ import type {
   ToolUseContentBlock,
 } from '../type/content-block'
 import type {
-  AgentContentBlock as ProtoAgentContentBlock,
   AgentMessage,
-  HumanContentBlock as ProtoHumanContentBlock,
   HumanMessage,
   ProgressData,
+  AgentContentBlock as ProtoAgentContentBlock,
+  HumanContentBlock as ProtoHumanContentBlock,
   Session,
   ToolExecution,
 } from '@/gen/grpcstub/session/v1/session_pb'
@@ -37,9 +37,7 @@ function isAgentData(
 }
 
 // Type guard for ToolExecution data
-function isToolExecutionData(
-  session: Session,
-): session is Session & {
+function isToolExecutionData(session: Session): session is Session & {
   data: { case: 'toolExecutionData'; value: ToolExecution }
 } {
   return session.data.case === 'toolExecutionData'
@@ -72,7 +70,7 @@ const extractProgressText = (data: ProgressData | undefined): string => {
 
   // 2. Hook progress: combine hook info
   if (data.type === ProgressType.HOOK) {
-    const parts: string[] = []
+    const parts: Array<string> = []
     if (data.hookEvent) parts.push(`Event: ${data.hookEvent}`)
     if (data.hookName) parts.push(`Hook: ${data.hookName}`)
     if (data.command) parts.push(`Command: ${data.command}`)

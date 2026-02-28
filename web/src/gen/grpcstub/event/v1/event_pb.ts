@@ -2,120 +2,134 @@
 // @generated from file event/v1/event.proto (package event.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2'
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from '@bufbuild/protobuf/codegenv2'
+import type { Message } from '@bufbuild/protobuf'
 
 /**
  * Describes the file event/v1/event.proto.
  */
-export const file_event_v1_event: GenFile = /*@__PURE__*/
-  fileDesc("ChRldmVudC92MS9ldmVudC5wcm90bxIIZXZlbnQudjEiaQoITG9nQmF0Y2gSFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSDQoFanNvbmwYAyADKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghwcm92aWRlchgFIAEoCSIwCgtTZW5kTG9nc1JlcRIhCgViYXRjaBgBIAEoCzISLmV2ZW50LnYxLkxvZ0JhdGNoIk4KC1NlbmRMb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSFQoNZXJyb3JfbWVzc2FnZRgCIAEoCRIXCg9wcm9jZXNzZWRfY291bnQYAyABKAUySAoMRXZlbnRTZXJ2aWNlEjgKCFNlbmRMb2dzEhUuZXZlbnQudjEuU2VuZExvZ3NSZXEaFS5ldmVudC52MS5TZW5kTG9nc1Jlc0KgAQoMY29tLmV2ZW50LnYxQgpFdmVudFByb3RvUAFaQ2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2V2ZW50L3YxO2V2ZW50djGiAgNFWFiqAghFdmVudC5WMcoCCEV2ZW50XFYx4gIURXZlbnRcVjFcR1BCTWV0YWRhdGHqAglFdmVudDo6VjFiBnByb3RvMw");
+export const file_event_v1_event: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    'ChRldmVudC92MS9ldmVudC5wcm90bxIIZXZlbnQudjEiaQoITG9nQmF0Y2gSFwoPb3JnYW5pemF0aW9uX2lkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSDQoFanNvbmwYAyADKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghwcm92aWRlchgFIAEoCSIwCgtTZW5kTG9nc1JlcRIhCgViYXRjaBgBIAEoCzISLmV2ZW50LnYxLkxvZ0JhdGNoIk4KC1NlbmRMb2dzUmVzEg8KB3N1Y2Nlc3MYASABKAgSFQoNZXJyb3JfbWVzc2FnZRgCIAEoCRIXCg9wcm9jZXNzZWRfY291bnQYAyABKAUySAoMRXZlbnRTZXJ2aWNlEjgKCFNlbmRMb2dzEhUuZXZlbnQudjEuU2VuZExvZ3NSZXEaFS5ldmVudC52MS5TZW5kTG9nc1Jlc0KgAQoMY29tLmV2ZW50LnYxQgpFdmVudFByb3RvUAFaQ2dpdGh1Yi5jb20vdGVhbS1hdHRlbnRpb24vY29wcy9zaGFyZWQvZ2VuL2dycGNzdHViL2V2ZW50L3YxO2V2ZW50djGiAgNFWFiqAghFdmVudC5WMcoCCEV2ZW50XFYx4gIURXZlbnRcVjFcR1BCTWV0YWRhdGHqAglFdmVudDo6VjFiBnByb3RvMw',
+  )
 
 /**
  * LogBatch contains raw JSONL lines for batch sending.
  *
  * @generated from message event.v1.LogBatch
  */
-export type LogBatch = Message<"event.v1.LogBatch"> & {
+export type LogBatch = Message<'event.v1.LogBatch'> & {
   /**
    * Organization identifier (required - project belongs to this org)
    *
    * @generated from field: string organization_id = 1;
    */
-  organizationId: string;
+  organizationId: string
 
   /**
    * Project identifier
    *
    * @generated from field: string project_id = 2;
    */
-  projectId: string;
+  projectId: string
 
   /**
    * Raw JSONL lines
    *
    * @generated from field: repeated string jsonl = 3;
    */
-  jsonl: string[];
+  jsonl: string[]
 
   /**
    * Event schema version (e.g., "v1")
    *
    * @generated from field: string version = 4;
    */
-  version: string;
+  version: string
 
   /**
    * Source provider (e.g., "claude")
    *
    * @generated from field: string provider = 5;
    */
-  provider: string;
-};
+  provider: string
+}
 
 /**
  * Describes the message event.v1.LogBatch.
  * Use `create(LogBatchSchema)` to create a new message.
  */
-export const LogBatchSchema: GenMessage<LogBatch> = /*@__PURE__*/
-  messageDesc(file_event_v1_event, 0);
+export const LogBatchSchema: GenMessage<LogBatch> =
+  /*@__PURE__*/
+  messageDesc(file_event_v1_event, 0)
 
 /**
  * SendLogsReq is the request message for SendLogs RPC.
  *
  * @generated from message event.v1.SendLogsReq
  */
-export type SendLogsReq = Message<"event.v1.SendLogsReq"> & {
+export type SendLogsReq = Message<'event.v1.SendLogsReq'> & {
   /**
    * Batch of JSONL log lines
    *
    * @generated from field: event.v1.LogBatch batch = 1;
    */
-  batch?: LogBatch;
-};
+  batch?: LogBatch
+}
 
 /**
  * Describes the message event.v1.SendLogsReq.
  * Use `create(SendLogsReqSchema)` to create a new message.
  */
-export const SendLogsReqSchema: GenMessage<SendLogsReq> = /*@__PURE__*/
-  messageDesc(file_event_v1_event, 1);
+export const SendLogsReqSchema: GenMessage<SendLogsReq> =
+  /*@__PURE__*/
+  messageDesc(file_event_v1_event, 1)
 
 /**
  * SendLogsRes is the response message for SendLogs RPC.
  *
  * @generated from message event.v1.SendLogsRes
  */
-export type SendLogsRes = Message<"event.v1.SendLogsRes"> & {
+export type SendLogsRes = Message<'event.v1.SendLogsRes'> & {
   /**
    * Whether the operation was successful
    *
    * @generated from field: bool success = 1;
    */
-  success: boolean;
+  success: boolean
 
   /**
    * Error message if success is false
    *
    * @generated from field: string error_message = 2;
    */
-  errorMessage: string;
+  errorMessage: string
 
   /**
    * Number of records successfully processed
    *
    * @generated from field: int32 processed_count = 3;
    */
-  processedCount: number;
-};
+  processedCount: number
+}
 
 /**
  * Describes the message event.v1.SendLogsRes.
  * Use `create(SendLogsResSchema)` to create a new message.
  */
-export const SendLogsResSchema: GenMessage<SendLogsRes> = /*@__PURE__*/
-  messageDesc(file_event_v1_event, 2);
+export const SendLogsResSchema: GenMessage<SendLogsRes> =
+  /*@__PURE__*/
+  messageDesc(file_event_v1_event, 2)
 
 /**
  * EventService provides transcript collection operations.
@@ -130,10 +144,8 @@ export const EventService: GenService<{
    * @generated from rpc event.v1.EventService.SendLogs
    */
   sendLogs: {
-    methodKind: "unary";
-    input: typeof SendLogsReqSchema;
-    output: typeof SendLogsResSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_event_v1_event, 0);
-
+    methodKind: 'unary'
+    input: typeof SendLogsReqSchema
+    output: typeof SendLogsResSchema
+  }
+}> = /*@__PURE__*/ serviceDesc(file_event_v1_event, 0)

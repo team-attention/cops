@@ -136,10 +136,11 @@ export const ToolCallItem = ({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div
-        className={`group relative overflow-hidden rounded-lg border transition-all duration-200 ${isHighlighted
-          ? 'border-cyan-500/50 bg-cyan-500/5 ring-1 ring-cyan-500/30'
-          : `border-zinc-800/50 bg-zinc-900/50 hover:border-zinc-700/50`
-          }`}
+        className={`group relative overflow-hidden rounded-lg border transition-all duration-200 ${
+          isHighlighted
+            ? 'border-cyan-500/50 bg-cyan-500/5 ring-1 ring-cyan-500/30'
+            : `border-zinc-800/50 bg-zinc-900/50 hover:border-zinc-700/50`
+        }`}
       >
         {/* Highlight indicator */}
         {isHighlighted && (

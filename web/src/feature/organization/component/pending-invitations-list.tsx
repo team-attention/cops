@@ -42,19 +42,26 @@ export const PendingInvitationsList = ({
   isAdmin,
 }: PendingInvitationsListProps) => {
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false)
-  const [selectedInvitationId, setSelectedInvitationId] = useState<string | null>(null)
+  const [selectedInvitationId, setSelectedInvitationId] = useState<
+    string | null
+  >(null)
   const [selectedEmail, setSelectedEmail] = useState<string>('')
   const [revokeError, setRevokeError] = useState<string | null>(null)
 
-  const { data, isLoading, error, refetch } = useListInvitations({ organizationId })
+  const { data, isLoading, error, refetch } = useListInvitations({
+    organizationId,
+  })
   const revokeMutation = useRevokeInvitation()
 
-  const handleRevokeClick = useCallback((invitationId: string, email: string) => {
-    setSelectedInvitationId(invitationId)
-    setSelectedEmail(email)
-    setRevokeError(null)
-    setRevokeDialogOpen(true)
-  }, [])
+  const handleRevokeClick = useCallback(
+    (invitationId: string, email: string) => {
+      setSelectedInvitationId(invitationId)
+      setSelectedEmail(email)
+      setRevokeError(null)
+      setRevokeDialogOpen(true)
+    },
+    [],
+  )
 
   const handleRevokeConfirm = useCallback(async () => {
     if (!selectedInvitationId) return
@@ -92,7 +99,9 @@ export const PendingInvitationsList = ({
     return (
       <div className="flex items-center justify-center py-4">
         <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
-        <span className="ml-2 text-sm text-zinc-500">Loading invitations...</span>
+        <span className="ml-2 text-sm text-zinc-500">
+          Loading invitations...
+        </span>
       </div>
     )
   }
