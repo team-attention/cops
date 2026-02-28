@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 INSTALL_DIR="$HOME/.cops/bin"
-CDN_BASE_URL="https://cops.build/releases"
+CDN_BASE_URL="https://storage.googleapis.com/cops-client/releases"
 PROJECT_NAME="cops"
 
 # Print colored message (to stderr to avoid capturing in subshells)
